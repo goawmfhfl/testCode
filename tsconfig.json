@@ -19,7 +19,8 @@
     "paths": {
       "@components/*": ["components/*"],
       "@icons/*": ["assets/icons/*"],
-      "@images/*": ["assets/images/*"]
+      "@images/*": ["assets/images/*"],
+      "@fonts/*": ["assets/fonts/*"]
     }
   },
   "include": ["src"]

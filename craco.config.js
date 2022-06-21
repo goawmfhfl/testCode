@@ -17,6 +17,7 @@ module.exports = {
       "@components": path.resolve(__dirname, "components"),
       "@icons": path.resolve(__dirname, "assets/icons"),
       "@images": path.resolve(__dirname, "assets/images"),
+      "@fonts": path.resolve(__dirname, "assets/fonts"),
     },
   },
 };
