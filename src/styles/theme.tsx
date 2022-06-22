@@ -1,17 +1,6 @@
-export interface PaletteType {
-  white: string;
-  black: string;
-  grey900: string;
-  grey700: string;
-  grey500: string;
-  grey400: string;
-  grey300: string;
-  grey100: string;
-  red900: string;
-  red500: string;
-}
+import { DefaultTheme } from "styled-components";
 
-const palette: PaletteType = {
+const palette = {
   white: "#fff",
   black: "#000",
   grey900: "#192033",
@@ -28,7 +17,7 @@ const shadow = {
   boxShadow: "7px 10px 8px rgba(0, 0, 0, 0.1)",
 };
 
-const theme = {
+const theme: DefaultTheme = {
   palette,
   shadow,
 };
