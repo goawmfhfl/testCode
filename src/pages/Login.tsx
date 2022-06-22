@@ -1,6 +1,7 @@
+/* eslint-disable */
 import styled from "styled-components";
 import Layout from "../components/Layout";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 
 import appleSrc from "@icons/apple.svg";
 import naverSrc from "@icons/naver.svg";
@@ -8,8 +9,25 @@ import kakaoSrc from "@icons/kakao.svg";
 import googleSrc from "@icons/google.svg";
 import Button from "@components/Button";
 
+interface FormValues {
+  id: string;
+  password: string;
+}
+
 const Login = () => {
-  const isValidText = true;
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors, isValid },
+  } = useForm<FormValues>({ mode: "onSubmit", reValidateMode: "onSubmit" });
+
+  const onSubmit: SubmitHandler<FormValues> = (data) => {};
+  const onError = (error: any, e: any) => {};
+
+  const hasNoId = errors.id?.type === "required";
+  const isInvalidId = errors.id?.type === "pattern";
+  const hasNoPassword = errors.password?.type === "required";
 
   return (
     <Layout>
@@ -18,21 +36,49 @@ const Login = () => {
           <LoginTextWrapper>
             <LoginText>로그인</LoginText>
           </LoginTextWrapper>
-          <InputBox>
-            <Input placeholder="아이디" type="text" />
-            <Input placeholder="비밀번호" type="password" />
-            {/* <ValidText className="invalid">아이디를 입력해 주세요.</ValidText> */}
-            {/* <ValidText className="invalid">비밀번호를 입력해 주세요.</ValidText> */}
-            {/* <ValidText className={isValidText ? "valid" : "invliad"}> */}
-            <ValidText isValid={isValidText}>
-              입력된 아이디 또는 비밀번호가 올바르지 않습니다.
-            </ValidText>
-          </InputBox>
-          <ButtonWrapper>
-            <Button className="positive" size={"big"} full={true}>
-              로그인 하기
-            </Button>
-          </ButtonWrapper>
+          <LoginForm id="login-form" onSubmit={handleSubmit(onSubmit, onError)}>
+            <Input
+              id="id"
+              placeholder="아이디"
+              type="text"
+              {...register("id", {
+                required: true,
+                pattern: /^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+              })}
+            />
+            <Input
+              placeholder="비밀번호"
+              type="password"
+              id="password"
+              {...register("password", {
+                required: true,
+              })}
+            />
+
+            {hasNoId && <ValidText>아이디를 입력해 주세요.</ValidText>}
+            {!hasNoId && hasNoPassword && (
+              <ValidText>비밀번호를 입력해 주세요.</ValidText>
+            )}
+
+            {!hasNoId && !hasNoPassword && isInvalidId && (
+              <ValidText>
+                아이디(이메일)형식이 올바르지 않습니다. 아이디를 다시
+                확인해주세요.
+              </ValidText>
+            )}
+
+            <ButtonWrapper>
+              <Button
+                form="login-form"
+                className="positive"
+                size={"big"}
+                full={true}
+                type="submit"
+              >
+                로그인 하기
+              </Button>
+            </ButtonWrapper>
+          </LoginForm>
         </LoginContainer>
         <SnsContainer>
           <SnsTitleWrapper>
@@ -94,7 +140,7 @@ const LoginText = styled.h2`
   text-align: center;
   letter-spacing: -0.015em;
 `;
-const InputBox = styled.div`
+const LoginForm = styled.form`
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -125,14 +171,12 @@ const Input = styled.input`
     outline: 1px solid ${(props) => props.theme.palette["grey700"]};
   }
 `;
-const ValidText = styled.p<{ isValid: boolean }>`
+const ValidText = styled.p`
   font-weight: 400;
   font-size: 12px;
   line-height: 14px;
   letter-spacing: 0.1px;
-
-  color: ${({ isValid, theme }) =>
-    isValid ? theme.palette["black"] : theme.palette["red900"]};
+  color: ${({ theme }) => theme.palette["red900"]};
 
   span.red-text {
     color: ${(props) => props.theme.palette["red900"]};
