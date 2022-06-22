@@ -23,5 +23,5 @@
       "@fonts/*": ["assets/fonts/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "types"]
 }

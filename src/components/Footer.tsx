@@ -1,7 +1,6 @@
 import styled from "styled-components";
 
 import logoSrc from "@images/logo-black.png";
-import { PaletteType } from "styles/theme";
 
 const Footer = () => {
   return (
@@ -43,8 +42,7 @@ const Container = styled.footer`
   flex-direction: column;
   align-items: flex-start;
   position: relative;
-  background-color: ${(props: { theme: { palette: PaletteType } }) =>
-    props.theme.palette["grey500"]};
+  background-color: ${(props) => props.theme.palette["grey500"]};
   padding: 63px 112px;
 `;
 
@@ -96,8 +94,7 @@ const CopyRight = styled.span`
   font-size: 10px;
   line-height: 14px;
   letter-spacing: 0.1px;
-  color: ${(props: { theme: { palette: PaletteType } }) =>
-    props.theme.palette["grey700"]};
+  color: ${(props) => props.theme.palette["grey700"]};
 `;
 
 export default Footer;

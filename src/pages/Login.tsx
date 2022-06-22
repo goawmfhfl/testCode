@@ -1,35 +1,43 @@
 import styled from "styled-components";
 import Layout from "../components/Layout";
+import { useForm } from "react-hook-form";
 
-import appleSrc from "@images/apple.svg";
+import appleSrc from "@icons/apple.svg";
 import naverSrc from "@icons/naver.svg";
 import kakaoSrc from "@icons/kakao.svg";
 import googleSrc from "@icons/google.svg";
+import Button from "@components/Button";
 
 const Login = () => {
+  const isValidText = true;
+
   return (
     <Layout>
       <Container>
         <LoginContainer>
-          <TitleBox>
-            <LargeTypo>로그인</LargeTypo>
-          </TitleBox>
+          <LoginTextWrapper>
+            <LoginText>로그인</LoginText>
+          </LoginTextWrapper>
           <InputBox>
             <Input placeholder="아이디" type="text" />
             <Input placeholder="비밀번호" type="password" />
             {/* <ValidText className="invalid">아이디를 입력해 주세요.</ValidText> */}
             {/* <ValidText className="invalid">비밀번호를 입력해 주세요.</ValidText> */}
-            <ValidText className="invalid">
+            {/* <ValidText className={isValidText ? "valid" : "invliad"}> */}
+            <ValidText isValid={isValidText}>
               입력된 아이디 또는 비밀번호가 올바르지 않습니다.
             </ValidText>
           </InputBox>
-          <ButtonBox>
-            <Button>로그인 하기</Button>
-          </ButtonBox>
+          <ButtonWrapper>
+            <Button className="positive" size={"big"} full={true}>
+              로그인 하기
+            </Button>
+          </ButtonWrapper>
         </LoginContainer>
-        {/* SNS 간편 로그인 */}
         <SnsContainer>
-          <SubTitleWrapper>SNS 간편 로그인</SubTitleWrapper>
+          <SnsTitleWrapper>
+            <SnsTitleText>SNS 간편 로그인</SnsTitleText>
+          </SnsTitleWrapper>
           <IconBox>
             <img src={naverSrc} />
             <img src={kakaoSrc} />
@@ -37,7 +45,6 @@ const Login = () => {
             <img src={appleSrc} />
           </IconBox>
         </SnsContainer>
-        {/* 아이디 찾기 비밀번호 찾기 */}
         <FindUserContainer>
           <Link>
             <FindUserButton>아이디 찾기</FindUserButton>
@@ -56,7 +63,6 @@ const Container = styled.main`
   width: 400px;
   padding: 160px 0px;
 `;
-
 const LoginContainer = styled.div`
   width: 100%;
   display: flex;
@@ -64,12 +70,11 @@ const LoginContainer = styled.div`
   align-items: center;
   margin-bottom: 32px;
 `;
-const TitleBox = styled.div`
+const LoginTextWrapper = styled.div`
   position: relative;
   width: 100%;
   height: 42px;
   margin-bottom: 24px;
-
   &:before {
     position: absolute;
     content: "";
@@ -77,77 +82,71 @@ const TitleBox = styled.div`
     left: 0px;
     right: 0px;
     bottom: 0px;
-    background-color: ${(props) => props.theme.palette["Grey500"]};
+    background-color: ${(props) => props.theme.palette["grey500"]};
   }
 `;
-
-const LargeTypo = styled.h2`
+const LoginText = styled.h2`
   text-align: center;
   font-weight: 700;
+  font-size: 25px;
+  line-height: 24px;
+
+  text-align: center;
+  letter-spacing: -0.015em;
 `;
 const InputBox = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
   margin-bottom: 40px;
-
   input {
     margin-bottom: 8px;
   }
 `;
-
 const Input = styled.input`
   display: flex;
   align-items: center;
   width: 100%;
   padding: 16px;
-
-  background: ${(props) => props.theme.palette["White"]};
-  border: 1px solid ${(props) => props.theme.palette["Grey500"]};
+  background: ${({ theme }) => theme.palette["white"]};
+  border: 1px solid ${(props) => props.theme.palette["grey500"]};
   color: ${(props) => props.theme.palette["black"]};
 
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 18px;
+  letter-spacing: -0.015em;
+
   &::placeholder {
-    color: ${(props) => props.theme.palette["Grey500"]};
+    color: ${(props) => props.theme.palette["grey500"]};
   }
   &:focus {
-    border: 1px solid ${(props) => props.theme.palette["Grey700"]};
-    outline: 1px solid ${(props) => props.theme.palette["Grey700"]};
+    border: 1px solid ${(props) => props.theme.palette["grey700"]};
+    outline: 1px solid ${(props) => props.theme.palette["grey700"]};
   }
 `;
-const ValidText = styled.div``;
-const ButtonBox = styled.div`
+const ValidText = styled.p<{ isValid: boolean }>`
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 14px;
+  letter-spacing: 0.1px;
+
+  color: ${({ isValid, theme }) =>
+    isValid ? theme.palette["black"] : theme.palette["red900"]};
+
+  span.red-text {
+    color: ${(props) => props.theme.palette["red900"]};
+  }
+`;
+const ButtonWrapper = styled.div`
   width: 100%;
-  button {
-    width: 100%;
-  }
 `;
-const Button = styled.button`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  border: 1px solid ${(props) => props.theme.palette["Grey500"]};
-
-  &.positive {
-    background-color: ${(props) => props.theme.palette["Grey700"]};
-    border: none;
-    color: ${(props) => props.theme.palette["White"]};
-  }
-  &.negative {
-    background-color: ${(props) => props.theme.palette["Grey300"]};
-    border: none;
-    color: ${(props) => props.theme.palette["Grey500"]};
-  }
-`;
-
-// SnsContainer
 const SnsContainer = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-
   &:before {
     position: absolute;
     content: "";
@@ -155,12 +154,17 @@ const SnsContainer = styled.div`
     left: 0px;
     right: 0px;
     bottom: 0px;
-    background-color: ${(props) => props.theme.palette["Grey300"]};
+    background-color: ${({ theme: { palette } }) => palette["grey300"]};
   }
 `;
-const SubTitleWrapper = styled.div`
+const SnsTitleWrapper = styled.div`
   margin-bottom: 16px;
+`;
+const SnsTitleText = styled.h2`
   font-weight: 400;
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: -0.015em;
 `;
 const IconBox = styled.div`
   position: relative;
@@ -168,24 +172,17 @@ const IconBox = styled.div`
   justify-content: center;
   gap: 16px;
   padding-bottom: 32px;
-
   img {
     border-radius: 22px;
   }
 `;
-
-// 회원가입 및 아이디
-
 const FindUserContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 35px;
 `;
-
 const Link = styled.a`
-  /* React Router DOM 적용 예정 */
-  /* Link를 통한 라우팅 ? */
-  /* history.push를 통한 라우팅? */
   position: relative;
   display: inline-block;
   padding: 0 16px;
@@ -197,11 +194,15 @@ const Link = styled.a`
     left: 0;
     width: 1px;
     height: 14px;
-    background: ${(props) => props.theme.palette["Grey500"]};
+    background-color: ${({ theme: { palette } }) => palette["grey500"]};
     content: " ";
   }
 `;
-
-const FindUserButton = styled.button``;
+const FindUserButton = styled.button`
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 14px;
+  letter-spacing: 0.1px;
+`;
 
 export default Login;

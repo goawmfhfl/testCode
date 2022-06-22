@@ -25,15 +25,16 @@ const GlobalNavigationBar = () => {
 };
 
 const Container = styled.header`
-  position: sticky;
+  position: absolute;
   top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 6px 30px 6px 30px;
   z-index: 1000;
-
-  background-color: #123;
+  background-color: ${({ theme: { palette } }) => palette["grey700"]};
 `;
 
 const LogoWrapper = styled.div``;
@@ -55,7 +56,7 @@ const NavItem = styled.button`
 `;
 const Icon = styled.img``;
 const Text = styled.span`
-  color: #fff;
+  color: ${({ theme: { palette } }) => palette["grey500"]};
   font-weight: 400;
   font-size: 10px;
   line-height: 14px;
