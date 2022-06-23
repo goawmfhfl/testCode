@@ -1,13 +1,13 @@
 import styled, { css } from "styled-components";
 
 const sizeStyles = css<{ size: string }>`
-  ${(props) =>
-    props.size === "small" &&
+  ${({ size }) =>
+    size === "small" &&
     css`
       padding: 10px 16px;
     `}
-  ${(props) =>
-    props.size === "big" &&
+  ${({ size }) =>
+    size === "big" &&
     css`
       padding: 15px 20px;
     `}
@@ -17,9 +17,9 @@ const Button = styled.button<{ full: boolean; size: string }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid ${(props) => props.theme.palette["grey500"]};
+  border: 1px solid ${({ theme: { palette } }) => palette["grey500"]};
 
-  width: ${(props) => (props.full ? "100%" : "")};
+  width: ${({ full }) => (full ? "100%" : "")};
   ${sizeStyles}
 
   font-weight: 400;
@@ -28,14 +28,14 @@ const Button = styled.button<{ full: boolean; size: string }>`
   letter-spacing: -0.015em;
 
   &.positive {
-    background-color: ${(props) => props.theme.palette["grey700"]};
+    background-color: ${({ theme: { palette } }) => palette["grey700"]};
     border: none;
-    color: ${(props) => props.theme.palette["white"]};
+    color: ${({ theme: { palette } }) => palette["white"]};
   }
   &.negative {
-    background-color: ${(props) => props.theme.palette["grey300"]};
+    background-color: ${({ theme: { palette } }) => palette["grey300"]};
     border: none;
-    color: ${(props) => props.theme.palette["grey500"]};
+    color: ${({ theme: { palette } }) => palette["grey500"]};
   }
 `;
 
