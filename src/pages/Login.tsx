@@ -1,7 +1,9 @@
 /* eslint-disable */
+import { useState } from "react";
 import styled from "styled-components";
 import Layout from "../components/Layout";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useMutation, gql } from "@apollo/client";
 
 import appleSrc from "@icons/apple.svg";
 import naverSrc from "@icons/naver.svg";
@@ -9,21 +11,65 @@ import kakaoSrc from "@icons/kakao.svg";
 import googleSrc from "@icons/google.svg";
 import Button from "@components/Button";
 
-interface FormValues {
+interface LoginFormType {
   id: string;
   password: string;
 }
 
+interface LoginInput {
+  email: string;
+  password: string;
+}
+
+const LOGIN = gql`
+  mutation Login($input: LoginInput!) {
+    login(input: $input) {
+      ok
+      error
+      user {
+        name
+      }
+    }
+  }
+`;
+
 const Login = () => {
+  const [isLoginSucceed, setIsLoginSucceed] = useState(true);
+
+  const [loginFunction, { loading }] = useMutation(LOGIN);
   const {
     register,
     handleSubmit,
-    getValues,
-    formState: { errors, isValid },
-  } = useForm<FormValues>({ mode: "onSubmit", reValidateMode: "onSubmit" });
+    formState: { errors },
+  } = useForm<LoginFormType>({ mode: "onSubmit", reValidateMode: "onSubmit" });
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {};
-  const onError = (error: any, e: any) => {};
+  const onSubmit: SubmitHandler<LoginFormType> = async ({
+    id: email,
+    password,
+  }: {
+    id: string | undefined;
+    password: string | undefined;
+  }) => {
+    try {
+      const { data: loginData } = await loginFunction({
+        variables: {
+          input: { email, password },
+        },
+      });
+      const isLoginSucceed = loginData?.login.ok && !loginData?.login.error;
+
+      setIsLoginSucceed(isLoginSucceed);
+
+      if (isLoginSucceed) {
+        // 리다이렉션!
+      }
+    } catch (error) {
+      console.log("로그인 요청이 실패하였습니다");
+    }
+  };
+  const onError = (errors: any, e: any) => {
+    console.log("onError errors", errors, "onError event");
+  };
 
   const hasNoId = errors.id?.type === "required";
   const isInvalidId = errors.id?.type === "pattern";
@@ -38,7 +84,6 @@ const Login = () => {
           </LoginTextWrapper>
           <LoginForm id="login-form" onSubmit={handleSubmit(onSubmit, onError)}>
             <Input
-              id="id"
               placeholder="아이디"
               type="text"
               {...register("id", {
@@ -66,10 +111,14 @@ const Login = () => {
                 확인해주세요.
               </ValidText>
             )}
+            {!isLoginSucceed && (
+              <ValidText>
+                입력된 아이디 또는 비밀번호가 올바르지 않습니다.
+              </ValidText>
+            )}
 
             <ButtonWrapper>
               <Button
-                form="login-form"
                 className="positive"
                 size={"big"}
                 full={true}
@@ -84,12 +133,12 @@ const Login = () => {
           <SnsTitleWrapper>
             <SnsTitleText>SNS 간편 로그인</SnsTitleText>
           </SnsTitleWrapper>
-          <IconBox>
+          <IconList>
             <img src={naverSrc} />
             <img src={kakaoSrc} />
             <img src={googleSrc} />
             <img src={appleSrc} />
-          </IconBox>
+          </IconList>
         </SnsContainer>
         <FindUserContainer>
           <Link>
@@ -210,7 +259,7 @@ const SnsTitleText = styled.h2`
   line-height: 24px;
   letter-spacing: -0.015em;
 `;
-const IconBox = styled.div`
+const IconList = styled.div`
   position: relative;
   display: flex;
   justify-content: center;
