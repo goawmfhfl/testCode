@@ -227,11 +227,14 @@ const ValidText = styled.p`
   letter-spacing: 0.1px;
   color: ${({ theme }) => theme.palette["red900"]};
 
+  margin-bottom: -14px;
+
   span.red-text {
     color: ${(props) => props.theme.palette["red900"]};
   }
 `;
 const ButtonWrapper = styled.div`
+  margin-top: 48px;
   width: 100%;
 `;
 const SnsContainer = styled.div`
