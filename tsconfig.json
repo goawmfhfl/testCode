@@ -20,7 +20,8 @@
       "@components/*": ["components/*"],
       "@icons/*": ["assets/icons/*"],
       "@images/*": ["assets/images/*"],
-      "@fonts/*": ["assets/fonts/*"]
+      "@fonts/*": ["assets/fonts/*"],
+      "@styles/*": ["styles/*"]
     }
   },
   "include": ["src", "types"]
