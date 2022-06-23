@@ -29,6 +29,7 @@ const LOGIN = gql`
       user {
         name
       }
+      token
     }
   }
 `;
@@ -59,8 +60,9 @@ const Login = () => {
       const isLoginSucceed = loginData?.login.ok && !loginData?.login.error;
 
       setIsLoginSucceed(isLoginSucceed);
-
+      console.log(loginData);
       if (isLoginSucceed) {
+        window.sessionStorage.setItem("authToken", loginData?.login.token);
         // 리다이렉션!
       }
     } catch (error) {
