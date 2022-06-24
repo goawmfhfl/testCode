@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { useState } from "react";
 import styled from "styled-components";
-import Layout from "../components/Layout";
+import Layout from "@components/Layout";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useMutation, gql } from "@apollo/client";
 
@@ -13,11 +13,6 @@ import Button from "@components/Button";
 
 interface LoginFormType {
   id: string;
-  password: string;
-}
-
-interface LoginInput {
-  email: string;
   password: string;
 }
 
@@ -36,20 +31,19 @@ const LOGIN = gql`
 
 const Login = () => {
   const [isLoginSucceed, setIsLoginSucceed] = useState(true);
+  const [hasNoId, setHasNoId] = useState(false);
+  const [hasNoPassword, setHasNoPassword] = useState(false);
+  const [isInvalidId, setIsInvalidId] = useState(false);
 
   const [loginFunction, { loading }] = useMutation(LOGIN);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormType>({ mode: "onSubmit", reValidateMode: "onSubmit" });
+  const { register, handleSubmit } = useForm<LoginFormType>({
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
+  });
 
   const onSubmit: SubmitHandler<LoginFormType> = async ({
     id: email,
     password,
-  }: {
-    id: string | undefined;
-    password: string | undefined;
   }) => {
     try {
       const { data: loginData } = await loginFunction({
@@ -60,22 +54,19 @@ const Login = () => {
       const isLoginSucceed = loginData?.login.ok && !loginData?.login.error;
 
       setIsLoginSucceed(isLoginSucceed);
-      console.log(loginData);
       if (isLoginSucceed) {
         window.sessionStorage.setItem("authToken", loginData?.login.token);
-        // 리다이렉션!
+        // 리다이렉션
       }
     } catch (error) {
       console.log("로그인 요청이 실패하였습니다");
     }
   };
-  const onError = (errors: any, e: any) => {
-    console.log("onError errors", errors, "onError event");
+  const onError = (errors: any) => {
+    setHasNoId(errors.id?.type === "required");
+    setHasNoPassword(errors.password?.type === "required");
+    setIsInvalidId(errors.id?.type === "pattern");
   };
-
-  const hasNoId = errors.id?.type === "required";
-  const isInvalidId = errors.id?.type === "pattern";
-  const hasNoPassword = errors.password?.type === "required";
 
   return (
     <Layout>
