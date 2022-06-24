@@ -31,9 +31,11 @@ const LOGIN = gql`
 
 const Login = () => {
   const [isLoginSucceed, setIsLoginSucceed] = useState(true);
-  const [hasNoId, setHasNoId] = useState(false);
-  const [hasNoPassword, setHasNoPassword] = useState(false);
-  const [isInvalidId, setIsInvalidId] = useState(false);
+  const [isValidAuth, setIsValidAuth] = useState({
+    hasNoId: false,
+    hasNoPassword: false,
+    isInvalid: false,
+  });
 
   const [loginFunction, { loading }] = useMutation(LOGIN);
   const { register, handleSubmit } = useForm<LoginFormType>({
@@ -45,6 +47,12 @@ const Login = () => {
     id: email,
     password,
   }) => {
+    setIsValidAuth({
+      hasNoId: false,
+      hasNoPassword: false,
+      isInvalid: false,
+    });
+
     try {
       const { data: loginData } = await loginFunction({
         variables: {
@@ -63,9 +71,12 @@ const Login = () => {
     }
   };
   const onError = (errors: any) => {
-    setHasNoId(errors.id?.type === "required");
-    setHasNoPassword(errors.password?.type === "required");
-    setIsInvalidId(errors.id?.type === "pattern");
+    setIsLoginSucceed(true);
+    setIsValidAuth({
+      hasNoId: errors.id?.type === "required",
+      hasNoPassword: errors.password?.type === "required",
+      isInvalid: errors.id?.type === "pattern",
+    });
   };
 
   return (
@@ -93,17 +104,21 @@ const Login = () => {
               })}
             />
 
-            {hasNoId && <ValidText>아이디를 입력해 주세요.</ValidText>}
-            {!hasNoId && hasNoPassword && (
+            {isValidAuth.hasNoId && (
+              <ValidText>아이디를 입력해 주세요.</ValidText>
+            )}
+            {!isValidAuth.hasNoId && isValidAuth.hasNoPassword && (
               <ValidText>비밀번호를 입력해 주세요.</ValidText>
             )}
 
-            {!hasNoId && !hasNoPassword && isInvalidId && (
-              <ValidText>
-                아이디(이메일)형식이 올바르지 않습니다. 아이디를 다시
-                확인해주세요.
-              </ValidText>
-            )}
+            {!isValidAuth.hasNoId &&
+              !isValidAuth.hasNoPassword &&
+              isValidAuth.isInvalid && (
+                <ValidText>
+                  아이디(이메일)형식이 올바르지 않습니다. 아이디를 다시
+                  확인해주세요.
+                </ValidText>
+              )}
             {!isLoginSucceed && (
               <ValidText>
                 입력된 아이디 또는 비밀번호가 올바르지 않습니다.
