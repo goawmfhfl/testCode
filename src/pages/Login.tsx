@@ -16,7 +16,7 @@ interface LoginFormType {
   password: string;
 }
 
-const LOGIN = gql`
+export const LOGIN = gql`
   mutation Login($input: LoginInput!) {
     login(input: $input) {
       ok
@@ -79,6 +79,8 @@ const Login = () => {
     });
   };
 
+  const { hasNoId, hasNoPassword, isInvalid } = isValidAuth;
+
   return (
     <Layout>
       <Container>
@@ -103,28 +105,21 @@ const Login = () => {
                 required: true,
               })}
             />
-
-            {isValidAuth.hasNoId && (
-              <ValidText>아이디를 입력해 주세요.</ValidText>
-            )}
-            {!isValidAuth.hasNoId && isValidAuth.hasNoPassword && (
+            {hasNoId && <ValidText>아이디를 입력해 주세요.</ValidText>}
+            {!hasNoId && hasNoPassword && (
               <ValidText>비밀번호를 입력해 주세요.</ValidText>
             )}
-
-            {!isValidAuth.hasNoId &&
-              !isValidAuth.hasNoPassword &&
-              isValidAuth.isInvalid && (
-                <ValidText>
-                  아이디(이메일)형식이 올바르지 않습니다. 아이디를 다시
-                  확인해주세요.
-                </ValidText>
-              )}
+            {!hasNoId && !hasNoPassword && isInvalid && (
+              <ValidText>
+                아이디(이메일)형식이 올바르지 않습니다. 아이디를 다시
+                확인해주세요.
+              </ValidText>
+            )}
             {!isLoginSucceed && (
               <ValidText>
                 입력된 아이디 또는 비밀번호가 올바르지 않습니다.
               </ValidText>
             )}
-
             <ButtonWrapper>
               <Button
                 className="positive"
