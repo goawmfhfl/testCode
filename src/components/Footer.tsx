@@ -41,8 +41,7 @@ const Container = styled.footer`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  position: relative;
-  background-color: ${(props) => props.theme.palette["grey500"]};
+  background-color: ${({ theme: { palette } }) => palette.grey500};
   padding: 63px 112px;
 `;
 
@@ -94,7 +93,7 @@ const CopyRight = styled.span`
   font-size: 10px;
   line-height: 14px;
   letter-spacing: 0.1px;
-  color: ${(props) => props.theme.palette["grey700"]};
+  color: ${({ theme: { palette } }) => palette.grey700};
 `;
 
 export default Footer;

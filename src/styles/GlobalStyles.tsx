@@ -18,14 +18,6 @@ const GlobalStyles = createGlobalStyle`
       min-height:100vh;
     }
 
-    .App {
-      position:relative;
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-      height: auto;
-    }
-
     ::-webkit-scrollbar {
       display: none;
     }

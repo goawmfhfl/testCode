@@ -17,7 +17,7 @@ const Button = styled.button<{ full: boolean; size: string }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid ${({ theme: { palette } }) => palette["grey500"]};
+  border: 1px solid ${({ theme: { palette } }) => palette.grey500};
 
   width: ${({ full }) => (full ? "100%" : "")};
   ${sizeStyles}
@@ -28,14 +28,14 @@ const Button = styled.button<{ full: boolean; size: string }>`
   letter-spacing: -0.015em;
 
   &.positive {
-    background-color: ${({ theme: { palette } }) => palette["grey700"]};
+    background-color: ${({ theme: { palette } }) => palette.grey700};
     border: none;
-    color: ${({ theme: { palette } }) => palette["white"]};
+    color: ${({ theme: { palette } }) => palette.white};
   }
   &.negative {
-    background-color: ${({ theme: { palette } }) => palette["grey300"]};
+    background-color: ${({ theme: { palette } }) => palette.grey300};
     border: none;
-    color: ${({ theme: { palette } }) => palette["grey500"]};
+    color: ${({ theme: { palette } }) => palette.grey500};
   }
 `;
 

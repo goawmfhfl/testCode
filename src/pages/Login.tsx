@@ -185,7 +185,7 @@ const LoginTextWrapper = styled.div`
     left: 0px;
     right: 0px;
     bottom: 0px;
-    background-color: ${(props) => props.theme.palette["grey500"]};
+    background-color: ${({ theme: { palette } }) => palette.grey500};
   }
 `;
 const LoginText = styled.h2`
@@ -211,9 +211,9 @@ const Input = styled.input`
   align-items: center;
   width: 100%;
   padding: 16px;
-  background: ${({ theme }) => theme.palette["white"]};
-  border: 1px solid ${(props) => props.theme.palette["grey500"]};
-  color: ${(props) => props.theme.palette["black"]};
+  background: ${({ theme: { palette } }) => palette.white};
+  border: 1px solid ${({ theme: { palette } }) => palette.grey500};
+  color: ${({ theme: { palette } }) => palette.black};
 
   font-weight: 400;
   font-size: 15px;
@@ -221,11 +221,11 @@ const Input = styled.input`
   letter-spacing: -0.015em;
 
   &::placeholder {
-    color: ${(props) => props.theme.palette["grey500"]};
+    color: ${({ theme: { palette } }) => palette.grey500};
   }
   &:focus {
-    border: 1px solid ${(props) => props.theme.palette["grey700"]};
-    outline: 1px solid ${(props) => props.theme.palette["grey700"]};
+    border: 1px solid ${({ theme: { palette } }) => palette.grey700};
+    outline: 1px solid ${({ theme: { palette } }) => palette.grey700};
   }
 `;
 const ValidText = styled.p`
@@ -233,12 +233,12 @@ const ValidText = styled.p`
   font-size: 12px;
   line-height: 14px;
   letter-spacing: 0.1px;
-  color: ${({ theme }) => theme.palette["red900"]};
+  color: ${({ theme: { palette } }) => palette.red900};
 
   margin-bottom: -14px;
 
   span.red-text {
-    color: ${(props) => props.theme.palette["red900"]};
+    color: ${({ theme: { palette } }) => palette.red900};
   }
 `;
 const ButtonWrapper = styled.div`
@@ -258,7 +258,7 @@ const SnsContainer = styled.div`
     left: 0px;
     right: 0px;
     bottom: 0px;
-    background-color: ${({ theme: { palette } }) => palette["grey300"]};
+    background-color: ${({ theme: { palette } }) => palette.grey300};
   }
 `;
 const SnsTitleWrapper = styled.div`
@@ -298,7 +298,7 @@ const Link = styled.a`
     left: 0;
     width: 1px;
     height: 14px;
-    background-color: ${({ theme: { palette } }) => palette["grey500"]};
+    background-color: ${({ theme: { palette } }) => palette.grey500};
     content: " ";
   }
 `;
