@@ -1,5 +1,5 @@
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import Button from "./Button";
+import Button from "@components/Button";
 
 export default {
   component: Button,
@@ -7,11 +7,20 @@ export default {
 } as ComponentMeta<typeof Button>;
 
 const Template: ComponentStory<typeof Button> = (args) => (
-  <Button {...args} className="positive"></Button>
+  <Button {...args} className="postive">
+    테스트 버튼
+  </Button>
 );
 
 export const Default = Template.bind({});
-Default.args = {
-  full: true,
+Default.args = {};
+
+export const Small = Template.bind({});
+Small.args = {
+  size: "small",
+};
+
+export const Big = Template.bind({});
+Big.args = {
   size: "big",
 };

@@ -1,5 +1,5 @@
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import SideNavigationBar from "./SideNavigationBar";
+import SideNavigationBar from "@components/SideNavigationBar";
 
 export default {
   component: SideNavigationBar,
