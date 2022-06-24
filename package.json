@@ -78,7 +78,9 @@
     "chromatic": "^6.6.3",
     "craco-alias": "^3.0.1",
     "eslint-plugin-react": "^7.30.0",
+    "msw": "^0.42.3",
     "prop-types": "^15.8.1",
+    "storybook-addon-apollo-client": "^4.0.11",
     "typescript": "^4.7.4",
     "webpack": "^5.73.0"
   },

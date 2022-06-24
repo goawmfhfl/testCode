@@ -1,12 +1,28 @@
-import { ComponentStory, ComponentMeta } from "@storybook/react";
-import Login from "@pages/Login";
+import { ComponentMeta } from "@storybook/react";
+import Login, { LOGIN } from "@pages/Login";
 
 export default {
   component: Login,
   title: "Login",
 } as ComponentMeta<typeof Login>;
 
-const Template: ComponentStory<typeof Login> = (args) => <Login />;
+export const Example = () => <Login />;
 
-export const Default = Template.bind({});
-Default.args = {};
+Example.parameters = {
+  apolloClient: {
+    mocks: [
+      {
+        request: {
+          query: LOGIN,
+        },
+        result: {
+          data: {
+            ok: false,
+            error: "Error found!",
+            token: null,
+          },
+        },
+      },
+    ],
+  },
+};

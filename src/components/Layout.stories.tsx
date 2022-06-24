@@ -10,6 +10,3 @@ const Template: ComponentStory<typeof Layout> = (args) => <Layout {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {};
-Default.parameters = {
-  layout: "fullscreen",
-};
