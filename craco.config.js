@@ -14,6 +14,7 @@ module.exports = {
   ],
   webpack: {
     alias: {
+      "@pages": path.resolve(__dirname, "pages"),
       "@components": path.resolve(__dirname, "components"),
       "@icons": path.resolve(__dirname, "assets/icons"),
       "@images": path.resolve(__dirname, "assets/images"),
