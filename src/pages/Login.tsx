@@ -43,6 +43,7 @@ const Login = () => {
   });
 
   useEffect(() => {
+    // naver oauth
     const naverLogin = new naver.LoginWithNaverId({
       clientId: "CZm3jInQ9yUhzPJCFM_j",
       callbackUrl:
@@ -57,6 +58,13 @@ const Login = () => {
     });
 
     naverLogin.init();
+
+    // kakao oauth
+    const isKakaoInitialized = Kakao.isInitialized();
+
+    if (!isKakaoInitialized) {
+      Kakao.init(process.env.REACT_APP_KAKAO_JAVASCRIPT_KEY);
+    }
   }, []);
 
   const onSubmit: SubmitHandler<LoginFormType> = async ({
@@ -86,12 +94,25 @@ const Login = () => {
       console.log("로그인 요청이 실패하였습니다");
     }
   };
+
   const onError = (errors: any) => {
     setIsLoginSucceed(true);
     setIsValidAuth({
       hasNoId: errors.id?.type === "required",
       hasNoPassword: errors.password?.type === "required",
       isInvalid: errors.id?.type === "pattern",
+    });
+  };
+
+  const handleKakaoLoginButtonClick = async () => {
+    await Kakao.Auth.login({
+      scope: "",
+      success: function (response: {}) {
+        console.log(response);
+      },
+      fail: function (error: {}) {
+        console.log(error);
+      },
     });
   };
 
@@ -156,7 +177,7 @@ const Login = () => {
             <div id="naverIdLogin">
               <img id="naverIdLoginButton" />
             </div>
-            <img src={kakaoSrc} />
+            <img src={kakaoSrc} onClick={handleKakaoLoginButtonClick} />
             <img src={googleSrc} />
             <img src={appleSrc} />
           </IconList>
