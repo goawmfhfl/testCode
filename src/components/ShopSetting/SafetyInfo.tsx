@@ -1,8 +1,9 @@
 import styled from "styled-components";
 
-import NoticeContainer from "@components/NoticeContainer";
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
+import NoticeContainer from "@components/NoticeContainer";
 import Button from "@components/Button";
+import SafetyModal from "./SafetyModal";
 
 const SafetyInfo = () => {
   return (
@@ -27,10 +28,12 @@ const SafetyInfo = () => {
           </Button>
         </ConfirmContainer>
       </SafetyContainer>
+      <SafetyModal />
     </Container>
   );
 };
 const Container = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
   width: 100%;
@@ -84,13 +87,6 @@ const ConfirmInfoText = styled.p`
   font-size: 14px;
   line-height: 14px;
   letter-spacing: 0.1px;
-`;
-const ConfirmText = styled.span`
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-  letter-spacing: 0.1px;
-  color: ${({ theme: { palette } }) => palette.grey500};
 `;
 
 export default SafetyInfo;
