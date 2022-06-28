@@ -3,7 +3,7 @@ import styled from "styled-components";
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
 import NoticeContainer from "@components/NoticeContainer";
 import Button from "@components/Button";
-import SafetyModal from "./SafetyModal";
+import SafetyInfoModal from "./SafetyInfoModal";
 
 const SafetyInfo = () => {
   return (
@@ -28,7 +28,7 @@ const SafetyInfo = () => {
           </Button>
         </ConfirmContainer>
       </SafetyContainer>
-      <SafetyModal />
+      {/* <SafetyInfoModal /> */}
     </Container>
   );
 };

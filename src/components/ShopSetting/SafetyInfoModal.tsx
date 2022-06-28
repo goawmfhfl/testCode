@@ -8,18 +8,18 @@ import ValidText from "@components/ValidText";
 import Button from "@components/Button";
 import NoticeContainer from "@components/NoticeContainer";
 
-const SafetyModal = () => (
-  <ModalContainer>
+const SafetyInfoModal = () => (
+  <Container>
     <Icon src={deleteSrc} />
-    <ModalTitle>안전기준 적합 확인 검사 신고번호 인증하기</ModalTitle>
+    <Title>안전기준 적합 확인 검사 신고번호 인증하기</Title>
     <NoticeContainer icon={exclamationmarkSrc}>
       캔들, 디퓨저 판매 창작자는 검사 인증을 완료해야 상품 등록시 카테고리
       설정에서
       <br />
       캔들, 디퓨저를 선택하실 수 있습니다.
     </NoticeContainer>
-    <ModalConfirmContainer>
-      <ModalConfirmText>안전기준 적합 확인 검사 신고번호</ModalConfirmText>
+    <ConfirmContainer>
+      <ConfirmText>안전기준 적합 확인 검사 신고번호</ConfirmText>
       <RegisterContainer>
         <InputContainer>
           <Input />
@@ -29,19 +29,19 @@ const SafetyModal = () => (
         </InputContainer>
         <ValidText valid={true}>인증되었습니다.</ValidText>
       </RegisterContainer>
-    </ModalConfirmContainer>
-    <ButtonWrapper>
+    </ConfirmContainer>
+    <ButtonContainer>
       <Button size="small" full={false} className="positive">
         저장
       </Button>
       <Button size="small" full={false}>
         취소
       </Button>
-    </ButtonWrapper>
-  </ModalContainer>
+    </ButtonContainer>
+  </Container>
 );
 
-const ModalContainer = styled.div`
+const Container = styled.div`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -70,14 +70,14 @@ const Icon = styled.img`
   right: 12.77px;
 `;
 
-const ModalTitle = styled.h2`
+const Title = styled.h2`
   font-weight: 700;
   font-size: 18px;
   line-height: 24px;
   letter-spacing: -0.015em;
 `;
 
-const ModalConfirmContainer = styled.div`
+const ConfirmContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 58px;
@@ -87,7 +87,7 @@ const ModalConfirmContainer = styled.div`
   }
 `;
 
-const ModalConfirmText = styled.span`
+const ConfirmText = styled.span`
   font-weight: 500;
   font-size: 14px;
   line-height: 18px;
@@ -118,7 +118,7 @@ const InputContainer = styled.div`
   }
 `;
 
-const ButtonWrapper = styled.div`
+const ButtonContainer = styled.div`
   display: flex;
   width: 100%;
   justify-content: flex-end;
@@ -134,4 +134,4 @@ const ButtonWrapper = styled.div`
   }
 `;
 
-export default SafetyModal;
+export default SafetyInfoModal;
