@@ -20,7 +20,8 @@ const SafetyInfo = () => {
           설정에서 캔들, 디퓨저를 선택하실 수 있습니다.
         </NoticeContainer>
         <ConfirmContainer>
-          <ConfirmText>안전기준 적합 확인 검사 신고번호</ConfirmText>
+          <ConfirmInfoText>안전기준 적합 확인 검사 신고번호</ConfirmInfoText>
+          {/* <ConfirmText>인증완료</ConfirmText> */}
           <Button size="small" full={false}>
             인증하기
           </Button>
@@ -66,6 +67,10 @@ const ConfirmContainer = styled.div`
     margin-right: 12px;
   }
 
+  & > span {
+    margin-right: 12px;
+  }
+
   & > button {
     font-weight: 500;
     font-size: 12px;
@@ -74,11 +79,18 @@ const ConfirmContainer = styled.div`
     letter-spacing: 0.1px;
   }
 `;
-const ConfirmText = styled.p`
+const ConfirmInfoText = styled.p`
   font-weight: 400;
   font-size: 14px;
   line-height: 14px;
   letter-spacing: 0.1px;
+`;
+const ConfirmText = styled.span`
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+  color: ${({ theme: { palette } }) => palette.grey500};
 `;
 
 export default SafetyInfo;
