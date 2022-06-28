@@ -26,7 +26,10 @@ const IdentifiCationInfo = () => {
           주민등록증 인증은 필수가 아닙니다.)
         </NoticeContainer>
         <InfoContainer>
-          <InfoText>인증된 주민등록증이 없습니다.</InfoText>
+          <InfoText>
+            인증된 주민등록증이 없습니다.
+            {/* 주민등록이 인증되었습니다. */}
+          </InfoText>
           <Button size="small" full={false}>
             인증하기
           </Button>
