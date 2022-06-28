@@ -3,19 +3,31 @@ import styled from "styled-components";
 
 import Button from "@components/Button";
 interface SystemModalType {
-  icon?: string;
-  text: string;
+  icon?: React.ReactNode;
   children: React.ReactNode;
+  text: string;
+  multi: boolean;
 }
 
-const SystemModal = ({ icon, children, text }: SystemModalType) => {
+const SystemModal = ({ icon, children, text, multi }: SystemModalType) => {
   return (
     <Container>
-      <Icon src={icon} />
+      {icon}
       <Text>{children}</Text>
-      <Button size="small" full={false}>
-        {text}
-      </Button>
+      {multi ? (
+        <ButtonWrapper>
+          <Button size="small" full={false} className="positive">
+            확인
+          </Button>
+          <Button size="small" full={false}>
+            취소
+          </Button>
+        </ButtonWrapper>
+      ) : (
+        <Button size="small" full={false}>
+          {text}
+        </Button>
+      )}
     </Container>
   );
 };
@@ -36,6 +48,8 @@ const Container = styled.div`
   box-shadow: ${({ theme: { shadow } }) => shadow.boxShadow};
 
   & > img {
+    width: 24px;
+    height: 24px;
     margin-bottom: 7px;
   }
 
@@ -44,17 +58,26 @@ const Container = styled.div`
   }
 `;
 
-const Icon = styled.img`
-  width: 24px;
-  height: 24px;
-`;
-
 const Text = styled.span`
   font-weight: 500;
   font-size: 14px;
   line-height: 18px;
   text-align: center;
   letter-spacing: 0.1px;
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 14px;
+  text-align: center;
+  letter-spacing: 0.1px;
+
+  & > :first-child {
+    margin-right: 16px;
+  }
 `;
 
 export default SystemModal;
