@@ -7,8 +7,9 @@ import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
 
 import SystemModal from "@components/Common/SystemModal";
+// Represent
 
-const MainInfo = () => {
+const Represent = () => {
   return (
     <Container>
       <SubTitleWrapper>
@@ -232,4 +233,4 @@ const TextCounter = styled.span`
   line-height: 22px;
 `;
 
-export default MainInfo;
+export default Represent;

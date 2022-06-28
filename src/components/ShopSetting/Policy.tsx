@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const PolicyInfo = () => {
+const Policy = () => {
   return (
     <Container>
       <SubTitleWrapper>
@@ -90,4 +90,4 @@ const TextArea = styled.textarea`
   letter-spacing: 0.1px;
 `;
 
-export default PolicyInfo;
+export default Policy;

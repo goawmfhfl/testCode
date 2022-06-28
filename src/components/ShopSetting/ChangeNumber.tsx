@@ -4,7 +4,7 @@ import styled from "styled-components";
 import ChangeNumberModal from "./ChangeNumberModal";
 import Button from "@components/Button";
 
-const ChangeNumberInfo = () => {
+const ChangeNumber = () => {
   return (
     <Container>
       <SubTitleWrapper>
@@ -66,4 +66,4 @@ const NumberText = styled.span`
   letter-spacing: 0.1px;
 `;
 
-export default ChangeNumberInfo;
+export default ChangeNumber;

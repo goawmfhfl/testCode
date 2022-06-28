@@ -2,14 +2,14 @@ import React from "react";
 import styled from "styled-components";
 import Layout from "@components/Layout";
 
-import MainInfo from "@components/ShopSetting/MainInfo";
-import PolicyInfo from "@components/ShopSetting/PolicyInfo";
-import SafetyInfo from "@components/ShopSetting/SafetyInfo";
-import OrderInfo from "@components/ShopSetting/OrderInfo";
-import EnterPreneurInfo from "@components/ShopSetting/EnterPreneurInfo";
-import ChangeNumberInfo from "@components/ShopSetting/ChangeNumberInfo";
-import AccountInfo from "@components/ShopSetting/AccountInfo";
-import IdentifiCationInfo from "@components/ShopSetting/IdentifiCationInfo";
+import Represent from "@components/ShopSetting/Represent";
+import Policy from "@components/ShopSetting/Policy";
+import Safety from "@components/ShopSetting/Safety";
+import Order from "@components/ShopSetting/Order";
+import EnterPreneur from "@components/ShopSetting/EnterPreneur";
+import ChangeNumber from "@components/ShopSetting/ChangeNumber";
+import Account from "@components/ShopSetting/Account";
+import IdentifiCation from "@components/ShopSetting/IdentifiCation";
 import Button from "@components/Button";
 
 const ShopSetting = () => {
@@ -24,14 +24,14 @@ const ShopSetting = () => {
           <WithdrawalMenu>탈퇴</WithdrawalMenu>
         </MenuContainer>
         <MainContainer>
-          <MainInfo />
-          <PolicyInfo />
-          <SafetyInfo />
-          <OrderInfo />
-          <EnterPreneurInfo />
-          <ChangeNumberInfo />
-          <IdentifiCationInfo />
-          <AccountInfo />
+          <Represent />
+          <Policy />
+          <Safety />
+          <Order />
+          <EnterPreneur />
+          <ChangeNumber />
+          <IdentifiCation />
+          <Account />
           <ButtonWrapper>
             <Button size="big" full={false}>
               저장

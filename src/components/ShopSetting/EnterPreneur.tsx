@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 import Button from "@components/Button";
 
-const EnterPreneurInfo = () => {
+const EnterPreneur = () => {
   return (
     <Container>
       <SubTitleWrapper>
@@ -128,4 +128,4 @@ const InfoText = styled.h3`
   letter-spacing: 0.1px;
 `;
 
-export default EnterPreneurInfo;
+export default EnterPreneur;

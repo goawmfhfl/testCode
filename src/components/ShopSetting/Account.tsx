@@ -4,13 +4,13 @@ import styled from "styled-components";
 import Button from "@components/Button";
 import AccountModal from "./AccountModal";
 
-const AccountInfo = () => {
+const Account = () => {
   return (
     <Container>
       <SubTitleWrapper>
         <SubTitle>정산 계좌 정보</SubTitle>
       </SubTitleWrapper>
-      <AccountInfoContainer>
+      <AccountContainer>
         <AccountInfoText>등록된 계좌 정보</AccountInfoText>
         <RegisterContainer>
           <AccountInfoText>
@@ -24,7 +24,7 @@ const AccountInfo = () => {
             변경
           </Button> */}
         </RegisterContainer>
-      </AccountInfoContainer>
+      </AccountContainer>
       <AccountModal />
     </Container>
   );
@@ -48,7 +48,7 @@ const SubTitle = styled.h2`
   line-height: 20px;
 `;
 
-const AccountInfoContainer = styled.div`
+const AccountContainer = styled.div`
   display: flex;
   flex-direction: column;
 
@@ -84,4 +84,4 @@ const RegisterContainer = styled.div`
   }
 `;
 
-export default AccountInfo;
+export default Account;

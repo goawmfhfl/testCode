@@ -2,10 +2,11 @@ import React from "react";
 import styled from "styled-components";
 
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
+import IdentifiCationModal from "./IdentifiCationModal";
 import NoticeContainer from "@components/NoticeContainer";
 import Button from "@components/Button";
 
-const IdentifiCationInfo = () => {
+const IdentifiCation = () => {
   return (
     <Container>
       <SubTitleWrapper>
@@ -35,11 +36,13 @@ const IdentifiCationInfo = () => {
           </Button>
         </InfoContainer>
       </IdentifiCationInfoContainer>
+      <IdentifiCationModal />
     </Container>
   );
 };
 
 const Container = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
 
@@ -97,4 +100,4 @@ const InfoText = styled.h3`
   letter-spacing: 0.1px;
 `;
 
-export default IdentifiCationInfo;
+export default IdentifiCation;

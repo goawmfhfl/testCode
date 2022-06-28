@@ -3,9 +3,9 @@ import styled from "styled-components";
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
 import NoticeContainer from "@components/NoticeContainer";
 import Button from "@components/Button";
-import SafetyInfoModal from "./SafetyInfoModal";
+import SafetyModal from "./SafetyModal";
 
-const SafetyInfo = () => {
+const Safety = () => {
   return (
     <Container>
       <SubTitleWrapper>
@@ -28,7 +28,7 @@ const SafetyInfo = () => {
           </Button>
         </ConfirmContainer>
       </SafetyContainer>
-      {/* <SafetyInfoModal /> */}
+      <SafetyModal />
     </Container>
   );
 };
@@ -89,4 +89,4 @@ const ConfirmInfoText = styled.p`
   letter-spacing: 0.1px;
 `;
 
-export default SafetyInfo;
+export default Safety;

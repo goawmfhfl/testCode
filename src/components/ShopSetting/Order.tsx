@@ -4,7 +4,7 @@ import styled from "styled-components";
 import triangleSrc from "@icons/triangle.svg";
 import Input from "@components/Input";
 
-const OrderInfo = () => {
+const Order = () => {
   return (
     <Container>
       <SubTitleWrapper>
@@ -120,4 +120,4 @@ const KrwText = styled.span`
   letter-spacing: 0.1px;
 `;
 
-export default OrderInfo;
+export default Order;
