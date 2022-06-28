@@ -33,7 +33,7 @@ const MainInfo = () => {
                 파일 크기 : 1장 당 2mb / 등록 가능 파일 확장자 : jpg, jpeg, png
               </ImageInfoText>
               <AddMobilePhotoContainer>
-                <img src={addphotoSrc} />
+                <Image src={addphotoSrc} />
                 <p>사진 등록하기</p>
               </AddMobilePhotoContainer>
             </ImageContainer>
@@ -45,7 +45,7 @@ const MainInfo = () => {
                 파일 크기 : 1장 당 3mb / 등록 가능 파일 확장자 : jpg, jpeg, png
               </ImageInfoText>
               <AddPcPhotoContainer>
-                <img src={addphotoSrc} />
+                <Image src={addphotoSrc} />
                 <p>사진 등록하기</p>
               </AddPcPhotoContainer>
             </ImageContainer>
@@ -62,11 +62,15 @@ const MainInfo = () => {
           </TextAreaContainer>
         </SectionContainer>
       </ShopInfoContainer>
-      <SystemModal icon="" text="확인">
+      {/* <SystemModal
+        text="확인"
+        icon={<Image src={questionmarkSrc} />}
+        multi={true}
+      >
         샵/판매자 정보 설정을 완료하시면
         <br />
         판매 활동을 시작할 수 있습니다.
-      </SystemModal>
+      </SystemModal> */}
     </Container>
   );
 };
@@ -144,6 +148,9 @@ const ImageInfoText = styled.p`
   line-height: 18px;
   letter-spacing: 0.1px;
 `;
+
+const Image = styled.img``;
+
 const AddMobilePhotoContainer = styled.div`
   display: flex;
   flex-direction: column;
