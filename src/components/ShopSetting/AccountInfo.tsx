@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 import Button from "@components/Button";
+import AccountModal from "./AccountModal";
 
 const AccountInfo = () => {
   return (
@@ -24,11 +25,13 @@ const AccountInfo = () => {
           </Button> */}
         </RegisterContainer>
       </AccountInfoContainer>
+      <AccountModal />
     </Container>
   );
 };
 
 const Container = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
   width: 100%;
