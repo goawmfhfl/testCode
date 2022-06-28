@@ -6,6 +6,8 @@ import addphotoSrc from "@icons/addphoto.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
 
+import SystemModal from "@components/Common/SystemModal";
+
 const MainInfo = () => {
   return (
     <Container>
@@ -60,6 +62,11 @@ const MainInfo = () => {
           </TextAreaContainer>
         </SectionContainer>
       </ShopInfoContainer>
+      <SystemModal icon="" text="확인">
+        샵/판매자 정보 설정을 완료하시면
+        <br />
+        판매 활동을 시작할 수 있습니다.
+      </SystemModal>
     </Container>
   );
 };
