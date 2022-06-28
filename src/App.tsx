@@ -4,6 +4,7 @@ import { ThemeProvider } from "styled-components";
 import Home from "@pages/Home";
 import Login from "@pages/Login";
 import OAuth from "@pages/OAuth";
+import ShopSetting from "@pages/ShopSetting";
 import GlobalStyles from "@styles/GlobalStyles";
 import theme from "@styles/theme";
 
@@ -18,6 +19,7 @@ function App() {
           <Route path="oauth" element={<OAuth />}>
             <Route path=":oauthProvider" element={<OAuth />} />
           </Route>
+          <Route path="shopSetting" element={<ShopSetting />} />
         </Routes>
       </ThemeProvider>
     </BrowserRouter>
