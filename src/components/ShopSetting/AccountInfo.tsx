@@ -12,10 +12,16 @@ const AccountInfo = () => {
       <AccountInfoContainer>
         <AccountInfoText>등록된 계좌 정보</AccountInfoText>
         <RegisterContainer>
-          <AccountInfoText>등록된 계좌 정보가 없습니다.</AccountInfoText>
+          <AccountInfoText>
+            등록된 계좌 정보가 없습니다.
+            {/* 국민은행 632902-**-****** (예금주명: 김지원) */}
+          </AccountInfoText>
           <Button size="small" full={false}>
             등록
           </Button>
+          {/* <Button size="small" full={false}>
+            변경
+          </Button> */}
         </RegisterContainer>
       </AccountInfoContainer>
     </Container>
