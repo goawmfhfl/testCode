@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const FillShopPolicyInfo = () => {
+const PolicyInfo = () => {
   return (
     <Container>
       <SubTitleWrapper>
@@ -25,12 +25,15 @@ const FillShopPolicyInfo = () => {
 };
 const Container = styled.div`
   display: flex;
+  justify-content: center;
+
+  width: 100%;
   padding-bottom: 88px;
   border-bottom: 1px solid ${({ theme: { palette } }) => palette.grey400};
 `;
 
 const SubTitleWrapper = styled.div`
-  width: 235px;
+  min-width: 235px;
   padding-left: 56px;
 `;
 const SubTitle = styled.h2`
@@ -42,6 +45,9 @@ const SubTitle = styled.h2`
 const ShopPolicyContainer = styled.div`
   display: flex;
   flex-direction: column;
+
+  min-width: 736px;
+
   & > div:first-child {
     margin-bottom: 48px;
   }
@@ -84,4 +90,4 @@ const TextArea = styled.textarea`
   letter-spacing: 0.1px;
 `;
 
-export default FillShopPolicyInfo;
+export default PolicyInfo;

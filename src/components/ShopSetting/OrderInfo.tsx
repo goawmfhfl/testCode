@@ -4,7 +4,7 @@ import styled from "styled-components";
 import triangleSrc from "@icons/triangle.svg";
 import Input from "@components/Input";
 
-const FillShopOrderInfo = () => {
+const OrderInfo = () => {
   return (
     <Container>
       <SubTitleWrapper>
@@ -36,12 +36,15 @@ const FillShopOrderInfo = () => {
 
 const Container = styled.div`
   display: flex;
+  justify-content: center;
+
+  width: 100%;
   padding: 88px 0px;
   border-bottom: 1px solid ${({ theme: { palette } }) => palette.grey400};
 `;
 
 const SubTitleWrapper = styled.div`
-  width: 235px;
+  min-width: 235px;
   padding-left: 56px;
 `;
 const SubTitle = styled.h2`
@@ -53,7 +56,8 @@ const SubTitle = styled.h2`
 const OrderInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 432px;
+
+  min-width: 736px;
 
   & > :first-child {
     margin-bottom: 24px;
@@ -116,4 +120,4 @@ const KrwText = styled.span`
   letter-spacing: 0.1px;
 `;
 
-export default FillShopOrderInfo;
+export default OrderInfo;

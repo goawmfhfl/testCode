@@ -4,7 +4,7 @@ import NoticeContainer from "@components/NoticeContainer";
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
 import Button from "@components/Button";
 
-const FillShopSafetyInfo = () => {
+const SafetyInfo = () => {
   return (
     <Container>
       <SubTitleWrapper>
@@ -31,6 +31,8 @@ const FillShopSafetyInfo = () => {
 };
 const Container = styled.div`
   display: flex;
+  justify-content: center;
+  width: 100%;
   padding: 88px 0px;
   border-bottom: 1px solid ${({ theme: { palette } }) => palette.grey400};
 `;
@@ -47,6 +49,9 @@ const SubTitle = styled.h2`
 const SafetyContainer = styled.div`
   display: flex;
   flex-direction: column;
+
+  min-width: 736px;
+
   & > :first-child {
     margin-bottom: 24px;
   }
@@ -54,6 +59,7 @@ const SafetyContainer = styled.div`
 
 const ConfirmContainer = styled.div`
   display: flex;
+  width: 702px;
   align-items: center;
 
   & > :first-child {
@@ -75,4 +81,4 @@ const ConfirmText = styled.p`
   letter-spacing: 0.1px;
 `;
 
-export default FillShopSafetyInfo;
+export default SafetyInfo;

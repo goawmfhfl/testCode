@@ -6,7 +6,7 @@ import addphotoSrc from "@icons/addphoto.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
 
-const FillShopInfo = () => {
+const MainInfo = () => {
   return (
     <Container>
       <SubTitleWrapper>
@@ -66,10 +66,13 @@ const FillShopInfo = () => {
 
 const Container = styled.div`
   display: flex;
+  justify-content: center;
+
+  width: 100%;
   padding: 88px 0px;
 `;
 const SubTitleWrapper = styled.div`
-  width: 235px;
+  min-width: 235px;
   padding-left: 56px;
 `;
 const SubTitle = styled.h2`
@@ -80,6 +83,9 @@ const SubTitle = styled.h2`
 const ShopInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
+
+  min-width: 736px;
+
   & > div:first-child {
     margin-bottom: 48px;
   }
@@ -212,4 +218,4 @@ const TextCounter = styled.span`
   line-height: 22px;
 `;
 
-export default FillShopInfo;
+export default MainInfo;
