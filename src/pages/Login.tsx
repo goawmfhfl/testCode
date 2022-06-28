@@ -1,12 +1,11 @@
 /* eslint-disable */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import Layout from "@components/Layout";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useMutation, gql } from "@apollo/client";
 
 import appleSrc from "@icons/apple.svg";
-import naverSrc from "@icons/naver.svg";
 import kakaoSrc from "@icons/kakao.svg";
 import googleSrc from "@icons/google.svg";
 import Button from "@components/Button";
@@ -42,6 +41,23 @@ const Login = () => {
     mode: "onSubmit",
     reValidateMode: "onSubmit",
   });
+
+  useEffect(() => {
+    const naverLogin = new naver.LoginWithNaverId({
+      clientId: "CZm3jInQ9yUhzPJCFM_j",
+      callbackUrl:
+        "http://" +
+        window.location.hostname +
+        (location.port == "" || location.port == undefined
+          ? ""
+          : ":" + location.port) +
+        "/oauth/naver",
+      isPopup: true,
+      loginButton: { color: "green", type: 1, height: 44 },
+    });
+
+    naverLogin.init();
+  }, []);
 
   const onSubmit: SubmitHandler<LoginFormType> = async ({
     id: email,
@@ -137,7 +153,9 @@ const Login = () => {
             <SnsTitleText>SNS 간편 로그인</SnsTitleText>
           </SnsTitleWrapper>
           <IconList>
-            <img src={naverSrc} />
+            <div id="naverIdLogin">
+              <img id="naverIdLoginButton" />
+            </div>
             <img src={kakaoSrc} />
             <img src={googleSrc} />
             <img src={appleSrc} />

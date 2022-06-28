@@ -15,7 +15,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="login" element={<Login />} />
-          <Route path="oauth" element={<OAuth />} />
+          <Route path="oauth" element={<OAuth />}>
+            <Route path=":oauthProvider" element={<OAuth />} />
+          </Route>
         </Routes>
       </ThemeProvider>
     </BrowserRouter>
