@@ -19,7 +19,6 @@ const Container = styled.div`
   padding: 12px 16px 8px 11px;
   border-radius: 7px;
   background: ${({ theme: { palette } }) => palette.grey400};
-  margin-bottom: 12px;
 `;
 const NoticeText = styled.p`
   display: flex;
