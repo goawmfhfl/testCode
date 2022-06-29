@@ -1,5 +1,4 @@
 /* eslint-disable */
-import React from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
 

@@ -1,17 +1,17 @@
 /* eslint-disable */
-import React, { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import axios from "axios";
 import styled from "styled-components";
 
+import NoticeContainer from "@components/Common/NoticeContainer";
+import SystemModal from "@components/Common/SystemModal";
 import addphotoSrc from "@icons/addphoto.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import exclamationmarkRedSrc from "@icons/exclamationmark-red.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
 import deleteSrc from "@icons/delete.svg";
 import photochangeSrc from "@icons/photochange.svg";
-import NoticeContainer from "@components/Common/NoticeContainer";
-import SystemModal from "@components/Common/SystemModal";
 
 const Represent = () => {
   const { register } = useFormContext();
