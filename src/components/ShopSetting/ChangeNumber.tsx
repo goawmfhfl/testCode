@@ -1,10 +1,13 @@
 import React from "react";
+import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 
 import ChangeNumberModal from "./ChangeNumberModal";
 import Button from "@components/Common/Button";
 
 const ChangeNumber = () => {
+  const { register } = useFormContext();
+
   return (
     <Container>
       <SubTitleWrapper>
@@ -16,7 +19,7 @@ const ChangeNumber = () => {
           변경하기
         </Button>
       </ChangeNumberContainer>
-      <ChangeNumberModal />
+      {/* <ChangeNumberModal /> */}
     </Container>
   );
 };

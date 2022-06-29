@@ -1,6 +1,10 @@
+import React from "react";
+import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 
 const Policy = () => {
+  const { register } = useFormContext();
+
   return (
     <Container>
       <SubTitleWrapper>
@@ -10,13 +14,13 @@ const Policy = () => {
         <SectionContainer>
           <Description>배송 정책</Description>
           <TextAreaContainer>
-            <TextArea />
+            <TextArea {...register("deliveryPolicy")} />
           </TextAreaContainer>
         </SectionContainer>
         <SectionContainer>
           <Description>교환/환불 정책</Description>
           <TextAreaContainer>
-            <TextArea />
+            <TextArea {...register("returnPolicy")} />
           </TextAreaContainer>
         </SectionContainer>
       </ShopPolicyContainer>

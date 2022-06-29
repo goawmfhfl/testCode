@@ -1,10 +1,12 @@
 import React from "react";
+import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 
 import Button from "@components/Common/Button";
 import AccountModal from "./AccountModal";
 
 const Account = () => {
+  const { register } = useFormContext();
   return (
     <Container>
       <SubTitleWrapper>
@@ -25,7 +27,7 @@ const Account = () => {
           </Button> */}
         </RegisterContainer>
       </AccountContainer>
-      <AccountModal />
+      {/* <AccountModal /> */}
     </Container>
   );
 };

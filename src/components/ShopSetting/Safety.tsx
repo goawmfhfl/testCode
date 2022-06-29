@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { useFormContext } from "react-hook-form";
 
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
 import NoticeContainer from "@components/Common/NoticeContainer";
@@ -6,6 +7,8 @@ import Button from "@components/Common/Button";
 import SafetyModal from "./SafetyModal";
 
 const Safety = () => {
+  const { register } = useFormContext();
+
   return (
     <Container>
       <SubTitleWrapper>
@@ -28,7 +31,7 @@ const Safety = () => {
           </Button>
         </ConfirmContainer>
       </SafetyContainer>
-      <SafetyModal />
+      {/* <SafetyModal /> */}
     </Container>
   );
 };

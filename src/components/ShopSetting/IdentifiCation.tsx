@@ -1,4 +1,5 @@
 import React from "react";
+import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
@@ -7,6 +8,8 @@ import NoticeContainer from "@components/Common/NoticeContainer";
 import Button from "@components/Common/Button";
 
 const IdentifiCation = () => {
+  const { register } = useFormContext();
+
   return (
     <Container>
       <SubTitleWrapper>
@@ -36,7 +39,7 @@ const IdentifiCation = () => {
           </Button>
         </InfoContainer>
       </IdentifiCationInfoContainer>
-      <IdentifiCationModal />
+      {/* <IdentifiCationModal /> */}
     </Container>
   );
 };

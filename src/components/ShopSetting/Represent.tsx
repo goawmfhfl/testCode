@@ -1,4 +1,5 @@
-import React from "react";
+import React, { ChangeEvent, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 
 import NoticeContainer from "@components/Common/NoticeContainer";
@@ -10,6 +11,20 @@ import SystemModal from "@components/Common/SystemModal";
 // Represent
 
 const Represent = () => {
+  const { register } = useFormContext();
+
+  const [textLengh, setTextLength] = useState<number>(0);
+  const [modal, setModal] = useState<boolean>(false);
+
+  const onChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
+    // 만약 150글자보다 크다면
+    // 모달을 보여준다.
+    if (e.target.value.length > 150) {
+      setModal(true);
+      return;
+    }
+    setTextLength(e.target.value.length);
+  };
   return (
     <Container>
       <SubTitleWrapper>
@@ -34,7 +49,14 @@ const Represent = () => {
                 파일 크기 : 1장 당 2mb / 등록 가능 파일 확장자 : jpg, jpeg, png
               </ImageInfoText>
               <AddMobilePhotoContainer>
-                <Image src={addphotoSrc} />
+                <UploadImgIcon htmlFor="pcImg">
+                  <UploadImgInput
+                    type="file"
+                    id="pcImg"
+                    accept="image/jpg,image/png,image/jpeg"
+                    {...register("pcImage")}
+                  />
+                </UploadImgIcon>
                 <p>사진 등록하기</p>
               </AddMobilePhotoContainer>
             </ImageContainer>
@@ -46,7 +68,14 @@ const Represent = () => {
                 파일 크기 : 1장 당 3mb / 등록 가능 파일 확장자 : jpg, jpeg, png
               </ImageInfoText>
               <AddPcPhotoContainer>
-                <Image src={addphotoSrc} />
+                <UploadImgIcon htmlFor="mobileImg">
+                  <UploadImgInput
+                    type="file"
+                    id="mobileImg"
+                    accept="image/jpg,image/png,image/jpeg"
+                    {...register("mobileImage")}
+                  />
+                </UploadImgIcon>
                 <p>사진 등록하기</p>
               </AddPcPhotoContainer>
             </ImageContainer>
@@ -58,8 +87,8 @@ const Represent = () => {
             창작자 페이지, 작품 상세 페이지에 노출되는 소개말입니다.
           </NoticeContainer>
           <TextAreaContainer>
-            <TextArea />
-            <TextCounter>0/150</TextCounter>
+            <TextArea {...register("shopInroduce")} />
+            <TextCounter>{textLengh}/150</TextCounter>
           </TextAreaContainer>
         </SectionContainer>
       </ShopInfoContainer>
@@ -154,9 +183,21 @@ const ImageInfoText = styled.p`
   line-height: 18px;
   letter-spacing: 0.1px;
 `;
-
-const Image = styled.img``;
-
+const UploadImgIcon = styled.label`
+  background-image: url(${addphotoSrc});
+  background-position: center;
+  background-size: cover;
+  cursor: pointer;
+`;
+const UploadImgInput = styled.input`
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+`;
 const AddMobilePhotoContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -169,7 +210,7 @@ const AddMobilePhotoContainer = styled.div`
   background-color: ${({ theme: { palette } }) => palette.white};
   border: 1px dashed ${({ theme: { palette } }) => palette.grey500};
 
-  & > img {
+  & > label {
     width: 48px;
     height: 48px;
     margin-bottom: 14px;
@@ -196,7 +237,7 @@ const AddPcPhotoContainer = styled.div`
   background-color: ${({ theme: { palette } }) => palette.white};
   border: 1px dashed ${({ theme: { palette } }) => palette.grey500};
 
-  & > img {
+  & > label {
     width: 48px;
     height: 48px;
     margin-bottom: 14px;
@@ -231,7 +272,6 @@ const TextArea = styled.textarea`
   line-height: 18px;
   letter-spacing: 0.1px;
 `;
-
 const TextCounter = styled.span`
   font-weight: 400;
   font-size: 16px;

@@ -1,8 +1,11 @@
 import styled from "styled-components";
 
 import Button from "@components/Common/Button";
+import { useFormContext } from "react-hook-form";
 
 const EnterPreneur = () => {
+  const { register } = useFormContext();
+
   return (
     <Container>
       <SubTitleWrapper>

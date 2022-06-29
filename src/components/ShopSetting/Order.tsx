@@ -1,10 +1,12 @@
 import React from "react";
+import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 
 import triangleSrc from "@icons/triangle.svg";
 import Input from "@components/Common/Input";
 
 const Order = () => {
+  const { register } = useFormContext();
   return (
     <Container>
       <SubTitleWrapper>
@@ -14,18 +16,18 @@ const Order = () => {
         <OrderFeeContainer>
           <OrderInfoText>기본 배송비</OrderInfoText>
           <ContentContainer>
-            <Select>
+            <Select {...register("orderOption")}>
               <Option>유료</Option>
               <Option>무료</Option>
             </Select>
-            <Input />
+            <Input {...register("defaultOrderFee")} />
             <KrwText>원</KrwText>
           </ContentContainer>
         </OrderFeeContainer>
         <OrderFeeContainer>
           <OrderInfoText>기본 제주 도서산간 추가 배송비</OrderInfoText>
           <ContentContainer>
-            <Input />
+            <Input {...register("addtionalOrderFee")} />
             <KrwText>원</KrwText>
           </ContentContainer>
         </OrderFeeContainer>

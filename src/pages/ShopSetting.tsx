@@ -1,7 +1,9 @@
+/* eslint-disable */
 import React from "react";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
-import Layout from "@components/Common/Layout";
 
+import Layout from "@components/Common/Layout";
 import Represent from "@components/ShopSetting/Represent";
 import Policy from "@components/ShopSetting/Policy";
 import Safety from "@components/ShopSetting/Safety";
@@ -12,34 +14,56 @@ import Account from "@components/ShopSetting/Account";
 import IdentifiCation from "@components/ShopSetting/IdentifiCation";
 import Button from "@components/Common/Button";
 
+interface FormType {
+  pcImage: string;
+  mobileImage: string;
+  shopInroduce: string;
+  deliveryPolicy: string;
+  returnPolicy: string;
+  orderOption: string;
+  defaultOrderFee: number;
+  addtionalOrderFee: number;
+}
+
 const ShopSetting = () => {
+  const methods = useForm<FormType>({
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
+  });
+
+  const onSubmit: SubmitHandler<FormType> = (data) => {
+    console.log(data);
+  };
+
   return (
-    <Layout>
-      <Container>
-        <HeaderWrapper>
-          <HeaderText>샾 설정</HeaderText>
-        </HeaderWrapper>
-        <MenuContainer>
-          <ShopInfoMenu>샵 정보</ShopInfoMenu>
-          <WithdrawalMenu>탈퇴</WithdrawalMenu>
-        </MenuContainer>
-        <MainContainer>
-          <Represent />
-          <Policy />
-          <Safety />
-          <Order />
-          <EnterPreneur />
-          <ChangeNumber />
-          <IdentifiCation />
-          <Account />
-          <ButtonWrapper>
-            <Button size="big" full={false}>
-              저장
-            </Button>
-          </ButtonWrapper>
-        </MainContainer>
-      </Container>
-    </Layout>
+    <FormProvider {...methods}>
+      <Layout>
+        <Container onSubmit={methods.handleSubmit(onSubmit)}>
+          <HeaderWrapper>
+            <HeaderText>샾 설정</HeaderText>
+          </HeaderWrapper>
+          <MenuContainer>
+            <ShopInfoMenu>샵 정보</ShopInfoMenu>
+            <WithdrawalMenu>탈퇴</WithdrawalMenu>
+          </MenuContainer>
+          <MainContainer>
+            <Represent />
+            <Policy />
+            <Safety />
+            <Order />
+            <EnterPreneur />
+            <ChangeNumber />
+            <IdentifiCation />
+            <Account />
+            <ButtonWrapper>
+              <Button size="big" full={false}>
+                저장
+              </Button>
+            </ButtonWrapper>
+          </MainContainer>
+        </Container>
+      </Layout>
+    </FormProvider>
   );
 };
 
