@@ -123,9 +123,10 @@ const ButtonContainer = styled.div`
   width: 100%;
   justify-content: flex-end;
 
-  & > button {
+  & > button:first-child {
     margin-right: 16px;
-
+  }
+  & > button {
     font-weight: 500;
     font-size: 12px;
     line-height: 14px;
