@@ -24,13 +24,13 @@ const IdentifiCationModal = () => (
         <SubTitle>주민등록번호</SubTitle>
         <InputContainer>
           <Input />
-          -
+          <span>-</span>
           <Input />
         </InputContainer>
       </IdContainer>
       <DateContainer>
         <SubTitle>발급일자</SubTitle>
-        <Input />
+        <Input placeholder="YYYYMMDD" />
       </DateContainer>
     </InfoContainer>
     <ButtonContainer>
@@ -49,16 +49,21 @@ const Container = styled.div`
   transform: translateY(-50%);
   z-index: 100;
 
-  padding: 40px 24px 24px 24px;
   display: flex;
   flex-direction: column;
 
+  width: 530px;
+  padding: 40px 24px 24px 24px;
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
   background-color: ${({ theme: { palette } }) => palette.white};
   box-shadow: ${({ theme: { shadow } }) => shadow.boxShadow};
 
   & > h2 {
-    margin: 0px auto 24px;
+    margin-bottom: 24px;
+  }
+  & > h2 + div {
+    width: 369px;
+    margin-bottom: 24px;
   }
 `;
 const Icon = styled.img`
@@ -75,30 +80,72 @@ const Title = styled.h2`
 const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: 58px;
 `;
 const NameContainer = styled.div`
   display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+
+  & > h3 {
+    width: 152px;
+  }
+  & > input {
+    width: 120px;
+    height: 32px;
+    padding: 9px 8px;
+  }
 `;
 const IdContainer = styled.div`
   display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+
+  & > h3 {
+    width: 152px;
+  }
 `;
 const DateContainer = styled.div`
   display: flex;
-`;
-const SubTitle = styled.h3``;
+  align-items: center;
+  margin-bottom: 16px;
 
+  & > h3 {
+    width: 152px;
+  }
+
+  & > input {
+    width: 120px;
+    height: 32px;
+    padding: 9px 8px;
+  }
+`;
+const SubTitle = styled.h3`
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: 0.1px;
+`;
 const InputContainer = styled.div`
   display: flex;
+
+  & > input {
+    width: 120px;
+    height: 32px;
+    padding: 9px 8px;
+  }
+
+  & > span {
+    margin: auto 8px;
+  }
 `;
 const ButtonContainer = styled.div`
   display: flex;
   width: 100%;
   justify-content: flex-end;
-
-  & > button {
+  & > button:first-child {
     margin-right: 16px;
-
+  }
+  & > button {
     font-weight: 500;
     font-size: 12px;
     line-height: 14px;
