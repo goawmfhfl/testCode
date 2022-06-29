@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Layout from "@components/Layout";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useMutation, gql } from "@apollo/client";
+import { OAuth2Client } from "google-auth-library";
 
 import appleSrc from "@icons/apple.svg";
 import kakaoSrc from "@icons/kakao.svg";
@@ -65,6 +66,37 @@ const Login = () => {
     if (!isKakaoInitialized) {
       Kakao.init(process.env.REACT_APP_KAKAO_JAVASCRIPT_KEY);
     }
+
+    // google oauth
+    async function handleCredentialResponse(response: { credential: any }) {
+      const googleClient = new OAuth2Client(
+        process.env.REACT_APP_OAUTH_GOOGLE_CLIENT_ID
+      );
+
+      const verified = await googleClient.verifyIdToken({
+        idToken: response.credential,
+        audience: process.env.REACT_APP_OAUTH_GOOGLE_CLIENT_ID,
+      });
+
+      console.log(verified);
+    }
+
+    google.accounts.id.initialize({
+      client_id: process.env.REACT_APP_OAUTH_GOOGLE_CLIENT_ID,
+      callback: handleCredentialResponse,
+    });
+
+    google.accounts.id.renderButton(
+      document.getElementById("google-login-button"),
+      {
+        theme: "filled_blue",
+        size: "large",
+        shape: "circle",
+        type: "icon",
+      }
+    );
+
+    google.accounts.id.prompt();
   }, []);
 
   const onSubmit: SubmitHandler<LoginFormType> = async ({
@@ -178,7 +210,14 @@ const Login = () => {
               <img id="naverIdLoginButton" />
             </div>
             <img src={kakaoSrc} onClick={handleKakaoLoginButtonClick} />
-            <img src={googleSrc} />
+            <GoogleLoginButton
+              id="google-login-button"
+              data-type="icon"
+              data-shape="circle"
+              data-theme="filled_blue"
+              data-text="signin_with"
+              data-size="large"
+            ></GoogleLoginButton>
             <img src={appleSrc} />
           </IconList>
         </SnsContainer>
@@ -313,6 +352,15 @@ const IconList = styled.div`
   img {
     border-radius: 22px;
   }
+`;
+const GoogleLoginButton = styled.div`
+  width: 44px;
+  height: 44px;
+  background-color: #1b72e8;
+
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
 `;
 const FindUserContainer = styled.div`
   display: flex;

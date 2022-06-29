@@ -1,5 +1,6 @@
 const cracoAlias = require("craco-alias");
 const path = require(`path`);
+const webpack = require("webpack");
 
 module.exports = {
   plugins: [
@@ -21,5 +22,39 @@ module.exports = {
       "@fonts": path.resolve(__dirname, "assets/fonts"),
       "@styles": path.resolve(__dirname, "styles"),
     },
+    configure: {
+      resolve: {
+        fallback: {
+          crypto: require.resolve("crypto-browserify"),
+          stream: require.resolve("stream-browserify"),
+          http: require.resolve("stream-http"),
+          https: require.resolve("https-browserify"),
+          os: require.resolve("os-browserify"),
+          path: require.resolve("path-browserify"),
+          fs: false,
+          tls: false,
+          net: false,
+          child_process: false,
+        },
+        alias: {
+          process: "process/browser",
+        },
+      },
+      module: {
+        rules: [
+          {
+            test: /\.m?js$/,
+            resolve: {
+              fullySpecified: false, // disable the behaviour
+            },
+          },
+        ],
+      },
+    },
+    plugins: [
+      new webpack.ProvidePlugin({
+        process: "process/browser",
+      }),
+    ],
   },
 };
