@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import Layout from "@components/Layout";
+import Layout from "@components/Common/Layout";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useMutation, gql } from "@apollo/client";
 import { OAuth2Client } from "google-auth-library";
@@ -9,7 +9,7 @@ import { OAuth2Client } from "google-auth-library";
 import appleSrc from "@icons/apple.svg";
 import kakaoSrc from "@icons/kakao.svg";
 import googleSrc from "@icons/google.svg";
-import Button from "@components/Button";
+import Button from "@components/Common/Button";
 
 interface LoginFormType {
   id: string;

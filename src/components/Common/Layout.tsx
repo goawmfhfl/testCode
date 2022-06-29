@@ -1,7 +1,8 @@
 import styled from "styled-components";
-import GlobalNavigationBar from "@components/GlobalNavigationBar";
-import Footer from "@components/Footer";
+
+import GlobalNavigationBar from "./GlobalNavigationBar";
 import SideNavigationBar from "./SideNavigationBar";
+import Footer from "./Footer";
 
 interface LayoutProps {
   children: React.ReactNode;

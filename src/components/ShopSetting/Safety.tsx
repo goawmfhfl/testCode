@@ -1,8 +1,8 @@
 import styled from "styled-components";
 
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
-import NoticeContainer from "@components/NoticeContainer";
-import Button from "@components/Button";
+import NoticeContainer from "@components/Common/NoticeContainer";
+import Button from "@components/Common/Button";
 import SafetyModal from "./SafetyModal";
 
 const Safety = () => {

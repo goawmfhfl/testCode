@@ -1,5 +1,5 @@
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import GlobalNavigationBar from "@components/GlobalNavigationBar";
+import GlobalNavigationBar from "./GlobalNavigationBar";
 
 export default {
   component: GlobalNavigationBar,

@@ -2,9 +2,9 @@ import React from "react";
 import styled from "styled-components";
 
 import deleteSrc from "@icons/delete.svg";
-import Input from "@components/Input";
-import Button from "@components/Button";
-import ValidText from "@components/ValidText";
+import Input from "@components/Common/Input";
+import Button from "@components/Common/Button";
+import ValidText from "@components/Common/ValidText";
 
 const ChangeNumberModal = () => {
   return (

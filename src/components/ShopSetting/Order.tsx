@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 import triangleSrc from "@icons/triangle.svg";
-import Input from "@components/Input";
+import Input from "@components/Common/Input";
 
 const Order = () => {
   return (

@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-import Button from "@components/Button";
+import Button from "@components/Common/Button";
 import AccountModal from "./AccountModal";
 
 const Account = () => {

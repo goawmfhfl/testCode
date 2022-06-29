@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 import ChangeNumberModal from "./ChangeNumberModal";
-import Button from "@components/Button";
+import Button from "@components/Common/Button";
 
 const ChangeNumber = () => {
   return (

@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-import NoticeContainer from "@components/NoticeContainer";
+import NoticeContainer from "@components/Common/NoticeContainer";
 import addphotoSrc from "@icons/addphoto.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import questionmarkSrc from "@icons/questionmark.svg";

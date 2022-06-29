@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-import Button from "@components/Button";
+import Button from "./Button";
 interface SystemModalType {
   icon?: React.ReactNode;
   children: React.ReactNode;

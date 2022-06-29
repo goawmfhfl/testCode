@@ -4,9 +4,9 @@ import styled from "styled-components";
 
 import deleteSrc from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
-import NoticeContainer from "@components/NoticeContainer";
-import Button from "@components/Button";
-import Input from "@components/Input";
+import NoticeContainer from "@components/Common/NoticeContainer";
+import Button from "@components/Common/Button";
+import Input from "@components/Common/Input";
 
 const IdentifiCationModal = () => (
   <Container>

@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import Layout from "@components/Layout";
+import Layout from "@components/Common/Layout";
 
 import Represent from "@components/ShopSetting/Represent";
 import Policy from "@components/ShopSetting/Policy";
@@ -10,7 +10,7 @@ import EnterPreneur from "@components/ShopSetting/EnterPreneur";
 import ChangeNumber from "@components/ShopSetting/ChangeNumber";
 import Account from "@components/ShopSetting/Account";
 import IdentifiCation from "@components/ShopSetting/IdentifiCation";
-import Button from "@components/Button";
+import Button from "@components/Common/Button";
 
 const ShopSetting = () => {
   return (

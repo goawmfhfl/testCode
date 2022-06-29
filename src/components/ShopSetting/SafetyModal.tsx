@@ -3,10 +3,10 @@ import styled from "styled-components";
 
 import deleteSrc from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
-import Input from "@components/Input";
-import ValidText from "@components/ValidText";
-import Button from "@components/Button";
-import NoticeContainer from "@components/NoticeContainer";
+import Input from "@components/Common/Input";
+import ValidText from "@components/Common/ValidText";
+import Button from "@components/Common/Button";
+import NoticeContainer from "@components/Common/NoticeContainer";
 
 const SafetyModal = () => (
   <Container>
