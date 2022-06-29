@@ -105,8 +105,13 @@ const ShopInfoContainer = styled.div`
 const SectionContainer = styled.div`
   display: flex;
   flex-direction: column;
+
   & > span {
     margin-bottom: 8px;
+  }
+
+  & > span + div {
+    margin-bottom: 12px;
   }
 `;
 const Description = styled.span`
