@@ -36,6 +36,8 @@ const ContentsContainer = styled.div`
 `;
 const ContentsWrapper = styled.div`
   flex: 1;
+
+  padding: 16px 24px;
 `;
 
 export default Layout;
