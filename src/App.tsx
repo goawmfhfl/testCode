@@ -5,6 +5,7 @@ import Home from "@pages/Home";
 import Login from "@pages/Login";
 import OAuth from "@pages/OAuth";
 import ShopSetting from "@pages/ShopSetting";
+import ProductRegistration from "@pages/ProductRegistration";
 import GlobalStyles from "@styles/GlobalStyles";
 import theme from "@styles/theme";
 
@@ -20,6 +21,10 @@ function App() {
             <Route path=":oauthProvider" element={<OAuth />} />
           </Route>
           <Route path="shopSetting" element={<ShopSetting />} />
+          <Route
+            path="/productRegistration"
+            element={<ProductRegistration />}
+          />
         </Routes>
       </ThemeProvider>
     </BrowserRouter>
