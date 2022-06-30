@@ -7,24 +7,31 @@ interface SystemModalType {
   children: React.ReactNode;
   text: string;
   multi: boolean;
+  onClick: () => void;
 }
 
-const SystemModal = ({ icon, children, text, multi }: SystemModalType) => {
+const SystemModal = ({
+  icon,
+  children,
+  text,
+  multi,
+  onClick,
+}: SystemModalType) => {
   return (
     <Container>
       {icon}
       <Text>{children}</Text>
       {multi ? (
         <ButtonWrapper>
-          <Button size="small" full={false} className="positive">
+          <Button type="button" size="small" full={false} className="positive">
             확인
           </Button>
-          <Button size="small" full={false}>
+          <Button type="button" size="small" full={false}>
             취소
           </Button>
         </ButtonWrapper>
       ) : (
-        <Button size="small" full={false}>
+        <Button type="button" size="small" full={false} onClick={onClick}>
           {text}
         </Button>
       )}
