@@ -1,30 +1,66 @@
+/* eslint-disable */
 import React, { ChangeEvent, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import axios from "axios";
 import styled from "styled-components";
 
 import NoticeContainer from "@components/Common/NoticeContainer";
 import addphotoSrc from "@icons/addphoto.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
+import exclamationmarkRedSrc from "@icons/exclamationmark-red.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
+import deleteSrc from "@icons/delete.svg";
+import photochangeSrc from "@icons/photochange.svg";
 
 import SystemModal from "@components/Common/SystemModal";
-// Represent
 
 const Represent = () => {
   const { register } = useFormContext();
 
-  const [textLengh, setTextLength] = useState<number>(0);
+  const [mobileImage, setMoboileImage] = useState<string>("");
+  const [pcImage, setPcImage] = useState<string>("");
   const [modal, setModal] = useState<boolean>(false);
+  const [textLengh, setTextLength] = useState<number>(0);
 
-  const onChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
-    // 만약 150글자보다 크다면
-    // 모달을 보여준다.
-    if (e.target.value.length > 150) {
-      setModal(true);
-      return;
-    }
-    setTextLength(e.target.value.length);
+  const imageHandler = async (event: ChangeEvent<HTMLInputElement>) => {
+    const formData = new FormData();
+    const version = event.target.name;
+    const targetImage = event.target.files as FileList;
+    const { size } = targetImage[0];
+    formData.append("files", targetImage[0]);
+
+    // check Image size
+    if (version === "mobileImage" && size / 1024 / 1024 > 2)
+      return setModal(true);
+    if (version === "pcImage" && size / 1024 / 1024 > 3) return setModal(true);
+
+    // delete duplicate url
+    if (mobileImage && version === "mobileImage") deleteImageUrl(mobileImage);
+    if (pcImage && version === "pcImage") deleteImageUrl(pcImage);
+
+    // create & save image url
+    const { data } = await axios.post(
+      "https://dev.chopsticks-store.com/upload",
+      formData
+    );
+    if (version === "mobileImage") setMoboileImage(data);
+    if (version === "pcImage") setPcImage(data);
   };
+
+  const deleteImageUrl = async (imageUrl: any) => {
+    const response = await axios.delete(
+      "https://dev.chopsticks-store.com/upload",
+      {
+        data: {
+          url: imageUrl.toString(),
+        },
+      }
+    );
+
+    if (imageUrl === mobileImage) setMoboileImage("");
+    if (imageUrl === pcImage) setPcImage("");
+  };
+
   return (
     <Container>
       <SubTitleWrapper>
@@ -48,17 +84,37 @@ const Represent = () => {
                 <br />
                 파일 크기 : 1장 당 2mb / 등록 가능 파일 확장자 : jpg, jpeg, png
               </ImageInfoText>
-              <AddMobilePhotoContainer>
-                <UploadImgIcon htmlFor="pcImg">
-                  <UploadImgInput
-                    type="file"
-                    id="pcImg"
-                    accept="image/jpg,image/png,image/jpeg"
-                    {...register("pcImage")}
+              {mobileImage ? (
+                <AddedMobileImageContainer>
+                  <AddedMobileImage src={mobileImage} />
+                  <DeleteIcon
+                    src={deleteSrc}
+                    onClick={() => deleteImageUrl(mobileImage)}
                   />
-                </UploadImgIcon>
-                <p>사진 등록하기</p>
-              </AddMobilePhotoContainer>
+                  <ChangeImageLabel htmlFor="mobileImage">
+                    <UploadImgInput
+                      type="file"
+                      id="mobileImage"
+                      accept="image/jpg,image/png,image/jpeg"
+                      {...register("mobileImage")}
+                      onChange={(event) => imageHandler(event)}
+                    />
+                  </ChangeImageLabel>
+                </AddedMobileImageContainer>
+              ) : (
+                <MobileImageContainer>
+                  <UploadImageLabel htmlFor="mobileImage">
+                    <UploadImgInput
+                      type="file"
+                      id="mobileImage"
+                      accept="image/jpg,image/png,image/jpeg"
+                      {...register("mobileImage")}
+                      onChange={(event) => imageHandler(event)}
+                    />
+                  </UploadImageLabel>
+                  <p>사진 등록하기</p>
+                </MobileImageContainer>
+              )}
             </ImageContainer>
             <ImageContainer>
               <ImageTitleText>PC 버전</ImageTitleText>
@@ -67,17 +123,37 @@ const Represent = () => {
                 <br />
                 파일 크기 : 1장 당 3mb / 등록 가능 파일 확장자 : jpg, jpeg, png
               </ImageInfoText>
-              <AddPcPhotoContainer>
-                <UploadImgIcon htmlFor="mobileImg">
-                  <UploadImgInput
-                    type="file"
-                    id="mobileImg"
-                    accept="image/jpg,image/png,image/jpeg"
-                    {...register("mobileImage")}
+              {pcImage ? (
+                <AddedPcImageContainer>
+                  <AddedPcImage src={pcImage} />
+                  <DeleteIcon
+                    src={deleteSrc}
+                    onClick={() => deleteImageUrl(pcImage)}
                   />
-                </UploadImgIcon>
-                <p>사진 등록하기</p>
-              </AddPcPhotoContainer>
+                  <ChangeImageLabel htmlFor="pcImage">
+                    <UploadImgInput
+                      type="file"
+                      id="pcImage"
+                      accept="image/jpg,image/png,image/jpeg"
+                      {...register("pcImage")}
+                      onChange={(event) => imageHandler(event)}
+                    />
+                  </ChangeImageLabel>
+                </AddedPcImageContainer>
+              ) : (
+                <PcImageContainer>
+                  <UploadImageLabel htmlFor="pcImage">
+                    <UploadImgInput
+                      type="file"
+                      id="pcImage"
+                      accept="image/jpg,image/png,image/jpeg"
+                      {...register("pcImage")}
+                      onChange={(event) => imageHandler(event)}
+                    />
+                  </UploadImageLabel>
+                  <p>사진 등록하기</p>
+                </PcImageContainer>
+              )}
             </ImageContainer>
           </RepresentImageContainer>
         </SectionContainer>
@@ -87,20 +163,27 @@ const Represent = () => {
             창작자 페이지, 작품 상세 페이지에 노출되는 소개말입니다.
           </NoticeContainer>
           <TextAreaContainer>
-            <TextArea {...register("shopInroduce")} />
-            <TextCounter>{textLengh}/150</TextCounter>
+            <TextArea
+              {...register("shopInroduce")}
+              onChange={(event) => setTextLength(event.target.value.length)}
+              maxLength={200}
+            />
+            <TextCounter>{textLengh}/200</TextCounter>
           </TextAreaContainer>
         </SectionContainer>
       </ShopInfoContainer>
-      {/* <SystemModal
-        text="확인"
-        icon={<Image src={questionmarkSrc} />}
-        multi={true}
-      >
-        샵/판매자 정보 설정을 완료하시면
-        <br />
-        판매 활동을 시작할 수 있습니다.
-      </SystemModal> */}
+      {modal && (
+        <SystemModal
+          text="확인"
+          icon={<img src={exclamationmarkRedSrc} />}
+          multi={false}
+          onClick={() => setModal(false)}
+        >
+          등록 가능한 최대 파일크기를
+          <br />
+          초과하였습니다.
+        </SystemModal>
+      )}
     </Container>
   );
 };
@@ -155,6 +238,8 @@ const RepresentImageContainer = styled.div`
 const ImageContainer = styled.div`
   display: flex;
   flex-direction: column;
+
+  width: 363px;
   padding: 16px 24px;
   background-color: ${({ theme: { palette } }) => palette.grey100};
 
@@ -164,7 +249,6 @@ const ImageContainer = styled.div`
 
   & > h3 {
     padding-bottom: 12px;
-    padding-right: 254px;
   }
 
   & > p {
@@ -183,7 +267,7 @@ const ImageInfoText = styled.p`
   line-height: 18px;
   letter-spacing: 0.1px;
 `;
-const UploadImgIcon = styled.label`
+const UploadImageLabel = styled.label`
   background-image: url(${addphotoSrc});
   background-position: center;
   background-size: cover;
@@ -198,17 +282,17 @@ const UploadImgInput = styled.input`
   overflow: hidden;
   padding: 0;
 `;
-const AddMobilePhotoContainer = styled.div`
+const PcImageContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
-  padding: 36px 32px;
-  margin: 0 auto;
-
+  width: 315px;
+  height: 140px;
   background-color: ${({ theme: { palette } }) => palette.white};
   border: 1px dashed ${({ theme: { palette } }) => palette.grey500};
+  margin: 0 auto;
 
   & > label {
     width: 48px;
@@ -224,18 +308,18 @@ const AddMobilePhotoContainer = styled.div`
     letter-spacing: 0.1px;
   }
 `;
-const AddPcPhotoContainer = styled.div`
+
+const MobileImageContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
-  margin: 0 auto;
-  width: 100%;
-  padding: 33px 0px;
-
+  width: 140px;
+  height: 140px;
   background-color: ${({ theme: { palette } }) => palette.white};
   border: 1px dashed ${({ theme: { palette } }) => palette.grey500};
+  margin: 0 auto;
 
   & > label {
     width: 48px;
@@ -251,6 +335,51 @@ const AddPcPhotoContainer = styled.div`
     letter-spacing: 0.1px;
   }
 `;
+const AddedMobileImageContainer = styled.div`
+  position: relative;
+  margin: 0 auto;
+  width: 140px;
+  height: 140px;
+`;
+
+const AddedPcImageContainer = styled.div`
+  position: relative;
+  margin: 0 auto;
+  width: 315px;
+  height: 140px;
+`;
+
+const AddedMobileImage = styled.img`
+  width: 140px;
+  height: 140px;
+`;
+const AddedPcImage = styled.img`
+  width: 315px;
+  height: 140px;
+`;
+const DeleteIcon = styled.img`
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: ${({ theme: { palette } }) => palette.grey500};
+
+  width: 24px;
+  height: 24px;
+`;
+const ChangeImageLabel = styled.label`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+
+  width: 24px;
+  height: 24px;
+
+  background-image: url(${photochangeSrc});
+  background-position: center;
+  background-size: cover;
+  cursor: pointer;
+`;
+
 const TextAreaContainer = styled.div`
   display: flex;
 
@@ -271,6 +400,8 @@ const TextArea = styled.textarea`
   font-size: 12px;
   line-height: 18px;
   letter-spacing: 0.1px;
+
+  resize: none;
 `;
 const TextCounter = styled.span`
   font-weight: 400;
