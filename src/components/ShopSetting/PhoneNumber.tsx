@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 
-import ChangeNumberModal from "./ChangeNumberModal";
-import Button from "@components/Common/Button";
+import PhoneNumberModal from "./PhoneNumberModal";
+import Button from "@components/common/Button";
 
-const ChangeNumber = () => {
+const PhoneNumber = () => {
   const [registeredPhoneNumber, setRegisteredPhoneNumber] =
     useState<string>("");
   const [modal, setModal] = useState<boolean>(false);
@@ -23,19 +23,17 @@ const ChangeNumber = () => {
 
   return (
     <Container>
-      <SubTitleWrapper>
-        <SubTitle>전화번호 변경</SubTitle>
-      </SubTitleWrapper>
-      <ChangeNumberContainer>
+      <PhoneNumberContainer>
         <NumberText>
           등록된 전화번호 : {hidePhoneNumber(registeredPhoneNumber)}
         </NumberText>
         <Button size="small" full={false} onClick={() => setModal(true)}>
           변경하기
         </Button>
-      </ChangeNumberContainer>
+      </PhoneNumberContainer>
+
       {modal && (
-        <ChangeNumberModal
+        <PhoneNumberModal
           onClickModalHandler={setModal}
           setPhoneNumber={setRegisteredPhoneNumber}
         />
@@ -53,18 +51,7 @@ const Container = styled.div`
   padding: 94px 0px;
 `;
 
-const SubTitleWrapper = styled.div`
-  min-width: 235px;
-  padding-left: 56px;
-`;
-
-const SubTitle = styled.h2`
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 20px;
-`;
-
-const ChangeNumberContainer = styled.div`
+const PhoneNumberContainer = styled.div`
   display: flex;
   min-width: 704px;
 
@@ -90,4 +77,4 @@ const NumberText = styled.span`
   letter-spacing: 0.1px;
 `;
 
-export default ChangeNumber;
+export default PhoneNumber;

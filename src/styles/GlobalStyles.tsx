@@ -59,11 +59,6 @@ const GlobalStyles = createGlobalStyle`
     }
     @font-face {
       font-family: "SpoqaHanSansNeo";
-      font-weight: 300;
-      src: url("@fonts/SpoqaHanSansNeo/Light.woff2");
-    }
-    @font-face {
-      font-family: "SpoqaHanSansNeo";
       font-weight: 500;
       src: url("@fonts/SpoqaHanSansNeo/Medium.woff2");
     }
@@ -71,6 +66,11 @@ const GlobalStyles = createGlobalStyle`
       font-family: "SpoqaHanSansNeo";
       font-weight: 400;
       src: url("@fonts/SpoqaHanSansNeo/Regular.woff2");
+    }
+    @font-face {
+      font-family: "SpoqaHanSansNeo";
+      font-weight: 300;
+      src: url("@fonts/SpoqaHanSansNeo/Light.woff2");
     }
     @font-face {
       font-family: "SpoqaHanSansNeo";

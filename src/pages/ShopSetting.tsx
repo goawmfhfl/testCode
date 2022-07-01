@@ -2,18 +2,25 @@
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
 
-import Layout from "@components/Common/Layout";
-import Represent from "@components/ShopSetting/Represent";
-import Policy from "@components/ShopSetting/Policy";
-import Safety from "@components/ShopSetting/Safety";
-import Order from "@components/ShopSetting/Order";
-import EnterPreneur from "@components/ShopSetting/EnterPreneur";
-import ChangeNumber from "@components/ShopSetting/ChangeNumber";
-import Account from "@components/ShopSetting/Account";
-import IdentifiCation from "@components/ShopSetting/IdentifiCation";
-import Button from "@components/Common/Button";
+import Layout from "@components/common/Layout";
+import ContentsContainer from "@components/common/ContentsContainer";
+import ContentsHeader from "@components/common/ContentsHeader";
+import ContentsMain from "@components/common/ContentsMain";
+import ContentsSection from "@components/common/ContentsSection";
+import ContentsNavigation from "@components/common/ContentsNavigation";
+import ContentsNavItem from "@components/common/ContentsNavItem";
+import InputWrapper from "@components/common/InputWrapper";
+import ShopInfo from "@components/ShopSetting/ShopInfo";
+import ShopPolicy from "@components/ShopSetting/ShopPolicy";
+import SafetyCertification from "@components/ShopSetting/SafetyCertification";
+import DeliveryFee from "@components/ShopSetting/DeliveryFee";
+import BusinessLicense from "@components/ShopSetting/BusinessLicense";
+import PhoneNumber from "@components/ShopSetting/PhoneNumber";
+import SettlementAccount from "@components/ShopSetting/SettlementAccount";
+import RegistrationNumber from "@components/ShopSetting/RegistrationNumber";
+import Button from "@components/common/Button";
 
-interface FormType {
+export interface ShopSettingFormInputType {
   pcImage: string;
   mobileImage: string;
   shopInroduce: string;
@@ -25,92 +32,87 @@ interface FormType {
 }
 
 const ShopSetting = () => {
-  const methods = useForm<FormType>({
+  const methods = useForm<ShopSettingFormInputType>({
     mode: "onSubmit",
     reValidateMode: "onSubmit",
   });
 
-  const onSubmit: SubmitHandler<FormType> = (data) => {
+  const onSubmit: SubmitHandler<ShopSettingFormInputType> = (data) => {
     console.log(data);
   };
 
   return (
     <FormProvider {...methods}>
       <Layout>
-        <Container onSubmit={methods.handleSubmit(onSubmit)}>
-          <HeaderWrapper>
-            <HeaderText>샾 설정</HeaderText>
-          </HeaderWrapper>
-          <MenuContainer>
-            <ShopInfoMenu>샵 정보</ShopInfoMenu>
-            <WithdrawalMenu>탈퇴</WithdrawalMenu>
-          </MenuContainer>
-          <MainContainer>
-            <Represent />
-            <Policy />
-            <Safety />
-            <Order />
-            <EnterPreneur />
-            <ChangeNumber />
-            <IdentifiCation />
-            <Account />
+        <ContentsContainer
+          isForm={true}
+          onSubmit={methods.handleSubmit(onSubmit)}
+        >
+          <ContentsHeader headerName="샵 정보" />
+
+          <ContentsNavigation>
+            <ContentsNavItem selected={true}>샵 / 판매자 정보</ContentsNavItem>
+            <ContentsNavItem>탈퇴</ContentsNavItem>
+          </ContentsNavigation>
+
+          <ContentsMain>
+            <ContentsSection>
+              <InputWrapper label="샵 정보">
+                <ShopInfo />
+              </InputWrapper>
+              <InputWrapper label="정책 설정">
+                <ShopPolicy />
+              </InputWrapper>
+            </ContentsSection>
+
+            <ContentsSection>
+              <InputWrapper label="안전기준적합확인검사 인증">
+                <SafetyCertification />
+              </InputWrapper>
+            </ContentsSection>
+
+            <ContentsSection>
+              <InputWrapper label="기본 배송 정보">
+                <DeliveryFee />
+              </InputWrapper>
+            </ContentsSection>
+
+            <ContentsSection>
+              <InputWrapper label="사업자 정보(간이, 법인)">
+                <BusinessLicense />
+              </InputWrapper>
+
+              <InputWrapper label="전화번호 변경">
+                <PhoneNumber />
+              </InputWrapper>
+
+              <InputWrapper label="개인판매자 주민등록증 인증">
+                <RegistrationNumber />
+              </InputWrapper>
+
+              <InputWrapper label="정산 계좌 정보">
+                <SettlementAccount />
+              </InputWrapper>
+            </ContentsSection>
+
             <ButtonWrapper>
               <Button size="big" full={false}>
                 저장
               </Button>
             </ButtonWrapper>
-          </MainContainer>
-        </Container>
+          </ContentsMain>
+        </ContentsContainer>
       </Layout>
     </FormProvider>
   );
 };
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 16px 24px 56px 24px;
-  background-color: ${({ theme: { palette } }) => palette.grey100};
-`;
-const HeaderWrapper = styled.header`
-  background-color: ${({ theme: { palette } }) => palette.white};
-  padding: 16px 0px 16px 56px;
-  margin-bottom: 16px;
-`;
-const HeaderText = styled.h2`
-  font-weight: 700;
-  font-size: 18px;
-  line-height: 24px;
-  letter-spacing: -0.015em;
-`;
-const MenuContainer = styled.div`
-  display: flex;
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 24px;
-  letter-spacing: 0.1px;
-
-  margin-bottom: 16px;
-  & > div {
-    padding: 12px 56px 12px 56px;
-    background-color: ${({ theme: { palette } }) => palette.white};
-  }
-`;
-const ShopInfoMenu = styled.div`
-  border-bottom: 1px solid ${({ theme: { palette } }) => palette.grey500};
-`;
-const WithdrawalMenu = styled.div`
-  /* border-bottom: 1px solid ${({ theme: { palette } }) => palette.grey500}; */
-`;
-const MainContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  background-color: ${({ theme: { palette } }) => palette.white};
-`;
-
 const ButtonWrapper = styled.div`
   margin: 0 auto;
   padding-bottom: 40px;
+
+  display: grid;
+  place-items: center;
 
   & > button {
     width: 126px;
@@ -122,4 +124,5 @@ const ButtonWrapper = styled.div`
     letter-spacing: -0.015em;
   }
 `;
+
 export default ShopSetting;

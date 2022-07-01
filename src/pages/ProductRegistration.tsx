@@ -1,10 +1,10 @@
 import styled from "styled-components";
 
-import Layout from "@components/Layout";
-import ContentsHeader from "@components/ContentsHeader";
-import ContentsMain from "@components/ContentsMain";
-import ContentsSection from "@components/ContentsSection";
-import InputWrapper from "@components/InputWrapper";
+import Layout from "@components/common/Layout";
+import ContentsHeader from "@components/common/ContentsHeader";
+import ContentsMain from "@components/common/ContentsMain";
+import ContentsSection from "@components/common/ContentsSection";
+import InputWrapper from "@components/common/InputWrapper";
 
 const ProductRegistration = () => {
   return (

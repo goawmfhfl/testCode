@@ -1,25 +1,25 @@
 /* eslint-disable */
 import React, { Dispatch, SetStateAction, useState } from "react";
-import { useFormContext, useWatch } from "react-hook-form";
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { useFormContext } from "react-hook-form";
+import axios from "axios";
 import styled from "styled-components";
 
-import { encryptedData } from "utils/cipher";
+import { encryptedData } from "@utils/cipher";
 
 import deleteSrc from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
-import NoticeContainer from "@components/Common/NoticeContainer";
-import Button from "@components/Common/Button";
-import Input from "@components/Common/Input";
-import SystemModal from "@components/Common/SystemModal";
+import NoticeContainer from "@components/common/NoticeContainer";
+import Button from "@components/common/Button";
+import Input from "@components/common/Input";
+import SystemModal from "@components/common/SystemModal";
 
-interface IdentifiCationModalProps {
+interface RegistrationNumberModalProps {
   onClickModalHandler: Dispatch<SetStateAction<boolean>>;
 }
 
-const IdentifiCationModal = ({
+const RegistrationNumberModal = ({
   onClickModalHandler,
-}: IdentifiCationModalProps) => {
+}: RegistrationNumberModalProps) => {
   const [systemModal, setSysyemModal] = useState<{
     isVisible: boolean;
     icon: string;
@@ -45,7 +45,7 @@ const IdentifiCationModal = ({
   const watchFields = watch();
   const { idName, firstDigits, lastDigits, issuance } = watchFields;
 
-  const confirmIdentifiCationCode = async () => {
+  const confirmRegistrationNumberCode = async () => {
     try {
       const configs = {
         headers: { Authorization: process.env.REACT_APP_DATA_API_KEY || "" },
@@ -107,9 +107,11 @@ const IdentifiCationModal = ({
     <Container>
       <Icon src={deleteSrc} onClick={() => onClickModalHandler(false)} />
       <Title>주민등록증 인증하기</Title>
+
       <NoticeContainer icon={exclamationmarkSrc}>
         주민등록증은 정산받을 계좌 정보의 예금주명과 같아야 합니다.
       </NoticeContainer>
+
       <InfoContainer>
         <NameContainer>
           <SubTitle>성명</SubTitle>
@@ -128,12 +130,13 @@ const IdentifiCationModal = ({
           <Input placeholder="YYYYMMDD" {...register("issuance")} />
         </DateContainer>
       </InfoContainer>
+
       <ButtonContainer>
         <Button
           size="small"
           full={false}
           className="positive"
-          onClick={confirmIdentifiCationCode}
+          onClick={confirmRegistrationNumberCode}
         >
           저장
         </Button>
@@ -145,6 +148,7 @@ const IdentifiCationModal = ({
           취소
         </Button>
       </ButtonContainer>
+
       {systemModal.isVisible && (
         <SystemModal {...systemModal}>{systemModal.description}</SystemModal>
       )}
@@ -157,20 +161,16 @@ const Container = styled.div`
   top: 50%;
   transform: translateY(-50%);
   z-index: 100;
-
   display: flex;
   flex-direction: column;
-
   width: 530px;
   padding: 40px 24px 24px 24px;
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
   background-color: ${({ theme: { palette } }) => palette.white};
   box-shadow: ${({ theme: { shadow } }) => shadow.boxShadow};
-
   & > h2 {
     margin-bottom: 24px;
   }
-
   & > h2 + div {
     width: 369px;
     margin-bottom: 24px;
@@ -200,7 +200,6 @@ const NameContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 16px;
-
   & > h3 {
     width: 152px;
   }
@@ -215,7 +214,6 @@ const IdContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 16px;
-
   & > h3 {
     width: 152px;
   }
@@ -225,11 +223,9 @@ const DateContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 16px;
-
   & > h3 {
     width: 152px;
   }
-
   & > input {
     width: 120px;
     height: 32px;
@@ -246,13 +242,11 @@ const SubTitle = styled.h3`
 
 const InputContainer = styled.div`
   display: flex;
-
   & > input {
     width: 120px;
     height: 32px;
     padding: 9px 8px;
   }
-
   & > span {
     margin: auto 8px;
   }
@@ -262,7 +256,6 @@ const ButtonContainer = styled.div`
   display: flex;
   width: 100%;
   justify-content: flex-end;
-
   & > button:first-child {
     margin-right: 16px;
   }
@@ -275,4 +268,4 @@ const ButtonContainer = styled.div`
   }
 `;
 
-export default IdentifiCationModal;
+export default RegistrationNumberModal;

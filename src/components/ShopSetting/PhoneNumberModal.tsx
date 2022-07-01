@@ -1,11 +1,10 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
-
+import Input from "@components/common/Input";
+import Button from "@components/common/Button";
+import ValidText from "@components/common/ValidText";
 import deleteSrc from "@icons/delete.svg";
-import Input from "@components/Common/Input";
-import Button from "@components/Common/Button";
-import ValidText from "@components/Common/ValidText";
 
 const bizm = axios.create({
   baseURL: process.env.REACT_APP_BIZM_PRODUCT_URL,
@@ -46,7 +45,7 @@ interface ChangeNumberModalProps {
   setPhoneNumber: Dispatch<SetStateAction<string>>;
 }
 
-const ChangeNumberModal = ({
+const PhoneNumberModal = ({
   onClickModalHandler,
   setPhoneNumber,
 }: ChangeNumberModalProps) => {
@@ -173,6 +172,7 @@ const ChangeNumberModal = ({
           ? "인증번호가 전송되었습니다. 확인해주세요."
           : "변경할 전화번호를 입력해주세요"}
       </DescriptText>
+
       <ConfirmContainer>
         <PhoneNumberContainer>
           <Input
@@ -193,6 +193,7 @@ const ChangeNumberModal = ({
             {isStarted ? "인증번호 재전송" : "인증번호 전송"}
           </Button>
         </PhoneNumberContainer>
+
         {isStarted && (
           <AuthenticationCodeContainer>
             <Input
@@ -236,6 +237,7 @@ const ChangeNumberModal = ({
           </ValidText>
         )}
       </ConfirmContainer>
+
       <ButtonContainer>
         <Button
           size="small"
@@ -386,4 +388,4 @@ const ButtonContainer = styled.div`
     letter-spacing: 0.1px;
   }
 `;
-export default ChangeNumberModal;
+export default PhoneNumberModal;

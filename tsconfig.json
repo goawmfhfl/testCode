@@ -23,7 +23,8 @@
       "@icons/*": ["assets/icons/*"],
       "@images/*": ["assets/images/*"],
       "@fonts/*": ["assets/fonts/*"],
-      "@styles/*": ["styles/*"]
+      "@styles/*": ["styles/*"],
+      "@utils/*": ["utils/*"]
     }
   },
   "include": ["src", "types"]

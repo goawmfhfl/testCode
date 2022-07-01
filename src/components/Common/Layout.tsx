@@ -1,8 +1,8 @@
 import styled from "styled-components";
 
-import GlobalNavigationBar from "./GlobalNavigationBar";
-import SideNavigationBar from "./SideNavigationBar";
-import Footer from "./Footer";
+import GlobalNavigationBar from "@components/common/GlobalNavigationBar";
+import SideNavigationBar from "@components/common/SideNavigationBar";
+import Footer from "@components/common/Footer";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -36,8 +36,6 @@ const ContentsContainer = styled.div`
 `;
 const ContentsWrapper = styled.div`
   flex: 1;
-
-  padding: 16px 24px;
 `;
 
 export default Layout;

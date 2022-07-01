@@ -14,15 +14,15 @@ import Input from "@components/common/Input";
 import ValidText from "@components/common/ValidText";
 import SystemModal from "@components/common/SystemModal";
 
-interface AccountModalProps {
+interface SettlementAccountModalProps {
   onClickModalHandler: Dispatch<SetStateAction<boolean>>;
   setAccountInformation: Dispatch<SetStateAction<accountInformationType>>;
 }
 
-const AccountModal = ({
+const SettlementAccountModal = ({
   onClickModalHandler,
   setAccountInformation,
-}: AccountModalProps) => {
+}: SettlementAccountModalProps) => {
   const [systemModal, setSysyemModal] = useState<{
     isVisible: boolean;
     icon: string;
@@ -198,15 +198,12 @@ const Container = styled.div`
   top: 50%;
   transform: translateY(-50%);
   z-index: 100;
-
   padding: 40px 24px 24px 24px;
   display: flex;
   flex-direction: column;
-
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
   background-color: ${({ theme: { palette } }) => palette.white};
   box-shadow: ${({ theme: { shadow } }) => shadow.boxShadow};
-
   & > h2 {
     margin-bottom: 24px;
   }
@@ -242,12 +239,10 @@ const SelectContainer = styled.select`
   margin-bottom: 17px;
   background: url(${triangleSrc}) right no-repeat;
   background-size: 24px;
-
   font-weight: 500;
   font-size: 12px;
   line-height: 14px;
   letter-spacing: 0.1px;
-
   -o-appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -260,22 +255,18 @@ const UserAccountContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 16px;
-
   & > input {
     width: 136px;
     height: 32px;
     padding: 9px 8px;
     margin-right: 16px;
-
     font-weight: 500;
     font-size: 12px;
     line-height: 14px;
   }
-
   & > input:first-child {
     margin-right: 16px;
   }
-
   & > button {
     font-weight: 400;
     font-size: 12px;
@@ -292,7 +283,6 @@ const ButtonContainer = styled.div`
   display: flex;
   width: 100%;
   justify-content: flex-end;
-
   & > button:first-child {
     margin-right: 16px;
   }
@@ -305,4 +295,4 @@ const ButtonContainer = styled.div`
   }
 `;
 
-export default AccountModal;
+export default SettlementAccountModal;

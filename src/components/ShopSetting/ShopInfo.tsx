@@ -4,8 +4,8 @@ import { useFormContext } from "react-hook-form";
 import axios from "axios";
 import styled from "styled-components";
 
-import NoticeContainer from "@components/Common/NoticeContainer";
-import SystemModal from "@components/Common/SystemModal";
+import NoticeContainer from "@components/common/NoticeContainer";
+import SystemModal from "@components/common/SystemModal";
 import addphotoSrc from "@icons/addphoto.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import exclamationmarkRedSrc from "@icons/exclamationmark-red.svg";
@@ -13,7 +13,7 @@ import questionmarkSrc from "@icons/questionmark.svg";
 import deleteSrc from "@icons/delete.svg";
 import photochangeSrc from "@icons/photochange.svg";
 
-const Represent = () => {
+const ShopInfo = () => {
   const { register } = useFormContext();
 
   const [mobileImage, setMoboileImage] = useState<string>("");
@@ -434,4 +434,4 @@ const TextCounter = styled.span`
   line-height: 22px;
 `;
 
-export default Represent;
+export default ShopInfo;

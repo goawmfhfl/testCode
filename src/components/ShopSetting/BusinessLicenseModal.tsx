@@ -6,21 +6,21 @@ import axios from "axios";
 
 import deleteSrc from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
-import NoticeContainer from "@components/Common/NoticeContainer";
-import SystemModal from "@components/Common/SystemModal";
-import Input from "@components/Common/Input";
-import Button from "@components/Common/Button";
-import { EnterPreneurInfoType } from "@components/ShopSetting/EnterPreneur";
+import NoticeContainer from "@components/common/NoticeContainer";
+import SystemModal from "@components/common/SystemModal";
+import Input from "@components/common/Input";
+import Button from "@components/common/Button";
+import { BusinessLicenseInfoType } from "@components/ShopSetting/BusinessLicense";
 
-interface EnterPreneurModalProps {
+interface BusinessLicenseModalProps {
   setModal: Dispatch<SetStateAction<boolean>>;
-  setEnterPreneurInfo: Dispatch<SetStateAction<EnterPreneurInfoType>>;
+  setBusinessLicenseInfo: Dispatch<SetStateAction<BusinessLicenseInfoType>>;
 }
 
-const EnterPreneurModal = ({
+const BusinessLicenseModal = ({
   setModal,
-  setEnterPreneurInfo,
-}: EnterPreneurModalProps) => {
+  setBusinessLicenseInfo,
+}: BusinessLicenseModalProps) => {
   const [systemModal, setSystemModal] = useState<{
     isVisible: boolean;
     icon: string;
@@ -46,13 +46,10 @@ const EnterPreneurModal = ({
   const watchFields = watch();
   const { businessNumber, ecommerceRegistrationNumber } = watchFields;
 
-  const postEnterPreneur = async () => {
+  const postBusinessLicense = async () => {
     try {
+      // 사업자등록증, 혹은 통신판매업신고 번호를 입력하지 않았을 경우
       if (!businessNumber || !ecommerceRegistrationNumber) {
-        console.log(
-          "사업자등록증, 혹은 통신판매업신고 번호를 입력하지 않았을 경우"
-        );
-
         setSystemModal((prev) => ({
           ...prev,
           isVisible: true,
@@ -85,7 +82,6 @@ const EnterPreneurModal = ({
           prmsnMgtNo: ecommerceRegistrationNumber,
         },
       };
-      console.log("parameter 요청하려는 데이터 ", parameter);
 
       // 사업자등록번호 : 882-87-01829
       // 통신판매업신고번호 : 2020-서울송파-3260
@@ -138,8 +134,8 @@ const EnterPreneurModal = ({
     }
   };
 
-  const onConfirm = (items: SetStateAction<EnterPreneurInfoType>) => {
-    setEnterPreneurInfo(items);
+  const onConfirm = (items: SetStateAction<BusinessLicenseInfoType>) => {
+    setBusinessLicenseInfo(items);
   };
 
   const onCancel = () => {
@@ -159,14 +155,14 @@ const EnterPreneurModal = ({
         통신판매업 신고를 해야 합니다.
       </NoticeContainer>
       <InfoContainer>
-        <FillCodeContainer>
+        <InputContainer>
           <SubTitle>사업자등록번호</SubTitle>
           <Input placeholder="숫자만 입력" {...register("businessNumber")} />
-        </FillCodeContainer>
-        <FillCodeContainer>
+        </InputContainer>
+        <InputContainer>
           <SubTitle>통신판매업신고 번호</SubTitle>
           <Input {...register("ecommerceRegistrationNumber")} />
-        </FillCodeContainer>
+        </InputContainer>
       </InfoContainer>
       <ButtonContainer>
         <Button
@@ -174,7 +170,7 @@ const EnterPreneurModal = ({
           size="small"
           full={false}
           className="positive"
-          onClick={() => postEnterPreneur()}
+          onClick={postBusinessLicense}
         >
           저장
         </Button>
@@ -182,6 +178,7 @@ const EnterPreneurModal = ({
           취소
         </Button>
       </ButtonContainer>
+
       {systemModal.isVisible && (
         <SystemModal {...systemModal}>{systemModal.description}</SystemModal>
       )}
@@ -239,7 +236,7 @@ const InfoContainer = styled.div`
   }
 `;
 
-const FillCodeContainer = styled.div`
+const InputContainer = styled.div`
   height: 32px;
   display: flex;
   align-items: center;
@@ -277,4 +274,4 @@ const ButtonContainer = styled.div`
   }
 `;
 
-export default EnterPreneurModal;
+export default BusinessLicenseModal;

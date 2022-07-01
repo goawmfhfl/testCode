@@ -1,5 +1,5 @@
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import InputWrapper from "@components/InputWrapper";
+import InputWrapper from "@components/common/InputWrapper";
 
 export default {
   component: InputWrapper,

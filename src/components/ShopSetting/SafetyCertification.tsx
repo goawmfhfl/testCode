@@ -2,23 +2,16 @@ import styled from "styled-components";
 import { useState } from "react";
 
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
-import NoticeContainer from "@components/Common/NoticeContainer";
-import Button from "@components/Common/Button";
-import SafetyModal from "./SafetyModal";
+import NoticeContainer from "@components/common/NoticeContainer";
+import Button from "@components/common/Button";
+import SafetyModal from "@components/ShopSetting/SafetyModal";
 
-const Safety = () => {
+const SafetyCertification = () => {
   const [modal, setModal] = useState<boolean>(false);
   const [isConfirm, setIsConfirm] = useState<boolean>(false);
 
   return (
     <Container>
-      <SubTitleWrapper>
-        <SubTitle>
-          안전기준 적합
-          <br />
-          확인 검사 인증
-        </SubTitle>
-      </SubTitleWrapper>
       <SafetyContainer>
         <NoticeContainer icon={exclamationmarkSrc}>
           캔들, 디퓨저 판매 브랜드는 검사 인증을 완료해야 상품 등록시 카테고리
@@ -32,6 +25,7 @@ const Safety = () => {
           </Button>
         </ConfirmContainer>
       </SafetyContainer>
+
       {modal && (
         <SafetyModal
           onClickModalHandler={setModal}
@@ -49,17 +43,6 @@ const Container = styled.div`
   width: 100%;
   padding: 88px 0px;
   border-bottom: 1px solid ${({ theme: { palette } }) => palette.grey400};
-`;
-
-const SubTitleWrapper = styled.div`
-  width: 235px;
-  padding-left: 56px;
-`;
-
-const SubTitle = styled.h2`
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 20px;
 `;
 
 const SafetyContainer = styled.div`
@@ -114,4 +97,4 @@ const ConfirmText = styled.span`
   text-align: left;
 `;
 
-export default Safety;
+export default SafetyCertification;

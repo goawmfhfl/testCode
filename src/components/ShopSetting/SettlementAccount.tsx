@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 
-import Button from "@components/Common/Button";
-import AccountModal from "./AccountModal";
+import Button from "@components/common/Button";
+import SettlementAccountModal from "@components/ShopSetting/SettlementAccountModal";
 
 export interface accountInformationType {
   hasInformation: boolean;
@@ -24,7 +24,7 @@ const hideAccountNumber = (accountNumber: string) => {
   );
 };
 
-const Account = () => {
+const SettlementAccount = () => {
   const [modal, setModal] = useState<boolean>(false);
   const [accountInformation, setAccountInformation] =
     useState<accountInformationType>({
@@ -58,8 +58,9 @@ const Account = () => {
           </Button>
         </RegisterContainer>
       </AccountContainer>
+
       {modal && (
-        <AccountModal
+        <SettlementAccountModal
           onClickModalHandler={setModal}
           setAccountInformation={setAccountInformation}
         />
@@ -122,4 +123,4 @@ const RegisterContainer = styled.div`
   }
 `;
 
-export default Account;
+export default SettlementAccount;

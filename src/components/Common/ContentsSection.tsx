@@ -6,8 +6,6 @@ const ContentsSection = ({ children }: { children: React.ReactNode }) => {
 };
 
 const Container = styled.div`
-  background-color: pink;
-
   border-bottom: 1px solid grey;
   min-height: 300px;
   padding: 40px 56px;

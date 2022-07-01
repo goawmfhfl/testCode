@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import axios from "axios";
@@ -7,10 +7,10 @@ import X2JS from "x2js";
 
 import deleteSrc from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
-import Input from "@components/Common/Input";
-import ValidText from "@components/Common/ValidText";
-import Button from "@components/Common/Button";
-import NoticeContainer from "@components/Common/NoticeContainer";
+import Input from "@components/common/Input";
+import ValidText from "@components/common/ValidText";
+import Button from "@components/common/Button";
+import NoticeContainer from "@components/common/NoticeContainer";
 
 interface parsedDataType {
   rows: {

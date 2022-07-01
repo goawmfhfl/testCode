@@ -6,11 +6,11 @@ const ContentsMain = ({ children }: { children: React.ReactNode }) => {
 };
 
 const Container = styled.div`
-  background-color: skyblue;
+  background-color: #fff;
 
   margin: 12px 0px;
 
-  & > div:last-child {
+  & > div:nth-last-child(2) {
     border-bottom: none;
   }
 `;

@@ -1,10 +1,10 @@
 import { useState } from "react";
 import styled from "styled-components";
 
-import Button from "@components/Common/Button";
-import EnterPreneurModal from "./EnterPreneurModal";
+import Button from "@components/common/Button";
+import BusinessLicenseModal from "@components/ShopSetting/BusinessLicenseModal";
 
-export interface EnterPreneurInfoType {
+export interface BusinessLicenseInfoType {
   rprsvNm: string; // 대표자명
   bizrno: string; // 사업자 등록번호
   crno: string; // 법인 등록번호
@@ -13,9 +13,9 @@ export interface EnterPreneurInfoType {
   prmsnMgtNo: string; // 통신판매업신고번호(인허가관리번호)
 }
 
-const EnterPreneur = () => {
-  const [enterPreneurInfo, setEnterPreneurInfo] =
-    useState<EnterPreneurInfoType>({
+const BusinessLicense = () => {
+  const [businessLicenseInfo, setBusinessLicenseInfo] =
+    useState<BusinessLicenseInfoType>({
       rprsvNm: "",
       bizrno: "",
       crno: "",
@@ -23,7 +23,13 @@ const EnterPreneur = () => {
       rdnAddr: "",
       prmsnMgtNo: "",
     });
+
   const [modal, setModal] = useState<boolean>(false);
+
+  const hasBusinessLicense: boolean = Object.values(businessLicenseInfo).find(
+    (el) => el !== ""
+  ) as boolean;
+
   const {
     rprsvNm: ownerName,
     bizrno: businessNumber,
@@ -31,18 +37,14 @@ const EnterPreneur = () => {
     simTxtnTrgtYnDesc: isTaxPayer,
     rdnAddr: address,
     prmsnMgtNo: ecommerceRegistrationNumber,
-  } = enterPreneurInfo;
-
-  const hasEntreprenuer: boolean = Object.values(enterPreneurInfo).find(
-    (el) => el !== ""
-  ) as boolean;
+  } = businessLicenseInfo;
 
   return (
     <Container>
       <SubTitleWrapper>
         <SubTitle>사업자 정보(간이,법인)</SubTitle>
       </SubTitleWrapper>
-      {!hasEntreprenuer ? (
+      {!hasBusinessLicense ? (
         <HasNoInfoContainer>
           <InfoText>등록된 사업자등록증/통신판매업신고증이 없습니다.</InfoText>
           <Button size="small" full={false} onClick={() => setModal(true)}>
@@ -51,39 +53,39 @@ const EnterPreneur = () => {
         </HasNoInfoContainer>
       ) : (
         <HasInfoContainer>
-          <EntrePreneurInfoList>
-            <EntrepreneurInfoContainer>
-              <EntrePreneurText>대표자명</EntrePreneurText>
-              <EntrePreneurText>{ownerName}</EntrePreneurText>
-            </EntrepreneurInfoContainer>
-            <EntrepreneurInfoContainer>
-              <EntrePreneurText>사업자등록번호 </EntrePreneurText>
-              <EntrePreneurText>{businessNumber}</EntrePreneurText>
-            </EntrepreneurInfoContainer>
-            <EntrepreneurInfoContainer>
-              <EntrePreneurText>법인등록번호</EntrePreneurText>
-              <EntrePreneurText>{corporateNumber}</EntrePreneurText>
-            </EntrepreneurInfoContainer>
-            <EntrepreneurInfoContainer>
-              <EntrePreneurText>간이과세대상자</EntrePreneurText>
-              <EntrePreneurText>{isTaxPayer}</EntrePreneurText>
-            </EntrepreneurInfoContainer>
-            <EntrepreneurInfoContainer>
-              <EntrePreneurText>소재지</EntrePreneurText>
-              <EntrePreneurText>{address}</EntrePreneurText>
-            </EntrepreneurInfoContainer>
-            <EntrepreneurInfoContainer>
-              <EntrePreneurText>통신판매업신고번호</EntrePreneurText>
-              <EntrePreneurText>{ecommerceRegistrationNumber}</EntrePreneurText>
-            </EntrepreneurInfoContainer>
-          </EntrePreneurInfoList>
+          <InfoList>
+            <InfoContainer>
+              <Text>대표자명</Text>
+              <Text>{ownerName}</Text>
+            </InfoContainer>
+            <InfoContainer>
+              <Text>사업자등록번호 </Text>
+              <Text>{businessNumber}</Text>
+            </InfoContainer>
+            <InfoContainer>
+              <Text>법인등록번호</Text>
+              <Text>{corporateNumber}</Text>
+            </InfoContainer>
+            <InfoContainer>
+              <Text>간이과세대상자</Text>
+              <Text>{isTaxPayer}</Text>
+            </InfoContainer>
+            <InfoContainer>
+              <Text>소재지</Text>
+              <Text>{address}</Text>
+            </InfoContainer>
+            <InfoContainer>
+              <Text>통신판매업신고번호</Text>
+              <Text>{ecommerceRegistrationNumber}</Text>
+            </InfoContainer>
+          </InfoList>
         </HasInfoContainer>
       )}
 
       {modal && (
-        <EnterPreneurModal
+        <BusinessLicenseModal
           setModal={setModal}
-          setEnterPreneurInfo={setEnterPreneurInfo}
+          setBusinessLicenseInfo={setBusinessLicenseInfo}
         />
       )}
     </Container>
@@ -142,12 +144,12 @@ const HasInfoContainer = styled.div`
   background-color: ${({ theme: { palette } }) => palette.grey100};
 `;
 
-const EntrePreneurInfoList = styled.ul`
+const InfoList = styled.ul`
   display: flex;
   flex-direction: column;
 `;
 
-const EntrepreneurInfoContainer = styled.li`
+const InfoContainer = styled.li`
   display: flex;
   padding-bottom: 8px;
   margin-bottom: 8px;
@@ -158,7 +160,7 @@ const EntrepreneurInfoContainer = styled.li`
   }
 `;
 
-const EntrePreneurText = styled.span`
+const Text = styled.span`
   font-weight: 400;
   font-size: 14px;
   line-height: 18px;
@@ -173,4 +175,4 @@ const InfoText = styled.h3`
   letter-spacing: 0.1px;
 `;
 
-export default EnterPreneur;
+export default BusinessLicense;

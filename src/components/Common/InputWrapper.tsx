@@ -25,8 +25,6 @@ const InputWrapper = ({
 };
 
 const Container = styled.div<{ marginTop: string; marginBottom: string }>`
-  background-color: gainsboro;
-
   margin-top: ${({ marginTop }) => marginTop};
   margin-bottom: ${({ marginBottom }) => marginBottom};
 
@@ -43,15 +41,14 @@ const requiredInputStyle = css`
 `;
 
 const InputLabel = styled.label<{ isRequired: boolean }>`
-  flex-basis: 234px;
+  min-width: 234px;
 
   font-weight: 700;
   font-size: 14px;
   line-height: 13.86px;
 
-  padding-left: 56px;
-  padding-top: 9px;
-  padding-bottom: 9px;
+  display: flex;
+  align-items: start;
 
   ${({ isRequired }) => (isRequired ? requiredInputStyle : "")};
 `;

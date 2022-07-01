@@ -1,7 +1,7 @@
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import ContentsSection from "@components/ContentsSection";
-import InputWrapper from "@components/InputWrapper";
-import TextInput from "@components/input/TextInput";
+import ContentsSection from "@components/common/ContentsSection";
+import InputWrapper from "@components/common/InputWrapper";
+import TextInput from "@components/common/input/TextInput";
 
 export default {
   component: ContentsSection,

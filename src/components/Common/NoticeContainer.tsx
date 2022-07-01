@@ -16,13 +16,17 @@ const NoticeContainer = ({ children, icon }: NoticeContainerType) => {
 
 const Container = styled.div`
   display: flex;
-  padding: 12px 16px 8px 11px;
+  padding: 8px 16px 8px 8px;
   border-radius: 7px;
   background: ${({ theme: { palette } }) => palette.grey400};
 `;
 const NoticeText = styled.p`
   display: flex;
   align-items: center;
+
+  padding-top: 4px;
+
+  font-family: "SpoqaHanSansNeo";
   font-weight: 300;
   font-size: 12px;
   line-height: 18px;

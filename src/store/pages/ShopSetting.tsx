@@ -1,18 +1,17 @@
 /* eslint-disable */
-import React from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
 
-import Layout from "@components/Common/Layout";
-import Represent from "@components/ShopSetting/Represent";
+import Layout from "@components/common/Layout";
+import Represent from "@components/ShopSetting/ShopInfo";
 import Policy from "@components/ShopSetting/Policy";
 import Safety from "@components/ShopSetting/Safety";
 import Order from "@components/ShopSetting/Order";
-import EnterPreneur from "@components/ShopSetting/EnterPreneur";
-import ChangeNumber from "@components/ShopSetting/ChangeNumber";
-import Account from "@components/ShopSetting/Account";
-import IdentifiCation from "@components/ShopSetting/IdentifiCation";
-import Button from "@components/Common/Button";
+import BusinessLicense from "@components/ShopSetting/BusinessLicense";
+import ChangeNumber from "@components/ShopSetting/PhoneNumber";
+import SettlementAccount from "@components/ShopSetting/SettlementAccount";
+import RegistrationNumber from "@components/ShopSetting/RegistrationNumber";
+import Button from "@components/common/Button";
 
 interface FormType {
   pcImage: string;
@@ -51,10 +50,10 @@ const ShopSetting = () => {
             <Policy />
             <Safety />
             <Order />
-            <EnterPreneur />
+            <BusinessLicense />
             <ChangeNumber />
-            <IdentifiCation />
-            <Account />
+            <RegistrationNumber />
+            <SettlementAccount />
             <ButtonWrapper>
               <Button size="big" full={false}>
                 저장
