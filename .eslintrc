@@ -8,7 +8,7 @@
   ],
   "parser": "@typescript-eslint/parser",
   "rules": {
-    "@typescript-eslint/strict-boolean-expressions": [2]
+    "@typescript-eslint/strict-boolean-expressions": 0
   },
   "overrides": [
     {
