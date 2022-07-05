@@ -9,6 +9,7 @@ import SystemModal from "@components/common/SystemModal";
 import addphotoSrc from "@icons/addphoto.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import exclamationmarkRedSrc from "@icons/exclamationmark-red.svg";
+import addImageSrc from "@icons/addImage.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
 import deleteSrc from "@icons/delete.svg";
 import photochangeSrc from "@icons/photochange.svg";

@@ -20,6 +20,7 @@ const Container = styled.div`
   border-radius: 7px;
   background: ${({ theme: { palette } }) => palette.grey400};
 `;
+
 const NoticeText = styled.p`
   display: flex;
   align-items: center;
@@ -32,6 +33,7 @@ const NoticeText = styled.p`
   line-height: 18px;
   letter-spacing: 0.1px;
 `;
+
 const Image = styled.img`
   width: 24px;
   height: 24px;

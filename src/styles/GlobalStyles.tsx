@@ -48,6 +48,19 @@ const GlobalStyles = createGlobalStyle`
       }
     }
 
+    // Remove downside arrow of select input
+    select {
+      /* for Firefox */
+      -moz-appearance: none;
+      /* for Chrome */
+      -webkit-appearance: none;
+    }
+
+    /* For IE10 */
+    select::-ms-expand {
+      display: none;
+    }
+
     a, button {
         cursor: pointer;
     }

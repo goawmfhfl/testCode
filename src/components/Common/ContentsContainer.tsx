@@ -2,15 +2,20 @@ import React, { BaseSyntheticEvent } from "react";
 import styled from "styled-components";
 
 const ContentsContainer = ({
-  children,
+  isForm,
   onSubmit,
+  children,
 }: {
-  isForm: boolean;
-  onSubmit: (
+  isForm?: boolean | undefined;
+  onSubmit?: (
     e?: BaseSyntheticEvent<object, any, any> | undefined
   ) => Promise<void>;
   children: React.ReactNode;
 }) => {
+  if (!(isForm ?? false) || !onSubmit) {
+    return <Container>{children}</Container>;
+  }
+
   return (
     <Container
       onSubmit={(e) => {
@@ -22,7 +27,6 @@ const ContentsContainer = ({
         })();
       }}
     >
-      {" "}
       {children}
     </Container>
   );

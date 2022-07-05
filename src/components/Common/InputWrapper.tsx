@@ -33,15 +33,16 @@ const Container = styled.div<{ marginTop: string; marginBottom: string }>`
 
 const requiredInputStyle = css`
   &:after {
-    width: 5px;
-    height: 5px;
-    background-color: black;
-    border-radius: 50%;
+    content: "●";
+    margin-left: 4px;
+    font-size: 0.5em;
+    /* align-self: center; */
   }
 `;
 
 const InputLabel = styled.label<{ isRequired: boolean }>`
   min-width: 234px;
+  margin-top: 9px;
 
   font-weight: 700;
   font-size: 14px;
