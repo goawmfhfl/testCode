@@ -6,9 +6,18 @@ import ContentsSection from "@components/common/ContentsSection";
 import InputWrapper from "@components/common/InputWrapper";
 import NoticeContainer from "@components/common/NoticeContainer";
 import TextInput from "@components/common/input/TextInput";
+import Textarea from "@components/common/input/Textarea";
 
 import ProductCategory from "@components/ProductRegistration/ProductCategory";
 import ProductImage from "@components/ProductRegistration/ProductImage";
+import ProductColor from "@components/ProductRegistration/ProductColor";
+import ProductPrice from "@components/ProductRegistration/ProductPrice";
+import ProductDiscount from "@components/ProductRegistration/ProductDiscount";
+import ProductStock from "@components/ProductRegistration/ProductStock";
+import PurchaseOption from "@components/ProductRegistration/PurchaseOption";
+import OrderProduction from "@components/ProductRegistration/OrderProduction";
+import ProductDeliveryFee from "@components/ProductRegistration/ProductDeliveryFee";
+import ProductSpecification from "@components/ProductRegistration/ProductSpecification";
 
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 
@@ -36,7 +45,7 @@ const ProductRegistration = () => {
               <ProductImage />
             </InputWrapper>
             <InputWrapper label={"상품설명"} isRequired={true}>
-              <input type="text" name="" id="" />
+              <Textarea width={"716px"} height={"126px"} />
             </InputWrapper>
             <InputWrapper label={"상품 상세페이지"} isRequired={true}>
               <input type="text" name="" id="" />
@@ -44,41 +53,45 @@ const ProductRegistration = () => {
             <InputWrapper label={"상품 스토리"} isRequired={true}>
               <input type="text" name="" id="" />
             </InputWrapper>
-            <InputWrapper label={"상품 컬러"} isRequired={true}>
-              <input type="text" name="" id="" />
+            <InputWrapper
+              label={"상품 컬러"}
+              isRequired={true}
+              labelMarginTop={false}
+            >
+              <ProductColor />
             </InputWrapper>
           </ContentsSection>
 
           <ContentsSection>
             <InputWrapper label={"판매가"} isRequired={true}>
-              <input type="text" name="" id="" />
+              <ProductPrice />
             </InputWrapper>
             <InputWrapper label={"할인"}>
-              <input type="text" name="" id="" />
+              <ProductDiscount />
             </InputWrapper>
           </ContentsSection>
 
           <ContentsSection>
             <InputWrapper label={"재고"} isRequired={true}>
-              <TextInput /> 개
+              <ProductStock />
             </InputWrapper>
             <InputWrapper label={"옵션 설정"}>
-              <input type="text" name="" id="" />
+              <PurchaseOption />
             </InputWrapper>
           </ContentsSection>
 
           <ContentsSection>
             <InputWrapper label={"주문 후 제작 여부"}>
-              <input type="text" name="" id="" />
+              <OrderProduction />
             </InputWrapper>
             <InputWrapper label={"배송 설정"}>
-              <input type="text" name="" id="" />
+              <ProductDeliveryFee />
             </InputWrapper>
           </ContentsSection>
 
           <ContentsSection>
             <InputWrapper label={"작품정보제공고시"} isRequired={true}>
-              <input type="text" name="" id="" />
+              <ProductSpecification />
             </InputWrapper>
           </ContentsSection>
         </ContentsMain>

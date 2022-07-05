@@ -94,12 +94,6 @@ const ShopSetting = () => {
                 <SettlementAccount />
               </InputWrapper>
             </ContentsSection>
-
-            <ButtonWrapper>
-              <Button size="big" full={false}>
-                저장
-              </Button>
-            </ButtonWrapper>
           </ContentsMain>
         </ContentsContainer>
       </Layout>

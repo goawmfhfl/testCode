@@ -24,6 +24,12 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const DropdownContainer = styled.div``;
+const DropdownContainer = styled.div`
+  margin-top: 8px;
+
+  & > select {
+    margin-right: 16px;
+  }
+`;
 
 export default ProductCategory;

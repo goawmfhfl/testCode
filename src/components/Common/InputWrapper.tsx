@@ -7,16 +7,22 @@ const InputWrapper = ({
   children,
   marginTop = "88px",
   marginBottom = "88px",
+  labelMarginTop = true,
 }: {
   label: string;
   isRequired?: boolean;
   children: React.ReactNode;
   marginTop?: string;
   marginBottom?: string;
+  labelMarginTop?: boolean;
 }) => {
   return (
     <Container marginTop={marginTop} marginBottom={marginBottom}>
-      <InputLabel htmlFor="" isRequired={isRequired}>
+      <InputLabel
+        htmlFor=""
+        isRequired={isRequired}
+        hasTopMargin={labelMarginTop}
+      >
         {label}
       </InputLabel>
       {children}
@@ -36,13 +42,12 @@ const requiredInputStyle = css`
     content: "●";
     margin-left: 4px;
     font-size: 0.5em;
-    /* align-self: center; */
   }
 `;
 
-const InputLabel = styled.label<{ isRequired: boolean }>`
+const InputLabel = styled.label<{ isRequired: boolean; hasTopMargin: boolean }>`
   min-width: 234px;
-  margin-top: 9px;
+  margin-top: ${({ hasTopMargin }) => (hasTopMargin ? "9px" : "")};
 
   font-weight: 700;
   font-size: 14px;

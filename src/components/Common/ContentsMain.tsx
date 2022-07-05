@@ -10,7 +10,7 @@ const Container = styled.div`
 
   margin: 12px 0px;
 
-  & > div:nth-last-child(2) {
+  & > div:nth-last-child(1) {
     border-bottom: none;
   }
 `;

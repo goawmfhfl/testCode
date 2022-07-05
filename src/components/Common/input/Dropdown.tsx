@@ -45,13 +45,11 @@ const Dropdown = ({
   }, []);
 
   return (
-    <>
-      <Select size={size}>
-        {dropdownOptions.map(({ key, text }) => {
-          return <Option key={key}>{text}</Option>;
-        })}
-      </Select>
-    </>
+    <Select size={size}>
+      {dropdownOptions.map(({ key, text }) => {
+        return <Option key={key}>{text}</Option>;
+      })}
+    </Select>
   );
 };
 
@@ -90,6 +88,7 @@ const SelectInput = styled.select<SelectProps>`
       case "medium":
         return `
           padding: 8px;
+          height: 32px;
           background-image: url(${arrowSrc});
           background-repeat: no-repeat;
           background-position: right;
@@ -108,8 +107,7 @@ const SelectInput = styled.select<SelectProps>`
   }};
 
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
-  margin-top: 8px;
-  margin-right: 24px;
+
   padding-right: 54px;
 `;
 
