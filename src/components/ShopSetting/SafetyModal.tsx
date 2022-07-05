@@ -6,7 +6,7 @@ import axios from "axios";
 import X2JS from "x2js";
 
 import deleteSrc from "@icons/delete.svg";
-import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
+import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import Input from "@components/common/Input";
 import ValidText from "@components/common/ValidText";
 import Button from "@components/common/Button";

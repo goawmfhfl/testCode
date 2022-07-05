@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
 
-import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
+import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import RegistrationNumberModal from "@components/ShopSetting/RegistrationNumberModal";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";

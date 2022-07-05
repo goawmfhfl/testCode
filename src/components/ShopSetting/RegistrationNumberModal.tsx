@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { encryptedData } from "@utils/cipher";
 
 import deleteSrc from "@icons/delete.svg";
-import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
+import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
 import Input from "@components/common/Input";

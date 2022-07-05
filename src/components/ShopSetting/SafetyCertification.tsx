@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useState } from "react";
 
-import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
+import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
 import SafetyModal from "@components/ShopSetting/SafetyModal";

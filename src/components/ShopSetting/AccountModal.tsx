@@ -6,7 +6,7 @@ import { useFormContext } from "react-hook-form";
 import { accountInformationType } from "@components/ShopSetting/SettlementAccount";
 
 import deleteSrc from "@icons/delete.svg";
-import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
+import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import triangleSrc from "@icons/triangle.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
