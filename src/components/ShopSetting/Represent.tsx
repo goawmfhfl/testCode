@@ -23,42 +23,51 @@ const Represent = () => {
   const [textLengh, setTextLength] = useState<number>(0);
 
   const imageHandler = async (event: ChangeEvent<HTMLInputElement>) => {
-    const formData = new FormData();
-    const version = event.target.name;
-    const targetImage = event.target.files as FileList;
-    const { size } = targetImage[0];
-    formData.append("files", targetImage[0]);
+    try {
+      const formData = new FormData();
+      const version = event.target.name;
+      const targetImage = event.target.files as FileList;
+      const { size } = targetImage[0];
+      formData.append("files", targetImage[0]);
 
-    // check Image size
-    if (version === "mobileImage" && size / 1024 / 1024 > 2)
-      return setModal(true);
-    if (version === "pcImage" && size / 1024 / 1024 > 3) return setModal(true);
+      // check Image size
+      if (version === "mobileImage" && size / 1024 / 1024 > 2)
+        return setModal(true);
+      if (version === "pcImage" && size / 1024 / 1024 > 3)
+        return setModal(true);
 
-    // delete duplicate url
-    if (mobileImage && version === "mobileImage") deleteImageUrl(mobileImage);
-    if (pcImage && version === "pcImage") deleteImageUrl(pcImage);
+      // delete duplicate url
+      if (mobileImage && version === "mobileImage") deleteImageUrl(mobileImage);
+      if (pcImage && version === "pcImage") deleteImageUrl(pcImage);
 
-    // create & save image url
-    const { data } = await axios.post(
-      "https://dev.chopsticks-store.com/upload",
-      formData
-    );
-    if (version === "mobileImage") setMoboileImage(data);
-    if (version === "pcImage") setPcImage(data);
+      // create & save image url
+      const { data } = await axios.post(
+        "https://dev.chopsticks-store.com/upload",
+        formData
+      );
+      if (version === "mobileImage") setMoboileImage(data);
+      if (version === "pcImage") setPcImage(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const deleteImageUrl = async (imageUrl: any) => {
-    const response = await axios.delete(
-      "https://dev.chopsticks-store.com/upload",
-      {
-        data: {
-          url: imageUrl.toString(),
-        },
-      }
-    );
+    try {
+      const response = await axios.delete(
+        "https://dev.chopsticks-store.com/upload",
+        {
+          data: {
+            url: imageUrl.toString(),
+          },
+        }
+      );
 
-    if (imageUrl === mobileImage) setMoboileImage("");
-    if (imageUrl === pcImage) setPcImage("");
+      if (imageUrl === mobileImage) setMoboileImage("");
+      if (imageUrl === pcImage) setPcImage("");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

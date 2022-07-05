@@ -1,57 +1,97 @@
+import { useState } from "react";
 import styled from "styled-components";
 
 import Button from "@components/Common/Button";
-import { useFormContext } from "react-hook-form";
+import EnterPreneurModal from "./EnterPreneurModal";
+
+export interface EnterPreneurInfoType {
+  rprsvNm: string; // 대표자명
+  bizrno: string; // 사업자 등록번호
+  crno: string; // 법인 등록번호
+  simTxtnTrgtYnDesc: string; // 간이과세대상자
+  rdnAddr: string; // 소재지
+  prmsnMgtNo: string; // 통신판매업신고번호(인허가관리번호)
+}
 
 const EnterPreneur = () => {
-  const { register } = useFormContext();
+  const [enterPreneurInfo, setEnterPreneurInfo] =
+    useState<EnterPreneurInfoType>({
+      rprsvNm: "",
+      bizrno: "",
+      crno: "",
+      simTxtnTrgtYnDesc: "",
+      rdnAddr: "",
+      prmsnMgtNo: "",
+    });
+  const [modal, setModal] = useState<boolean>(false);
+  const {
+    rprsvNm: ownerName,
+    bizrno: businessNumber,
+    crno: corporateNumber,
+    simTxtnTrgtYnDesc: isTaxPayer,
+    rdnAddr: address,
+    prmsnMgtNo: ecommerceRegistrationNumber,
+  } = enterPreneurInfo;
+
+  const hasEntreprenuer: boolean = Object.values(enterPreneurInfo).find(
+    (el) => el !== ""
+  ) as boolean;
 
   return (
     <Container>
       <SubTitleWrapper>
         <SubTitle>사업자 정보(간이,법인)</SubTitle>
       </SubTitleWrapper>
-      {/* <HasNoInfoContainer>
-        <InfoText>등록된 사업자등록증/통신판매업신고증이 없습니다.</InfoText>
-        <Button size="small" full={false}>
-          등록하기
-        </Button>
-      </HasNoInfoContainer> */}
-      <HasInfoContainer>
-        <EntrePreneurInfoList>
-          <EntrepreneurInfoContainer>
-            <EntrePreneurText>대표자명</EntrePreneurText>
-            <EntrePreneurText>김지원</EntrePreneurText>
-          </EntrepreneurInfoContainer>
-          <EntrepreneurInfoContainer>
-            <EntrePreneurText>사업자등록번호 </EntrePreneurText>
-            <EntrePreneurText>123-45-12345</EntrePreneurText>
-          </EntrepreneurInfoContainer>
-          <EntrepreneurInfoContainer>
-            <EntrePreneurText>법인등록번호</EntrePreneurText>
-            <EntrePreneurText>해당사항없음</EntrePreneurText>
-          </EntrepreneurInfoContainer>
-          <EntrepreneurInfoContainer>
-            <EntrePreneurText>간이과세대상자</EntrePreneurText>
-            <EntrePreneurText>대상</EntrePreneurText>
-          </EntrepreneurInfoContainer>
-          <EntrepreneurInfoContainer>
-            <EntrePreneurText>소재지</EntrePreneurText>
-            <EntrePreneurText>
-              서울특별시 종로구 새문안로 3길 3, 내일신문빌딩 5층
-            </EntrePreneurText>
-          </EntrepreneurInfoContainer>
-          <EntrepreneurInfoContainer>
-            <EntrePreneurText>통신판매업신고번호</EntrePreneurText>
-            <EntrePreneurText>2020-서울송파-3260</EntrePreneurText>
-          </EntrepreneurInfoContainer>
-        </EntrePreneurInfoList>
-      </HasInfoContainer>
+      {!hasEntreprenuer ? (
+        <HasNoInfoContainer>
+          <InfoText>등록된 사업자등록증/통신판매업신고증이 없습니다.</InfoText>
+          <Button size="small" full={false} onClick={() => setModal(true)}>
+            등록하기
+          </Button>
+        </HasNoInfoContainer>
+      ) : (
+        <HasInfoContainer>
+          <EntrePreneurInfoList>
+            <EntrepreneurInfoContainer>
+              <EntrePreneurText>대표자명</EntrePreneurText>
+              <EntrePreneurText>{ownerName}</EntrePreneurText>
+            </EntrepreneurInfoContainer>
+            <EntrepreneurInfoContainer>
+              <EntrePreneurText>사업자등록번호 </EntrePreneurText>
+              <EntrePreneurText>{businessNumber}</EntrePreneurText>
+            </EntrepreneurInfoContainer>
+            <EntrepreneurInfoContainer>
+              <EntrePreneurText>법인등록번호</EntrePreneurText>
+              <EntrePreneurText>{corporateNumber}</EntrePreneurText>
+            </EntrepreneurInfoContainer>
+            <EntrepreneurInfoContainer>
+              <EntrePreneurText>간이과세대상자</EntrePreneurText>
+              <EntrePreneurText>{isTaxPayer}</EntrePreneurText>
+            </EntrepreneurInfoContainer>
+            <EntrepreneurInfoContainer>
+              <EntrePreneurText>소재지</EntrePreneurText>
+              <EntrePreneurText>{address}</EntrePreneurText>
+            </EntrepreneurInfoContainer>
+            <EntrepreneurInfoContainer>
+              <EntrePreneurText>통신판매업신고번호</EntrePreneurText>
+              <EntrePreneurText>{ecommerceRegistrationNumber}</EntrePreneurText>
+            </EntrepreneurInfoContainer>
+          </EntrePreneurInfoList>
+        </HasInfoContainer>
+      )}
+
+      {modal && (
+        <EnterPreneurModal
+          setModal={setModal}
+          setEnterPreneurInfo={setEnterPreneurInfo}
+        />
+      )}
     </Container>
   );
 };
 
 const Container = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
 

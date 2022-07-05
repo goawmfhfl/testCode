@@ -2,42 +2,64 @@ import React from "react";
 import styled from "styled-components";
 
 import Button from "./Button";
+
 interface SystemModalType {
-  icon?: React.ReactNode;
+  icon?: string;
   children: React.ReactNode;
-  text: string;
-  multi: boolean;
-  onClick: () => void;
+  buttonText?: string;
+  hasMultiButton: boolean;
+  handleConfirmButtonClick?: () => void;
+  handleCancelButtonClick?: () => void;
 }
 
 const SystemModal = ({
-  icon,
+  icon = "",
   children,
-  text,
-  multi,
-  onClick,
+  buttonText,
+  hasMultiButton,
+  handleConfirmButtonClick,
+  handleCancelButtonClick,
 }: SystemModalType) => {
+  console.log(children);
+
   return (
     <Container>
-      {icon}
+      {icon && <Icon src={icon} />}
       <Text>{children}</Text>
-      {multi ? (
+      {hasMultiButton ? (
         <ButtonWrapper>
-          <Button type="button" size="small" full={false} className="positive">
+          <Button
+            type="button"
+            size="small"
+            full={false}
+            className="positive"
+            onClick={handleConfirmButtonClick}
+          >
             확인
           </Button>
-          <Button type="button" size="small" full={false}>
+          <Button
+            type="button"
+            size="small"
+            full={false}
+            onClick={handleCancelButtonClick}
+          >
             취소
           </Button>
         </ButtonWrapper>
       ) : (
-        <Button type="button" size="small" full={false} onClick={onClick}>
-          {text}
+        <Button
+          type="button"
+          size="small"
+          full={false}
+          onClick={handleConfirmButtonClick}
+        >
+          {buttonText}
         </Button>
       )}
     </Container>
   );
 };
+
 const Container = styled.div`
   position: fixed;
   top: 40%;
@@ -48,8 +70,9 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 279px;
+  padding: 20px 0px;
 
-  padding: 20px 56.5px;
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
   background-color: ${({ theme: { palette } }) => palette.white};
   box-shadow: ${({ theme: { shadow } }) => shadow.boxShadow};
@@ -72,6 +95,8 @@ const Text = styled.span`
   text-align: center;
   letter-spacing: 0.1px;
 `;
+
+const Icon = styled.img``;
 
 const ButtonWrapper = styled.div`
   display: flex;
