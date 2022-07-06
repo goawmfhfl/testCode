@@ -3,6 +3,7 @@ import styled from "styled-components";
 import TextInput from "@components/common/input/TextInput";
 import Dropdown from "@components/common/input/Dropdown";
 import DateInput from "@components/common/input/DateInput";
+import Checkbox from "@components/common/input/Checkbox";
 
 const ProductDiscount = () => {
   const discountedPrice = "-";
@@ -54,10 +55,7 @@ const DropdownWrapper = styled.span`
   margin-right: 8px;
 `;
 
-const DiscountCheckbox = styled.input.attrs({ type: "checkbox" })`
-  width: 16px;
-  height: 16px;
-
+const DiscountCheckbox = styled(Checkbox)`
   margin-left: 24px;
   margin-right: 8px;
 `;

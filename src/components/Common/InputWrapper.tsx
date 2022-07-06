@@ -35,6 +35,10 @@ const Container = styled.div<{ marginTop: string; marginBottom: string }>`
   margin-bottom: ${({ marginBottom }) => marginBottom};
 
   display: flex;
+
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 15px;
 `;
 
 const requiredInputStyle = css`
@@ -49,6 +53,7 @@ const InputLabel = styled.label<{ isRequired: boolean; hasTopMargin: boolean }>`
   min-width: 234px;
   margin-top: ${({ hasTopMargin }) => (hasTopMargin ? "9px" : "")};
 
+  font-family: "SpoqaHanSansNeo";
   font-weight: 700;
   font-size: 14px;
   line-height: 13.86px;

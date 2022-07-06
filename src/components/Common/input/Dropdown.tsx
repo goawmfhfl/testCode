@@ -92,6 +92,10 @@ const SelectInput = styled.select<SelectProps>`
           background-image: url(${arrowSrc});
           background-repeat: no-repeat;
           background-position: right;
+
+          font-weight: 500;
+          font-size: 12px;
+          line-height: 14px;
         `;
       case "big":
         return `

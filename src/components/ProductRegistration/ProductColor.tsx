@@ -1,34 +1,46 @@
+import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import styled from "styled-components";
 import checkedIconSrc from "@icons/checkbox-checked-white.svg";
 import darkCheckedIconSrc from "@icons/checkbox-checked-grey.svg";
 
+const colors: { name: string; hex: string; darkCheckedIcon?: boolean }[] = [
+  { name: "빨강", hex: "#FF0000" },
+  { name: "주황", hex: "#FF8A00" },
+  { name: "노랑", hex: "#FFE600" },
+  { name: "연두", hex: "#37D300" },
+  { name: "초록", hex: "#008A0E" },
+  { name: "하늘", hex: "#7ACFFF" },
+  { name: "파랑", hex: "#0BA7FF" },
+  { name: "남색", hex: "#003AAD" },
+  { name: "분홍", hex: "#FF81FA" },
+  { name: "보라", hex: "#9038FF" },
+  { name: "자주", hex: "#DA00AA" },
+  { name: "검정", hex: "#000000" },
+  { name: "흰색", hex: "#FFFFFF", darkCheckedIcon: true },
+  { name: "회색", hex: "#BBC0C6" },
+  { name: "아이보리", hex: "#FEFAF0", darkCheckedIcon: true },
+  { name: "베이지", hex: "#FDF2D7", darkCheckedIcon: true },
+  { name: "갈색", hex: "#955D0A" },
+  { name: "패턴/일러스트", hex: "#008A0E" },
+];
+
 const ProductColor = () => {
-  const colors: { name: string; hex: string; darkCheckedIcon?: boolean }[] = [
-    { name: "빨강", hex: "#FF0000" },
-    { name: "주황", hex: "#FF8A00" },
-    { name: "노랑", hex: "#FFE600" },
-    { name: "연두", hex: "#37D300" },
-    { name: "초록", hex: "#008A0E" },
-    { name: "하늘", hex: "#7ACFFF" },
-    { name: "파랑", hex: "#0BA7FF" },
-    { name: "남색", hex: "#003AAD" },
-    { name: "분홍", hex: "#FF81FA" },
-    { name: "보라", hex: "#9038FF" },
-    { name: "자주", hex: "#DA00AA" },
-    { name: "검정", hex: "#000000" },
-    { name: "흰색", hex: "#FFFFFF", darkCheckedIcon: true },
-    { name: "회색", hex: "#BBC0C6" },
-    { name: "아이보리", hex: "#FEFAF0", darkCheckedIcon: true },
-    { name: "베이지", hex: "#FDF2D7", darkCheckedIcon: true },
-    { name: "갈색", hex: "#955D0A" },
-    { name: "패턴/일러스트", hex: "#008A0E" },
-  ];
+  const [mappedColorList, setMappedColorList] = useState<
+    Array<{ key: string; name: string; hex: string; darkCheckedIcon?: boolean }>
+  >([]);
+
+  useEffect(() => {
+    const mappedColors = colors.map((el) => ({ ...el, key: uuidv4() }));
+
+    setMappedColorList(mappedColors);
+  }, []);
 
   return (
     <Container>
-      {colors.map(({ name, hex, darkCheckedIcon }) => {
+      {mappedColorList.map(({ key, name, hex, darkCheckedIcon }) => {
         return (
-          <ColorContainer>
+          <ColorContainer key={key}>
             <Color hex={hex} darkCheckedIcon={darkCheckedIcon} />
             <Label>{name}</Label>
           </ColorContainer>
