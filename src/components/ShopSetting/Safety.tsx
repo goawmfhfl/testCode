@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
@@ -7,6 +8,7 @@ import Button from "@components/Common/Button";
 import SafetyModal from "./SafetyModal";
 
 const Safety = () => {
+  const [modal, setModal] = useState<boolean>(false);
   const { register } = useFormContext();
 
   return (
@@ -26,15 +28,16 @@ const Safety = () => {
         <ConfirmContainer>
           <ConfirmInfoText>안전기준 적합 확인 검사 신고번호</ConfirmInfoText>
           {/* <ConfirmText>인증완료</ConfirmText> */}
-          <Button size="small" full={false}>
+          <Button size="small" full={false} onClick={() => setModal(true)}>
             인증하기
           </Button>
         </ConfirmContainer>
       </SafetyContainer>
-      {/* <SafetyModal /> */}
+      {modal && <SafetyModal onClickModalHandler={setModal} />}
     </Container>
   );
 };
+
 const Container = styled.div`
   position: relative;
   display: flex;
