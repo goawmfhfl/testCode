@@ -26,14 +26,26 @@ const sizeStyles = css<{ size: string }>`
     `}
 `;
 
-const Button = styled.button<{ full?: boolean; size: string }>`
+const Button = styled.button<{
+  full?: boolean;
+  size: string;
+  color?: string;
+  backgroundColor?: string;
+}>`
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid ${({ theme: { palette } }) => palette.grey500};
-  word-break: keep-all;
 
-  width: ${({ full }) => (full ? "100%" : "")};
+  border: 1px solid
+    ${({ backgroundColor, theme: { palette } }) =>
+      backgroundColor ? backgroundColor : palette.grey500};
+  word-break: keep-all;
+  color: ${({ color }) => (color ? color : "black")};
+  background-color: ${({ backgroundColor }) =>
+    backgroundColor ? backgroundColor : "transparent"};
+  font-family: "SpoqaHanSansNeo";
+
+  width: ${({ full }) => (full ? "100%" : "126px")};
 
   ${sizeStyles};
 
