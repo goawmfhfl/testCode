@@ -1,23 +1,26 @@
 import React, { BaseSyntheticEvent } from "react";
 import styled from "styled-components";
 
-const ContentsContainer = ({
-  isForm,
-  onSubmit,
-  children,
-}: {
+interface ContentsContainerProps {
   isForm?: boolean | undefined;
   onSubmit?: (
     e?: BaseSyntheticEvent<object, any, any> | undefined
   ) => Promise<void>;
   children: React.ReactNode;
-}) => {
+}
+
+const ContentsContainer = ({
+  isForm,
+  onSubmit,
+  children,
+}: ContentsContainerProps) => {
   if (!(isForm ?? false) || !onSubmit) {
-    return <Container>{children}</Container>;
+    return <div>{children}</div>;
   }
 
   return (
-    <Container
+    <form
+      id="hook-form"
       onSubmit={(e) => {
         e.preventDefault();
 
@@ -28,14 +31,12 @@ const ContentsContainer = ({
       }}
     >
       {children}
-    </Container>
+    </form>
   );
 };
 
-const Container = styled.div`
+export default styled(ContentsContainer)`
   background-color: ${({ theme: { palette } }) => palette.grey100};
 
   padding: 16px 24px;
 `;
-
-export default ContentsContainer;

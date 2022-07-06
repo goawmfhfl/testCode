@@ -18,7 +18,6 @@ import BusinessLicense from "@components/ShopSetting/BusinessLicense";
 import PhoneNumber from "@components/ShopSetting/PhoneNumber";
 import SettlementAccount from "@components/ShopSetting/SettlementAccount";
 import RegistrationNumber from "@components/ShopSetting/RegistrationNumber";
-import Button from "@components/common/Button";
 
 export interface ShopSettingFormInputType {
   pcImage: string;
@@ -38,12 +37,13 @@ const ShopSetting = () => {
   });
 
   const onSubmit: SubmitHandler<ShopSettingFormInputType> = (data) => {
+    console.log("form is submitted!");
     console.log(data);
   };
 
   return (
     <FormProvider {...methods}>
-      <Layout>
+      <Layout hasSaveBar={true}>
         <ContentsContainer
           isForm={true}
           onSubmit={methods.handleSubmit(onSubmit)}
@@ -100,23 +100,5 @@ const ShopSetting = () => {
     </FormProvider>
   );
 };
-
-const ButtonWrapper = styled.div`
-  margin: 0 auto;
-  padding-bottom: 40px;
-
-  display: grid;
-  place-items: center;
-
-  & > button {
-    width: 126px;
-
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 18px;
-    text-align: center;
-    letter-spacing: -0.015em;
-  }
-`;
 
 export default ShopSetting;

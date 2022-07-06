@@ -15,13 +15,16 @@ const SaveBar = () => {
         >
           임시 저장
         </Button>
-        <Button
+
+        <SubmitButton
           size="big"
           color={theme.palette.white}
           backgroundColor={theme.palette.red900}
+          form="hook-form"
         >
-          저장
-        </Button>
+          등록
+        </SubmitButton>
+
         <Button size="big">취소</Button>
       </ButtonContainer>
     </Container>
@@ -47,5 +50,9 @@ const ButtonContainer = styled.div`
   display: flex;
   margin-right: 30px;
 `;
+
+const SubmitButton = styled(Button).attrs({
+  type: "submit",
+})``;
 
 export default SaveBar;

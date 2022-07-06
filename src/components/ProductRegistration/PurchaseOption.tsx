@@ -1,4 +1,6 @@
+import { useState } from "react";
 import styled from "styled-components";
+import { useForm } from "react-hook-form";
 
 import NoticeContainer from "@components/common/NoticeContainer";
 import Checkbox from "@components/common/input/Checkbox";
@@ -9,6 +11,27 @@ import removeOptionIconSrc from "@icons/remove-option.svg";
 import smallDownwardArrowIconSrc from "@icons/arrow-downward-small.svg";
 
 const PurchaseOption = () => {
+  const { register } = useForm();
+
+  const [optionInputList, setOptionInputList] = useState<
+    Array<{
+      isRequired: boolean;
+      optionName: string;
+      optionValues: Array<string>;
+    }>
+  >([
+    {
+      isRequired: false,
+      optionName: "일러스트",
+      optionValues: ["산, 바다"],
+    },
+    {
+      isRequired: false,
+      optionName: "액자",
+      optionValues: ["화이트, 블랙"],
+    },
+  ]);
+
   return (
     <Container>
       <CheckboxContainer>
@@ -97,10 +120,10 @@ const OptionInputRow = () => {
         <OptionRequiredCheckbox />
       </TableData>
       <TableData>
-        <OptionCategoryName />
+        <OptionName />
       </TableData>
       <TableData>
-        <SelectableOptions width={"263px"} />
+        <OptionValues width={"263px"} />
       </TableData>
       <TableData>
         <img src={removeOptionIconSrc} />
@@ -130,9 +153,9 @@ const TableData = styled.td`
 
 const OptionRequiredCheckbox = styled(Checkbox)``;
 
-const OptionCategoryName = styled(TextInput)``;
+const OptionName = styled(TextInput)``;
 
-const SelectableOptions = styled(TextInput)``;
+const OptionValues = styled(TextInput)``;
 
 const AdaptButton = styled(Button)``;
 
@@ -183,6 +206,7 @@ const AdaptedOptionTableHeaderRow = styled.tr`
   background-color: ${({ theme: { palette } }) => palette.grey400};
 `;
 const AdaptedOptionTableHeader = styled.th`
+  width: 50%;
   padding: 10px;
 
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
@@ -215,6 +239,7 @@ const AdaptedOptionTableHeader = styled.th`
 
 const AdaptedOptionTableRow = styled.tr``;
 const AdaptedOptionTableData = styled.td`
+  width: 50%;
   padding: 10px;
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
   text-align: center;
