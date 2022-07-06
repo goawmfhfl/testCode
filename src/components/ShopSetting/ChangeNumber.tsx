@@ -1,12 +1,24 @@
-import React from "react";
-import { useFormContext } from "react-hook-form";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 import ChangeNumberModal from "./ChangeNumberModal";
 import Button from "@components/Common/Button";
 
 const ChangeNumber = () => {
-  const { register } = useFormContext();
+  const [registeredPhoneNumber, setRegisteredPhoneNumber] =
+    useState<string>("");
+  const [modal, setModal] = useState<boolean>(false);
+
+  const hidePhoneNumber = (phoneNumber: string) => {
+    const addAsteriskPhoneNumber = phoneNumber.slice(0, 5) + "*".repeat(6);
+    return (
+      addAsteriskPhoneNumber.substr(0, 3) +
+      "-" +
+      addAsteriskPhoneNumber.substr(3, 4) +
+      "-" +
+      addAsteriskPhoneNumber.substr(7, 4)
+    );
+  };
 
   return (
     <Container>
@@ -14,12 +26,19 @@ const ChangeNumber = () => {
         <SubTitle>전화번호 변경</SubTitle>
       </SubTitleWrapper>
       <ChangeNumberContainer>
-        <NumberText>등록된 전화번호 : 010 - 43** - ****</NumberText>
-        <Button size="small" full={false}>
+        <NumberText>
+          등록된 전화번호 : {hidePhoneNumber(registeredPhoneNumber)}
+        </NumberText>
+        <Button size="small" full={false} onClick={() => setModal(true)}>
           변경하기
         </Button>
       </ChangeNumberContainer>
-      {/* <ChangeNumberModal /> */}
+      {modal && (
+        <ChangeNumberModal
+          onClickModalHandler={setModal}
+          setPhoneNumber={setRegisteredPhoneNumber}
+        />
+      )}
     </Container>
   );
 };
@@ -37,6 +56,7 @@ const SubTitleWrapper = styled.div`
   min-width: 235px;
   padding-left: 56px;
 `;
+
 const SubTitle = styled.h2`
   font-weight: 700;
   font-size: 14px;

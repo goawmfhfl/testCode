@@ -1,4 +1,5 @@
-import React from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import axios from "axios";
 import styled from "styled-components";
 
 import deleteSrc from "@icons/delete.svg";
@@ -6,35 +7,245 @@ import Input from "@components/Common/Input";
 import Button from "@components/Common/Button";
 import ValidText from "@components/Common/ValidText";
 
-const ChangeNumberModal = () => {
+const bizm = axios.create({
+  baseURL: process.env.REACT_APP_BIZM_PRODUCT_URL,
+  headers: { userid: "chopsticks" },
+});
+
+const formatNumber = (number: string) => {
+  return "+82" + number.slice(1);
+};
+
+const postAuthenticationCode = (
+  phoneNumber: string,
+  AuthenticationCode: string
+) => {
+  const data = [
+    {
+      message_type: "AT",
+      phn: formatNumber(phoneNumber),
+      profile: "beaed98a65b993e706e963a8aa941c2db48e4938",
+      reserveDt: "00000000000000",
+      tmplId: "chopsticks_05",
+      msg: `[${AuthenticationCode}] 인증번호를 입력하시면 인증이 완료됩니다.`,
+    },
+  ];
+
+  bizm
+    .post(`/v2/sender/send`, data)
+    .then((res) => {
+      console.log("post res", res);
+    })
+    .catch((e) => {
+      console.log("post error", e);
+    });
+};
+
+interface ChangeNumberModalProps {
+  onClickModalHandler: Dispatch<SetStateAction<boolean>>;
+  setPhoneNumber: Dispatch<SetStateAction<string>>;
+}
+
+const ChangeNumberModal = ({
+  onClickModalHandler,
+  setPhoneNumber,
+}: ChangeNumberModalProps) => {
+  const [time, setTime] = useState<{ minutes: number; seconds: number }>({
+    minutes: 0,
+    seconds: 0,
+  });
+
+  const [authentication, setAuthentication] = useState<{
+    isStarted: boolean;
+    codeByUser: string;
+    codeByService: string;
+    userPhoneNumber: string;
+  }>({
+    isStarted: false,
+    codeByUser: "",
+    codeByService: "",
+    userPhoneNumber: "",
+  });
+
+  const [authenticationValid, setAuthenticationValid] = useState<{
+    isTimeout: boolean;
+    isWrongNumber: boolean;
+    isVerified: boolean;
+  }>({
+    isTimeout: false,
+    isWrongNumber: false,
+    isVerified: false,
+  });
+
+  const handleClickAuthenticationButton = () => {
+    setAuthenticationValid(() => ({
+      isVerified: false,
+      isTimeout: false,
+      isWrongNumber: false,
+    }));
+
+    const randomNumber = String(Math.random()).slice(2, 8);
+
+    postAuthenticationCode(userPhoneNumber, randomNumber);
+
+    setAuthentication((prev) => ({
+      ...prev,
+      codeByService: randomNumber,
+    }));
+    setAuthentication((prev) => ({ ...prev, isStarted: true }));
+
+    setTime(() => ({
+      minutes: 3,
+      seconds: 0,
+    }));
+  };
+
+  const confirmAuthenticationCode = (AuthenticationCodeByUser: any) => {
+    if (codeByService !== AuthenticationCodeByUser) {
+      setAuthenticationValid(() => ({
+        isVerified: false,
+        isTimeout: false,
+        isWrongNumber: true,
+      }));
+    } else {
+      setAuthenticationValid(() => ({
+        isVerified: true,
+        isTimeout: false,
+        isWrongNumber: false,
+      }));
+    }
+  };
+
+  const handleConfirmButtonClick = () => {
+    onClickModalHandler(false);
+    setPhoneNumber(userPhoneNumber);
+  };
+
+  const handleCancelButtonClick = () => {
+    onClickModalHandler(false);
+  };
+  const { minutes, seconds } = time;
+  const { isTimeout, isWrongNumber, isVerified } = authenticationValid;
+  const { isStarted, codeByUser, codeByService, userPhoneNumber } =
+    authentication;
+
+  useEffect(() => {
+    if (!isStarted) return;
+
+    const countdown = setInterval(() => {
+      if (seconds > 0) {
+        setTime((prev) => ({
+          ...prev,
+          seconds: seconds - 1,
+        }));
+      }
+
+      if (seconds !== 0) return;
+
+      if (minutes === 0) {
+        clearInterval(countdown);
+        if (!isVerified) {
+          setAuthenticationValid((prev) => ({
+            ...prev,
+            isWrongNumber: false,
+            isTimeout: true,
+          }));
+        }
+      } else {
+        setTime(() => ({
+          minutes: minutes - 1,
+          seconds: 59,
+        }));
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(countdown);
+    };
+  }, [minutes, seconds, isStarted]);
+
   return (
     <Container>
-      <Icon src={deleteSrc} />
+      <Icon src={deleteSrc} onClick={() => onClickModalHandler(false)} />
       <Title>전화번호 변경하기</Title>
-      <DescriptText>변경할 전화번호를 입력해주세요</DescriptText>
+      <DescriptText>
+        {isStarted
+          ? "인증번호가 전송되었습니다. 확인해주세요."
+          : "변경할 전화번호를 입력해주세요"}
+      </DescriptText>
       <ConfirmContainer>
         <PhoneNumberContainer>
-          <Input placeholder="전화번호 - 제외하고 입력해주세요" />
-          <Button size="small" full={false}>
-            인증번호 재전송
+          <Input
+            placeholder="전화번호 - 제외하고 입력해주세요"
+            value={userPhoneNumber}
+            onChange={(event) =>
+              setAuthentication((prev) => ({
+                ...prev,
+                userPhoneNumber: event.target.value,
+              }))
+            }
+          />
+          <Button
+            size="small"
+            full={false}
+            onClick={handleClickAuthenticationButton}
+          >
+            {isStarted ? "인증번호 재전송" : "인증번호 전송"}
           </Button>
         </PhoneNumberContainer>
-        <AuthenticationCodeContainer>
-          <Input />
-          <Button size="small" full={false}>
-            인증
-          </Button>
-          <CounterText>03:00</CounterText>
-        </AuthenticationCodeContainer>
-        <ValidText valid={false}>
-          세션 시간이 만료되었습니다. 인증번호 재전송 버튼을 눌러 주세요.
-        </ValidText>
+        {isStarted && (
+          <AuthenticationCodeContainer>
+            <Input
+              value={codeByUser}
+              onChange={(event) =>
+                setAuthentication((prev) => ({
+                  ...prev,
+                  codeByUser: event.target.value,
+                }))
+              }
+            />
+            {isVerified ? (
+              <ValidText valid={isVerified}>인증완료!</ValidText>
+            ) : (
+              <>
+                <Button
+                  size="small"
+                  full={false}
+                  onClick={() => confirmAuthenticationCode(codeByUser)}
+                >
+                  인증
+                </Button>
+                <CounterText>
+                  {minutes < 10 ? `0${minutes}` : minutes}:
+                  {seconds < 10 ? `0${seconds}` : seconds}
+                </CounterText>
+              </>
+            )}
+          </AuthenticationCodeContainer>
+        )}
+        {isTimeout && (
+          <ValidText valid={!isTimeout}>
+            세션 시간이 만료되었습니다. 인증번호 재전송 버튼을 눌러 주세요.
+          </ValidText>
+        )}
+        {isWrongNumber && (
+          <ValidText valid={!isWrongNumber}>
+            인증번호가 올바르지 않습니다.
+            <br />
+            다시 입력해주시거나 인증번호를 재전송 버튼을 눌러 주세요.
+          </ValidText>
+        )}
       </ConfirmContainer>
       <ButtonContainer>
-        <Button size="small" full={false} className="positive">
+        <Button
+          size="small"
+          full={false}
+          className="positive"
+          onClick={handleConfirmButtonClick}
+        >
           확인
         </Button>
-        <Button size="small" full={false}>
+        <Button size="small" full={false} onClick={handleCancelButtonClick}>
           취소
         </Button>
       </ButtonContainer>
@@ -63,29 +274,34 @@ const Container = styled.div`
     margin-bottom: 12px;
   }
 `;
+
 const Icon = styled.img`
   position: absolute;
   top: 12.79px;
   right: 12.77px;
 `;
+
 const Title = styled.h2`
   font-weight: 700;
   font-size: 18px;
   line-height: 24px;
   letter-spacing: -0.015em;
 `;
+
 const DescriptText = styled.span`
   font-weight: 500;
   font-size: 14px;
   line-height: 18px;
   letter-spacing: 0.1px;
 `;
+
 const ConfirmContainer = styled.div`
   display: flex;
   flex-direction: column;
 
   margin-bottom: 32px;
 `;
+
 const PhoneNumberContainer = styled.div`
   display: flex;
   margin-bottom: 12px;
@@ -108,6 +324,7 @@ const PhoneNumberContainer = styled.div`
     letter-spacing: 0.1px;
   }
 `;
+
 const AuthenticationCodeContainer = styled.div`
   display: flex;
   margin-bottom: 12px;
@@ -135,13 +352,19 @@ const AuthenticationCodeContainer = styled.div`
     justify-content: center;
     align-items: center;
   }
+
+  & > p {
+    margin: auto 0;
+  }
 `;
+
 const CounterText = styled.span`
   font-weight: 500;
   font-size: 12px;
   line-height: 14px;
   letter-spacing: 0.1px;
 `;
+
 const ButtonContainer = styled.div`
   display: flex;
   width: 100%;
