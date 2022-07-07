@@ -11,6 +11,34 @@ import Button from "@components/Common/Button";
 import NoticeContainer from "@components/Common/NoticeContainer";
 import axios from "axios";
 
+interface parsedDataType {
+  rows: {
+    count: string;
+    pagenum: string;
+    pagesize: string;
+    resultcode: string;
+    row: {
+      comp_nm: string;
+      df: string;
+      eff_prd: string;
+      expired_date: string;
+      inspct_org: string;
+      item: string;
+      mf_icm: string;
+      mod_date: string;
+      pkg_unit: string;
+      prdt_nm: string;
+      prdt_type: string;
+      renew_yn: string;
+      safe_sd: string;
+      slfsfcfst_no: string;
+      start_date: string;
+      sttus: string;
+      valid_yn: string;
+    };
+  };
+}
+
 interface SafetyModalProps {
   onClickModalHandler: Dispatch<SetStateAction<boolean>>;
 }
@@ -26,34 +54,42 @@ const SafetyModal = ({ onClickModalHandler }: SafetyModalProps) => {
   });
 
   const postAuthenticationCode = async (validationCode: string) => {
-    // TODO: POST 요청을 진행한다.
+    try {
+      const parameter = {
+        params: {
+          AuthKey: "AOF672NHN7FLME9653L7VVF549D48H8O",
+          ServiceName: "slfsfcfstChk",
+          SlfsfcfstNo: validationCode,
+        },
+      };
 
-    const parameter = {
-      params: {
-        AuthKey: "94476PQ3G6X632RTOQUS8N2Y9P62GAW9",
-        ServiceName: "slfsfcfstChk",
-        SlfsfcfstNo: "HB21-26-0192",
-      },
-    };
+      const { data } = await axios.get(
+        "https://ecolife.me.go.kr/openapi/ServiceSvl?idx=13",
+        parameter
+      );
 
-    const { data } = await axios.get(
-      "https://ecolife.me.go.kr/openapi/TestSvl?idx=13",
-      parameter
-    );
+      const x2js = new X2JS();
+      const parsedData: parsedDataType = x2js.xml2js(data);
 
-    const x2js = new X2JS();
-    const { rows } = x2js.xml2js(data);
-
-    if (rows?.resultcode !== "0000") {
-      setValidation(() => ({
-        isVerified: false,
-        isWrongNumber: true,
-      }));
-    } else {
-      setValidation(() => ({
-        isVerified: true,
-        isWrongNumber: false,
-      }));
+      if (parsedData?.rows?.row?.valid_yn === "N") {
+        setValidation(() => ({
+          isVerified: false,
+          isWrongNumber: true,
+        }));
+      } else {
+        setValidation(() => ({
+          isVerified: true,
+          isWrongNumber: false,
+        }));
+      }
+      if (parsedData.rows.count === "0") {
+        setValidation(() => ({
+          isVerified: false,
+          isWrongNumber: true,
+        }));
+      }
+    } catch (error) {
+      console.log("error", error);
     }
   };
 
