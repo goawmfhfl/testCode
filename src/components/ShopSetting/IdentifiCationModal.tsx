@@ -1,7 +1,8 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import styled from "styled-components";
-import CryptoJS from "crypto-js";
+
+import { encryptedData } from "utils/cipher";
 
 import deleteSrc from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
@@ -14,6 +15,16 @@ interface IdentifiCationModalProps {
 }
 
 const IdentifiCationModal = ({ setModal }: IdentifiCationModalProps) => {
+  const [IdentifiCation, setIdentifiCation] = useState<{
+    name: string;
+    IdentifiCationCode: string;
+    issueData: string;
+  }>({
+    name: "",
+    IdentifiCationCode: "",
+    issueData: "",
+  });
+
   const { register, watch } = useFormContext();
   const watchFields = watch();
 
@@ -27,20 +38,13 @@ const IdentifiCationModal = ({ setModal }: IdentifiCationModalProps) => {
 
   const { name, IdentifiCationCode } = myData;
 
-  const iv = CryptoJS.enc.Utf8.parse("1Rs.Vs7RwlYJ.!7.");
-  const key = CryptoJS.enc.Utf8.parse("JF11WwmwWci!mVVRYW.MRcwsWFRM7f6l");
-  const bitKeyType = 256;
-  const plainData = "!Kwic123테스트";
-  const encryptedData = CryptoJS.AES.encrypt(plainData, key, {
-    iv,
-    keySize: bitKeyType,
-    padding: CryptoJS.pad.Pkcs7,
-  });
-  // XE0poWIU+X6c9hP4UmKePmfAHT097bAsckA2nLltDh4=
-  console.log("stringfy", encryptedData.toString());
-
-  const onClickEvent = () => {
+  const confirmIdentifiCationCode = () => {
     const { idName, firstDigits, lastDigits } = watchFields;
+    setIdentifiCation(() => ({
+      name: encryptedData("최재영"),
+      IdentifiCationCode: encryptedData("9123451234567"),
+      issueData: "20190307",
+    }));
   };
 
   return (
@@ -73,7 +77,7 @@ const IdentifiCationModal = ({ setModal }: IdentifiCationModalProps) => {
           size="small"
           full={false}
           className="positive"
-          onClick={onClickEvent}
+          onClick={confirmIdentifiCationCode}
         >
           저장
         </Button>
