@@ -53,8 +53,6 @@ const SafetyModal = ({
   onClickModalHandler,
   onClickCheckIsConfrim,
 }: SafetyModalProps) => {
-  const { register } = useFormContext();
-  const [validationCode, setValidationCode] = useState<string>("");
   const [validation, setValidation] = useState<{
     isVerified: boolean;
     isWrongNumber: boolean;
@@ -62,6 +60,9 @@ const SafetyModal = ({
     isVerified: false,
     isWrongNumber: false,
   });
+  const { register, watch } = useFormContext();
+  const watchFields = watch();
+  const { validationCode } = watchFields;
 
   const postAuthenticationCode = async (validationCode: string) => {
     try {
@@ -139,10 +140,7 @@ const SafetyModal = ({
         <ConfirmText>안전기준 적합 확인 검사 신고번호</ConfirmText>
         <RegisterContainer>
           <InputContainer>
-            <Input
-              {...register("")}
-              onChange={(event) => setValidationCode(event.target.value)}
-            />
+            <Input {...register("validationCode")} />
             <Button
               size="small"
               full={false}
