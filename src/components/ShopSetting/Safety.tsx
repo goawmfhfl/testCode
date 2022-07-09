@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { useState } from "react";
-import { useFormContext } from "react-hook-form";
 
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
 import NoticeContainer from "@components/Common/NoticeContainer";
@@ -9,7 +8,7 @@ import SafetyModal from "./SafetyModal";
 
 const Safety = () => {
   const [modal, setModal] = useState<boolean>(false);
-  const { register } = useFormContext();
+  const [isConfirm, setIsConfirm] = useState<boolean>(false);
 
   return (
     <Container>
@@ -27,13 +26,18 @@ const Safety = () => {
         </NoticeContainer>
         <ConfirmContainer>
           <ConfirmInfoText>안전기준 적합 확인 검사 신고번호</ConfirmInfoText>
-          {/* <ConfirmText>인증완료</ConfirmText> */}
+          {isConfirm && <ConfirmText>인증완료</ConfirmText>}
           <Button size="small" full={false} onClick={() => setModal(true)}>
             인증하기
           </Button>
         </ConfirmContainer>
       </SafetyContainer>
-      {modal && <SafetyModal onClickModalHandler={setModal} />}
+      {modal && (
+        <SafetyModal
+          onClickModalHandler={setModal}
+          onClickCheckIsConfrim={setIsConfirm}
+        />
+      )}
     </Container>
   );
 };
@@ -51,11 +55,13 @@ const SubTitleWrapper = styled.div`
   width: 235px;
   padding-left: 56px;
 `;
+
 const SubTitle = styled.h2`
   font-weight: 700;
   font-size: 14px;
   line-height: 20px;
 `;
+
 const SafetyContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -79,6 +85,9 @@ const ConfirmContainer = styled.div`
   & > span {
     margin-right: 12px;
   }
+  & > span + span {
+    color: ${({ theme: { palette } }) => palette.grey500};
+  }
 
   & > button {
     font-weight: 500;
@@ -88,11 +97,21 @@ const ConfirmContainer = styled.div`
     letter-spacing: 0.1px;
   }
 `;
-const ConfirmInfoText = styled.p`
+
+const ConfirmInfoText = styled.span`
   font-weight: 400;
   font-size: 14px;
   line-height: 14px;
   letter-spacing: 0.1px;
+`;
+
+const ConfirmText = styled.span`
+  font-family: "NanumGothic";
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 0.10000000149011612px;
+  text-align: left;
 `;
 
 export default Safety;

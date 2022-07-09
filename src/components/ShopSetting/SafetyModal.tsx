@@ -1,6 +1,8 @@
 /* eslint-disable */
 import React, { Dispatch, SetStateAction, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
+import axios from "axios";
 import X2JS from "x2js";
 
 import deleteSrc from "@icons/delete.svg";
@@ -9,7 +11,6 @@ import Input from "@components/Common/Input";
 import ValidText from "@components/Common/ValidText";
 import Button from "@components/Common/Button";
 import NoticeContainer from "@components/Common/NoticeContainer";
-import axios from "axios";
 
 interface parsedDataType {
   rows: {
@@ -37,13 +38,22 @@ interface parsedDataType {
       valid_yn: string;
     };
   };
+  error: {
+    msg: string;
+    resultcode: string;
+  };
 }
 
 interface SafetyModalProps {
   onClickModalHandler: Dispatch<SetStateAction<boolean>>;
+  onClickCheckIsConfrim: Dispatch<SetStateAction<boolean>>;
 }
 
-const SafetyModal = ({ onClickModalHandler }: SafetyModalProps) => {
+const SafetyModal = ({
+  onClickModalHandler,
+  onClickCheckIsConfrim,
+}: SafetyModalProps) => {
+  const { register } = useFormContext();
   const [validationCode, setValidationCode] = useState<string>("");
   const [validation, setValidation] = useState<{
     isVerified: boolean;
@@ -71,6 +81,26 @@ const SafetyModal = ({ onClickModalHandler }: SafetyModalProps) => {
       const x2js = new X2JS();
       const parsedData: parsedDataType = x2js.xml2js(data);
 
+      // 개발 테스트 진행중 허가된 IP주소가 아닐 경우
+      if (parsedData?.error) {
+        setValidation(() => ({
+          isVerified: false,
+          isWrongNumber: true,
+        }));
+        return;
+      }
+
+      // 1. 허용된 IP 주소로 요청, 통신에 성공함
+      // 1-1. But 입력 값으로 조회된 정보가 없을 경우
+      if (parsedData?.rows?.count === "0") {
+        setValidation(() => ({
+          isVerified: false,
+          isWrongNumber: true,
+        }));
+        return;
+      }
+
+      // 1-2. But 안준기준이 적합하지 않은 경우
       if (parsedData?.rows?.row?.valid_yn === "N") {
         setValidation(() => ({
           isVerified: false,
@@ -82,15 +112,15 @@ const SafetyModal = ({ onClickModalHandler }: SafetyModalProps) => {
           isWrongNumber: false,
         }));
       }
-      if (parsedData.rows.count === "0") {
-        setValidation(() => ({
-          isVerified: false,
-          isWrongNumber: true,
-        }));
-      }
     } catch (error) {
       console.log("error", error);
     }
+  };
+  const saveAuthenticationCode = () => {
+    // 그냥 Return 혹은 경고 Alert?
+    if (isVerified === false && isWrongNumber === true) return;
+    onClickCheckIsConfrim(true);
+    onClickModalHandler(false);
   };
 
   const { isVerified, isWrongNumber } = validation;
@@ -110,6 +140,7 @@ const SafetyModal = ({ onClickModalHandler }: SafetyModalProps) => {
         <RegisterContainer>
           <InputContainer>
             <Input
+              {...register("")}
               onChange={(event) => setValidationCode(event.target.value)}
             />
             <Button
@@ -131,7 +162,12 @@ const SafetyModal = ({ onClickModalHandler }: SafetyModalProps) => {
         </RegisterContainer>
       </ConfirmContainer>
       <ButtonContainer>
-        <Button size="small" full={false} className="positive">
+        <Button
+          size="small"
+          full={false}
+          className="positive"
+          onClick={saveAuthenticationCode}
+        >
           저장
         </Button>
         <Button
