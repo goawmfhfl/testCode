@@ -1,8 +1,8 @@
 /* eslint-disable */
 import React, { Dispatch, SetStateAction, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import axios from "axios";
-import { useFormContext } from "react-hook-form";
 
 import deleteSrc from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
@@ -10,7 +10,6 @@ import NoticeContainer from "@components/Common/NoticeContainer";
 import SystemModal from "@components/Common/SystemModal";
 import Input from "@components/Common/Input";
 import Button from "@components/Common/Button";
-
 import { EnterPreneurInfoType } from "@components/ShopSetting/EnterPreneur";
 
 interface EnterPreneurModalProps {
@@ -45,107 +44,107 @@ const EnterPreneurModal = ({
 
   const { register, watch, resetField } = useFormContext();
   const watchFields = watch();
-  const { bizrno, prmsnMgtNo } = watchFields;
+  const { businessNumber, ecommerceRegistrationNumber } = watchFields;
 
   const postEnterPreneur = async () => {
-    if (!bizrno || !prmsnMgtNo) {
-      setSystemModal((prev) => ({
-        ...prev,
-        isVisible: true,
-        icon: exclamationmarkSrc,
-        description: (
-          <>
-            사업자등록번호와 통신판매업신고 번호를
-            <br /> 모두 입력해주세요.
-          </>
-        ),
-        buttonText: "확인",
-        hasMultiButton: false,
-        handleConfirmButtonClick: () => {
-          setSystemModal((prev) => ({
-            ...prev,
-            isVisible: false,
-          }));
+    try {
+      // 사업자등록증, 혹은 통신판매업신고 번호를 입력하지 않았을 경우
+      if (!businessNumber || !ecommerceRegistrationNumber) {
+        setSystemModal((prev) => ({
+          ...prev,
+          isVisible: true,
+          icon: exclamationmarkSrc,
+          description: (
+            <>
+              사업자등록번호와 통신판매업신고 번호를
+              <br /> 모두 입력해주세요.
+            </>
+          ),
+          buttonText: "확인",
+          hasMultiButton: false,
+          handleConfirmButtonClick: () => {
+            setSystemModal((prev) => ({
+              ...prev,
+              isVisible: false,
+            }));
+          },
+        }));
+        return;
+      }
+
+      const parameter = {
+        params: {
+          ServiceKey:
+            "M9GeLCBRxbhAJt3QlWNEGLQAYdLqjtZm+JhsJcjYIUm62vaFl/7oJZXUjdMg5kz9KosBdLsSUT24ojG+eZhGTA==",
+          pageNo: 1,
+          numOfRows: 10,
+          resultType: "json",
+          bizrno: businessNumber,
+          prmsnMgtNo: ecommerceRegistrationNumber,
         },
-      }));
+      };
+      // 사업자등록번호 : 882-87-01829
+      // 통신판매업신고번호 : 2020-서울종로-0138
+      const { data } = await axios.get(
+        "http://apis.data.go.kr/1130000/MllBsDtlService/getMllBsInfoDetail",
+        parameter
+      );
 
-      return;
-    }
-
-    const parameter = {
-      params: {
-        ServiceKey:
-          "M9GeLCBRxbhAJt3QlWNEGLQAYdLqjtZm+JhsJcjYIUm62vaFl/7oJZXUjdMg5kz9KosBdLsSUT24ojG+eZhGTA==",
-        pageNo: 1,
-        numOfRows: 1,
-        resultType: "json",
-        bizrno,
-        prmsnMgtNo,
-      },
-    };
-
-    const { data } = await axios.get(
-      "http://apis.data.go.kr/1130000/MllBsDtlService/getMllBsInfoDetail",
-      parameter
-    );
-
-    if (data?.items?.length !== 0) {
-      setSystemModal((prev) => ({
-        ...prev,
-        isVisible: true,
-        icon: "",
-        description: (
-          <>
-            사업자등록증과 통신판매업신고증이 <br />
-            등록되었습니다.
-          </>
-        ),
-        hasMultiButton: true,
-        handleConfirmButtonClick: () => {
-          setModal(false);
-
-          onConfirm(data.items[0]);
-        },
-        handleCancelButtonClick: () => {
-          setSystemModal((prev) => ({
-            ...prev,
-            isVisible: false,
-          }));
-        },
-      }));
-    } else {
-      setSystemModal((prev) => ({
-        ...prev,
-        isVisible: true,
-        icon: exclamationmarkSrc,
-        description: <>기입한 정보가 올바르지 않습니다.</>,
-        buttonText: "확인",
-        hasMultiButton: false,
-        handleConfirmButtonClick: () => {
-          setSystemModal((prev) => ({
-            ...prev,
-            isVisible: false,
-          }));
-        },
-      }));
+      if (data?.items?.length === 0) {
+        // 요청에 성공했으나, 입력한 정보가 틀린 경우
+        setSystemModal((prev) => ({
+          ...prev,
+          isVisible: true,
+          icon: exclamationmarkSrc,
+          description: <>기입한 정보가 올바르지 않습니다.</>,
+          buttonText: "확인",
+          hasMultiButton: false,
+          handleConfirmButtonClick: () => {
+            setSystemModal((prev) => ({
+              ...prev,
+              isVisible: false,
+            }));
+          },
+        }));
+      } else {
+        // 요청 성공
+        setSystemModal((prev) => ({
+          ...prev,
+          isVisible: true,
+          icon: "",
+          description: (
+            <>
+              사업자등록증과 통신판매업신고증이 <br />
+              등록되었습니다.
+            </>
+          ),
+          hasMultiButton: true,
+          handleConfirmButtonClick: () => {
+            setModal(false);
+            onConfirm(data.items[0]);
+          },
+          handleCancelButtonClick: () => {
+            setSystemModal((prev) => ({
+              ...prev,
+              isVisible: false,
+            }));
+          },
+        }));
+      }
+    } catch (error) {
+      console.log("error", error);
     }
   };
 
-  const onConfirm = async (items: SetStateAction<EnterPreneurInfoType>) => {
+  const onConfirm = (items: SetStateAction<EnterPreneurInfoType>) => {
     setEnterPreneurInfo(items);
   };
 
   const onCancel = () => {
-    resetField("bizrno");
-    resetField("prmsnMgtNo");
-
+    resetField("businessNumber");
+    resetField("ecommerceRegistrationNumber");
     setModal(false);
   };
-
-  // 8828701829
-  // 2020-서울송파-3260
-
-  console.log(systemModal);
 
   return (
     <Container>
@@ -160,11 +159,11 @@ const EnterPreneurModal = ({
       <InfoContainer>
         <FillCodeContainer>
           <SubTitle>사업자등록번호</SubTitle>
-          <Input placeholder="숫자만 입력" {...register("bizrno")} />
+          <Input placeholder="숫자만 입력" {...register("businessNumber")} />
         </FillCodeContainer>
         <FillCodeContainer>
           <SubTitle>통신판매업신고 번호</SubTitle>
-          <Input {...register("prmsnMgtNo")} />
+          <Input {...register("ecommerceRegistrationNumber")} />
         </FillCodeContainer>
       </InfoContainer>
       <ButtonContainer>

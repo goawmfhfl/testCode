@@ -104,6 +104,7 @@ const SubTitleWrapper = styled.div`
   min-width: 235px;
   padding-left: 56px;
 `;
+
 const SubTitle = styled.h2`
   font-weight: 700;
   font-size: 14px;
@@ -145,6 +146,7 @@ const EntrePreneurInfoList = styled.ul`
   display: flex;
   flex-direction: column;
 `;
+
 const EntrepreneurInfoContainer = styled.li`
   display: flex;
   padding-bottom: 8px;
