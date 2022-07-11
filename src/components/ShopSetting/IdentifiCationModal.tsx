@@ -1,5 +1,7 @@
+/* eslint-disable */
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import styled from "styled-components";
 
 import { encryptedData } from "utils/cipher";
@@ -9,47 +11,101 @@ import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
 import NoticeContainer from "@components/Common/NoticeContainer";
 import Button from "@components/Common/Button";
 import Input from "@components/Common/Input";
+import SystemModal from "@components/Common/SystemModal";
 
 interface IdentifiCationModalProps {
-  setModal: Dispatch<SetStateAction<boolean>>;
+  onClickModalHandler: Dispatch<SetStateAction<boolean>>;
 }
 
-const IdentifiCationModal = ({ setModal }: IdentifiCationModalProps) => {
-  const [IdentifiCation, setIdentifiCation] = useState<{
-    name: string;
-    IdentifiCationCode: string;
-    issueData: string;
+const IdentifiCationModal = ({
+  onClickModalHandler,
+}: IdentifiCationModalProps) => {
+  const [systemModal, setSysyemModal] = useState<{
+    isVisible: boolean;
+    icon: string;
+    description: React.ReactNode;
+    buttonText: string;
+    hasMultiButton: boolean;
+    handleConfirmButtonClick?: () => void;
+    handleCancleButtonClick?: () => void;
   }>({
-    name: "",
-    IdentifiCationCode: "",
-    issueData: "",
+    isVisible: false,
+    icon: "",
+    description: <></>,
+    buttonText: "",
+    hasMultiButton: true,
+    handleCancleButtonClick: () =>
+      setSysyemModal((prev) => ({
+        ...prev,
+        isVisible: false,
+      })),
   });
 
   const { register, watch } = useFormContext();
   const watchFields = watch();
+  const { idName, firstDigits, lastDigits, issuance } = watchFields;
 
-  const [myData, setMyData] = useState<{
-    name: string;
-    IdentifiCationCode: string;
-  }>({
-    name: "최재영",
-    IdentifiCationCode: "9123451234567",
-  });
+  const confirmIdentifiCationCode = async () => {
+    try {
+      const headers = {
+        headers: { Authorization: "cc06a93d90e141ccbe1e8171ce242169ef7b3379" },
+      };
 
-  const { name, IdentifiCationCode } = myData;
+      const requestData = {
+        JUMIN: encryptedData([firstDigits, lastDigits].join("")),
+        NAME: encryptedData(idName),
+        ISSUEDATE: issuance,
+      };
 
-  const confirmIdentifiCationCode = () => {
-    const { idName, firstDigits, lastDigits } = watchFields;
-    setIdentifiCation(() => ({
-      name: encryptedData("최재영"),
-      IdentifiCationCode: encryptedData("9123451234567"),
-      issueData: "20190307",
-    }));
+      const { data } = await axios.post(
+        "https://datahub-dev.scraping.co.kr/scrap/docInq/gov/ResidentPromotionCommittee",
+        requestData,
+        headers
+      );
+
+      if (data?.data?.ERRMSG) {
+        setSysyemModal((prev) => ({
+          ...prev,
+          isVisible: true,
+          icon: exclamationmarkSrc,
+          description: (
+            <>
+              기입한 정보가 올바르지 않습니다.
+              <br />
+              다시 기입해주세요.
+            </>
+          ),
+          buttonText: "확인",
+          hasMultiButton: false,
+          handleConfirmButtonClick: () =>
+            setSysyemModal((prev) => ({
+              ...prev,
+              isVisible: false,
+            })),
+        }));
+      } else {
+        setSysyemModal((prev) => ({
+          ...prev,
+          isVisible: true,
+          icon: "",
+          description: <>인증되었습니다.</>,
+          buttonText: "확인",
+          hasMultiButton: false,
+          handleConfirmButtonClick: () =>
+            setSysyemModal((prev) => ({
+              ...prev,
+              isVisible: false,
+            })),
+        }));
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
     <Container>
-      <Icon src={deleteSrc} onClick={() => setModal(false)} />
+      <Icon src={deleteSrc} onClick={() => onClickModalHandler(false)} />
       <Title>주민등록증 인증하기</Title>
       <NoticeContainer icon={exclamationmarkSrc}>
         주민등록증은 정산받을 계좌 정보의 예금주명과 같아야 합니다.
@@ -81,13 +137,21 @@ const IdentifiCationModal = ({ setModal }: IdentifiCationModalProps) => {
         >
           저장
         </Button>
-        <Button size="small" full={false} onClick={() => setModal(false)}>
+        <Button
+          size="small"
+          full={false}
+          onClick={() => onClickModalHandler(false)}
+        >
           취소
         </Button>
       </ButtonContainer>
+      {systemModal.isVisible && (
+        <SystemModal {...systemModal}>{systemModal.description}</SystemModal>
+      )}
     </Container>
   );
 };
+
 const Container = styled.div`
   position: absolute;
   top: 50%;
@@ -106,27 +170,32 @@ const Container = styled.div`
   & > h2 {
     margin-bottom: 24px;
   }
+
   & > h2 + div {
     width: 369px;
     margin-bottom: 24px;
   }
 `;
+
 const Icon = styled.img`
   position: absolute;
   top: 12.79px;
   right: 12.77px;
   cursor: pointer;
 `;
+
 const Title = styled.h2`
   font-weight: 700;
   font-size: 18px;
   line-height: 24px;
   letter-spacing: -0.015em;
 `;
+
 const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
+
 const NameContainer = styled.div`
   display: flex;
   align-items: center;
@@ -141,6 +210,7 @@ const NameContainer = styled.div`
     padding: 9px 8px;
   }
 `;
+
 const IdContainer = styled.div`
   display: flex;
   align-items: center;
@@ -150,6 +220,7 @@ const IdContainer = styled.div`
     width: 152px;
   }
 `;
+
 const DateContainer = styled.div`
   display: flex;
   align-items: center;
@@ -165,12 +236,14 @@ const DateContainer = styled.div`
     padding: 9px 8px;
   }
 `;
+
 const SubTitle = styled.h3`
   font-weight: 500;
   font-size: 14px;
   line-height: 18px;
   letter-spacing: 0.1px;
 `;
+
 const InputContainer = styled.div`
   display: flex;
 
@@ -184,10 +257,12 @@ const InputContainer = styled.div`
     margin: auto 8px;
   }
 `;
+
 const ButtonContainer = styled.div`
   display: flex;
   width: 100%;
   justify-content: flex-end;
+
   & > button:first-child {
     margin-right: 16px;
   }

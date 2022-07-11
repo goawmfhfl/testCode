@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 
@@ -8,7 +8,9 @@ import NoticeContainer from "@components/Common/NoticeContainer";
 import Button from "@components/Common/Button";
 
 const IdentifiCation = () => {
+  const [modal, setModal] = useState<boolean>(false);
   const { register } = useFormContext();
+  const textText = true;
 
   return (
     <Container>
@@ -31,15 +33,16 @@ const IdentifiCation = () => {
         </NoticeContainer>
         <InfoContainer>
           <InfoText>
-            인증된 주민등록증이 없습니다.
-            {/* 주민등록이 인증되었습니다. */}
+            {textText
+              ? "주민등록이 인증되었습니다."
+              : "인증된 주민등록증이 없습니다."}
           </InfoText>
-          <Button size="small" full={false}>
+          <Button size="small" full={false} onClick={() => setModal(true)}>
             인증하기
           </Button>
         </InfoContainer>
       </IdentifiCationInfoContainer>
-      {/* <IdentifiCationModal /> */}
+      {modal && <IdentifiCationModal onClickModalHandler={setModal} />}
     </Container>
   );
 };
@@ -57,6 +60,7 @@ const SubTitleWrapper = styled.div`
   padding-left: 56px;
   min-width: 235px;
 `;
+
 const SubTitle = styled.h2`
   font-weight: 700;
   font-size: 14px;
@@ -66,13 +70,13 @@ const SubTitle = styled.h2`
 const IdentifiCationInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
-
   min-width: 736px;
 
   & > :first-child {
     margin-bottom: 16px;
   }
 `;
+
 const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
