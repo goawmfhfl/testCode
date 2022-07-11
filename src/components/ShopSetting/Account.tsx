@@ -1,12 +1,43 @@
-import React from "react";
-import { useFormContext } from "react-hook-form";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 import Button from "@components/Common/Button";
 import AccountModal from "./AccountModal";
 
+export interface accountInformationType {
+  hasInformation: boolean;
+  accountName: string;
+  accountNumber: string;
+  bankCode: string;
+  bankName: string;
+}
+
+const hideAccountNumber = (accountNumber: string) => {
+  const addAsterisk = accountNumber.slice(0, 5) + "*".repeat(6);
+
+  return (
+    addAsterisk.slice(0, 3) +
+    "-" +
+    addAsterisk.slice(3, 7) +
+    "-" +
+    addAsterisk.slice(7, 11)
+  );
+};
+
 const Account = () => {
-  const { register } = useFormContext();
+  const [modal, setModal] = useState<boolean>(false);
+  const [accountInformation, setAccountInformation] =
+    useState<accountInformationType>({
+      hasInformation: false,
+      accountName: "",
+      accountNumber: "",
+      bankCode: "",
+      bankName: "",
+    });
+
+  const { hasInformation, accountName, accountNumber, bankCode, bankName } =
+    accountInformation;
+
   return (
     <Container>
       <SubTitleWrapper>
@@ -16,18 +47,23 @@ const Account = () => {
         <AccountInfoText>등록된 계좌 정보</AccountInfoText>
         <RegisterContainer>
           <AccountInfoText>
-            등록된 계좌 정보가 없습니다.
-            {/* 국민은행 632902-**-****** (예금주명: 김지원) */}
+            {hasInformation
+              ? `${bankName} ${hideAccountNumber(
+                  accountNumber
+                )} (예금주명: ${accountName})`
+              : " 등록된 계좌 정보가 없습니다."}
           </AccountInfoText>
-          <Button size="small" full={false}>
-            등록
+          <Button size="small" full={false} onClick={() => setModal(true)}>
+            {hasInformation ? "변경" : "등록"}
           </Button>
-          {/* <Button size="small" full={false}>
-            변경
-          </Button> */}
         </RegisterContainer>
       </AccountContainer>
-      {/* <AccountModal /> */}
+      {modal && (
+        <AccountModal
+          onClickModalHandler={setModal}
+          setAccountInformation={setAccountInformation}
+        />
+      )}
     </Container>
   );
 };
@@ -44,6 +80,7 @@ const SubTitleWrapper = styled.div`
   min-width: 235px;
   padding-left: 56px;
 `;
+
 const SubTitle = styled.h2`
   font-weight: 700;
   font-size: 14px;
@@ -53,7 +90,6 @@ const SubTitle = styled.h2`
 const AccountContainer = styled.div`
   display: flex;
   flex-direction: column;
-
   min-width: 736px;
 
   & > :first-child {

@@ -1,5 +1,9 @@
-import React from "react";
+/* eslint-disable */
+import React, { Dispatch, SetStateAction, useState } from "react";
 import styled from "styled-components";
+import axios from "axios";
+import { useFormContext } from "react-hook-form";
+import { accountInformationType } from "./Account";
 
 import deleteSrc from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
@@ -8,11 +12,120 @@ import NoticeContainer from "@components/Common/NoticeContainer";
 import Button from "@components/Common/Button";
 import Input from "@components/Common/Input";
 import ValidText from "@components/Common/ValidText";
+import SystemModal from "@components/Common/SystemModal";
 
-const AccountModal = () => {
+interface AccountModalProps {
+  onClickModalHandler: Dispatch<SetStateAction<boolean>>;
+  setAccountInformation: Dispatch<SetStateAction<accountInformationType>>;
+}
+
+const AccountModal = ({
+  onClickModalHandler,
+  setAccountInformation,
+}: AccountModalProps) => {
+  const [systemModal, setSysyemModal] = useState<{
+    isVisible: boolean;
+    icon: string;
+    description: React.ReactNode;
+    buttonText: string;
+    hasMultiButton: boolean;
+    handleConfirmButtonClick?: () => void;
+    handleCancleButtonClick?: () => void;
+  }>({
+    isVisible: false,
+    icon: "",
+    description: <></>,
+    buttonText: "",
+    hasMultiButton: true,
+    handleCancleButtonClick: () =>
+      setSysyemModal((prev) => ({
+        ...prev,
+        isVisible: false,
+      })),
+  });
+
+  const [validation, setValidation] = useState<{
+    isWrongNumber: boolean;
+    isVerified: boolean;
+  }>({ isWrongNumber: false, isVerified: false });
+  const { isWrongNumber, isVerified } = validation;
+
+  const { register, watch, resetField } = useFormContext();
+  const watchField = watch();
+  const { accountNumber, accountName, bankCode } = watchField;
+
+  const confirmAccountOwner = async () => {
+    try {
+      const headers = {
+        headers: { Authorization: "cc06a93d90e141ccbe1e8171ce242169ef7b3379" },
+      };
+
+      const requestData = {
+        ACCTNO: accountNumber,
+        BANKCODE: bankCode,
+        CUSTNM: accountName,
+      };
+
+      const { data } = await axios.post(
+        "https://datahub-dev.scraping.co.kr/scrap/common/settlebank/accountOwner",
+        requestData,
+        headers
+      );
+
+      if (data?.data.OUTRSLTMSG !== "정상처리") {
+        setValidation(() => ({
+          isVerified: false,
+          isWrongNumber: true,
+        }));
+      } else {
+        setValidation(() => ({
+          isVerified: true,
+          isWrongNumber: false,
+        }));
+
+        setSysyemModal((prev) => ({
+          ...prev,
+          isVisible: true,
+          icon: "",
+          description: <>계좌정보가 등록되었습니다.</>,
+          buttonText: "확인",
+          hasMultiButton: false,
+          handleConfirmButtonClick: () => {
+            setSysyemModal((prev) => ({
+              ...prev,
+              isVisible: false,
+            }));
+            setAccountInformation((prev) => ({
+              ...prev,
+              hasInformation: true,
+              accountName,
+              accountNumber,
+              bankCode,
+            }));
+          },
+        }));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const pickBankName = (options: any) => {
+    setAccountInformation((prev) => ({
+      ...prev,
+      bankName: options[options.selectedIndex].textContent,
+    }));
+  };
+
+  const offModalButton = () => {
+    onClickModalHandler(false);
+    resetField("accountName");
+    resetField("accountNumber");
+    resetField("bankCode");
+  };
   return (
     <Container>
-      <Icon src={deleteSrc} />
+      <Icon src={deleteSrc} onClick={() => onClickModalHandler(false)} />
       <Title>정산 계좌 등록하기</Title>
       <NoticeContainer icon={exclamationmarkSrc}>
         예금주명은 사업자등록증의 법인 명의(상호명)과 동일해야 합니다.
@@ -22,36 +135,60 @@ const AccountModal = () => {
         <br /> (예금주명에 따라 비교가 어려울 경우 서류 제출이 필요합니다.)
       </NoticeContainer>
       <InfoContainer>
-        <SelectContainer>
-          <Option>은행선택</Option>
-          <Option>신한은행</Option>
-          <Option>우리은행</Option>
-          <Option>카카오뱅크</Option>
-          <Option>수협</Option>
+        <SelectContainer
+          {...register("bankCode")}
+          onChange={(event) => pickBankName(event.target.options)}
+        >
+          <Option defaultChecked>은행선택</Option>
+          <Option value={"001"}>한국은행</Option>
+          <Option value={"002"}>산업은행</Option>
+          <Option value={"003"}>기업은행</Option>
+          <Option value={"004"}>KB국민은행</Option>
+          <Option value={"007"}>수협은행</Option>
+          <Option value={"008"}>수출입은행</Option>
+          <Option value={"011"}>NH농협은행</Option>
+          <Option value={"012"}>농축협</Option>
+          <Option value={"020"}>우리은행</Option>
         </SelectContainer>
         <UserAccountContainer>
-          <Input placeholder="예금주명" />
-          <Input placeholder="계좌번호 (-없이 입력)" />
-          <Button size="small" full={false}>
+          <Input placeholder="예금주명" {...register("accountName")} />
+          <Input
+            placeholder="계좌번호 (-없이 입력)"
+            {...register("accountNumber")}
+          />
+          <Button size="small" full={false} onClick={confirmAccountOwner}>
             인증
           </Button>
-          <ValidText valid={true}>인증되었습니다</ValidText>
-          {/* <ValidText valid={false}>인증 실패하였습니다.</ValidText> */}
+          {isVerified && <ValidText valid={true}>인증되었습니다</ValidText>}
+          {isWrongNumber && (
+            <ValidText valid={false}>인증 실패하였습니다.</ValidText>
+          )}
         </UserAccountContainer>
-        <ValidText valid={true}>
-          입력하신 계좌 정보가 실제 계좌 정보와 일치하지 않습니다.
-          <br />
-          입력하신 은행, 예금주, 계좌번호를 다시 한번 확인해주세요.
-        </ValidText>
+        {isWrongNumber && (
+          <ValidText valid={true}>
+            입력하신 계좌 정보가 실제 계좌 정보와 일치하지 않습니다.
+            <br />
+            입력하신호를 다시 한번 확인해주세요.
+          </ValidText>
+        )}
       </InfoContainer>
       <ButtonContainer>
-        <Button size="small" full={false} className="positive">
-          저장
+        <Button
+          size="small"
+          full={false}
+          className={isVerified ? "positive" : "negative"}
+          disabled={!isVerified}
+          onClick={offModalButton}
+        >
+          확인
         </Button>
-        <Button size="small" full={false}>
+        <Button size="small" full={false} onClick={offModalButton}>
           취소
         </Button>
       </ButtonContainer>
+      {systemModal.isVisible && (
+        <SystemModal {...systemModal}>{systemModal.description}</SystemModal>
+      )}
     </Container>
   );
 };
@@ -73,23 +210,31 @@ const Container = styled.div`
   & > h2 {
     margin-bottom: 24px;
   }
+  & > h2 + div {
+    margin-bottom: 24px;
+  }
 `;
+
 const Icon = styled.img`
   position: absolute;
   top: 12.79px;
   right: 12.77px;
+  cursor: pointer;
 `;
+
 const Title = styled.h2`
   font-weight: 800;
   font-size: 20px;
   line-height: 20px;
   letter-spacing: 0.1px;
 `;
+
 const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 58px;
 `;
+
 const SelectContainer = styled.select`
   width: 134px;
   border: 1px solid ${({ theme: { palette } }) => palette.grey400};
@@ -108,7 +253,9 @@ const SelectContainer = styled.select`
   -moz-appearance: none;
   appearance: none;
 `;
+
 const Option = styled.option``;
+
 const UserAccountContainer = styled.div`
   display: flex;
   align-items: center;
