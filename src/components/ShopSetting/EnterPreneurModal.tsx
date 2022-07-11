@@ -48,8 +48,11 @@ const EnterPreneurModal = ({
 
   const postEnterPreneur = async () => {
     try {
-      // 사업자등록증, 혹은 통신판매업신고 번호를 입력하지 않았을 경우
       if (!businessNumber || !ecommerceRegistrationNumber) {
+        console.log(
+          "사업자등록증, 혹은 통신판매업신고 번호를 입력하지 않았을 경우"
+        );
+
         setSystemModal((prev) => ({
           ...prev,
           isVisible: true,
@@ -83,15 +86,16 @@ const EnterPreneurModal = ({
           prmsnMgtNo: ecommerceRegistrationNumber,
         },
       };
+      console.log("parameter 요청하려는 데이터 ", parameter);
+
       // 사업자등록번호 : 882-87-01829
-      // 통신판매업신고번호 : 2020-서울종로-0138
+      // 통신판매업신고번호 : 2020-서울송파-3260
       const { data } = await axios.get(
         "http://apis.data.go.kr/1130000/MllBsDtlService/getMllBsInfoDetail",
         parameter
       );
 
       if (data?.items?.length === 0) {
-        // 요청에 성공했으나, 입력한 정보가 틀린 경우
         setSystemModal((prev) => ({
           ...prev,
           isVisible: true,
@@ -107,7 +111,6 @@ const EnterPreneurModal = ({
           },
         }));
       } else {
-        // 요청 성공
         setSystemModal((prev) => ({
           ...prev,
           isVisible: true,
