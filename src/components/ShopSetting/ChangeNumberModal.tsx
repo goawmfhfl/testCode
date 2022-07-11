@@ -240,8 +240,9 @@ const ChangeNumberModal = ({
         <Button
           size="small"
           full={false}
-          className="positive"
+          className={isVerified ? "positive" : "negative"}
           onClick={handleConfirmButtonClick}
+          disabled={!isVerified}
         >
           확인
         </Button>
