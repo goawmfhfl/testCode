@@ -27,7 +27,7 @@ const Order = () => {
         <OrderFeeContainer>
           <OrderInfoText>기본 제주 도서산간 추가 배송비</OrderInfoText>
           <ContentContainer>
-            <Input {...register("addtionalOrderFee")} />
+            <Input type="text" {...register("addtionalOrderFee")} />
             <KrwText>원</KrwText>
           </ContentContainer>
         </OrderFeeContainer>
@@ -49,6 +49,7 @@ const SubTitleWrapper = styled.div`
   min-width: 235px;
   padding-left: 56px;
 `;
+
 const SubTitle = styled.h2`
   font-weight: 700;
   font-size: 14px;
@@ -73,6 +74,7 @@ const OrderFeeContainer = styled.div`
     width: 234px;
   }
 `;
+
 const OrderInfoText = styled.h3`
   display: flex;
   align-items: center;
@@ -87,6 +89,7 @@ const ContentContainer = styled.div`
   gap: 8px;
 
   & > input {
+    padding: 9px 8px;
     width: 104px;
     height: 32px;
   }
@@ -109,6 +112,7 @@ const Select = styled.select`
   line-height: 14px;
   letter-spacing: 0.1px;
 `;
+
 const Option = styled.option``;
 
 const KrwText = styled.span`

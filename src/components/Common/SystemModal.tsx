@@ -20,8 +20,6 @@ const SystemModal = ({
   handleConfirmButtonClick,
   handleCancelButtonClick,
 }: SystemModalType) => {
-  console.log(children);
-
   return (
     <Container>
       {icon && <Icon src={icon} />}
@@ -95,7 +93,6 @@ const Text = styled.span`
   text-align: center;
   letter-spacing: 0.1px;
 `;
-
 const Icon = styled.img``;
 
 const ButtonWrapper = styled.div`

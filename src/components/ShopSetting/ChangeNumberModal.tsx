@@ -33,11 +33,11 @@ const postAuthenticationCode = (
 
   bizm
     .post(`/v2/sender/send`, data)
-    .then((res) => {
-      console.log("post res", res);
+    .then((result) => {
+      console.log("bizm post Result", result);
     })
-    .catch((e) => {
-      console.log("post error", e);
+    .catch((error) => {
+      console.log("bizm post Error", error);
     });
 };
 
@@ -85,13 +85,12 @@ const ChangeNumberModal = ({
     }));
 
     const randomNumber = String(Math.random()).slice(2, 8);
-
     postAuthenticationCode(userPhoneNumber, randomNumber);
-
     setAuthentication((prev) => ({
       ...prev,
       codeByService: randomNumber,
     }));
+
     setAuthentication((prev) => ({ ...prev, isStarted: true }));
 
     setTime(() => ({
@@ -124,6 +123,7 @@ const ChangeNumberModal = ({
   const handleCancelButtonClick = () => {
     onClickModalHandler(false);
   };
+
   const { minutes, seconds } = time;
   const { isTimeout, isWrongNumber, isVerified } = authenticationValid;
   const { isStarted, codeByUser, codeByService, userPhoneNumber } =
@@ -316,6 +316,7 @@ const PhoneNumberContainer = styled.div`
     line-height: 14px;
     letter-spacing: 0.1px;
   }
+
   & > button {
     font-weight: 500;
     font-size: 12px;
@@ -328,6 +329,7 @@ const PhoneNumberContainer = styled.div`
 const AuthenticationCodeContainer = styled.div`
   display: flex;
   margin-bottom: 12px;
+
   & > input {
     width: 246px;
     margin-right: 8px;
@@ -338,6 +340,7 @@ const AuthenticationCodeContainer = styled.div`
     line-height: 14px;
     letter-spacing: 0.1px;
   }
+
   & > button {
     margin-right: 8px;
     font-weight: 500;
@@ -373,6 +376,7 @@ const ButtonContainer = styled.div`
   & > button:first-child {
     margin-right: 16px;
   }
+
   & > button {
     font-weight: 500;
     font-size: 12px;

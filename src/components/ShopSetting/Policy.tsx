@@ -40,6 +40,7 @@ const SubTitleWrapper = styled.div`
   min-width: 235px;
   padding-left: 56px;
 `;
+
 const SubTitle = styled.h2`
   font-weight: 700;
   font-size: 14px;
@@ -49,7 +50,6 @@ const SubTitle = styled.h2`
 const ShopPolicyContainer = styled.div`
   display: flex;
   flex-direction: column;
-
   min-width: 736px;
 
   & > div:first-child {
@@ -60,6 +60,7 @@ const ShopPolicyContainer = styled.div`
 const SectionContainer = styled.div`
   display: flex;
   flex-direction: column;
+
   & > span {
     margin-bottom: 8px;
   }
@@ -81,6 +82,7 @@ const TextAreaContainer = styled.div`
     margin-left: 8px;
   }
 `;
+
 const TextArea = styled.textarea`
   width: 377px;
   height: 156px;
@@ -92,6 +94,8 @@ const TextArea = styled.textarea`
   font-size: 12px;
   line-height: 18px;
   letter-spacing: 0.1px;
+
+  resize: none;
 `;
 
 export default Policy;

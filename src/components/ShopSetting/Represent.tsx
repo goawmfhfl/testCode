@@ -4,14 +4,13 @@ import { useFormContext } from "react-hook-form";
 import axios from "axios";
 import styled from "styled-components";
 
-import NoticeContainer from "@components/Common/NoticeContainer";
 import addphotoSrc from "@icons/addphoto.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import exclamationmarkRedSrc from "@icons/exclamationmark-red.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
 import deleteSrc from "@icons/delete.svg";
 import photochangeSrc from "@icons/photochange.svg";
-
+import NoticeContainer from "@components/Common/NoticeContainer";
 import SystemModal from "@components/Common/SystemModal";
 
 const Represent = () => {
@@ -36,7 +35,7 @@ const Represent = () => {
       if (version === "pcImage" && size / 1024 / 1024 > 3)
         return setModal(true);
 
-      // delete duplicate url
+      // delete duplicate image url
       if (mobileImage && version === "mobileImage") deleteImageUrl(mobileImage);
       if (pcImage && version === "pcImage") deleteImageUrl(pcImage);
 
@@ -183,10 +182,10 @@ const Represent = () => {
       </ShopInfoContainer>
       {modal && (
         <SystemModal
-          text="확인"
-          icon={<img src={exclamationmarkRedSrc} />}
-          multi={false}
-          onClick={() => setModal(false)}
+          buttonText="확인"
+          icon={exclamationmarkRedSrc}
+          hasMultiButton={false}
+          handleConfirmButtonClick={() => setModal(false)}
         >
           등록 가능한 최대 파일크기를
           <br />
@@ -204,25 +203,28 @@ const Container = styled.div`
   width: 100%;
   padding: 88px 0px;
 `;
+
 const SubTitleWrapper = styled.div`
   min-width: 235px;
   padding-left: 56px;
 `;
+
 const SubTitle = styled.h2`
   font-weight: 700;
   font-size: 14px;
   line-height: 20px;
 `;
+
 const ShopInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
-
   min-width: 736px;
 
   & > div:first-child {
     margin-bottom: 48px;
   }
 `;
+
 const SectionContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -235,15 +237,18 @@ const SectionContainer = styled.div`
     margin-bottom: 12px;
   }
 `;
+
 const Description = styled.span`
   font-weight: 400;
   font-size: 14px;
   line-height: 14px;
   letter-spacing: 0.1px;
 `;
+
 const RepresentImageContainer = styled.div`
   display: flex;
 `;
+
 const ImageContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -264,24 +269,28 @@ const ImageContainer = styled.div`
     margin-bottom: 35px;
   }
 `;
+
 const ImageTitleText = styled.h3`
   font-weight: 700;
   font-size: 14px;
   line-height: 16px;
   letter-spacing: 0.1px;
 `;
+
 const ImageInfoText = styled.p`
   font-weight: 300;
   font-size: 12px;
   line-height: 18px;
   letter-spacing: 0.1px;
 `;
+
 const UploadImageLabel = styled.label`
   background-image: url(${addphotoSrc});
   background-position: center;
   background-size: cover;
   cursor: pointer;
 `;
+
 const UploadImgInput = styled.input`
   position: absolute;
   left: -10000px;
@@ -291,6 +300,7 @@ const UploadImgInput = styled.input`
   overflow: hidden;
   padding: 0;
 `;
+
 const PcImageContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -344,6 +354,7 @@ const MobileImageContainer = styled.div`
     letter-spacing: 0.1px;
   }
 `;
+
 const AddedMobileImageContainer = styled.div`
   position: relative;
   margin: 0 auto;
@@ -362,10 +373,12 @@ const AddedMobileImage = styled.img`
   width: 140px;
   height: 140px;
 `;
+
 const AddedPcImage = styled.img`
   width: 315px;
   height: 140px;
 `;
+
 const DeleteIcon = styled.img`
   position: absolute;
   top: 0;
@@ -375,6 +388,7 @@ const DeleteIcon = styled.img`
   width: 24px;
   height: 24px;
 `;
+
 const ChangeImageLabel = styled.label`
   position: absolute;
   bottom: 0;
@@ -398,6 +412,7 @@ const TextAreaContainer = styled.div`
     margin-left: 8px;
   }
 `;
+
 const TextArea = styled.textarea`
   width: 377px;
   height: 156px;
@@ -412,6 +427,7 @@ const TextArea = styled.textarea`
 
   resize: none;
 `;
+
 const TextCounter = styled.span`
   font-weight: 400;
   font-size: 16px;

@@ -10,13 +10,14 @@ const ChangeNumber = () => {
   const [modal, setModal] = useState<boolean>(false);
 
   const hidePhoneNumber = (phoneNumber: string) => {
-    const addAsteriskPhoneNumber = phoneNumber.slice(0, 5) + "*".repeat(6);
+    const addAsterisk = phoneNumber.slice(0, 5) + "*".repeat(6);
+
     return (
-      addAsteriskPhoneNumber.substr(0, 3) +
+      addAsterisk.slice(0, 3) +
       "-" +
-      addAsteriskPhoneNumber.substr(3, 4) +
+      addAsterisk.slice(3, 7) +
       "-" +
-      addAsteriskPhoneNumber.substr(7, 4)
+      addAsterisk.slice(7, 11)
     );
   };
 
@@ -65,8 +66,8 @@ const SubTitle = styled.h2`
 
 const ChangeNumberContainer = styled.div`
   display: flex;
-
   min-width: 704px;
+
   & > span {
     display: flex;
     align-items: center;
