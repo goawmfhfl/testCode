@@ -73,7 +73,7 @@ const SafetyModal = ({
 
       const parameter = {
         params: {
-          AuthKey: "AOF672NHN7FLME9653L7VVF549D48H8O",
+          AuthKey: process.env.REACT_APP_IDETIFICATION_AUTHENTICATION_API_KEY,
           ServiceName: "slfsfcfstChk",
           SlfsfcfstNo: validationCode,
         },

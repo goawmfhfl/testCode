@@ -77,8 +77,7 @@ const EnterPreneurModal = ({
 
       const parameter = {
         params: {
-          ServiceKey:
-            "M9GeLCBRxbhAJt3QlWNEGLQAYdLqjtZm+JhsJcjYIUm62vaFl/7oJZXUjdMg5kz9KosBdLsSUT24ojG+eZhGTA==",
+          ServiceKey: process.env.REACT_APP_BUSINESS_AUTHENTICATION_API_KEY,
           pageNo: 1,
           numOfRows: 10,
           resultType: "json",

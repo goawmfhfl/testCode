@@ -24,7 +24,7 @@ const postAuthenticationCode = (
     {
       message_type: "AT",
       phn: formatNumber(phoneNumber),
-      profile: "beaed98a65b993e706e963a8aa941c2db48e4938",
+      profile: process.env.REACT_APP_BIZM_PROFILE,
       reserveDt: "00000000000000",
       tmplId: "chopsticks_05",
       msg: `[${AuthenticationCode}] 인증번호를 입력하시면 인증이 완료됩니다.`,

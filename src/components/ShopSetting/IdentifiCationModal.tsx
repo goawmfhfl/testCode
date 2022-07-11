@@ -47,8 +47,8 @@ const IdentifiCationModal = ({
 
   const confirmIdentifiCationCode = async () => {
     try {
-      const headers = {
-        headers: { Authorization: "cc06a93d90e141ccbe1e8171ce242169ef7b3379" },
+      const configs = {
+        headers: { Authorization: process.env.REACT_APP_DATA_API_KEY || "" },
       };
 
       const requestData = {
@@ -60,7 +60,7 @@ const IdentifiCationModal = ({
       const { data } = await axios.post(
         "https://datahub-dev.scraping.co.kr/scrap/docInq/gov/ResidentPromotionCommittee",
         requestData,
-        headers
+        configs
       );
 
       if (data?.data?.ERRMSG) {
