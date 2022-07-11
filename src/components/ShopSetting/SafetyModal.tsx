@@ -60,12 +60,17 @@ const SafetyModal = ({
     isVerified: false,
     isWrongNumber: false,
   });
-  const { register, watch } = useFormContext();
+  const { register, watch, resetField } = useFormContext();
   const watchFields = watch();
   const { validationCode } = watchFields;
 
   const postAuthenticationCode = async (validationCode: string) => {
     try {
+      setValidation(() => ({
+        isVerified: false,
+        isWrongNumber: false,
+      }));
+
       const parameter = {
         params: {
           AuthKey: "AOF672NHN7FLME9653L7VVF549D48H8O",
@@ -82,17 +87,6 @@ const SafetyModal = ({
       const x2js = new X2JS();
       const parsedData: parsedDataType = x2js.xml2js(data);
 
-      // 개발 테스트 진행중 허가된 IP주소가 아닐 경우
-      if (parsedData?.error) {
-        setValidation(() => ({
-          isVerified: false,
-          isWrongNumber: true,
-        }));
-        return;
-      }
-
-      // 1. 허용된 IP 주소로 요청, 통신에 성공함
-      // 1-1. But 입력 값으로 조회된 정보가 없을 경우
       if (parsedData?.rows?.count === "0") {
         setValidation(() => ({
           isVerified: false,
@@ -101,7 +95,6 @@ const SafetyModal = ({
         return;
       }
 
-      // 1-2. But 안준기준이 적합하지 않은 경우
       if (parsedData?.rows?.row?.valid_yn === "N") {
         setValidation(() => ({
           isVerified: false,
@@ -118,10 +111,14 @@ const SafetyModal = ({
     }
   };
   const saveAuthenticationCode = () => {
-    // 그냥 Return 혹은 경고 Alert?
-    if (isVerified === false && isWrongNumber === true) return;
     onClickCheckIsConfrim(true);
     onClickModalHandler(false);
+    resetField("validationCode");
+  };
+
+  const onCancelButton = () => {
+    onClickModalHandler(false);
+    resetField("validationCode");
   };
 
   const { isVerified, isWrongNumber } = validation;
@@ -163,16 +160,13 @@ const SafetyModal = ({
         <Button
           size="small"
           full={false}
-          className="positive"
+          className={isVerified ? "positive" : "negative"}
           onClick={saveAuthenticationCode}
+          disabled={!isVerified}
         >
           저장
         </Button>
-        <Button
-          size="small"
-          full={false}
-          onClick={() => onClickModalHandler(false)}
-        >
+        <Button size="small" full={false} onClick={onCancelButton}>
           취소
         </Button>
       </ButtonContainer>
