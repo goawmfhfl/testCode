@@ -5,9 +5,9 @@ const ContentsNavigation = ({ children }: { children: React.ReactNode }) => {
   return <Container>{children}</Container>;
 };
 
-const Container = styled.form`
+const Container = styled.div`
   display: flex;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 
   & > div {
     padding: 12px 56px 12px 56px;

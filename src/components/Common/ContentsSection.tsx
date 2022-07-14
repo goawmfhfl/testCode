@@ -6,7 +6,7 @@ const ContentsSection = ({ children }: { children: React.ReactNode }) => {
 };
 
 const Container = styled.div`
-  border-bottom: 1px solid grey;
+  border-bottom: 1px solid ${({ theme: { palette } }) => palette.grey500};
   min-height: 300px;
   padding: 40px 56px;
 `;

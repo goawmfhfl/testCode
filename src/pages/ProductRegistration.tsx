@@ -1,4 +1,4 @@
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
 import ContentsHeader from "@components/common/ContentsHeader";
@@ -6,9 +6,9 @@ import ContentsMain from "@components/common/ContentsMain";
 import ContentsSection from "@components/common/ContentsSection";
 import InputWrapper from "@components/common/InputWrapper";
 import NoticeContainer from "@components/common/NoticeContainer";
-import TextInput from "@components/common/input/TextInput";
 import Textarea from "@components/common/input/Textarea";
 
+import ProductName from "@components/ProductRegistration/ProductName";
 import ProductCategory from "@components/ProductRegistration/ProductCategory";
 import ProductImage from "@components/ProductRegistration/ProductImage";
 import ProductColor from "@components/ProductRegistration/ProductColor";
@@ -17,16 +17,39 @@ import ProductDiscount from "@components/ProductRegistration/ProductDiscount";
 import ProductStock from "@components/ProductRegistration/ProductStock";
 import PurchaseOption from "@components/ProductRegistration/PurchaseOption";
 import OrderProduction from "@components/ProductRegistration/OrderProduction";
-import ProductDeliveryFee from "@components/ProductRegistration/ProductDeliveryFee";
+import ShippingCharge from "@components/ProductRegistration/ProductShippingCharge";
 import ProductSpecification from "@components/ProductRegistration/ProductSpecification";
 
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 
-const ProductRegistration = () => {
-  const methods = useForm();
+export interface ProductRegistrationFormValues {
+  productName: string;
+  productPrice: string;
+  productDescription: string;
+  productStock: string;
+  productNameSpec: string;
+  productTextileSpec: string;
+  discountValue: string;
+  minLeadTime: string;
+  maxLeadTime: string;
+  optionValues: string;
+  cautionsSpec: string;
+  certifiedMattersSpec: string;
+  countrysideAdditionalShippingCharge: string;
+  contactInformationSpec: string;
+  deliveryFee: string;
+  categoryDepthFirst: string;
+  categoryDepthSecond: string;
+  categoryDepthThird: string;
+}
 
-  const onSubmit = () => {
+const ProductRegistration = () => {
+  const methods = useForm<ProductRegistrationFormValues>();
+  const { register } = methods;
+
+  const onSubmit: SubmitHandler<ProductRegistrationFormValues> = (data) => {
     console.log("form is submitted!");
+    console.log(data);
   };
 
   return (
@@ -44,7 +67,7 @@ const ProductRegistration = () => {
           <ContentsMain>
             <ContentsSection>
               <InputWrapper label={"상품명"} isRequired={true}>
-                <TextInput width={"540px"} />
+                <ProductName />
               </InputWrapper>
               <InputWrapper label={"카테고리"} isRequired={true}>
                 <ProductCategory />
@@ -56,7 +79,12 @@ const ProductRegistration = () => {
                 <ProductImage />
               </InputWrapper>
               <InputWrapper label={"상품설명"} isRequired={true}>
-                <Textarea width={"716px"} height={"126px"} />
+                <Textarea
+                  size="small"
+                  width={"716px"}
+                  height={"126px"}
+                  register={register("productDescription")}
+                />
               </InputWrapper>
               <InputWrapper label={"상품 상세페이지"} isRequired={true}>
                 <input type="text" name="" id="" />
@@ -96,7 +124,7 @@ const ProductRegistration = () => {
                 <OrderProduction />
               </InputWrapper>
               <InputWrapper label={"배송 설정"}>
-                <ProductDeliveryFee />
+                <ShippingCharge />
               </InputWrapper>
             </ContentsSection>
 

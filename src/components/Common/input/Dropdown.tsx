@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { UseFormRegisterReturn } from "react-hook-form";
 import { v4 as uuid } from "uuid";
 
 import downwordArrowMedium from "@icons/arrow-downward-medium.svg";
@@ -25,13 +26,19 @@ interface OptionType {
 const Dropdown = ({
   size,
   options,
+  register,
+  disabled,
 }: {
   size: string;
-  options: Array<string>;
+  options: Array<string> | undefined;
+  register: UseFormRegisterReturn;
+  disabled?: boolean;
 }) => {
   const [dropdownOptions, setDropdownOptions] = useState<Array<OptionType>>([]);
 
   useEffect(() => {
+    if (!options) return;
+
     const mappedOptions: Array<OptionType> = options.map((option) => {
       const key: string = uuid();
 
@@ -42,10 +49,10 @@ const Dropdown = ({
     });
 
     setDropdownOptions(mappedOptions);
-  }, []);
+  }, [options]);
 
   return (
-    <Select size={size}>
+    <Select register={register} size={size} disabled={disabled}>
       {dropdownOptions.map(({ key, text }) => {
         return <Option key={key}>{text}</Option>;
       })}
@@ -56,14 +63,23 @@ const Dropdown = ({
 const Select = ({
   size,
   children,
+  register,
+  disabled,
 }: {
   size: string;
   children: React.ReactNode;
+  register: UseFormRegisterReturn;
+  disabled?: boolean;
 }) => {
   const downwardArrowSrc: string = arrowSet[size as keyof arrowSetType];
 
   return (
-    <SelectInput sizing={size} arrowSrc={downwardArrowSrc}>
+    <SelectInput
+      sizing={size}
+      arrowSrc={downwardArrowSrc}
+      {...register}
+      disabled={disabled}
+    >
       {children}
     </SelectInput>
   );
@@ -104,6 +120,13 @@ const SelectInput = styled.select<SelectProps>`
           background-image: url(${arrowSrc});
           background-repeat: no-repeat;
           background-position: right 16px bottom 50%;
+
+          font-family: Spoqa Han Sans Neo;
+          font-size: 16px;
+          font-weight: 400;
+          line-height: 18px;
+          letter-spacing: -0.015em;
+          text-align: left;
         `;
       default:
         return "";

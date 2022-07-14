@@ -28,6 +28,7 @@ const sizeStyles = css<{ size: string }>`
 
 const Button = styled.button<{
   full?: boolean;
+  width?: string;
   size: string;
   color?: string;
   backgroundColor?: string;
@@ -45,7 +46,7 @@ const Button = styled.button<{
     backgroundColor ? backgroundColor : "transparent"};
   font-family: "SpoqaHanSansNeo";
 
-  width: ${({ full }) => (full ? "100%" : "126px")};
+  width: ${({ full, width }) => (full ? "100%" : width ? width : "")};
 
   ${sizeStyles};
 

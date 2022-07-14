@@ -10,6 +10,7 @@ const SaveBar = () => {
       <ButtonContainer>
         <Button
           size="big"
+          width="126px"
           color={theme.palette.white}
           backgroundColor={theme.palette.grey700}
         >
@@ -18,6 +19,7 @@ const SaveBar = () => {
 
         <SubmitButton
           size="big"
+          width="126px"
           color={theme.palette.white}
           backgroundColor={theme.palette.red900}
           form="hook-form"
@@ -25,7 +27,9 @@ const SaveBar = () => {
           등록
         </SubmitButton>
 
-        <Button size="big">취소</Button>
+        <Button size="big" width="126px">
+          취소
+        </Button>
       </ButtonContainer>
     </Container>
   );

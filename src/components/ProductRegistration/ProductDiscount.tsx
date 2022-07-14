@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { useFormContext } from "react-hook-form";
 
 import TextInput from "@components/common/input/TextInput";
 import Dropdown from "@components/common/input/Dropdown";
@@ -6,14 +7,21 @@ import DateInput from "@components/common/input/DateInput";
 import Checkbox from "@components/common/input/Checkbox";
 
 const ProductDiscount = () => {
+  const { register } = useFormContext();
+
   const discountedPrice = "-";
 
   return (
     <Container>
       <InputContainer>
-        <TextInput />
+        <TextInput register={register("discountValue")} />
         <DropdownWrapper>
-          <Dropdown size={"medium"} options={["%", "₩"]} />
+          {/* Dropdown name="discountUnit" */}
+          <Dropdown
+            size={"medium"}
+            options={["%", "₩"]}
+            register={register("discountOption")}
+          />
         </DropdownWrapper>
         할인
         <DiscountCheckbox name="" id="" /> 기간할인 설정하기
@@ -80,7 +88,7 @@ const HorizontalLine = styled.div`
 `;
 
 const DiscountedPrice = styled.div`
-  font-family: "Spoqa Han Sans Neo";
+  font-family: "SpoqaHanSansNeo";
   font-style: normal;
   font-weight: 400;
   font-size: 13px;
@@ -89,7 +97,7 @@ const DiscountedPrice = styled.div`
 `;
 
 const PriceWrapper = styled.span`
-  font-family: "Spoqa Han Sans Neo";
+  font-family: "SpoqaHanSansNeo";
   font-style: normal;
   font-weight: 500;
   font-size: 18px;
@@ -101,7 +109,7 @@ const PriceWrapper = styled.span`
 `;
 
 const DiscountTimespanNotification = styled.span`
-  font-family: "Spoqa Han Sans Neo";
+  font-family: "SpoqaHanSansNeo";
   font-style: normal;
   font-weight: 300;
   font-size: 12px;

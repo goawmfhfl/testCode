@@ -1,10 +1,14 @@
 import styled from "styled-components";
+import { useFormContext } from "react-hook-form";
+
 import TextInput from "@components/common/input/TextInput";
 
 const ProductPrice = () => {
+  const { register } = useFormContext();
+
   return (
     <Container>
-      <TextInput width={"112px"} /> 원
+      <TextInput width={"112px"} register={register("productPrice")} /> 원
     </Container>
   );
 };

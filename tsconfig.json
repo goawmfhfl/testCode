@@ -24,8 +24,11 @@
       "@images/*": ["assets/images/*"],
       "@fonts/*": ["assets/fonts/*"],
       "@styles/*": ["styles/*"],
-      "@utils/*": ["utils/*"]
-    }
+      "@utils/*": ["utils/*"],
+    },
+    "suppressImplicitAnyIndexErrors": true,
+    "strictNullChecks": false,
+    "strictPropertyInitialization": false
   },
   "include": ["src", "types"]
 }

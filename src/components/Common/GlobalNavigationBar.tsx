@@ -36,7 +36,7 @@ const Container = styled.header`
   align-items: center;
   padding: 6px 30px 6px 30px;
   z-index: 1000;
-  background-color: ${({ theme: { palette } }) => palette["grey700"]};
+  background-color: ${({ theme: { palette } }) => palette.grey900};
 `;
 
 const LogoWrapper = styled.div``;

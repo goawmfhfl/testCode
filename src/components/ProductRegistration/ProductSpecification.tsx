@@ -1,37 +1,40 @@
 import styled from "styled-components";
+import { useFormContext } from "react-hook-form";
 
 import TextInput from "@components/common/input/TextInput";
 
 const ProductSpecification = () => {
+  const { register } = useFormContext();
+
   return (
     <Container>
       <InputContainer>
         <Label>작품명</Label>
-        <TextInput width="100%" />
+        <TextInput register={register("productName")} width="100%" />
       </InputContainer>
       <InputContainer>
         <Label>소재</Label>
-        <TextInput width="100%" />
+        <TextInput register={register("material")} width="100%" />
       </InputContainer>
       <InputContainer>
         <Label>크기</Label>
-        <TextInput width="100%" />
+        <TextInput register={register("size")} width="100%" />
       </InputContainer>
       <InputContainer>
         <Label>제조자/제조국</Label>
-        <TextInput width="100%" />
+        <TextInput register={register("manufacturer")} width="100%" />
       </InputContainer>
       <InputContainer>
         <Label>취급시 주의사항</Label>
-        <TextInput width="100%" />
+        <TextInput register={register("precaution")} width="100%" />
       </InputContainer>
       <InputContainer>
         <Label>인증/허가 사항</Label>
-        <TextInput width="100%" />
+        <TextInput register={register("authorization")} width="100%" />
       </InputContainer>
       <InputContainer>
         <Label>AS책임자와 전화번호</Label>
-        <TextInput width="100%" />
+        <TextInput register={register("personInCharge")} width="100%" />
       </InputContainer>
     </Container>
   );

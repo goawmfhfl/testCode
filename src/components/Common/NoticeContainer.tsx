@@ -21,7 +21,7 @@ const Container = styled.div`
   background: ${({ theme: { palette } }) => palette.grey400};
 `;
 
-const NoticeText = styled.p`
+const NoticeText = styled.div`
   display: flex;
   align-items: center;
 

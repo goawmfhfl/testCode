@@ -1,41 +1,129 @@
-import { useState } from "react";
-import styled from "styled-components";
-import { useForm } from "react-hook-form";
+import { v4 as uuidv4 } from "uuid";
+import { useState, useEffect } from "react";
+import styled, { useTheme } from "styled-components";
+import { useFormContext, useWatch } from "react-hook-form";
 
+import { ProductRegistrationFormValues } from "@pages/ProductRegistration";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Checkbox from "@components/common/input/Checkbox";
 import Button from "@components/common/Button";
 import TextInput from "@components/common/input/TextInput";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import removeOptionIconSrc from "@icons/remove-option.svg";
-import smallDownwardArrowIconSrc from "@icons/arrow-downward-small.svg";
+import smallDownwardArrowIconSrc from "@icons/arrow-downward-small-red.svg";
+import addOptionInputIconSrc from "@icons/add-option-input.svg";
+
+interface OptionInputType {
+  id: string;
+  disabled?: boolean;
+}
+
+interface OptionRowType {
+  id: string;
+  option: Array<string>;
+  optionPrice: number;
+  optionStock: number;
+}
+
+interface AdaptedOptionType {
+  optionHeaders: Array<{
+    key: string;
+    header: string;
+  }>;
+  optionRows: Array<OptionRowType>;
+}
 
 const PurchaseOption = () => {
-  const { register } = useForm();
+  const theme = useTheme();
+  const { register, unregister, getValues } = useFormContext();
+  const productRegistrationInputs = useWatch<ProductRegistrationFormValues>();
 
   const [optionInputList, setOptionInputList] = useState<
-    Array<{
-      isRequired: boolean;
-      optionName: string;
-      optionValues: Array<string>;
-    }>
+    Array<OptionInputType>
   >([
     {
-      isRequired: false,
-      optionName: "일러스트",
-      optionValues: ["산, 바다"],
-    },
-    {
-      isRequired: false,
-      optionName: "액자",
-      optionValues: ["화이트, 블랙"],
+      id: uuidv4(),
     },
   ]);
+
+  const [adaptedOption, setAdaptedOption] = useState<AdaptedOptionType>({
+    optionHeaders: [],
+    optionRows: [],
+  });
+
+  const handleRemoveOptionIconClick = (optionKey: string) => {
+    setOptionInputList((prev) => {
+      const filteredList = prev.filter((option) => {
+        return option.id !== optionKey.toString();
+      });
+
+      return [...filteredList];
+    });
+
+    unregister(`optionName-${optionKey}`);
+    unregister(`optionValue-${optionKey}`);
+  };
+
+  const handleAddOptionInputButtonClick = () => {
+    setOptionInputList((prev) => [
+      ...prev,
+      {
+        id: uuidv4(),
+      },
+    ]);
+  };
+
+  const handleAdaptButtonClick = () => {
+    const optionHeaders = optionInputList.map(({ id }) => {
+      return {
+        key: uuidv4(),
+        header: productRegistrationInputs[`optionName-${id}`] as string,
+      };
+    });
+
+    const optionValues = optionInputList.map(
+      ({ id }: OptionInputType): Array<string> => {
+        const optionValue = productRegistrationInputs[
+          `optionValue-${id}`
+        ] as string;
+
+        return optionValue.split(",").map((value) => value.trim());
+      }
+    );
+
+    const optionRows = optionValues.reduce(
+      (prevPermutations: Array<Array<string>>, optionValue: Array<string>) => {
+        const permutation = optionValue.reduce(
+          (acc: Array<Array<string>>, value: string) => {
+            prevPermutations.forEach((permutation: Array<string>) => {
+              acc.push([...permutation, value]);
+            });
+
+            return acc;
+          },
+          []
+        );
+
+        return permutation;
+      },
+      [[]]
+    );
+
+    setAdaptedOption({
+      optionHeaders,
+      optionRows: optionRows.map((optionRow) => ({
+        id: uuidv4(),
+        option: optionRow,
+        optionPrice: 0,
+        optionStock: 0,
+      })),
+    });
+  };
 
   return (
     <Container>
       <CheckboxContainer>
-        <PurchaseOptionCheckbox /> 옵션 설정하기
+        <PurchaseOptionCheckbox {...register("hasOption")} /> 옵션 설정하기
       </CheckboxContainer>
 
       <NoticeContainer icon={exclamationMarkSrc}>
@@ -50,16 +138,40 @@ const PurchaseOption = () => {
 
       <OptionInputTable>
         <OptionInputHeader fieldNames={["필수", "옵션명", "옵션값"]} />
-        <OptionInputRow />
-        <OptionInputRow />
+        <tbody>
+          {optionInputList.map(({ id }, index) => {
+            const isLastOptionInput = optionInputList.length === index + 1;
+
+            const hasEnabled: boolean = getValues("hasOption") as boolean;
+
+            return (
+              <OptionInputRow
+                key={id}
+                optionId={id}
+                isOnly={optionInputList.length <= 1}
+                isLast={isLastOptionInput}
+                handleAddOptionInputButtonClick={
+                  handleAddOptionInputButtonClick
+                }
+                handleRemoveOptionIconClick={handleRemoveOptionIconClick}
+                disabled={!hasEnabled}
+              />
+            );
+          })}
+        </tbody>
       </OptionInputTable>
 
-      <AdaptButton size="small">
+      <AdaptButton
+        size="small"
+        color={theme.palette.white}
+        backgroundColor={theme.palette.grey700}
+        onClick={handleAdaptButtonClick}
+      >
         적용
         <img src={smallDownwardArrowIconSrc} width={14} />
       </AdaptButton>
 
-      <AdaptedOptionTable></AdaptedOptionTable>
+      <AdaptedOptionTable adaptedOption={adaptedOption} />
     </Container>
   );
 };
@@ -100,34 +212,109 @@ const OptionInputTable = styled.table`
 `;
 
 const OptionInputHeader = ({ fieldNames }: { fieldNames: Array<string> }) => {
+  const [mappedFieldNames, setMappedFieldNames] = useState<
+    Array<{
+      key: string;
+      name: string;
+    }>
+  >([]);
+
+  useEffect(() => {
+    setMappedFieldNames(
+      fieldNames.map((name) => ({
+        key: uuidv4(),
+        name,
+      }))
+    );
+  }, []);
+
   return (
-    <TableHeaderContainer>
-      {fieldNames.map((el) => {
-        return (
-          <TableHeader textAlign={el === "필수" ? "center" : "left"}>
-            {el}
-          </TableHeader>
-        );
-      })}
-    </TableHeaderContainer>
+    <thead>
+      <TableHeaderContainer>
+        {mappedFieldNames.map(({ key, name }) => {
+          return (
+            <TableHeader
+              key={key}
+              textAlign={name === "필수" ? "center" : "left"}
+            >
+              {name}
+            </TableHeader>
+          );
+        })}
+      </TableHeaderContainer>
+    </thead>
   );
 };
 
-const OptionInputRow = () => {
+interface OptionInputRowProps {
+  optionId: string;
+  disabled?: boolean;
+  isOnly: boolean;
+  isLast?: boolean;
+  handleRemoveOptionIconClick: (optionId: string) => void;
+  handleAddOptionInputButtonClick: () => void;
+}
+
+const OptionInputRow = ({
+  optionId,
+  disabled = false,
+  isOnly,
+  isLast,
+  handleRemoveOptionIconClick,
+  handleAddOptionInputButtonClick,
+}: OptionInputRowProps) => {
+  const { register } = useFormContext();
+
   return (
     <TableRowContainer>
       <TableData>
-        <OptionRequiredCheckbox />
+        <OptionRequiredCheckbox disabled={disabled} />
       </TableData>
       <TableData>
-        <OptionName />
+        <OptionName
+          disabled={disabled}
+          register={register(`optionName-${optionId}`)}
+        />
       </TableData>
       <TableData>
-        <OptionValues width={"263px"} />
+        <OptionValues
+          width={"263px"}
+          disabled={disabled}
+          register={register(`optionValue-${optionId}`)}
+        />
       </TableData>
-      <TableData>
-        <img src={removeOptionIconSrc} />
-      </TableData>
+      {!isOnly && (
+        <TableData>
+          <img
+            src={removeOptionIconSrc}
+            onClick={(e) => {
+              if (disabled) {
+                e.preventDefault();
+
+                return;
+              }
+
+              handleRemoveOptionIconClick(optionId);
+            }}
+          />
+        </TableData>
+      )}
+      {isLast && (
+        <TableData>
+          <img
+            src={addOptionInputIconSrc}
+            onClick={(e) => {
+              if (disabled) {
+                e.preventDefault();
+
+                return;
+              }
+
+              handleAddOptionInputButtonClick();
+            }}
+          />
+        </TableData>
+      )}
     </TableRowContainer>
   );
 };
@@ -149,6 +336,11 @@ const TableData = styled.td`
   & > input {
     margin: 4px 8px;
   }
+
+  & > img {
+    margin-right: 4px;
+    cursor: pointer;
+  }
 `;
 
 const OptionRequiredCheckbox = styled(Checkbox)``;
@@ -157,42 +349,75 @@ const OptionName = styled(TextInput)``;
 
 const OptionValues = styled(TextInput)``;
 
-const AdaptButton = styled(Button)``;
+const AdaptButton = styled(Button).attrs({ type: "button" })`
+  margin: 0 auto;
+`;
 
-const AdaptedOptionTable = () => {
+const AdaptedOptionTable = ({
+  adaptedOption,
+}: {
+  adaptedOption: AdaptedOptionType;
+}) => {
   return (
     <AdaptedOptionTableContainer>
-      <AdaptedOptionTableHeaderRow>
-        <AdaptedOptionTableHeader className={"headerContainer"} colSpan={2}>
-          <AdaptedOptionTableHeaderRow>
-            <AdaptedOptionTableHeader colSpan={2}>
-              옵션명
-            </AdaptedOptionTableHeader>
-          </AdaptedOptionTableHeaderRow>
-          <AdaptedOptionTableHeaderRow>
-            <AdaptedOptionTableHeader>일러스트</AdaptedOptionTableHeader>
-            <AdaptedOptionTableHeader>액자</AdaptedOptionTableHeader>
-          </AdaptedOptionTableHeaderRow>
-        </AdaptedOptionTableHeader>
-        <AdaptedOptionTableHeader>옵션가</AdaptedOptionTableHeader>
-        <AdaptedOptionTableHeader>재고</AdaptedOptionTableHeader>
-      </AdaptedOptionTableHeaderRow>
+      {/* tr */}
+      <tbody>
+        <AdaptedOptionTableHeaderRow>
+          {/* th */}
+          <AdaptedOptionTableHeader className={"headerContainer"} colSpan={2}>
+            {/* tr */}
+            <Table>
+              <tbody>
+                <AdaptedOptionTableHeaderRow>
+                  <AdaptedOptionTableHeader colSpan={2}>
+                    옵션명
+                  </AdaptedOptionTableHeader>
+                </AdaptedOptionTableHeaderRow>
 
-      <AdaptedOptionTableRow>
-        <AdaptedOptionTableData>산</AdaptedOptionTableData>
-        <AdaptedOptionTableData>화이트</AdaptedOptionTableData>
-        <AdaptedOptionTableData>+10,000</AdaptedOptionTableData>
-        <AdaptedOptionTableData>20</AdaptedOptionTableData>
-      </AdaptedOptionTableRow>
-      <AdaptedOptionTableRow>
-        <AdaptedOptionTableData>산</AdaptedOptionTableData>
-        <AdaptedOptionTableData>블랙</AdaptedOptionTableData>
-        <AdaptedOptionTableData>+10,000</AdaptedOptionTableData>
-        <AdaptedOptionTableData>20</AdaptedOptionTableData>
-      </AdaptedOptionTableRow>
+                {adaptedOption.optionHeaders.length ? (
+                  // tr
+                  <AdaptedOptionTableHeaderRow>
+                    {adaptedOption.optionHeaders.map(({ key, header }) => (
+                      <AdaptedOptionTableHeader key={key}>
+                        {header}
+                      </AdaptedOptionTableHeader>
+                    ))}
+                  </AdaptedOptionTableHeaderRow>
+                ) : (
+                  <></>
+                )}
+              </tbody>
+            </Table>
+          </AdaptedOptionTableHeader>
+
+          <AdaptedOptionTableHeader>옵션가</AdaptedOptionTableHeader>
+
+          <AdaptedOptionTableHeader>재고</AdaptedOptionTableHeader>
+        </AdaptedOptionTableHeaderRow>
+
+        {adaptedOption.optionRows.map(
+          ({ id, option, optionPrice, optionStock }: OptionRowType) => {
+            return (
+              <AdaptedOptionTableRow key={id}>
+                {option.map((el, index) => (
+                  <AdaptedOptionTableData key={`${el}-${index}`}>
+                    {el}
+                  </AdaptedOptionTableData>
+                ))}
+                <AdaptedOptionTableData>{optionPrice}</AdaptedOptionTableData>
+                <AdaptedOptionTableData>{optionStock}</AdaptedOptionTableData>
+              </AdaptedOptionTableRow>
+            );
+          }
+        )}
+      </tbody>
     </AdaptedOptionTableContainer>
   );
 };
+
+const Table = styled.table`
+  width: 100%;
+`;
 
 const AdaptedOptionTableContainer = styled.table`
   width: 531px;

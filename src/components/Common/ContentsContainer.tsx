@@ -1,5 +1,5 @@
 import React, { BaseSyntheticEvent } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 interface ContentsContainerProps {
   isForm?: boolean | undefined;
@@ -15,11 +15,11 @@ const ContentsContainer = ({
   children,
 }: ContentsContainerProps) => {
   if (!(isForm ?? false) || !onSubmit) {
-    return <div>{children}</div>;
+    return <Container>{children}</Container>;
   }
 
   return (
-    <form
+    <Form
       id="hook-form"
       onSubmit={(e) => {
         e.preventDefault();
@@ -31,12 +31,21 @@ const ContentsContainer = ({
       }}
     >
       {children}
-    </form>
+    </Form>
   );
 };
 
-export default styled(ContentsContainer)`
+const containerStyles = css`
   background-color: ${({ theme: { palette } }) => palette.grey100};
-
   padding: 16px 24px;
 `;
+
+const Form = styled.form`
+  ${containerStyles}
+`;
+
+const Container = styled.div`
+  ${containerStyles}
+`;
+
+export default ContentsContainer;

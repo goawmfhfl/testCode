@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { useFormContext } from "react-hook-form";
 
 import Checkbox from "@components/common/input/Checkbox";
 import TextInput from "@components/common/input/TextInput";
@@ -6,6 +7,8 @@ import NoticeContainer from "@components/common/NoticeContainer";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 
 const OrderProduction = () => {
+  const { register } = useFormContext();
+
   return (
     <Container>
       <CheckboxWrapper>
@@ -21,11 +24,11 @@ const OrderProduction = () => {
       </NoticeContainerWrapper>
       제작 기간 최소{" "}
       <TextInputWrapper>
-        <TextInput textAlign="right" />
+        <TextInput register={register("minLeadTime")} textAlign="right" />
       </TextInputWrapper>
       일에서 최대{" "}
       <TextInputWrapper>
-        <TextInput textAlign="right" />
+        <TextInput register={register("maxLeadTime")} textAlign="right" />
       </TextInputWrapper>
       일까지 소요
     </Container>
