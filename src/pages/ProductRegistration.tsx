@@ -4,21 +4,21 @@ import ContentsContainer from "@components/common/ContentsContainer";
 import ContentsHeader from "@components/common/ContentsHeader";
 import ContentsMain from "@components/common/ContentsMain";
 import ContentsSection from "@components/common/ContentsSection";
-import InputWrapper from "@components/common/InputWrapper";
+import SectionWrapper from "@components/common/SectionWrapper";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
 
-import ProductName from "@components/ProductRegistration/ProductName";
-import ProductCategory from "@components/ProductRegistration/ProductCategory";
-import ProductImage from "@components/ProductRegistration/ProductImage";
-import ProductColor from "@components/ProductRegistration/ProductColor";
-import ProductPrice from "@components/ProductRegistration/ProductPrice";
-import ProductDiscount from "@components/ProductRegistration/ProductDiscount";
-import ProductStock from "@components/ProductRegistration/ProductStock";
-import PurchaseOption from "@components/ProductRegistration/PurchaseOption";
-import OrderProduction from "@components/ProductRegistration/OrderProduction";
-import ShippingCharge from "@components/ProductRegistration/ProductShippingCharge";
-import ProductSpecification from "@components/ProductRegistration/ProductSpecification";
+import ProductNameSection from "@components/ProductRegistration/ProductNameSection";
+import ProductCategorySection from "@components/ProductRegistration/ProductCategorySection";
+import ProductImageSection from "@components/ProductRegistration/ProductImageSection";
+import ProductColorSection from "@components/ProductRegistration/ProductColorSection";
+import ProductPriceSection from "@components/ProductRegistration/ProductPriceSection";
+import ProductDiscountSection from "@components/ProductRegistration/ProductDiscountSection";
+import ProductStockSection from "@components/ProductRegistration/ProductStockSection";
+import PurchaseOptionSection from "@components/ProductRegistration/PurchaseOptionSection";
+import OrderProductionSection from "@components/ProductRegistration/OrderProductionSection";
+import ShippingChargeSection from "@components/ProductRegistration/ProductShippingChargeSection";
+import ProductSpecificationSection from "@components/ProductRegistration/ProductSpecificationSection";
 
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 
@@ -66,72 +66,72 @@ const ProductRegistration = () => {
           </ContentsHeader>
           <ContentsMain>
             <ContentsSection>
-              <InputWrapper label={"상품명"} isRequired={true}>
-                <ProductName />
-              </InputWrapper>
-              <InputWrapper label={"카테고리"} isRequired={true}>
-                <ProductCategory />
-              </InputWrapper>
+              <SectionWrapper label={"상품명"} isRequired={true}>
+                <ProductNameSection />
+              </SectionWrapper>
+              <SectionWrapper label={"카테고리"} isRequired={true}>
+                <ProductCategorySection />
+              </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <InputWrapper label={"대표사진"} isRequired={true}>
-                <ProductImage />
-              </InputWrapper>
-              <InputWrapper label={"상품설명"} isRequired={true}>
+              <SectionWrapper label={"대표사진"} isRequired={true}>
+                <ProductImageSection />
+              </SectionWrapper>
+              <SectionWrapper label={"상품설명"} isRequired={true}>
                 <Textarea
                   size="small"
                   width={"716px"}
                   height={"126px"}
                   register={register("productDescription")}
                 />
-              </InputWrapper>
-              <InputWrapper label={"상품 상세페이지"} isRequired={true}>
+              </SectionWrapper>
+              <SectionWrapper label={"상품 상세페이지"} isRequired={true}>
                 <input type="text" name="" id="" />
-              </InputWrapper>
-              <InputWrapper label={"상품 스토리"} isRequired={true}>
+              </SectionWrapper>
+              <SectionWrapper label={"상품 스토리"} isRequired={true}>
                 <input type="text" name="" id="" />
-              </InputWrapper>
-              <InputWrapper
+              </SectionWrapper>
+              <SectionWrapper
                 label={"상품 컬러"}
                 isRequired={true}
                 labelMarginTop={false}
               >
-                <ProductColor />
-              </InputWrapper>
+                <ProductColorSection />
+              </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <InputWrapper label={"판매가"} isRequired={true}>
-                <ProductPrice />
-              </InputWrapper>
-              <InputWrapper label={"할인"}>
-                <ProductDiscount />
-              </InputWrapper>
+              <SectionWrapper label={"판매가"} isRequired={true}>
+                <ProductPriceSection />
+              </SectionWrapper>
+              <SectionWrapper label={"할인"}>
+                <ProductDiscountSection />
+              </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <InputWrapper label={"재고"} isRequired={true}>
-                <ProductStock />
-              </InputWrapper>
-              <InputWrapper label={"옵션 설정"}>
-                <PurchaseOption />
-              </InputWrapper>
+              <SectionWrapper label={"재고"} isRequired={true}>
+                <ProductStockSection />
+              </SectionWrapper>
+              <SectionWrapper label={"옵션 설정"}>
+                <PurchaseOptionSection />
+              </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <InputWrapper label={"주문 후 제작 여부"}>
-                <OrderProduction />
-              </InputWrapper>
-              <InputWrapper label={"배송 설정"}>
-                <ShippingCharge />
-              </InputWrapper>
+              <SectionWrapper label={"주문 후 제작 여부"}>
+                <OrderProductionSection />
+              </SectionWrapper>
+              <SectionWrapper label={"배송 설정"}>
+                <ShippingChargeSection />
+              </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <InputWrapper label={"작품정보제공고시"} isRequired={true}>
-                <ProductSpecification />
-              </InputWrapper>
+              <SectionWrapper label={"작품정보제공고시"} isRequired={true}>
+                <ProductSpecificationSection />
+              </SectionWrapper>
             </ContentsSection>
           </ContentsMain>
         </ContentsContainer>

@@ -1,10 +1,10 @@
 import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 
-import triangleSrc from "@icons/triangle.svg";
-import Input from "@components/common/Input";
+import TextInput from "@components/common/input/TextInput";
+import Dropdown from "@components/common/input/Dropdown";
 
-const DeliveryFee = () => {
+const ShipmentSettings = () => {
   const { register } = useFormContext();
 
   return (
@@ -12,18 +12,19 @@ const DeliveryFee = () => {
       <OrderFeeContainer>
         <OrderInfoText>기본 배송비</OrderInfoText>
         <ContentContainer>
-          <Select {...register("orderOption")}>
-            <Option>유료</Option>
-            <Option>무료</Option>
-          </Select>
-          <Input {...register("defaultOrderFee")} />
+          <Dropdown
+            size="medium"
+            register={register("shipmentType")}
+            options={["유료", "무료"]}
+          />
+          <TextInput register={register("shipmentPrice")} />
           <KrwText>원</KrwText>
         </ContentContainer>
       </OrderFeeContainer>
       <OrderFeeContainer>
         <OrderInfoText>기본 제주 도서산간 추가 배송비</OrderInfoText>
         <ContentContainer>
-          <Input {...register("addtionalOrderFee")} />
+          <TextInput register={register("shipmentDistantPrice")} />
           <KrwText>원</KrwText>
         </ContentContainer>
       </OrderFeeContainer>
@@ -69,26 +70,6 @@ const ContentContainer = styled.div`
   }
 `;
 
-const Select = styled.select`
-  border: 1px solid ${({ theme: { palette } }) => palette.grey400};
-  padding: 8px 31px 8px 8px;
-
-  -o-appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-
-  background: url(${triangleSrc}) right no-repeat;
-  background-size: 24px;
-
-  font-weight: 500;
-  font-size: 12px;
-  line-height: 14px;
-  letter-spacing: 0.1px;
-`;
-
-const Option = styled.option``;
-
 const KrwText = styled.span`
   display: flex;
   justify-content: center;
@@ -100,4 +81,4 @@ const KrwText = styled.span`
   letter-spacing: 0.1px;
 `;
 
-export default DeliveryFee;
+export default ShipmentSettings;

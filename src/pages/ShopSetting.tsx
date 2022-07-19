@@ -1,6 +1,5 @@
 /* eslint-disable */
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import styled from "styled-components";
 
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
@@ -9,11 +8,11 @@ import ContentsMain from "@components/common/ContentsMain";
 import ContentsSection from "@components/common/ContentsSection";
 import ContentsNavigation from "@components/common/ContentsNavigation";
 import ContentsNavItem from "@components/common/ContentsNavItem";
-import InputWrapper from "@components/common/InputWrapper";
+import SectionWrapper from "@components/common/SectionWrapper";
 import ShopInfo from "@components/ShopSetting/ShopInfo";
 import ShopPolicy from "@components/ShopSetting/ShopPolicy";
 import SafetyCertification from "@components/ShopSetting/SafetyCertification";
-import DeliveryFee from "@components/ShopSetting/DeliveryFee";
+import ShipmentSettings from "@components/ShopSetting/ShipmentSettings";
 import BusinessLicense from "@components/ShopSetting/BusinessLicense";
 import PhoneNumber from "@components/ShopSetting/PhoneNumber";
 import SettlementAccount from "@components/ShopSetting/SettlementAccount";
@@ -41,6 +40,12 @@ const ShopSetting = () => {
     console.log(data);
   };
 
+  const hasUserLoggedIn = false; // TODO: session storage에서 가져온 토큰정보로 판단
+
+  const formData = methods.watch();
+
+  console.log(formData);
+
   return (
     <FormProvider {...methods}>
       <Layout hasSaveBar={true}>
@@ -52,47 +57,47 @@ const ShopSetting = () => {
 
           <ContentsNavigation>
             <ContentsNavItem selected={true}>샵 / 판매자 정보</ContentsNavItem>
-            <ContentsNavItem>탈퇴</ContentsNavItem>
+            {hasUserLoggedIn && <ContentsNavItem>탈퇴</ContentsNavItem>}
           </ContentsNavigation>
 
           <ContentsMain>
             <ContentsSection>
-              <InputWrapper label="샵 정보">
+              <SectionWrapper label="샵 정보">
                 <ShopInfo />
-              </InputWrapper>
-              <InputWrapper label="정책 설정">
+              </SectionWrapper>
+              <SectionWrapper label="정책 설정">
                 <ShopPolicy />
-              </InputWrapper>
+              </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <InputWrapper label="안전기준적합확인검사 인증">
+              <SectionWrapper label="안전기준적합확인검사 인증">
                 <SafetyCertification />
-              </InputWrapper>
+              </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <InputWrapper label="기본 배송 정보">
-                <DeliveryFee />
-              </InputWrapper>
+              <SectionWrapper label="기본 배송 설정">
+                <ShipmentSettings />
+              </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <InputWrapper label="사업자 정보(간이, 법인)">
+              <SectionWrapper label="사업자 정보(간이, 법인)">
                 <BusinessLicense />
-              </InputWrapper>
+              </SectionWrapper>
 
-              <InputWrapper label="전화번호 변경">
+              <SectionWrapper label="전화번호 변경">
                 <PhoneNumber />
-              </InputWrapper>
+              </SectionWrapper>
 
-              <InputWrapper label="개인판매자 주민등록증 인증">
+              <SectionWrapper label="개인판매자 주민등록증 인증">
                 <RegistrationNumber />
-              </InputWrapper>
+              </SectionWrapper>
 
-              <InputWrapper label="정산 계좌 정보">
+              <SectionWrapper label="정산 계좌 정보">
                 <SettlementAccount />
-              </InputWrapper>
+              </SectionWrapper>
             </ContentsSection>
           </ContentsMain>
         </ContentsContainer>

@@ -1,6 +1,8 @@
 import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 
+import Textarea from "@components/common/input/Textarea";
+
 const ShopPolicy = () => {
   const { register } = useFormContext();
 
@@ -8,15 +10,25 @@ const ShopPolicy = () => {
     <ShopPolicyContainer>
       <SectionContainer>
         <Description>배송 정책</Description>
-        <TextAreaContainer>
-          <TextArea {...register("deliveryPolicy")} />
-        </TextAreaContainer>
+        <TextareaContainer>
+          <Textarea
+            width={"379px"}
+            height={"156px"}
+            size="small"
+            register={register("shipmentPolicy")}
+          />
+        </TextareaContainer>
       </SectionContainer>
       <SectionContainer>
         <Description>교환/환불 정책</Description>
-        <TextAreaContainer>
-          <TextArea {...register("returnPolicy")} />
-        </TextAreaContainer>
+        <TextareaContainer>
+          <Textarea
+            width={"379px"}
+            height={"156px"}
+            size="small"
+            register={register("returnPolicy")}
+          />
+        </TextareaContainer>
       </SectionContainer>
     </ShopPolicyContainer>
   );
@@ -48,7 +60,7 @@ const Description = styled.span`
   letter-spacing: 0.1px;
 `;
 
-const TextAreaContainer = styled.div`
+const TextareaContainer = styled.div`
   display: flex;
 
   & > span {
@@ -56,21 +68,6 @@ const TextAreaContainer = styled.div`
     align-items: flex-end;
     margin-left: 8px;
   }
-`;
-
-const TextArea = styled.textarea`
-  width: 377px;
-  height: 156px;
-  background: ${({ theme: { palette } }) => palette.white};
-  border: 1px solid ${({ theme: { palette } }) => palette.grey500};
-
-  padding: 8px;
-  font-weight: 300;
-  font-size: 12px;
-  line-height: 18px;
-  letter-spacing: 0.1px;
-
-  resize: none;
 `;
 
 export default ShopPolicy;

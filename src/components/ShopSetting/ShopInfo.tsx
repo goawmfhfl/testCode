@@ -9,13 +9,13 @@ import SystemModal from "@components/common/SystemModal";
 import addphotoSrc from "@icons/addphoto.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import exclamationmarkRedSrc from "@icons/exclamationmark-red.svg";
-import addImageSrc from "@icons/addImage.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
 import deleteSrc from "@icons/delete.svg";
 import photochangeSrc from "@icons/photochange.svg";
 
 const ShopInfo = () => {
-  const { register } = useFormContext();
+  const { register, watch } = useFormContext();
+  const shopDescription = watch("description") as string;
 
   const [mobileImage, setMoboileImage] = useState<string>("");
   const [pcImage, setPcImage] = useState<string>("");
@@ -85,7 +85,7 @@ const ShopInfo = () => {
             권장 이미지 크기 : 750 px x 750px (정사각형만 가능)파일 크기 : 1장
             당 2mb / 등록 가능 파일 확장자 : jpg, jpeg, png
           </NoticeContainer>
-          <RepresentImageContainer>
+          <ShopImages>
             <ImageContainer>
               <ImageTitleText>모바일 버전</ImageTitleText>
               <ImageInfoText>
@@ -164,7 +164,7 @@ const ShopInfo = () => {
                 </PcImageContainer>
               )}
             </ImageContainer>
-          </RepresentImageContainer>
+          </ShopImages>
         </SectionContainer>
         <SectionContainer>
           <Description>샵 소개</Description>
@@ -246,7 +246,7 @@ const Description = styled.span`
   letter-spacing: 0.1px;
 `;
 
-const RepresentImageContainer = styled.div`
+const ShopImages = styled.div`
   display: flex;
 `;
 
