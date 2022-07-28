@@ -1,5 +1,5 @@
 import { useFormContext } from "react-hook-form";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 import TextInput from "@components/common/input/TextInput";
 import Dropdown from "@components/common/input/Dropdown";

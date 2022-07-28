@@ -1,5 +1,6 @@
-import styled from "styled-components";
 import { useState } from "react";
+import styled from "styled-components/macro";
+import { useFormContext } from "react-hook-form";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import NoticeContainer from "@components/common/NoticeContainer";

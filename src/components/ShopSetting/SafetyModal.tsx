@@ -1,9 +1,9 @@
 /* eslint-disable */
 import { Dispatch, SetStateAction, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import styled from "styled-components";
 import axios from "axios";
 import X2JS from "x2js";
+import styled from "styled-components/macro";
 
 import deleteSrc from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";

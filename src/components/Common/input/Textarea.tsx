@@ -1,5 +1,5 @@
 import { UseFormRegisterReturn } from "react-hook-form";
-import styled, { css } from "styled-components";
+import styled, { css } from "styled-components/macro";
 
 const Textarea = ({
   width,

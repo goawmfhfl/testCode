@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import checkedIconSrc from "@icons/checkbox-checked-white.svg";
 import darkCheckedIconSrc from "@icons/checkbox-checked-grey.svg";
 

@@ -1,27 +1,30 @@
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 interface NoticeContainerType {
   icon: string;
   children: React.ReactNode;
+  width?: string;
 }
 
-const NoticeContainer = ({ children, icon }: NoticeContainerType) => {
+const NoticeContainer = ({ children, icon, width }: NoticeContainerType) => {
   return (
-    <Container>
+    <Container width={width}>
       <Image src={icon} />
       <NoticeText>{children}</NoticeText>
     </Container>
   );
 };
 
-const Container = styled.div`
+const Container = styled.div<{ width: string }>`
   display: flex;
+  width: ${({ width }) => (width ? width : "100%")};
   padding: 8px 16px 8px 8px;
   border-radius: 7px;
   background: ${({ theme: { palette } }) => palette.grey400};
 `;
 
 const NoticeText = styled.div`
+  flex: 1;
   display: flex;
   align-items: center;
 

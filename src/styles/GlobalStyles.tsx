@@ -18,10 +18,6 @@ const GlobalStyles = createGlobalStyle`
       min-height:100vh;
     }
 
-    ::-webkit-scrollbar {
-      display: none;
-    }
-
     html {
       -webkit-text-size-adjust: none;
       -ms-overflow-style: none;
@@ -90,6 +86,5 @@ const GlobalStyles = createGlobalStyle`
       font-weight: 200;
       src: url("@fonts/SpoqaHanSansNeo/Thin.woff2");
     }
-
 `;
 export default GlobalStyles;

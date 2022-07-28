@@ -2,7 +2,7 @@
 import { ChangeEvent, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import axios from "axios";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 import NoticeContainer from "@components/common/NoticeContainer";
 import SystemModal from "@components/common/SystemModal";

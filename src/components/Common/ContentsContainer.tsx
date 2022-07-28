@@ -1,5 +1,5 @@
 import React, { BaseSyntheticEvent } from "react";
-import styled, { css } from "styled-components";
+import styled, { css } from "styled-components/macro";
 
 interface ContentsContainerProps {
   isForm?: boolean | undefined;
@@ -21,6 +21,11 @@ const ContentsContainer = ({
   return (
     <Form
       id="hook-form"
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+        }
+      }}
       onSubmit={(e) => {
         e.preventDefault();
 

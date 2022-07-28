@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 import Button from "@components/common/Button";
 import BusinessLicenseModal from "@components/ShopSetting/BusinessLicenseModal";

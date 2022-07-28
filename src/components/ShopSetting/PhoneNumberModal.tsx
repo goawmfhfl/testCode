@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import axios from "axios";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import Input from "@components/common/Input";
 import Button from "@components/common/Button";
 import ValidText from "@components/common/ValidText";

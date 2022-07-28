@@ -36,8 +36,6 @@ const ProductImageSection = () => {
     productImages.map(({ id }) => id)
   );
 
-  console.log(productImageValues);
-
   const previousProductImageValuesRef = useRef<Array<FileList> | null>(null);
 
   useEffect(() => {
@@ -56,61 +54,63 @@ const ProductImageSection = () => {
 
     */
 
-    productImageValues.map(async (productImageValue: FileList, index) => {
-      try {
-        const previousImageValue: FileList | null =
-          previousProductImageValuesRef.current[index];
-        const hasImageChanged: boolean =
-          productImageValue !== previousImageValue &&
-          Boolean(productImageValue[0]);
+    productImageValues.map(
+      async (productImageValue: FileList, index: number) => {
+        try {
+          const previousImageValue: FileList | null =
+            previousProductImageValuesRef.current[index];
+          const hasImageChanged: boolean =
+            productImageValue !== previousImageValue &&
+            Boolean(productImageValue[0]);
 
-        if (!hasImageChanged) {
-          return;
-        }
-
-        const invalidMessage: string = await validateImage({
-          file: productImageValue[0],
-          validator: {
-            width: 750,
-            height: 750,
-            size: 2097152,
-            extensions: ["image/jpeg", "image/png", "image/jpg"],
-          },
-        });
-
-        if (invalidMessage) {
-          // TODO: 시스템 모달로 수정
-          alert(invalidMessage);
-
-          return;
-        }
-
-        if (productImages[index].url) {
-          const removeImageResult: {
-            result: string;
-            error: RemoveImageErrorType;
-          } = await removeImageFromServer(productImages[index].url);
-
-          if (removeImageResult.error) {
-            console.log(removeImageResult.error);
+          if (!hasImageChanged) {
+            return;
           }
+
+          const invalidMessage: string = await validateImage({
+            file: productImageValue[0],
+            validator: {
+              width: 750,
+              height: 750,
+              size: 2097152,
+              extensions: ["image/jpeg", "image/png", "image/jpg"],
+            },
+          });
+
+          if (invalidMessage) {
+            // TODO: 시스템 모달로 수정
+            alert(invalidMessage);
+
+            return;
+          }
+
+          if (productImages[index].url) {
+            const removeImageResult: {
+              result: string;
+              error: RemoveImageErrorType;
+            } = await removeImageFromServer(productImages[index].url);
+
+            if (removeImageResult.error) {
+              console.log(removeImageResult.error);
+            }
+          }
+
+          const addedImageUrl: string = await addImageOnServer(
+            productImageValue[0]
+          );
+
+          setProductImages((prev) => {
+            const newProductImages = [...prev];
+
+            newProductImages[index].url = addedImageUrl;
+
+            return newProductImages;
+          });
+        } catch (error) {
+          console.log(error);
         }
-
-        const addedImageUrl: string = await addImageOnServer(
-          productImageValue[0]
-        );
-
-        setProductImages((prev) => {
-          const newProductImages = [...prev];
-
-          newProductImages[index].url = addedImageUrl;
-
-          return newProductImages;
-        });
-      } catch (error) {
-        console.log(error);
       }
-    });
+    );
 
     previousProductImageValuesRef.current = productImageValues;
   }, [productImageValues]);
@@ -159,8 +159,6 @@ const ProductImageSection = () => {
       console.log(removeImageResult.error);
     }
   };
-
-  console.log(productImageValues);
 
   {
     /*

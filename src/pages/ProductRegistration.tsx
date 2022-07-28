@@ -15,7 +15,8 @@ import ProductColorSection from "@components/ProductRegistration/ProductColorSec
 import ProductPriceSection from "@components/ProductRegistration/ProductPriceSection";
 import ProductDiscountSection from "@components/ProductRegistration/ProductDiscountSection";
 import ProductStockSection from "@components/ProductRegistration/ProductStockSection";
-import PurchaseOptionSection from "@components/ProductRegistration/PurchaseOptionSection";
+import RequiredOptionSection from "@components/ProductRegistration/OptionSection/RequiredOption";
+import SelectiveOptionSection from "@components/ProductRegistration/OptionSection/SelectiveOption";
 import OrderProductionSection from "@components/ProductRegistration/OrderProductionSection";
 import ShippingChargeSection from "@components/ProductRegistration/ProductShippingChargeSection";
 import ProductSpecificationSection from "@components/ProductRegistration/ProductSpecificationSection";
@@ -114,8 +115,11 @@ const ProductRegistration = () => {
               <SectionWrapper label={"재고"} isRequired={true}>
                 <ProductStockSection />
               </SectionWrapper>
-              <SectionWrapper label={"옵션 설정"}>
-                <PurchaseOptionSection />
+              <SectionWrapper label={"필수 옵션 설정"}>
+                <RequiredOptionSection />
+              </SectionWrapper>
+              <SectionWrapper label={"추가 상품 설정"}>
+                <SelectiveOptionSection />
               </SectionWrapper>
             </ContentsSection>
 

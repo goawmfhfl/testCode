@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 const DateInput = styled.input.attrs({ type: "date" })`
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};

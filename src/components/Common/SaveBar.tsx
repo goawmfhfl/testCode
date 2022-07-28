@@ -1,4 +1,4 @@
-import styled, { useTheme } from "styled-components";
+import styled, { useTheme } from "styled-components/macro";
 
 import Button from "@components/common/Button";
 

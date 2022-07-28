@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 import logoSrc from "@images/logo-white.png";
 import loginSrc from "@icons/login.svg";

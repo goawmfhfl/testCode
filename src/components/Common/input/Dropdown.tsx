@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { v4 as uuid } from "uuid";
 

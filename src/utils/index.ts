@@ -133,4 +133,10 @@ async function validateImage({
   return invalidMessage;
 }
 
-export { addImageOnServer, removeImageFromServer, validateImage };
+function isNumber(value: string) {
+  const regExp = /^[0-9]*$/g;
+
+  return regExp.test(value);
+}
+
+export { addImageOnServer, removeImageFromServer, validateImage, isNumber };

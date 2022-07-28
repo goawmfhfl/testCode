@@ -1,7 +1,7 @@
 import React from "react";
-import styled, { css } from "styled-components";
+import styled, { css } from "styled-components/macro";
 
-const InputWrapper = ({
+const SectionWrapper = ({
   label,
   isRequired = false,
   children,
@@ -25,7 +25,7 @@ const InputWrapper = ({
       >
         {label}
       </InputLabel>
-      {children}
+      <Wrapper>{children}</Wrapper>
     </Container>
   );
 };
@@ -64,4 +64,9 @@ const InputLabel = styled.label<{ isRequired: boolean; hasTopMargin: boolean }>`
   ${({ isRequired }) => (isRequired ? requiredInputStyle : "")};
 `;
 
-export default InputWrapper;
+const Wrapper = styled.div`
+  width: 100%;
+  overflow: scroll;
+`;
+
+export default SectionWrapper;

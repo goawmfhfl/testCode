@@ -22,6 +22,8 @@ module.exports = {
       "@fonts": path.resolve(__dirname, "assets/fonts"),
       "@styles": path.resolve(__dirname, "styles"),
       "@utils": path.resolve(__dirname, "utils"),
+      "@models": path.resolve(__dirname, "models"),
+      "@cache": path.resolve(__dirname, "cache"),
     },
     configure: {
       resolve: {

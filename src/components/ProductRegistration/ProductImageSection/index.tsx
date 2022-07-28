@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 import RequiredImages from "@components/ProductRegistration/ProductImageSection/RequiredImages";
 import ExtraImages from "@components/ProductRegistration/ProductImageSection/ExtraImages";

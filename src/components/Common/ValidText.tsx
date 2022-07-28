@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 const ValidText = styled.p<{ valid: boolean }>`
   font-weight: 400;

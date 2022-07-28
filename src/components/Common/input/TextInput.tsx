@@ -1,30 +1,31 @@
 import { UseFormRegisterReturn } from "react-hook-form";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 const TextInput = ({
+  register,
+  disabled,
   width,
   textAlign,
-  disabled,
-  register,
+  maxLength,
 }: {
+  register: UseFormRegisterReturn;
+  disabled?: boolean;
   width?: string;
   textAlign?: string;
-  value?: string;
-  disabled?: boolean;
-  register: UseFormRegisterReturn;
+  maxLength?: number;
 }) => {
   return (
     <Input
-      type="text"
+      {...register}
+      disabled={disabled}
       width={width}
       textAlign={textAlign}
-      disabled={disabled}
-      {...register}
+      maxLength={maxLength}
     />
   );
 };
 // TODO: 현재 구현되어 있는 small 스타일 외에, medium과 big 구현 필요
-const Input = styled.input<{
+const Input = styled.input.attrs({ type: "text" })<{
   textAlign: string | undefined;
   disabled?: boolean;
 }>`

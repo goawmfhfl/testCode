@@ -2,7 +2,7 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import axios from "axios";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 import { encryptedData } from "@utils/cipher";
 

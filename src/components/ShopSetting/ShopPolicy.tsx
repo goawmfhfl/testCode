@@ -1,5 +1,5 @@
 import { useFormContext } from "react-hook-form";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 import Textarea from "@components/common/input/Textarea";
 

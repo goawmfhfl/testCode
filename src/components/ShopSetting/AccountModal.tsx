@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { Dispatch, SetStateAction, useState } from "react";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import axios from "axios";
 import { useFormContext } from "react-hook-form";
 import { accountInformationType } from "@components/ShopSetting/SettlementAccount";

@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import { useFormContext } from "react-hook-form";
 
 import NoticeContainer from "@components/common/NoticeContainer";
