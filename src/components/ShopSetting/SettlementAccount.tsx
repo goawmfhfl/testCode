@@ -40,9 +40,6 @@ const SettlementAccount = () => {
 
   return (
     <Container>
-      <SubTitleWrapper>
-        <SubTitle>정산 계좌 정보</SubTitle>
-      </SubTitleWrapper>
       <AccountContainer>
         <AccountInfoText>등록된 계좌 정보</AccountInfoText>
         <RegisterContainer>
@@ -72,20 +69,7 @@ const SettlementAccount = () => {
 const Container = styled.div`
   position: relative;
   display: flex;
-  justify-content: center;
   width: 100%;
-  padding-bottom: 88px;
-`;
-
-const SubTitleWrapper = styled.div`
-  min-width: 235px;
-  padding-left: 56px;
-`;
-
-const SubTitle = styled.h2`
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 20px;
 `;
 
 const AccountContainer = styled.div`

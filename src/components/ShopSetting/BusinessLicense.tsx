@@ -41,9 +41,6 @@ const BusinessLicense = () => {
 
   return (
     <Container>
-      <SubTitleWrapper>
-        <SubTitle>사업자 정보(간이,법인)</SubTitle>
-      </SubTitleWrapper>
       {!hasBusinessLicense ? (
         <HasNoInfoContainer>
           <InfoText>등록된 사업자등록증/통신판매업신고증이 없습니다.</InfoText>
@@ -95,22 +92,8 @@ const BusinessLicense = () => {
 const Container = styled.div`
   position: relative;
   display: flex;
-  justify-content: center;
 
   width: 100%;
-  padding: 88px 0px;
-  border-bottom: 1px solid ${({ theme: { palette } }) => palette.grey400};
-`;
-
-const SubTitleWrapper = styled.div`
-  min-width: 235px;
-  padding-left: 56px;
-`;
-
-const SubTitle = styled.h2`
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 20px;
 `;
 
 const HasNoInfoContainer = styled.div`

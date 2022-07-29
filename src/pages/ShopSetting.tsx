@@ -87,12 +87,12 @@ const ShopSetting = () => {
                 <BusinessLicense />
               </SectionWrapper>
 
-              <SectionWrapper label="전화번호 변경">
-                <PhoneNumber />
-              </SectionWrapper>
-
               <SectionWrapper label="개인판매자 주민등록증 인증">
                 <RegistrationNumber />
+              </SectionWrapper>
+
+              <SectionWrapper label="전화번호 변경">
+                <PhoneNumber />
               </SectionWrapper>
 
               <SectionWrapper label="정산 계좌 정보">

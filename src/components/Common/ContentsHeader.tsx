@@ -24,7 +24,7 @@ const Container = styled.div`
   align-items: center;
 `;
 
-const Text = styled.h2`
+const Text = styled.span`
   font-weight: 700;
   font-size: 18px;
   line-height: 24px;

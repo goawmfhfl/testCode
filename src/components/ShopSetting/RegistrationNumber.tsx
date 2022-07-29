@@ -12,7 +12,7 @@ const RegistrationNumber = () => {
 
   return (
     <Container>
-      <NoticeContainer icon={exclamationmarkSrc}>
+      <NoticeContainer icon={exclamationmarkSrc} width={"100%"}>
         사업자등록증 없이 판매하시는 경우 주민등록증 인증을 해주세요. 인증된
         주민등록번호는 정산에만 활용됩니다.
         <br />
@@ -21,6 +21,7 @@ const RegistrationNumber = () => {
         <br /> 예금주명과 같아야 합니다. (사업자 등록 번호를 등록하셨을 경우
         주민등록증 인증은 필수가 아닙니다.)
       </NoticeContainer>
+
       <InfoContainer>
         <InfoText>
           {textText
@@ -39,9 +40,9 @@ const RegistrationNumber = () => {
 const Container = styled.div`
   position: relative;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
 
-  width: 100%;
+  width: 702px;
   padding-bottom: 88px;
 `;
 
@@ -50,7 +51,7 @@ const InfoContainer = styled.div`
   flex-direction: column;
   align-items: center;
 
-  min-width: 736px;
+  margin-top: 16px;
   padding: 16px 174px;
   background-color: ${({ theme: { palette } }) => palette.grey100};
 

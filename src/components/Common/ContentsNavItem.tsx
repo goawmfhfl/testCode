@@ -18,10 +18,11 @@ const selectedNavItemStyle = css`
 const Container = styled.div<{ selected: boolean | undefined }>`
   ${({ selected }) => (selected ?? false ? selectedNavItemStyle : "")};
 
-  font-weight: 700;
+  font-family: Spoqa Han Sans Neo;
   font-size: 16px;
-  line-height: 24px;
-  letter-spacing: 0.1px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.015em;
 `;
 
 export default ContentsNavItem;

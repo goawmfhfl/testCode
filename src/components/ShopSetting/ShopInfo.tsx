@@ -6,9 +6,9 @@ import styled from "styled-components/macro";
 
 import NoticeContainer from "@components/common/NoticeContainer";
 import SystemModal from "@components/common/SystemModal";
-import addphotoSrc from "@icons/addphoto.svg";
+import addImageSrc from "@icons/addImage.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
-import exclamationmarkRedSrc from "@icons/exclamationmark-red.svg";
+import infoIconSrc from "@icons/info.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
 import deleteSrc from "@icons/delete.svg";
 import photochangeSrc from "@icons/photochange.svg";
@@ -72,13 +72,10 @@ const ShopInfo = () => {
 
   return (
     <Container>
-      <SubTitleWrapper>
-        <SubTitle>샾 정보</SubTitle>
-      </SubTitleWrapper>
       <ShopInfoContainer>
         <SectionContainer>
           <Description>샵 대표 사진</Description>
-          <NoticeContainer icon={exclamationmarkSrc}>
+          <NoticeContainer icon={infoIconSrc}>
             샵 대표 사진은 브랜드페이지 및 창작자 프로필 사진으로 노출됩니다.
             로고를 제외한 대표 상품 사진을 첨부해주세요.
             <br />
@@ -181,10 +178,11 @@ const ShopInfo = () => {
           </TextAreaContainer>
         </SectionContainer>
       </ShopInfoContainer>
+
       {modal && (
         <SystemModal
           buttonText="확인"
-          icon={exclamationmarkRedSrc}
+          icon={exclamationmarkSrc}
           hasMultiButton={false}
           handleConfirmButtonClick={() => setModal(false)}
         >
@@ -199,21 +197,7 @@ const ShopInfo = () => {
 
 const Container = styled.div`
   display: flex;
-  justify-content: center;
-
   width: 100%;
-  padding: 88px 0px;
-`;
-
-const SubTitleWrapper = styled.div`
-  min-width: 235px;
-  padding-left: 56px;
-`;
-
-const SubTitle = styled.h2`
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 20px;
 `;
 
 const ShopInfoContainer = styled.div`
@@ -286,7 +270,7 @@ const ImageInfoText = styled.p`
 `;
 
 const UploadImageLabel = styled.label`
-  background-image: url(${addphotoSrc});
+  background-image: url(${addImageSrc});
   background-position: center;
   background-size: cover;
   cursor: pointer;

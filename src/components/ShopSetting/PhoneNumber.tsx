@@ -45,10 +45,8 @@ const PhoneNumber = () => {
 const Container = styled.div`
   position: relative;
   display: flex;
-  justify-content: center;
 
   width: 100%;
-  padding: 94px 0px;
 `;
 
 const PhoneNumberContainer = styled.div`

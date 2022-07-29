@@ -1,6 +1,5 @@
 import { useState } from "react";
 import styled from "styled-components/macro";
-import { useFormContext } from "react-hook-form";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
@@ -40,10 +39,7 @@ const SafetyCertification = () => {
 const Container = styled.div`
   position: relative;
   display: flex;
-  justify-content: center;
   width: 100%;
-  padding: 88px 0px;
-  border-bottom: 1px solid ${({ theme: { palette } }) => palette.grey400};
 `;
 
 const SafetyContainer = styled.div`

@@ -5,7 +5,7 @@ import styled from "styled-components";
 import axios from "axios";
 
 import deleteSrc from "@icons/delete.svg";
-import exclamationmarkSrc from "@icons/exclamationmark-red.svg";
+import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import SystemModal from "@components/common/SystemModal";
 import Input from "@components/common/Input";
