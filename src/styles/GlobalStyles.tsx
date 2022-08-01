@@ -47,6 +47,12 @@ const GlobalStyles = createGlobalStyle<{ isModalVisible: boolean }>`
       }
     }
 
+    input[type="radio"] {
+      margin: 0;
+      margin-left: 8px;
+      margin-right: 8px;
+    }
+
     // Remove downside arrow of select input
     select {
       /* for Firefox */

@@ -25,11 +25,13 @@ interface OptionType {
 
 const Dropdown = ({
   size,
+  width,
   options,
   register,
   disabled,
 }: {
   size: string;
+  width?: string;
   options: Array<string> | undefined;
   register: UseFormRegisterReturn;
   disabled?: boolean;
@@ -52,7 +54,7 @@ const Dropdown = ({
   }, [options]);
 
   return (
-    <Select register={register} size={size} disabled={disabled}>
+    <Select register={register} size={size} width={width} disabled={disabled}>
       {dropdownOptions.map(({ key, text }) => {
         return <Option key={key}>{text}</Option>;
       })}
@@ -62,11 +64,13 @@ const Dropdown = ({
 
 const Select = ({
   size,
+  width,
   children,
   register,
   disabled,
 }: {
   size: string;
+  width?: string;
   children: React.ReactNode;
   register: UseFormRegisterReturn;
   disabled?: boolean;
@@ -76,6 +80,7 @@ const Select = ({
   return (
     <SelectInput
       sizing={size}
+      width={width}
       arrowSrc={downwardArrowSrc}
       {...register}
       disabled={disabled}
@@ -91,6 +96,7 @@ const Option = ({ children }: { children: string }) => {
 
 interface SelectProps {
   sizing?: string;
+  width?: string;
   arrowSrc: string;
 }
 
@@ -133,8 +139,8 @@ const SelectInput = styled.select<SelectProps>`
     }
   }};
 
+  width: ${({ width }) => (width ? width : "")};
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
-
   padding-right: 54px;
 `;
 
