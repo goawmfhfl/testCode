@@ -6,7 +6,6 @@ import ContentsMain from "@components/common/ContentsMain";
 import ContentsSection from "@components/common/ContentsSection";
 import SectionWrapper from "@components/common/SectionWrapper";
 import NoticeContainer from "@components/common/NoticeContainer";
-import Textarea from "@components/common/input/Textarea";
 
 import ProductNameSection from "@components/ProductRegistration/ProductNameSection";
 import ProductCategorySection from "@components/ProductRegistration/ProductCategorySection";
@@ -20,6 +19,7 @@ import SelectiveOptionSection from "@components/ProductRegistration/OptionSectio
 import OrderProductionSection from "@components/ProductRegistration/OrderProductionSection";
 import ShippingChargeSection from "@components/ProductRegistration/ProductShippingChargeSection";
 import ProductSpecificationSection from "@components/ProductRegistration/ProductSpecificationSection";
+import ProductDescriptionSection from "@components/ProductRegistration/ProductDescriptionSection";
 
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 
@@ -61,7 +61,7 @@ const ProductRegistration = () => {
           onSubmit={methods.handleSubmit(onSubmit)}
         >
           <ContentsHeader headerName={"상품 등록"}>
-            <NoticeContainer icon={exclamationMarkSrc}>
+            <NoticeContainer width={"175px"} icon={exclamationMarkSrc}>
               '●'는 필수 항목입니다.
             </NoticeContainer>
           </ContentsHeader>
@@ -80,12 +80,7 @@ const ProductRegistration = () => {
                 <ProductImageSection />
               </SectionWrapper>
               <SectionWrapper label={"상품설명"} isRequired={true}>
-                <Textarea
-                  size="small"
-                  width={"716px"}
-                  height={"126px"}
-                  register={register("productDescription")}
-                />
+                <ProductDescriptionSection />
               </SectionWrapper>
               <SectionWrapper label={"상품 상세페이지"} isRequired={true}>
                 <input type="text" name="" id="" />

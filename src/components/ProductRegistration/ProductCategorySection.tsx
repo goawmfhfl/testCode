@@ -67,9 +67,9 @@ const ProductCategory = () => {
 
   return (
     <Container>
-      <NoticeContainer icon={exclamationMarkSrc}>
-        카테고리는 하나만 설정 가능합니다. <br /> 상품과 어울리지 않는
-        카테고리에 등록할 경우, 강제 이동되거나 판매보류 될 수 있습니다.
+      <NoticeContainer icon={exclamationMarkSrc} width={"472px"}>
+        카테고리는 하나만 설정 가능합니다. <br /> 상품과 맞지 않는 카테고리에
+        등록할 경우 강제 이동되거나 판매보류 될 수 있습니다.
       </NoticeContainer>
 
       <DropdownContainer>

@@ -72,11 +72,4 @@ const ModalLayer = styled.div`
   }
 `;
 
-const TestModal = styled.div`
-  width: 300px;
-  height: 300px;
-
-  background-color: violet;
-`;
-
 export default Layout;

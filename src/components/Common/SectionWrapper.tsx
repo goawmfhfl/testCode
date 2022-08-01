@@ -50,7 +50,7 @@ const requiredInputStyle = css`
 `;
 
 const InputLabel = styled.label<{ isRequired: boolean; hasTopMargin: boolean }>`
-  min-width: 234px;
+  min-width: 178px;
   margin-top: ${({ hasTopMargin }) => (hasTopMargin ? "9px" : "")};
 
   font-family: "SpoqaHanSansNeo";

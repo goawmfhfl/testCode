@@ -15,7 +15,7 @@ const OrderProduction = () => {
         <Checkbox /> 주문 후 제작
       </CheckboxWrapper>
       <NoticeContainerWrapper>
-        <NoticeContainer icon={exclamationMarkSrc}>
+        <NoticeContainer icon={exclamationMarkSrc} width="539px">
           주문 확인 후 제작에 들어가는 상품이라면 ‘주문 후 제작'에 체크를 하고
           소요기간을 입력해주세요. <br />
           상품페이지에 노출되어 구매자들에게 상품 수령까지의 대략적인 기간을

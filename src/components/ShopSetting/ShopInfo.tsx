@@ -75,6 +75,7 @@ const ShopInfo = () => {
       <ShopInfoContainer>
         <SectionContainer>
           <Description>샵 대표 사진</Description>
+
           <NoticeContainer icon={infoIconSrc}>
             샵 대표 사진은 브랜드페이지 및 창작자 프로필 사진으로 노출됩니다.
             로고를 제외한 대표 상품 사진을 첨부해주세요.
@@ -82,6 +83,7 @@ const ShopInfo = () => {
             권장 이미지 크기 : 750 px x 750px (정사각형만 가능)파일 크기 : 1장
             당 2mb / 등록 가능 파일 확장자 : jpg, jpeg, png
           </NoticeContainer>
+
           <ShopImages>
             <ImageContainer>
               <ImageTitleText>모바일 버전</ImageTitleText>

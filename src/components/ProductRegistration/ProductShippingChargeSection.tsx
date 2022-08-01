@@ -13,14 +13,6 @@ const ProductShippingCharge = () => {
 
   return (
     <Container>
-      <CheckboxWrapper>
-        <Checkbox /> 배송 설정하기
-      </CheckboxWrapper>
-      <NoticeContainerWrapper>
-        <NoticeContainer icon={exclamationMarkSrc}>
-          미설정시 배송은 샵 설정 내 기본 배송 정보를 따릅니다.
-        </NoticeContainer>
-      </NoticeContainerWrapper>
       <InputContainer>
         <InputContainer>
           <Label>배송 템플릿</Label>
@@ -34,6 +26,7 @@ const ProductShippingCharge = () => {
           <Button size="small">배송 템플릿 만들기</Button>
         </InputContainer>
       </InputContainer>
+
       <InputContainer>
         <InputContainer>
           <Label>배송비 ●</Label>
@@ -65,26 +58,11 @@ const ProductShippingCharge = () => {
 
 const Container = styled.div``;
 
-const CheckboxWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  line-height: 14px;
-
-  & > input {
-    margin-right: 16px;
-  }
-`;
-
-const NoticeContainerWrapper = styled.div`
-  margin: 12px 0;
-  width: 330px;
-`;
-
 const InputContainer = styled.div`
   display: flex;
   align-items: center;
 
-  margin: 13px 0;
+  margin-bottom: 13px;
 `;
 
 const DropdownWrapper = styled.span`
