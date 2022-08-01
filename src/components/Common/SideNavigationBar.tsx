@@ -12,7 +12,7 @@ const Container = styled.div`
   position: fixed;
   left: 0;
   top: 56px;
-  z-index: 9999;
+  z-index: 1000;
 `;
 
 export default SideNavigationBar;

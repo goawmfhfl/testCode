@@ -1,8 +1,10 @@
-import { useState } from "react";
 import styled from "styled-components/macro";
+import { useReactiveVar } from "@apollo/client";
 
 import Button from "@components/common/Button";
 import BusinessLicenseModal from "@components/ShopSetting/BusinessLicenseModal";
+import { modalVar } from "@cache/index";
+import { businessLicenseVar } from "@cache/shopSettings";
 
 export interface BusinessLicenseInfoType {
   rprsvNm: string; // 대표자명
@@ -14,21 +16,11 @@ export interface BusinessLicenseInfoType {
 }
 
 const BusinessLicense = () => {
-  const [businessLicenseInfo, setBusinessLicenseInfo] =
-    useState<BusinessLicenseInfoType>({
-      rprsvNm: "",
-      bizrno: "",
-      crno: "",
-      simTxtnTrgtYnDesc: "",
-      rdnAddr: "",
-      prmsnMgtNo: "",
-    });
+  const businessLicense = useReactiveVar(businessLicenseVar);
 
-  const [modal, setModal] = useState<boolean>(false);
-
-  const hasBusinessLicense: boolean = Object.values(businessLicenseInfo).find(
+  const hasBusinessLicense = Object.values(businessLicense).find(
     (el) => el !== ""
-  ) as boolean;
+  );
 
   const {
     rprsvNm: ownerName,
@@ -37,14 +29,24 @@ const BusinessLicense = () => {
     simTxtnTrgtYnDesc: isTaxPayer,
     rdnAddr: address,
     prmsnMgtNo: ecommerceRegistrationNumber,
-  } = businessLicenseInfo;
+  } = businessLicense;
 
   return (
     <Container>
       {!hasBusinessLicense ? (
         <HasNoInfoContainer>
           <InfoText>등록된 사업자등록증/통신판매업신고증이 없습니다.</InfoText>
-          <Button size="small" full={false} onClick={() => setModal(true)}>
+          <Button
+            size="small"
+            full={false}
+            onClick={() =>
+              modalVar({
+                ...modalVar(),
+                isVisible: true,
+                component: <BusinessLicenseModal />,
+              })
+            }
+          >
             등록하기
           </Button>
         </HasNoInfoContainer>
@@ -77,13 +79,6 @@ const BusinessLicense = () => {
             </InfoContainer>
           </InfoList>
         </HasInfoContainer>
-      )}
-
-      {modal && (
-        <BusinessLicenseModal
-          setModal={setModal}
-          setBusinessLicenseInfo={setBusinessLicenseInfo}
-        />
       )}
     </Container>
   );

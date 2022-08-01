@@ -1,25 +1,20 @@
 /* eslint-disable */
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import axios from "axios";
 import styled from "styled-components/macro";
 
 import { encryptedData } from "@utils/cipher";
 
-import deleteSrc from "@icons/delete.svg";
+import closeIconSource from "@icons/close.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
 import Input from "@components/common/Input";
 import SystemModal from "@components/common/SystemModal";
+import { modalVar } from "@cache/index";
 
-interface RegistrationNumberModalProps {
-  onClickModalHandler: Dispatch<SetStateAction<boolean>>;
-}
-
-const RegistrationNumberModal = ({
-  onClickModalHandler,
-}: RegistrationNumberModalProps) => {
+const RegistrationNumberModal = () => {
   const [systemModal, setSysyemModal] = useState<{
     isVisible: boolean;
     icon: string;
@@ -103,9 +98,16 @@ const RegistrationNumberModal = ({
     }
   };
 
+  const turnOffModal = () => modalVar({ ...modalVar(), isVisible: false });
+
+  const handleCloseButtonClick = () => turnOffModal();
+
+  const handleCancelButtonClick = () => turnOffModal();
+
   return (
     <Container>
-      <Icon src={deleteSrc} onClick={() => onClickModalHandler(false)} />
+      <Icon src={closeIconSource} onClick={handleCloseButtonClick} />
+
       <Title>주민등록증 인증하기</Title>
 
       <NoticeContainer icon={exclamationmarkSrc}>
@@ -140,11 +142,8 @@ const RegistrationNumberModal = ({
         >
           저장
         </Button>
-        <Button
-          size="small"
-          full={false}
-          onClick={() => onClickModalHandler(false)}
-        >
+
+        <Button size="small" full={false} onClick={handleCancelButtonClick}>
           취소
         </Button>
       </ButtonContainer>

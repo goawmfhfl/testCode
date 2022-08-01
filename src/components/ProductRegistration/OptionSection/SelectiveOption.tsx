@@ -11,7 +11,7 @@ import Button from "@components/common/Button";
 import OptionInput from "@components/ProductRegistration/OptionSection/OptionInput";
 import AdaptedOption from "@components/ProductRegistration/OptionSection/AdaptedOption";
 
-import { selectiveOptionVar } from "@cache/index";
+import { selectiveOptionVar } from "@cache/options";
 import { OptionInputType, OptionTypes } from "@models/options";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import smallDownwardArrowIconSrc from "@icons/arrow-downward-small-red.svg";

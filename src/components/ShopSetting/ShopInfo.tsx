@@ -10,7 +10,7 @@ import addImageSrc from "@icons/addImage.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import infoIconSrc from "@icons/info.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
-import deleteSrc from "@icons/delete.svg";
+import closeIconSource from "@icons/close.svg";
 import photochangeSrc from "@icons/photochange.svg";
 
 const ShopInfo = () => {
@@ -94,7 +94,7 @@ const ShopInfo = () => {
                 <AddedMobileImageContainer>
                   <AddedMobileImage src={mobileImage} />
                   <DeleteIcon
-                    src={deleteSrc}
+                    src={closeIconSource}
                     onClick={() => deleteImageUrl(mobileImage)}
                   />
                   <ChangeImageLabel htmlFor="mobileImage">
@@ -133,7 +133,7 @@ const ShopInfo = () => {
                 <AddedPcImageContainer>
                   <AddedPcImage src={pcImage} />
                   <DeleteIcon
-                    src={deleteSrc}
+                    src={closeIconSource}
                     onClick={() => deleteImageUrl(pcImage)}
                   />
                   <ChangeImageLabel htmlFor="pcImage">

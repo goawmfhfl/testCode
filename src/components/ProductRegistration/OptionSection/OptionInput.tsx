@@ -8,7 +8,7 @@ import TextInput from "@components/common/input/TextInput";
 import removeOptionIconSrc from "@icons/remove-option.svg";
 import addOptionInputIconSrc from "@icons/add-option-input.svg";
 import { OptionTypes } from "@models/options";
-import { requiredOptionVar, selectiveOptionVar } from "@cache/index";
+import { requiredOptionVar, selectiveOptionVar } from "@cache/options";
 
 const OptionInput = ({
   optionType,

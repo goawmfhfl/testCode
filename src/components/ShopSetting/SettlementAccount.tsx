@@ -1,8 +1,10 @@
-import { useState } from "react";
 import styled from "styled-components/macro";
 
 import Button from "@components/common/Button";
 import SettlementAccountModal from "@components/ShopSetting/SettlementAccountModal";
+import { modalVar } from "@cache/index";
+import { settlementAccountVar } from "@cache/shopSettings";
+import { useReactiveVar } from "@apollo/client";
 
 export interface accountInformationType {
   hasInformation: boolean;
@@ -25,18 +27,21 @@ const hideAccountNumber = (accountNumber: string) => {
 };
 
 const SettlementAccount = () => {
-  const [modal, setModal] = useState<boolean>(false);
-  const [accountInformation, setAccountInformation] =
-    useState<accountInformationType>({
-      hasInformation: false,
-      accountName: "",
-      accountNumber: "",
-      bankCode: "",
-      bankName: "",
-    });
+  const settlementAccount = useReactiveVar(settlementAccountVar);
 
   const { hasInformation, accountName, accountNumber, bankCode, bankName } =
-    accountInformation;
+    settlementAccount;
+
+  const showSettlementAccountModal = () =>
+    modalVar({
+      ...modalVar(),
+      isVisible: true,
+      component: <SettlementAccountModal />,
+    });
+
+  const handleRegisterButtonClick = () => {
+    showSettlementAccountModal();
+  };
 
   return (
     <Container>
@@ -50,18 +55,11 @@ const SettlementAccount = () => {
                 )} (예금주명: ${accountName})`
               : " 등록된 계좌 정보가 없습니다."}
           </AccountInfoText>
-          <Button size="small" full={false} onClick={() => setModal(true)}>
+          <Button size="small" full={false} onClick={handleRegisterButtonClick}>
             {hasInformation ? "변경" : "등록"}
           </Button>
         </RegisterContainer>
       </AccountContainer>
-
-      {modal && (
-        <SettlementAccountModal
-          onClickModalHandler={setModal}
-          setAccountInformation={setAccountInformation}
-        />
-      )}
     </Container>
   );
 };

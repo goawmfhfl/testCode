@@ -1,16 +1,18 @@
 /* eslint-disable */
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import axios from "axios";
 import X2JS from "x2js";
 import styled from "styled-components/macro";
 
-import deleteSrc from "@icons/delete.svg";
+import closeIconSource from "@icons/close.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import Input from "@components/common/Input";
 import ValidText from "@components/common/ValidText";
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
+import { modalVar } from "@cache/index";
+import { safetyCertificationVar } from "@cache/shopSettings";
 
 interface parsedDataType {
   rows: {
@@ -44,15 +46,7 @@ interface parsedDataType {
   };
 }
 
-interface SafetyModalProps {
-  onClickModalHandler: Dispatch<SetStateAction<boolean>>;
-  onClickCheckIsConfrim: Dispatch<SetStateAction<boolean>>;
-}
-
-const SafetyModal = ({
-  onClickModalHandler,
-  onClickCheckIsConfrim,
-}: SafetyModalProps) => {
+const SafetyModal = () => {
   const [validation, setValidation] = useState<{
     isVerified: boolean;
     isWrongNumber: boolean;
@@ -111,13 +105,23 @@ const SafetyModal = ({
     }
   };
   const saveAuthenticationCode = () => {
-    onClickCheckIsConfrim(true);
-    onClickModalHandler(false);
+    safetyCertificationVar({
+      ...safetyCertificationVar(),
+      isConfirmed: true,
+    });
+
+    modalVar({
+      ...modalVar(),
+      isVisible: false,
+    });
     resetField("validationCode");
   };
 
   const onCancelButton = () => {
-    onClickModalHandler(false);
+    modalVar({
+      ...modalVar(),
+      isVisible: false,
+    });
     resetField("validationCode");
   };
 
@@ -125,7 +129,15 @@ const SafetyModal = ({
 
   return (
     <Container>
-      <Icon src={deleteSrc} onClick={() => onClickModalHandler(false)} />
+      <Icon
+        src={closeIconSource}
+        onClick={() =>
+          modalVar({
+            ...modalVar(),
+            isVisible: false,
+          })
+        }
+      />
       <Title>안전기준 적합 확인 검사 신고번호 인증하기</Title>
       <NoticeContainer icon={exclamationmarkSrc}>
         캔들, 디퓨저 판매 창작자는 검사 인증을 완료해야 상품 등록시 카테고리

@@ -1,13 +1,13 @@
-import { useState } from "react";
 import styled from "styled-components/macro";
+import { useReactiveVar } from "@apollo/client";
 
 import PhoneNumberModal from "./PhoneNumberModal";
 import Button from "@components/common/Button";
+import { modalVar } from "@cache/index";
+import { phoneNumberVar } from "@cache/shopSettings";
 
 const PhoneNumber = () => {
-  const [registeredPhoneNumber, setRegisteredPhoneNumber] =
-    useState<string>("");
-  const [modal, setModal] = useState<boolean>(false);
+  const phoneNumber = useReactiveVar(phoneNumberVar);
 
   const hidePhoneNumber = (phoneNumber: string) => {
     const addAsterisk = phoneNumber.slice(0, 5) + "*".repeat(6);
@@ -21,23 +21,29 @@ const PhoneNumber = () => {
     );
   };
 
+  const handleChangePhoneNumberButtonClick = () => {
+    modalVar({
+      ...modalVar(),
+      isVisible: true,
+      component: <PhoneNumberModal />,
+    });
+  };
+
   return (
     <Container>
       <PhoneNumberContainer>
         <NumberText>
-          등록된 전화번호 : {hidePhoneNumber(registeredPhoneNumber)}
+          등록된 전화번호 : {hidePhoneNumber(phoneNumber)}
         </NumberText>
-        <Button size="small" full={false} onClick={() => setModal(true)}>
+
+        <Button
+          size="small"
+          full={false}
+          onClick={handleChangePhoneNumberButtonClick}
+        >
           변경하기
         </Button>
       </PhoneNumberContainer>
-
-      {modal && (
-        <PhoneNumberModal
-          onClickModalHandler={setModal}
-          setPhoneNumber={setRegisteredPhoneNumber}
-        />
-      )}
     </Container>
   );
 };

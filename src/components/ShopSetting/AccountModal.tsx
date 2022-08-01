@@ -5,7 +5,7 @@ import axios from "axios";
 import { useFormContext } from "react-hook-form";
 import { accountInformationType } from "@components/ShopSetting/SettlementAccount";
 
-import deleteSrc from "@icons/delete.svg";
+import closeIconSource from "@icons/close.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import triangleSrc from "@icons/triangle.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
@@ -125,7 +125,7 @@ const AccountModal = ({
   };
   return (
     <Container>
-      <Icon src={deleteSrc} onClick={() => onClickModalHandler(false)} />
+      <Icon src={closeIconSource} onClick={() => onClickModalHandler(false)} />
       <Title>정산 계좌 등록하기</Title>
       <NoticeContainer icon={exclamationmarkSrc}>
         예금주명은 사업자등록증의 법인 명의(상호명)과 동일해야 합니다.

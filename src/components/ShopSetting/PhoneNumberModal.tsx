@@ -1,10 +1,12 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import styled from "styled-components/macro";
 import Input from "@components/common/Input";
 import Button from "@components/common/Button";
 import ValidText from "@components/common/ValidText";
-import deleteSrc from "@icons/delete.svg";
+import closeIconSource from "@icons/close.svg";
+import { modalVar } from "@cache/index";
+import { phoneNumberVar } from "@cache/shopSettings";
 
 const bizm = axios.create({
   baseURL: process.env.REACT_APP_BIZM_PRODUCT_URL,
@@ -40,15 +42,7 @@ const postAuthenticationCode = (
     });
 };
 
-interface ChangeNumberModalProps {
-  onClickModalHandler: Dispatch<SetStateAction<boolean>>;
-  setPhoneNumber: Dispatch<SetStateAction<string>>;
-}
-
-const PhoneNumberModal = ({
-  onClickModalHandler,
-  setPhoneNumber,
-}: ChangeNumberModalProps) => {
+const PhoneNumberModal = () => {
   const [time, setTime] = useState<{ minutes: number; seconds: number }>({
     minutes: 0,
     seconds: 0,
@@ -98,6 +92,12 @@ const PhoneNumberModal = ({
     }));
   };
 
+  const turnOffModal = () =>
+    modalVar({
+      ...modalVar(),
+      isVisible: false,
+    });
+
   const confirmAuthenticationCode = (AuthenticationCodeByUser: any) => {
     if (codeByService !== AuthenticationCodeByUser) {
       setAuthenticationValid(() => ({
@@ -115,12 +115,13 @@ const PhoneNumberModal = ({
   };
 
   const handleConfirmButtonClick = () => {
-    onClickModalHandler(false);
-    setPhoneNumber(userPhoneNumber);
+    phoneNumberVar(userPhoneNumber);
+
+    turnOffModal();
   };
 
   const handleCancelButtonClick = () => {
-    onClickModalHandler(false);
+    turnOffModal();
   };
 
   const { minutes, seconds } = time;
@@ -165,7 +166,7 @@ const PhoneNumberModal = ({
 
   return (
     <Container>
-      <Icon src={deleteSrc} onClick={() => onClickModalHandler(false)} />
+      <CloseButton src={closeIconSource} onClick={turnOffModal} />
       <Title>전화번호 변경하기</Title>
       <DescriptText>
         {isStarted
@@ -278,7 +279,7 @@ const Container = styled.div`
   }
 `;
 
-const Icon = styled.img`
+const CloseButton = styled.img`
   position: absolute;
   top: 12.79px;
   right: 12.77px;

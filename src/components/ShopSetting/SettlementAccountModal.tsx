@@ -1,11 +1,10 @@
 /* eslint-disable */
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { useFormContext } from "react-hook-form";
-import { accountInformationType } from "@components/ShopSetting/SettlementAccount";
 
-import deleteSrc from "@icons/delete.svg";
+import closeIconSource from "@icons/close.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import triangleSrc from "@icons/triangle.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
@@ -13,16 +12,10 @@ import Button from "@components/common/Button";
 import Input from "@components/common/Input";
 import ValidText from "@components/common/ValidText";
 import SystemModal from "@components/common/SystemModal";
+import { modalVar } from "@cache/index";
+import { settlementAccountVar } from "@cache/shopSettings";
 
-interface SettlementAccountModalProps {
-  onClickModalHandler: Dispatch<SetStateAction<boolean>>;
-  setAccountInformation: Dispatch<SetStateAction<accountInformationType>>;
-}
-
-const SettlementAccountModal = ({
-  onClickModalHandler,
-  setAccountInformation,
-}: SettlementAccountModalProps) => {
+const SettlementAccountModal = () => {
   const [systemModal, setSysyemModal] = useState<{
     isVisible: boolean;
     icon: string;
@@ -95,13 +88,11 @@ const SettlementAccountModal = ({
               ...prev,
               isVisible: false,
             }));
-            setAccountInformation((prev) => ({
-              ...prev,
+
+            settlementAccountVar({
+              ...settlementAccountVar(),
               hasInformation: true,
-              accountName,
-              accountNumber,
-              bankCode,
-            }));
+            });
           },
         }));
       }
@@ -111,21 +102,35 @@ const SettlementAccountModal = ({
   };
 
   const pickBankName = (options: any) => {
-    setAccountInformation((prev) => ({
-      ...prev,
+    settlementAccountVar({
+      ...settlementAccountVar(),
       bankName: options[options.selectedIndex].textContent,
-    }));
+    });
   };
 
-  const offModalButton = () => {
-    onClickModalHandler(false);
+  const turnOffModal = () => {
+    modalVar({
+      ...modalVar(),
+      isVisible: false,
+    });
+
     resetField("accountName");
     resetField("accountNumber");
     resetField("bankCode");
   };
+
+  const handleConfirmButtonClick = () => {
+    turnOffModal();
+  };
+
+  const handleCloseButtonClick = () => {
+    turnOffModal();
+  };
+
   return (
     <Container>
-      <Icon src={deleteSrc} onClick={() => onClickModalHandler(false)} />
+      <CloseButton src={closeIconSource} onClick={handleCloseButtonClick} />
+
       <Title>정산 계좌 등록하기</Title>
       <NoticeContainer icon={exclamationmarkSrc}>
         예금주명은 사업자등록증의 법인 명의(상호명)과 동일해야 합니다.
@@ -134,6 +139,7 @@ const SettlementAccountModal = ({
         사본 제출은 생략 됩니다.
         <br /> (예금주명에 따라 비교가 어려울 경우 서류 제출이 필요합니다.)
       </NoticeContainer>
+
       <InfoContainer>
         <SelectContainer
           {...register("bankCode")}
@@ -168,7 +174,7 @@ const SettlementAccountModal = ({
           <ValidText valid={true}>
             입력하신 계좌 정보가 실제 계좌 정보와 일치하지 않습니다.
             <br />
-            입력하신호를 다시 한번 확인해주세요.
+            입력하신 번호를 다시 한번 확인해주세요.
           </ValidText>
         )}
       </InfoContainer>
@@ -178,14 +184,16 @@ const SettlementAccountModal = ({
           full={false}
           className={isVerified ? "positive" : "negative"}
           disabled={!isVerified}
-          onClick={offModalButton}
+          onClick={handleConfirmButtonClick}
         >
           확인
         </Button>
-        <Button size="small" full={false} onClick={offModalButton}>
+
+        <Button size="small" full={false} onClick={handleCloseButtonClick}>
           취소
         </Button>
       </ButtonContainer>
+
       {systemModal.isVisible && (
         <SystemModal {...systemModal}>{systemModal.description}</SystemModal>
       )}
@@ -212,7 +220,7 @@ const Container = styled.div`
   }
 `;
 
-const Icon = styled.img`
+const CloseButton = styled.img`
   position: absolute;
   top: 12.79px;
   right: 12.77px;

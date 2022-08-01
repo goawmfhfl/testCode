@@ -1,14 +1,15 @@
-import { useState } from "react";
 import styled from "styled-components/macro";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
-import SafetyModal from "@components/ShopSetting/SafetyModal";
+import SafetyCertificationModal from "@components/ShopSetting/SafetyCertificationModal";
+import { useReactiveVar } from "@apollo/client";
+import { modalVar } from "@cache/index";
+import { safetyCertificationVar } from "@cache/shopSettings";
 
 const SafetyCertification = () => {
-  const [modal, setModal] = useState<boolean>(false);
-  const [isConfirm, setIsConfirm] = useState<boolean>(false);
+  const { isConfirmed } = useReactiveVar(safetyCertificationVar);
 
   return (
     <Container>
@@ -19,19 +20,22 @@ const SafetyCertification = () => {
         </NoticeContainer>
         <ConfirmContainer>
           <ConfirmInfoText>안전기준 적합 확인 검사 신고번호</ConfirmInfoText>
-          {isConfirm && <ConfirmText>인증완료</ConfirmText>}
-          <Button size="small" full={false} onClick={() => setModal(true)}>
+          {isConfirmed && <ConfirmText>인증완료</ConfirmText>}
+          <Button
+            size="small"
+            full={false}
+            onClick={() =>
+              modalVar({
+                ...modalVar(),
+                isVisible: true,
+                component: <SafetyCertificationModal />,
+              })
+            }
+          >
             인증하기
           </Button>
         </ConfirmContainer>
       </SafetyContainer>
-
-      {modal && (
-        <SafetyModal
-          onClickModalHandler={setModal}
-          onClickCheckIsConfrim={setIsConfirm}
-        />
-      )}
     </Container>
   );
 };

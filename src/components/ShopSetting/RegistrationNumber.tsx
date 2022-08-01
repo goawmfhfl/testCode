@@ -1,14 +1,13 @@
-import { useState } from "react";
 import styled from "styled-components/macro";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import RegistrationNumberModal from "@components/ShopSetting/RegistrationNumberModal";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
+import { modalVar } from "@cache/index";
 
 const RegistrationNumber = () => {
-  const [modal, setModal] = useState<boolean>(false);
-  const textText = true;
+  const isRegistrationNumberAuthenticated = true; // TODO: 실제 데이터로 바인딩
 
   return (
     <Container>
@@ -24,15 +23,24 @@ const RegistrationNumber = () => {
 
       <InfoContainer>
         <InfoText>
-          {textText
+          {isRegistrationNumberAuthenticated
             ? "주민등록이 인증되었습니다."
             : "인증된 주민등록증이 없습니다."}
         </InfoText>
-        <Button size="small" full={false} onClick={() => setModal(true)}>
+        <Button
+          size="small"
+          full={false}
+          onClick={() =>
+            modalVar({
+              ...modalVar(),
+              isVisible: true,
+              component: <RegistrationNumberModal />,
+            })
+          }
+        >
           인증하기
         </Button>
       </InfoContainer>
-      {modal && <RegistrationNumberModal onClickModalHandler={setModal} />}
     </Container>
   );
 };

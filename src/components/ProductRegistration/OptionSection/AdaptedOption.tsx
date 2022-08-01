@@ -1,18 +1,18 @@
 import styled from "styled-components";
 import { useState } from "react";
-import { useReactiveVar } from "@apollo/client";
+import { ReactiveVar, useReactiveVar } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
 
-import { OptionRowType, OptionTypes } from "@models/options";
-import { requiredOptionVar, selectiveOptionVar } from "@cache/index";
+import { OptionRowType, OptionType, OptionTypes } from "@models/options";
+import { requiredOptionVar, selectiveOptionVar } from "@cache/options";
 import { isNumber } from "@utils/index";
 
 const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
-  const optionVar =
+  const optionVar: ReactiveVar<OptionType> =
     optionType === OptionTypes.Required
       ? requiredOptionVar
       : selectiveOptionVar;
-  const { optionInputList, adaptedOption } = useReactiveVar(optionVar);
+  const { adaptedOption } = useReactiveVar(optionVar);
   const { register, setValue, getValues } = useFormContext();
   const [lastRowRef, setLastRowRef] = useState<HTMLElement | null>(null);
 

@@ -1,7 +1,7 @@
 import { createGlobalStyle } from "styled-components";
 import { reset } from "styled-reset";
 
-const GlobalStyles = createGlobalStyle`
+const GlobalStyles = createGlobalStyle<{ isModalVisible: boolean }>`
     ${reset}
 
     * {
@@ -9,9 +9,12 @@ const GlobalStyles = createGlobalStyle`
     }
 
     html, body {
-      min-height:100%;
       margin: 0;
       padding: 0;
+    }
+
+    body {
+      overflow: ${({ isModalVisible }) => (isModalVisible ? "hidden" : "")};;
     }
 
     #root {

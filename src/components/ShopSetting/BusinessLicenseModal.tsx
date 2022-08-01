@@ -1,26 +1,19 @@
 /* eslint-disable */
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import axios from "axios";
 
-import deleteSrc from "@icons/delete.svg";
+import closeIconSource from "@icons/close.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import SystemModal from "@components/common/SystemModal";
 import Input from "@components/common/Input";
 import Button from "@components/common/Button";
-import { BusinessLicenseInfoType } from "@components/ShopSetting/BusinessLicense";
+import { modalVar } from "@cache/index";
+import { businessLicenseVar } from "@cache/shopSettings";
 
-interface BusinessLicenseModalProps {
-  setModal: Dispatch<SetStateAction<boolean>>;
-  setBusinessLicenseInfo: Dispatch<SetStateAction<BusinessLicenseInfoType>>;
-}
-
-const BusinessLicenseModal = ({
-  setModal,
-  setBusinessLicenseInfo,
-}: BusinessLicenseModalProps) => {
+const BusinessLicenseModal = () => {
   const [systemModal, setSystemModal] = useState<{
     isVisible: boolean;
     icon: string;
@@ -118,7 +111,10 @@ const BusinessLicenseModal = ({
           ),
           hasMultiButton: true,
           handleConfirmButtonClick: () => {
-            setModal(false);
+            modalVar({
+              ...modalVar(),
+              isVisible: false,
+            });
             onConfirm(data.items[0]);
           },
           handleCancelButtonClick: () => {
@@ -134,36 +130,53 @@ const BusinessLicenseModal = ({
     }
   };
 
-  const onConfirm = (items: SetStateAction<BusinessLicenseInfoType>) => {
-    setBusinessLicenseInfo(items);
+  const onConfirm = (items) => {
+    businessLicenseVar({ ...items });
   };
 
   const onCancel = () => {
     resetField("businessNumber");
     resetField("ecommerceRegistrationNumber");
-    setModal(false);
+
+    modalVar({
+      ...modalVar(),
+      isVisible: false,
+    });
   };
 
   return (
     <Container>
-      <Icon src={deleteSrc} onClick={() => setModal(false)} />
+      <CloseButton
+        src={closeIconSource}
+        onClick={() =>
+          modalVar({
+            ...modalVar(),
+            isVisible: false,
+          })
+        }
+      />
+
       <Title>사업자등록증/통신판매업신고증 등록하기</Title>
+
       <NoticeContainer icon={exclamationmarkSrc}>
         전기통신매체, 광고물 등을 통해 소비자와 직접 상거래가 이루어지는 사업을
         하려면
         <br />
         통신판매업 신고를 해야 합니다.
       </NoticeContainer>
+
       <InfoContainer>
         <InputContainer>
           <SubTitle>사업자등록번호</SubTitle>
           <Input placeholder="숫자만 입력" {...register("businessNumber")} />
         </InputContainer>
+
         <InputContainer>
           <SubTitle>통신판매업신고 번호</SubTitle>
           <Input {...register("ecommerceRegistrationNumber")} />
         </InputContainer>
       </InfoContainer>
+
       <ButtonContainer>
         <Button
           type="button"
@@ -174,6 +187,7 @@ const BusinessLicenseModal = ({
         >
           저장
         </Button>
+
         <Button size="small" full={false} onClick={onCancel}>
           취소
         </Button>
@@ -217,7 +231,7 @@ const Title = styled.h2`
   letter-spacing: -0.015em;
 `;
 
-const Icon = styled.img`
+const CloseButton = styled.img`
   position: absolute;
   top: 12.79px;
   right: 12.77px;
