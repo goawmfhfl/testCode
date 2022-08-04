@@ -17,7 +17,7 @@ import ProductStockSection from "@components/ProductRegistration/ProductStockSec
 import RequiredOptionSection from "@components/ProductRegistration/OptionSection/RequiredOption";
 import SelectiveOptionSection from "@components/ProductRegistration/OptionSection/SelectiveOption";
 import OrderProductionSection from "@components/ProductRegistration/OrderProductionSection";
-import ShippingChargeSection from "@components/ProductRegistration/ProductShippingChargeSection";
+import ShipmentChargeSection from "@components/ProductRegistration/ProductShipmentChargeSection";
 import ProductSpecificationSection from "@components/ProductRegistration/ProductSpecificationSection";
 import ProductDescriptionSection from "@components/ProductRegistration/ProductDescriptionSection";
 
@@ -36,7 +36,7 @@ export interface ProductRegistrationFormValues {
   optionValues: string;
   cautionsSpec: string;
   certifiedMattersSpec: string;
-  countrysideAdditionalShippingCharge: string;
+  countrysideAdditionalShipmentCharge: string;
   contactInformationSpec: string;
   deliveryFee: string;
   categoryDepthFirst: string;
@@ -123,7 +123,7 @@ const ProductRegistration = () => {
                 <OrderProductionSection />
               </SectionWrapper>
               <SectionWrapper label={"배송 설정"}>
-                <ShippingChargeSection />
+                <ShipmentChargeSection />
               </SectionWrapper>
             </ContentsSection>
 

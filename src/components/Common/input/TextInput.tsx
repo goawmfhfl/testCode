@@ -7,12 +7,14 @@ const TextInput = ({
   width,
   textAlign,
   maxLength,
+  placeholder,
 }: {
   register: UseFormRegisterReturn;
   disabled?: boolean;
   width?: string;
   textAlign?: string;
   maxLength?: number;
+  placeholder?: string;
 }) => {
   return (
     <Input
@@ -21,13 +23,16 @@ const TextInput = ({
       width={width}
       textAlign={textAlign}
       maxLength={maxLength}
+      placeholder={placeholder}
     />
   );
 };
+
 // TODO: 현재 구현되어 있는 small 스타일 외에, medium과 big 구현 필요
-const Input = styled.input.attrs({ type: "text" })<{
-  textAlign: string | undefined;
+export const Input = styled.input.attrs({ type: "text" })<{
+  textAlign?: string | undefined;
   disabled?: boolean;
+  width?: string;
 }>`
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
   width: ${({ width }) => width};
@@ -39,7 +44,7 @@ const Input = styled.input.attrs({ type: "text" })<{
   margin-right: 8px;
 
   font-size: 12px;
-  font-family: "SpoqaHanSansNeo";
+  font-family: "Spoqa Han Sans Neo";
   font-weight: 300;
   line-height: 18px;
 

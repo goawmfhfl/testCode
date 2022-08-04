@@ -8,3 +8,11 @@ export const modalVar = makeVar<{
   isVisible: false,
   component: <></>,
 });
+
+export const overModalVar = makeVar<{
+  isVisible: boolean;
+  component: React.ReactNode;
+}>({
+  isVisible: false,
+  component: <></>,
+});

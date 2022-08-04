@@ -136,7 +136,16 @@ async function validateImage({
 function isNumber(value: string) {
   const regExp = /^[0-9]*$/g;
 
-  return regExp.test(value);
+  return regExp.test(value) && !isNaN(Number(value)) && value !== "";
 }
 
-export { addImageOnServer, removeImageFromServer, validateImage, isNumber };
+function removeLeadingZero(value: number) {
+  return Number(value).toString();
+}
+export {
+  addImageOnServer,
+  removeImageFromServer,
+  validateImage,
+  isNumber,
+  removeLeadingZero,
+};

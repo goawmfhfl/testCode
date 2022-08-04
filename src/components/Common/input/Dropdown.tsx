@@ -98,9 +98,12 @@ interface SelectProps {
   sizing?: string;
   width?: string;
   arrowSrc: string;
+  onChange?: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
 }
 
-const SelectInput = styled.select<SelectProps>`
+export const SelectInput = styled.select<SelectProps>`
   ${({ sizing, arrowSrc }) => {
     if (!sizing) return "";
 

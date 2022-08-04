@@ -4,10 +4,20 @@ import { useFormContext } from "react-hook-form";
 import TextInput from "@components/common/input/TextInput";
 import Dropdown from "@components/common/input/Dropdown";
 import Button from "@components/common/Button";
+import { modalVar } from "@cache/index";
+import ShipmentChargeTemplateModal from "@components/ProductRegistration/ShipmentChargeTemplateModal";
 
-const ProductShippingCharge = () => {
+const ProductShipmentCharge = () => {
   const theme = useTheme();
   const { register } = useFormContext();
+
+  const handleShipmentChargeTemplateButtonClick = () => {
+    modalVar({
+      ...modalVar(),
+      isVisible: true,
+      component: <ShipmentChargeTemplateModal />,
+    });
+  };
 
   return (
     <Container>
@@ -16,7 +26,7 @@ const ProductShippingCharge = () => {
 
         <DropdownWrapper>
           <Dropdown
-            register={register("shippingTemplate")}
+            register={register("shipmentTemplate")}
             size="medium"
             options={["기본 배송 설정", "배송 템플릿 1", "배송 템플릿 2"]}
           />
@@ -26,6 +36,7 @@ const ProductShippingCharge = () => {
           size="small"
           color="white"
           backgroundColor={`${theme.palette.grey700}`}
+          onClick={handleShipmentChargeTemplateButtonClick}
         >
           배송 템플릿
         </Button>
@@ -55,9 +66,9 @@ const ProductShippingCharge = () => {
 
       <InputContainer>
         <Label>배송비 ●</Label>
-        <ShippingChargeInputContainer>
+        <ShipmentChargeInputContainer>
           <Dropdown
-            register={register("shippingChargeOption")}
+            register={register("shipmentChargeOption")}
             size="medium"
             width="160px"
             options={["유료", "무료"]}
@@ -67,12 +78,12 @@ const ProductShippingCharge = () => {
             <TextInputWrapper>
               <TextInput
                 width="138px"
-                register={register("shippingChargeValue")}
+                register={register("shipmentChargeValue")}
               />
             </TextInputWrapper>
             원
           </TextInputContainer>
-        </ShippingChargeInputContainer>
+        </ShipmentChargeInputContainer>
       </InputContainer>
 
       <InputContainer>
@@ -81,7 +92,7 @@ const ProductShippingCharge = () => {
         <TextInputContainer>
           <TextInputWrapper>
             <TextInput
-              register={register("countrysideAdditionalShippingCharge")}
+              register={register("countrysideAdditionalShipmentCharge")}
             />
           </TextInputWrapper>
           원
@@ -96,7 +107,7 @@ const ProductShippingCharge = () => {
             반품배송비(편도)
             <TextInputWrapper hasLeftMargin={true}>
               <TextInput
-                register={register("countrysideAdditionalShippingCharge")}
+                register={register("countrysideAdditionalShipmentCharge")}
               />{" "}
             </TextInputWrapper>
             원
@@ -106,7 +117,7 @@ const ProductShippingCharge = () => {
             교환배송비(왕복)
             <TextInputWrapper hasLeftMargin={true}>
               <TextInput
-                register={register("countrysideAdditionalShippingCharge")}
+                register={register("countrysideAdditionalShipmentCharge")}
               />{" "}
             </TextInputWrapper>
             원
@@ -119,7 +130,7 @@ const ProductShippingCharge = () => {
 
 const Container = styled.div``;
 
-const InputContainer = styled.div`
+export const InputContainer = styled.div`
   display: flex;
   align-items: flex-start;
 
@@ -134,11 +145,11 @@ const InputContainer = styled.div`
   text-align: left;
 `;
 
-const DropdownWrapper = styled.span`
+export const DropdownWrapper = styled.span`
   margin-right: 9px;
 `;
 
-const RadioInputContainer = styled.div`
+export const RadioInputContainer = styled.div`
   display: flex;
   align-items: center;
 
@@ -152,17 +163,17 @@ const RadioInputContainer = styled.div`
   text-align: left;
 `;
 
-const ShippingChargeInputContainer = styled.div`
+export const ShipmentChargeInputContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
 
-const ReturnExchangeFeeInputContainer = styled.div`
+export const ReturnExchangeFeeInputContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
 
-const Label = styled.label`
+export const Label = styled.label`
   width: 230px;
   margin-top: 8px;
 
@@ -174,17 +185,17 @@ const Label = styled.label`
   text-align: left;
 `;
 
-const TextInputContainer = styled.div`
+export const TextInputContainer = styled.div`
   display: flex;
   align-items: center;
 
   margin-top: 9px;
 `;
 
-const TextInputWrapper = styled.div<{
+export const TextInputWrapper = styled.div<{
   hasLeftMargin?: boolean;
 }>`
   margin-left: ${({ hasLeftMargin }) => (hasLeftMargin ? "8px" : "")};
 `;
 
-export default ProductShippingCharge;
+export default ProductShipmentCharge;

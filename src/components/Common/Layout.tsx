@@ -5,7 +5,7 @@ import GlobalNavigationBar from "@components/common/GlobalNavigationBar";
 import SideNavigationBar from "@components/common/SideNavigationBar";
 import Footer from "@components/common/Footer";
 import SaveBar from "@components/common/SaveBar";
-import { modalVar } from "@cache/index";
+import { modalVar, overModalVar } from "@cache/index";
 
 interface LayoutProps {
   hasSaveBar?: boolean;
@@ -14,6 +14,7 @@ interface LayoutProps {
 
 const Layout = ({ children, hasSaveBar }: LayoutProps) => {
   const modal = useReactiveVar(modalVar);
+  const overModal = useReactiveVar(overModalVar);
 
   return (
     <>
@@ -27,7 +28,12 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
         {hasSaveBar && <SaveBar />}
       </Container>
 
-      {modal.isVisible && <ModalLayer>{modal.component}</ModalLayer>}
+      {modal.isVisible && (
+        <ModalLayer>
+          {modal.component}
+          {overModal.isVisible && overModal.component}
+        </ModalLayer>
+      )}
     </>
   );
 };
@@ -62,13 +68,26 @@ const ModalLayer = styled.div`
   height: 100vh;
   background-color: rgba(1, 1, 1, 0.5);
 
-  & > div {
+  & > div:first-child {
     position: fixed;
     top: 50%;
     left: 50%;
     z-index: 100;
 
     transform: translate(-50%, -50%);
+
+    box-shadow: 7px 10px 8px 0px #0000001a;
+  }
+
+  & > div:nth-child(2) {
+    position: fixed;
+    top: 46%;
+    left: 52%;
+    z-index: 150;
+
+    transform: translate(-50%, -50%);
+
+    box-shadow: 7px 10px 8px 0px #0000001a;
   }
 `;
 
