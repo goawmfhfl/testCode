@@ -1,11 +1,11 @@
 /* eslint-disable */
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import axios from "axios";
 import styled from "styled-components/macro";
 
+import { systemModalVar } from "@cache/index";
 import NoticeContainer from "@components/common/NoticeContainer";
-import SystemModal from "@components/common/SystemModal";
 import addImageSrc from "@icons/addImage.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import infoIconSrc from "@icons/info.svg";
@@ -14,13 +14,37 @@ import closeIconSource from "@icons/close.svg";
 import photochangeSrc from "@icons/photochange.svg";
 
 const ShopInfo = () => {
-  const { register, watch } = useFormContext();
-  const shopDescription = watch("description") as string;
+  const { register } = useFormContext();
 
   const [mobileImage, setMoboileImage] = useState<string>("");
   const [pcImage, setPcImage] = useState<string>("");
-  const [modal, setModal] = useState<boolean>(false);
   const [textLengh, setTextLength] = useState<number>(0);
+
+  function setShopInfoSystemModal() {
+    systemModalVar({
+      ...systemModalVar(),
+      buttonText: "확인",
+      icon: exclamationmarkSrc,
+      hasMultiButton: false,
+      handleConfirmButtonClick: () => {
+        clearModal();
+      },
+    });
+  }
+
+  function showModal() {
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+    });
+  }
+
+  function clearModal() {
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: false,
+    });
+  }
 
   const imageHandler = async (event: ChangeEvent<HTMLInputElement>) => {
     try {
@@ -31,10 +55,17 @@ const ShopInfo = () => {
       formData.append("files", targetImage[0]);
 
       // check Image size
-      if (version === "mobileImage" && size / 1024 / 1024 > 2)
-        return setModal(true);
-      if (version === "pcImage" && size / 1024 / 1024 > 3)
-        return setModal(true);
+      if (version === "mobileImage" && size / 1024 / 1024 > 2) {
+        showModal();
+
+        return;
+      }
+
+      if (version === "pcImage" && size / 1024 / 1024 > 3) {
+        showModal();
+
+        return;
+      }
 
       // delete duplicate image url
       if (mobileImage && version === "mobileImage") deleteImageUrl(mobileImage);
@@ -69,6 +100,10 @@ const ShopInfo = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    setShopInfoSystemModal();
+  }, []);
 
   return (
     <Container>
@@ -180,19 +215,6 @@ const ShopInfo = () => {
           </TextAreaContainer>
         </SectionContainer>
       </ShopInfoContainer>
-
-      {modal && (
-        <SystemModal
-          buttonText="확인"
-          icon={exclamationmarkSrc}
-          hasMultiButton={false}
-          handleConfirmButtonClick={() => setModal(false)}
-        >
-          등록 가능한 최대 파일크기를
-          <br />
-          초과하였습니다.
-        </SystemModal>
-      )}
     </Container>
   );
 };

@@ -1,5 +1,4 @@
 /* eslint-disable */
-import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import axios from "axios";
 import styled from "styled-components/macro";
@@ -11,31 +10,9 @@ import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
 import Input from "@components/common/Input";
-import SystemModal from "@components/common/SystemModal";
-import { modalVar } from "@cache/index";
+import { modalVar, systemModalVar } from "@cache/index";
 
 const RegistrationNumberModal = () => {
-  const [systemModal, setSysyemModal] = useState<{
-    isVisible: boolean;
-    icon: string;
-    description: React.ReactNode;
-    buttonText: string;
-    hasMultiButton: boolean;
-    handleConfirmButtonClick?: () => void;
-    handleCancleButtonClick?: () => void;
-  }>({
-    isVisible: false,
-    icon: "",
-    description: <></>,
-    buttonText: "",
-    hasMultiButton: true,
-    handleCancleButtonClick: () =>
-      setSysyemModal((prev) => ({
-        ...prev,
-        isVisible: false,
-      })),
-  });
-
   const { register, watch } = useFormContext();
   const watchFields = watch();
   const { idName, firstDigits, lastDigits, issuance } = watchFields;
@@ -59,8 +36,8 @@ const RegistrationNumberModal = () => {
       );
 
       if (data?.data?.ERRMSG) {
-        setSysyemModal((prev) => ({
-          ...prev,
+        systemModalVar({
+          ...systemModalVar(),
           isVisible: true,
           icon: exclamationmarkSrc,
           description: (
@@ -73,25 +50,25 @@ const RegistrationNumberModal = () => {
           buttonText: "확인",
           hasMultiButton: false,
           handleConfirmButtonClick: () =>
-            setSysyemModal((prev) => ({
-              ...prev,
+            systemModalVar({
+              ...systemModalVar(),
               isVisible: false,
-            })),
-        }));
+            }),
+        });
       } else {
-        setSysyemModal((prev) => ({
-          ...prev,
+        systemModalVar({
+          ...systemModalVar(),
           isVisible: true,
           icon: "",
           description: <>인증되었습니다.</>,
           buttonText: "확인",
           hasMultiButton: false,
           handleConfirmButtonClick: () =>
-            setSysyemModal((prev) => ({
-              ...prev,
+            systemModalVar({
+              ...systemModalVar(),
               isVisible: false,
-            })),
-        }));
+            }),
+        });
       }
     } catch (error) {
       console.log(error);
@@ -147,10 +124,6 @@ const RegistrationNumberModal = () => {
           취소
         </Button>
       </ButtonContainer>
-
-      {systemModal.isVisible && (
-        <SystemModal {...systemModal}>{systemModal.description}</SystemModal>
-      )}
     </Container>
   );
 };

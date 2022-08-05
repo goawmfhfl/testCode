@@ -5,7 +5,8 @@ import GlobalNavigationBar from "@components/common/GlobalNavigationBar";
 import SideNavigationBar from "@components/common/SideNavigationBar";
 import Footer from "@components/common/Footer";
 import SaveBar from "@components/common/SaveBar";
-import { modalVar, overModalVar } from "@cache/index";
+import { modalVar, overModalVar, systemModalVar } from "@cache/index";
+import SystemModal from "@components/common/SystemModal";
 
 interface LayoutProps {
   hasSaveBar?: boolean;
@@ -15,6 +16,7 @@ interface LayoutProps {
 const Layout = ({ children, hasSaveBar }: LayoutProps) => {
   const modal = useReactiveVar(modalVar);
   const overModal = useReactiveVar(overModalVar);
+  const systemModal = useReactiveVar(systemModalVar);
 
   return (
     <>
@@ -34,6 +36,8 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
           {overModal.isVisible && overModal.component}
         </ModalLayer>
       )}
+
+      {systemModal.isVisible && <SystemModal />}
     </>
   );
 };

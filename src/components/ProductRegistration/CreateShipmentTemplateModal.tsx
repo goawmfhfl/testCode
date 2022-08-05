@@ -126,7 +126,7 @@ const CreateShipmentTemplateModal = () => {
   `;
 
   const [createShipmentTemplate] = useMutation<
-    { ok: boolean; error: string },
+    { createShipmentTemplate: { ok: boolean; error: string } },
     { input: CreateShipmentTemplateInput }
   >(CREATE_SHIPMENT_TEMPLATE);
 
@@ -135,7 +135,11 @@ const CreateShipmentTemplateModal = () => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       (async function (): Promise<void> {
         // shipmentTemplate을 서버로 보낸다!
-        const result = await createShipmentTemplate({
+        const {
+          data: {
+            createShipmentTemplate: { ok, error },
+          },
+        } = await createShipmentTemplate({
           variables: {
             input: {
               name,
@@ -149,7 +153,12 @@ const CreateShipmentTemplateModal = () => {
           },
         });
 
-        console.log("create shipment template result!", result);
+        if (error) {
+          // TODO: system modal로 템플릿 생성 에러 알림
+          console.log(error);
+
+          return;
+        }
       })();
     } catch (error) {
       console.log(error);

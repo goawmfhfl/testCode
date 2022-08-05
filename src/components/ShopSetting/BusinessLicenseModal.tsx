@@ -1,5 +1,4 @@
 /* eslint-disable */
-import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import axios from "axios";
@@ -7,34 +6,12 @@ import axios from "axios";
 import closeIconSource from "@icons/close.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
-import SystemModal from "@components/common/SystemModal";
 import Input from "@components/common/Input";
 import Button from "@components/common/Button";
-import { modalVar } from "@cache/index";
+import { modalVar, systemModalVar } from "@cache/index";
 import { businessLicenseVar } from "@cache/shopSettings";
 
 const BusinessLicenseModal = () => {
-  const [systemModal, setSystemModal] = useState<{
-    isVisible: boolean;
-    icon: string;
-    description: React.ReactNode;
-    buttonText: string;
-    hasMultiButton: boolean;
-    handleConfirmButtonClick?: () => void;
-    handleCancelButtonClick?: () => void;
-  }>({
-    isVisible: false,
-    icon: "",
-    description: <></>,
-    buttonText: "",
-    hasMultiButton: true,
-    handleConfirmButtonClick: () =>
-      setSystemModal((prev) => ({
-        ...prev,
-        isVisible: false,
-      })),
-  });
-
   const { register, watch, resetField } = useFormContext();
   const watchFields = watch();
   const { businessNumber, ecommerceRegistrationNumber } = watchFields;
@@ -43,8 +20,8 @@ const BusinessLicenseModal = () => {
     try {
       // 사업자등록증, 혹은 통신판매업신고 번호를 입력하지 않았을 경우
       if (!businessNumber || !ecommerceRegistrationNumber) {
-        setSystemModal((prev) => ({
-          ...prev,
+        systemModalVar({
+          ...systemModalVar(),
           isVisible: true,
           icon: exclamationmarkSrc,
           description: (
@@ -56,12 +33,12 @@ const BusinessLicenseModal = () => {
           buttonText: "확인",
           hasMultiButton: false,
           handleConfirmButtonClick: () => {
-            setSystemModal((prev) => ({
-              ...prev,
+            systemModalVar({
+              ...systemModalVar(),
               isVisible: false,
-            }));
+            });
           },
-        }));
+        });
         return;
       }
 
@@ -84,23 +61,23 @@ const BusinessLicenseModal = () => {
       );
 
       if (data?.items?.length === 0) {
-        setSystemModal((prev) => ({
-          ...prev,
+        systemModalVar({
+          ...systemModalVar(),
           isVisible: true,
           icon: exclamationmarkSrc,
           description: <>기입한 정보가 올바르지 않습니다.</>,
           buttonText: "확인",
           hasMultiButton: false,
           handleConfirmButtonClick: () => {
-            setSystemModal((prev) => ({
-              ...prev,
+            systemModalVar({
+              ...systemModalVar(),
               isVisible: false,
-            }));
+            });
           },
-        }));
+        });
       } else {
-        setSystemModal((prev) => ({
-          ...prev,
+        systemModalVar({
+          ...systemModalVar(),
           isVisible: true,
           icon: "",
           description: (
@@ -118,12 +95,12 @@ const BusinessLicenseModal = () => {
             onConfirm(data.items[0]);
           },
           handleCancelButtonClick: () => {
-            setSystemModal((prev) => ({
-              ...prev,
+            systemModalVar({
+              ...systemModalVar(),
               isVisible: false,
-            }));
+            });
           },
-        }));
+        });
       }
     } catch (error) {
       console.log("error", error);
@@ -192,10 +169,6 @@ const BusinessLicenseModal = () => {
           취소
         </Button>
       </ButtonContainer>
-
-      {systemModal.isVisible && (
-        <SystemModal {...systemModal}>{systemModal.description}</SystemModal>
-      )}
     </Container>
   );
 };

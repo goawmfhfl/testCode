@@ -11,32 +11,10 @@ import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
 import Input from "@components/common/Input";
 import ValidText from "@components/common/ValidText";
-import SystemModal from "@components/common/SystemModal";
-import { modalVar } from "@cache/index";
+import { modalVar, systemModalVar } from "@cache/index";
 import { settlementAccountVar } from "@cache/shopSettings";
 
 const SettlementAccountModal = () => {
-  const [systemModal, setSysyemModal] = useState<{
-    isVisible: boolean;
-    icon: string;
-    description: React.ReactNode;
-    buttonText: string;
-    hasMultiButton: boolean;
-    handleConfirmButtonClick?: () => void;
-    handleCancleButtonClick?: () => void;
-  }>({
-    isVisible: false,
-    icon: "",
-    description: <></>,
-    buttonText: "",
-    hasMultiButton: true,
-    handleCancleButtonClick: () =>
-      setSysyemModal((prev) => ({
-        ...prev,
-        isVisible: false,
-      })),
-  });
-
   const [validation, setValidation] = useState<{
     isWrongNumber: boolean;
     isVerified: boolean;
@@ -76,25 +54,25 @@ const SettlementAccountModal = () => {
           isWrongNumber: false,
         }));
 
-        setSysyemModal((prev) => ({
-          ...prev,
+        systemModalVar({
+          ...systemModalVar(),
           isVisible: true,
           icon: "",
           description: <>계좌정보가 등록되었습니다.</>,
           buttonText: "확인",
           hasMultiButton: false,
           handleConfirmButtonClick: () => {
-            setSysyemModal((prev) => ({
-              ...prev,
+            systemModalVar({
+              ...systemModalVar(),
               isVisible: false,
-            }));
+            });
 
             settlementAccountVar({
               ...settlementAccountVar(),
               hasInformation: true,
             });
           },
-        }));
+        });
       }
     } catch (error) {
       console.log(error);
@@ -193,10 +171,6 @@ const SettlementAccountModal = () => {
           취소
         </Button>
       </ButtonContainer>
-
-      {systemModal.isVisible && (
-        <SystemModal {...systemModal}>{systemModal.description}</SystemModal>
-      )}
     </Container>
   );
 };

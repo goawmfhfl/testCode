@@ -1,29 +1,23 @@
-import React from "react";
 import styled from "styled-components/macro";
+import { useReactiveVar } from "@apollo/client";
 
+import { systemModalVar } from "@cache/index";
 import Button from "./Button";
 
-interface SystemModalType {
-  icon?: string;
-  children: React.ReactNode;
-  buttonText?: string;
-  hasMultiButton: boolean;
-  handleConfirmButtonClick?: () => void;
-  handleCancelButtonClick?: () => void;
-}
+const SystemModal = () => {
+  const {
+    icon,
+    description,
+    buttonText,
+    hasMultiButton,
+    handleConfirmButtonClick,
+    handleCancelButtonClick,
+  } = useReactiveVar(systemModalVar);
 
-const SystemModal = ({
-  icon = "",
-  children,
-  buttonText,
-  hasMultiButton,
-  handleConfirmButtonClick,
-  handleCancelButtonClick,
-}: SystemModalType) => {
   return (
     <Container>
       {icon && <Icon src={icon} />}
-      <Text>{children}</Text>
+      <Text>{description}</Text>
       {hasMultiButton ? (
         <ButtonWrapper>
           <Button

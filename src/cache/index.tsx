@@ -16,3 +16,32 @@ export const overModalVar = makeVar<{
   isVisible: false,
   component: <></>,
 });
+
+export const systemModalVar = makeVar<{
+  isVisible: boolean;
+  icon: string;
+  description: React.ReactNode;
+  buttonText: string;
+  hasMultiButton: boolean;
+  handleConfirmButtonClick?: () => void;
+  handleCancelButtonClick?: () => void;
+}>({
+  isVisible: false,
+  icon: "",
+  description: <></>,
+  buttonText: "",
+  hasMultiButton: true,
+  handleConfirmButtonClick: () => {
+    closeSystemModal();
+  },
+  handleCancelButtonClick: () => {
+    closeSystemModal();
+  },
+});
+
+function closeSystemModal() {
+  systemModalVar({
+    ...systemModalVar(),
+    isVisible: false,
+  });
+}
