@@ -47,9 +47,8 @@ const RegistrationNumberModal = () => {
               다시 기입해주세요.
             </>
           ),
-          buttonText: "확인",
-          hasMultiButton: false,
-          handleConfirmButtonClick: () =>
+          confirmButtonText: "확인",
+          confirmButtonClickHandler: () =>
             systemModalVar({
               ...systemModalVar(),
               isVisible: false,
@@ -61,9 +60,8 @@ const RegistrationNumberModal = () => {
           isVisible: true,
           icon: "",
           description: <>인증되었습니다.</>,
-          buttonText: "확인",
-          hasMultiButton: false,
-          handleConfirmButtonClick: () =>
+          confirmButtonText: "확인",
+          confirmButtonClickHandler: () =>
             systemModalVar({
               ...systemModalVar(),
               isVisible: false,
@@ -75,11 +73,10 @@ const RegistrationNumberModal = () => {
     }
   };
 
-  const turnOffModal = () => modalVar({ ...modalVar(), isVisible: false });
+  const clearModal = () => modalVar({ ...modalVar(), isVisible: false });
 
-  const handleCloseButtonClick = () => turnOffModal();
-
-  const handleCancelButtonClick = () => turnOffModal();
+  const handleCloseButtonClick = () => clearModal();
+  const handleCancelButtonClick = () => clearModal();
 
   return (
     <Container>
@@ -140,9 +137,11 @@ const Container = styled.div`
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
   background-color: ${({ theme: { palette } }) => palette.white};
   box-shadow: ${({ theme: { shadow } }) => shadow.boxShadow};
+
   & > h2 {
     margin-bottom: 24px;
   }
+
   & > h2 + div {
     width: 369px;
     margin-bottom: 24px;
@@ -172,9 +171,11 @@ const NameContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 16px;
+
   & > h3 {
     width: 152px;
   }
+
   & > input {
     width: 120px;
     height: 32px;
@@ -186,6 +187,7 @@ const IdContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 16px;
+
   & > h3 {
     width: 152px;
   }
@@ -195,9 +197,11 @@ const DateContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 16px;
+
   & > h3 {
     width: 152px;
   }
+
   & > input {
     width: 120px;
     height: 32px;
@@ -214,11 +218,13 @@ const SubTitle = styled.h3`
 
 const InputContainer = styled.div`
   display: flex;
+
   & > input {
     width: 120px;
     height: 32px;
     padding: 9px 8px;
   }
+
   & > span {
     margin: auto 8px;
   }
@@ -228,9 +234,11 @@ const ButtonContainer = styled.div`
   display: flex;
   width: 100%;
   justify-content: flex-end;
+
   & > button:first-child {
     margin-right: 16px;
   }
+
   & > button {
     font-weight: 500;
     font-size: 12px;

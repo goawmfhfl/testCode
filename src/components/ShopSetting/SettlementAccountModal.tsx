@@ -59,9 +59,8 @@ const SettlementAccountModal = () => {
           isVisible: true,
           icon: "",
           description: <>계좌정보가 등록되었습니다.</>,
-          buttonText: "확인",
-          hasMultiButton: false,
-          handleConfirmButtonClick: () => {
+          confirmButtonText: "확인",
+          confirmButtonClickHandler: () => {
             systemModalVar({
               ...systemModalVar(),
               isVisible: false,
@@ -86,7 +85,7 @@ const SettlementAccountModal = () => {
     });
   };
 
-  const turnOffModal = () => {
+  const clearModal = () => {
     modalVar({
       ...modalVar(),
       isVisible: false,
@@ -98,11 +97,11 @@ const SettlementAccountModal = () => {
   };
 
   const handleConfirmButtonClick = () => {
-    turnOffModal();
+    clearModal();
   };
 
   const handleCloseButtonClick = () => {
-    turnOffModal();
+    clearModal();
   };
 
   return (

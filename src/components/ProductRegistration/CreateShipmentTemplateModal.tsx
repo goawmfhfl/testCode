@@ -20,8 +20,12 @@ import {
 import Button from "@components/common/Button";
 import closeIconSource from "@icons/close.svg";
 import downwordArrowMedium from "@icons/arrow-downward-medium.svg";
-import { overModalVar } from "@cache/index";
-import { removeLeadingZero, isNumber } from "@utils/index";
+import { overModalVar, systemModalVar } from "@cache/index";
+import {
+  removeLeadingZero,
+  isNumber,
+  hasEveryInputFulfilled,
+} from "@utils/index";
 
 enum ShipmentChargeType {
   Charged = "CHARGE",
@@ -59,6 +63,8 @@ const CreateShipmentTemplateModal = () => {
       returnCharge: 0,
       exchangeCharge: 0,
     });
+
+  const [hasRegisterReady, setHasRegisterReady] = useState(false);
 
   const handleCloseButtonClick = () => {
     overModalVar({
@@ -159,11 +165,54 @@ const CreateShipmentTemplateModal = () => {
 
           return;
         }
+
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: "템플릿이 등록되었습니다.",
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+            });
+
+            overModalVar({
+              ...overModalVar(),
+              isVisible: false,
+            });
+          },
+        });
       })();
     } catch (error) {
       console.log(error);
     }
   };
+
+  const handleCancelButtonClick = () => {
+    overModalVar({
+      ...overModalVar(),
+      isVisible: false,
+    });
+  };
+
+  useEffect(() => {
+    const allowsZeroInputNames: Array<string> = [];
+
+    if (shipmentChargeType === ShipmentChargeType.Free) {
+      allowsZeroInputNames.push("shipmentCharge");
+    }
+
+    const { isFulfilled } = hasEveryInputFulfilled(
+      shipmentTemplate,
+      allowsZeroInputNames
+    );
+
+    if (isFulfilled) {
+      setHasRegisterReady(true);
+    } else {
+      setHasRegisterReady(false);
+    }
+  }, [shipmentTemplate]);
 
   return (
     <Container>
@@ -229,6 +278,8 @@ const CreateShipmentTemplateModal = () => {
                   value={removeLeadingZero(shipmentCharge)}
                   disabled={shipmentChargeType === ShipmentChargeType.Free}
                   hasHandle={false}
+                  step={1000}
+                  min={0}
                 />
               </TextInputWrapper>
               원
@@ -243,6 +294,8 @@ const CreateShipmentTemplateModal = () => {
             <TextInputWrapper>
               <NumberInput
                 hasHandle={false}
+                step={1000}
+                min={0}
                 value={removeLeadingZero(additionalCharge)}
                 onChange={handleInputChange("additionalCharge")}
                 placeholder="숫자만 입력"
@@ -261,6 +314,8 @@ const CreateShipmentTemplateModal = () => {
               <TextInputWrapper hasLeftMargin={true}>
                 <NumberInput
                   hasHandle={false}
+                  step={1000}
+                  min={0}
                   value={removeLeadingZero(returnCharge)}
                   onChange={handleInputChange("returnCharge")}
                   placeholder="숫자만 입력"
@@ -274,6 +329,8 @@ const CreateShipmentTemplateModal = () => {
               <TextInputWrapper hasLeftMargin={true}>
                 <NumberInput
                   hasHandle={false}
+                  step={1000}
+                  min={0}
                   value={removeLeadingZero(exchangeCharge)}
                   onChange={handleInputChange("exchangeCharge")}
                   placeholder="숫자만 입력"
@@ -291,10 +348,14 @@ const CreateShipmentTemplateModal = () => {
           color={"white"}
           backgroundColor={theme.palette.grey700}
           onClick={handleRegisterButtonClick}
+          disabled={!hasRegisterReady ? true : false}
+          className={!hasRegisterReady ? "negative" : ""}
         >
           등록
         </RegisterButton>
-        <CancelButton size="small">취소</CancelButton>
+        <CancelButton size="small" onClick={handleCancelButtonClick}>
+          취소
+        </CancelButton>
       </ButtonContainer>
     </Container>
   );
@@ -342,6 +403,8 @@ const ButtonContainer = styled.div`
 
 const RegisterButton = styled(Button)``;
 
-const CancelButton = styled(Button)``;
+const CancelButton = styled(Button)`
+  margin-left: 16px;
+`;
 
 export default CreateShipmentTemplateModal;

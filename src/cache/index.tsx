@@ -21,22 +21,22 @@ export const systemModalVar = makeVar<{
   isVisible: boolean;
   icon: string;
   description: React.ReactNode;
-  buttonText: string;
-  hasMultiButton: boolean;
-  handleConfirmButtonClick?: () => void;
-  handleCancelButtonClick?: () => void;
+  confirmButtonText: string;
+  confirmButtonVisibility: boolean;
+  confirmButtonClickHandler: () => void;
+  cancelButtonText: string;
+  cancelButtonVisibility: boolean;
+  cancelButtonClickHandler: () => void;
 }>({
   isVisible: false,
   icon: "",
   description: <></>,
-  buttonText: "",
-  hasMultiButton: true,
-  handleConfirmButtonClick: () => {
-    closeSystemModal();
-  },
-  handleCancelButtonClick: () => {
-    closeSystemModal();
-  },
+  confirmButtonText: "확인",
+  confirmButtonVisibility: true,
+  confirmButtonClickHandler: () => closeSystemModal(),
+  cancelButtonText: "취소",
+  cancelButtonVisibility: false,
+  cancelButtonClickHandler: () => closeSystemModal(),
 });
 
 function closeSystemModal() {

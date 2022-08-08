@@ -23,10 +23,9 @@ const ShopInfo = () => {
   function setShopInfoSystemModal() {
     systemModalVar({
       ...systemModalVar(),
-      buttonText: "확인",
       icon: exclamationmarkSrc,
-      hasMultiButton: false,
-      handleConfirmButtonClick: () => {
+      confirmButtonText: "확인",
+      confirmButtonClickHandler: () => {
         clearModal();
       },
     });

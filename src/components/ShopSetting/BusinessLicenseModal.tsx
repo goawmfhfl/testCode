@@ -30,9 +30,8 @@ const BusinessLicenseModal = () => {
               <br /> 모두 입력해주세요.
             </>
           ),
-          buttonText: "확인",
-          hasMultiButton: false,
-          handleConfirmButtonClick: () => {
+          confirmButtonText: "확인",
+          confirmButtonClickHandler: () => {
             systemModalVar({
               ...systemModalVar(),
               isVisible: false,
@@ -66,9 +65,8 @@ const BusinessLicenseModal = () => {
           isVisible: true,
           icon: exclamationmarkSrc,
           description: <>기입한 정보가 올바르지 않습니다.</>,
-          buttonText: "확인",
-          hasMultiButton: false,
-          handleConfirmButtonClick: () => {
+          confirmButtonText: "확인",
+          confirmButtonClickHandler: () => {
             systemModalVar({
               ...systemModalVar(),
               isVisible: false,
@@ -86,15 +84,16 @@ const BusinessLicenseModal = () => {
               등록되었습니다.
             </>
           ),
-          hasMultiButton: true,
-          handleConfirmButtonClick: () => {
+          confirmButtonVisibility: true,
+          confirmButtonClickHandler: () => {
             modalVar({
               ...modalVar(),
               isVisible: false,
             });
             onConfirm(data.items[0]);
           },
-          handleCancelButtonClick: () => {
+          cancelButtonVisibility: true,
+          cancelButtonClickHandler: () => {
             systemModalVar({
               ...systemModalVar(),
               isVisible: false,

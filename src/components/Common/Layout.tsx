@@ -30,14 +30,13 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
         {hasSaveBar && <SaveBar />}
       </Container>
 
-      {modal.isVisible && (
-        <ModalLayer>
-          {modal.component}
-          {overModal.isVisible && overModal.component}
-        </ModalLayer>
+      {modal.isVisible && <ModalLayer>{modal.component}</ModalLayer>}
+      {overModal.isVisible && (
+        <OverModalLayer>{overModal.component}</OverModalLayer>
       )}
-
-      {systemModal.isVisible && <SystemModal />}
+      {systemModal.isVisible && (
+        <SystemModalLayer>{<SystemModal />}</SystemModalLayer>
+      )}
     </>
   );
 };
@@ -66,13 +65,13 @@ const ModalLayer = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 3000;
+  z-index: 1000;
 
   width: 100vw;
   height: 100vh;
   background-color: rgba(1, 1, 1, 0.5);
 
-  & > div:first-child {
+  & > div {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -82,15 +81,47 @@ const ModalLayer = styled.div`
 
     box-shadow: 7px 10px 8px 0px #0000001a;
   }
+`;
 
-  & > div:nth-child(2) {
+const OverModalLayer = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+
+  & > div {
     position: fixed;
     top: 46%;
-    left: 52%;
+    left: 46%;
     z-index: 150;
 
     transform: translate(-50%, -50%);
 
+    box-shadow: 7px 10px 8px 0px #0000001a;
+  }
+`;
+
+const SystemModalLayer = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+
+  & > div {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 200;
+
+    transform: translate(-50%, -50%);
     box-shadow: 7px 10px 8px 0px #0000001a;
   }
 `;

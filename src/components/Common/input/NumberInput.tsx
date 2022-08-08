@@ -20,6 +20,8 @@ const NumberInput = styled.input.attrs({
   font-family: "Spoqa Han Sans Neo";
   font-weight: 300;
   line-height: 18px;
+
+  cursor: ${({ disabled }) => (disabled ? "default" : "pointer")}; ;
 `;
 
 export default NumberInput;

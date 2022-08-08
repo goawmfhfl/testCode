@@ -11,7 +11,7 @@ async function addImageOnServer(imageFile: File): Promise<string> {
   formData.append("files", imageFile);
 
   const response: { data: Array<string> } = await axios.post(
-    "https://dev.chopsticks-store.com/upload",
+    `${process.env.REACT_APP_SERVER_URI}/upload`,
     formData
   );
 
@@ -142,10 +142,61 @@ function isNumber(value: string) {
 function removeLeadingZero(value: number) {
   return Number(value).toString();
 }
+
+function hasEveryInputFulfilled(
+  inputFields: object,
+  allowsZeroInputNames?: Array<string>
+): {
+  isFulfilled: boolean;
+  unfulfilledInputNames: Array<string>;
+} {
+  const inputNames = Object.keys(inputFields);
+  const inputValues = Object.values(inputFields);
+
+  const isFulfilled = inputValues.reduce(
+    (acc: boolean, cur: string, index: number) => {
+      const inputName = inputNames[index];
+
+      const hasAllowedZero = allowsZeroInputNames.find(
+        (allowedInputName) => allowedInputName === inputName
+      );
+
+      return acc && validateInput(cur, Boolean(hasAllowedZero));
+    },
+    true
+  ) as boolean;
+
+  return {
+    isFulfilled,
+    unfulfilledInputNames: [],
+  };
+}
+
+function validateInput(
+  input: string | number | boolean | undefined | null,
+  allowsZero?: boolean
+) {
+  switch (typeof input) {
+    case "string":
+      return input !== "" ? true : false;
+    case "number":
+      if (allowsZero) {
+        return true;
+      }
+
+      return input !== 0 ? true : false;
+    case "boolean":
+      return true;
+    default:
+      return false;
+  }
+}
+
 export {
   addImageOnServer,
   removeImageFromServer,
   validateImage,
   isNumber,
   removeLeadingZero,
+  hasEveryInputFulfilled,
 };

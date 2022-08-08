@@ -92,7 +92,7 @@ const PhoneNumberModal = () => {
     }));
   };
 
-  const turnOffModal = () =>
+  const clearModal = () =>
     modalVar({
       ...modalVar(),
       isVisible: false,
@@ -117,11 +117,11 @@ const PhoneNumberModal = () => {
   const handleConfirmButtonClick = () => {
     phoneNumberVar(userPhoneNumber);
 
-    turnOffModal();
+    clearModal();
   };
 
   const handleCancelButtonClick = () => {
-    turnOffModal();
+    clearModal();
   };
 
   const { minutes, seconds } = time;
@@ -166,7 +166,7 @@ const PhoneNumberModal = () => {
 
   return (
     <Container>
-      <CloseButton src={closeIconSource} onClick={turnOffModal} />
+      <CloseButton src={closeIconSource} onClick={clearModal} />
       <Title>전화번호 변경하기</Title>
       <DescriptText>
         {isStarted

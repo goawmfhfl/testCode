@@ -2,52 +2,50 @@ import styled from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
 import { systemModalVar } from "@cache/index";
-import Button from "./Button";
+import Button from "@components/common/Button";
 
 const SystemModal = () => {
   const {
     icon,
     description,
-    buttonText,
-    hasMultiButton,
-    handleConfirmButtonClick,
-    handleCancelButtonClick,
+    confirmButtonText,
+    confirmButtonVisibility,
+    confirmButtonClickHandler,
+    cancelButtonText,
+    cancelButtonVisibility,
+    cancelButtonClickHandler,
   } = useReactiveVar(systemModalVar);
+
+  const hasAllButtons = confirmButtonVisibility && cancelButtonVisibility;
 
   return (
     <Container>
       {icon && <Icon src={icon} />}
       <Text>{description}</Text>
-      {hasMultiButton ? (
-        <ButtonWrapper>
+
+      <ButtonWrapper>
+        {confirmButtonVisibility && (
           <Button
             type="button"
             size="small"
             full={false}
-            className="positive"
-            onClick={handleConfirmButtonClick}
+            className={hasAllButtons && "positive"}
+            onClick={confirmButtonClickHandler}
           >
-            확인
+            {confirmButtonText}
           </Button>
+        )}
+        {cancelButtonVisibility && (
           <Button
             type="button"
             size="small"
             full={false}
-            onClick={handleCancelButtonClick}
+            onClick={cancelButtonClickHandler}
           >
-            취소
+            {cancelButtonText}
           </Button>
-        </ButtonWrapper>
-      ) : (
-        <Button
-          type="button"
-          size="small"
-          full={false}
-          onClick={handleConfirmButtonClick}
-        >
-          {buttonText}
-        </Button>
-      )}
+        )}
+      </ButtonWrapper>
     </Container>
   );
 };
