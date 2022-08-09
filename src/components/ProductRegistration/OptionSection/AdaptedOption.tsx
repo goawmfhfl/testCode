@@ -16,8 +16,6 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
   const { register, setValue, getValues } = useFormContext();
   const [lastRowRef, setLastRowRef] = useState<HTMLElement | null>(null);
 
-  console.log(adaptedOption.optionRows);
-
   return (
     <AdaptedOptionTableContainer
       hasManyColumns={adaptedOption.optionHeaders.length > 3}
@@ -27,7 +25,7 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
         <AdaptedOptionTableHeaderRow>
           {/* th */}
           <AdaptedOptionTableHeader
-            className={"headerContainer"}
+            className={"header--container"}
             colSpan={
               adaptedOption.optionHeaders.length < 2
                 ? 2
@@ -37,11 +35,23 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
             {/* tr */}
             <Table>
               <tbody>
-                {optionType === OptionTypes.Required && (
-                  <AdaptedOptionTableHeaderRow>
+                <AdaptedOptionTableHeaderRow>
+                  {optionType === OptionTypes.Required && (
                     <AdaptedOptionTableHeader>옵션명</AdaptedOptionTableHeader>
-                  </AdaptedOptionTableHeaderRow>
-                )}
+                  )}
+
+                  {!adaptedOption.optionHeaders.length &&
+                    optionType === OptionTypes.Selective && (
+                      <>
+                        <AdaptedOptionTableHeader>
+                          추가 옵션명
+                        </AdaptedOptionTableHeader>
+                        <AdaptedOptionTableHeader>
+                          추가 옵션값
+                        </AdaptedOptionTableHeader>
+                      </>
+                    )}
+                </AdaptedOptionTableHeaderRow>
 
                 {adaptedOption.optionHeaders.length ? (
                   // tr
@@ -72,11 +82,11 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
             </Table>
           </AdaptedOptionTableHeader>
 
-          <AdaptedOptionTableHeader className={"topestHeader priceCell"}>
+          <AdaptedOptionTableHeader className={"header--top-end header--price"}>
             옵션가
           </AdaptedOptionTableHeader>
 
-          <AdaptedOptionTableHeader className={"topestHeader stockCell"}>
+          <AdaptedOptionTableHeader className={"header--top-end header--stock"}>
             재고
           </AdaptedOptionTableHeader>
         </AdaptedOptionTableHeaderRow>
@@ -95,7 +105,7 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
                     <AdaptedOptionTableData
                       key={`${el}-${index}`}
                       colSpan={adaptedOption.optionHeaders.length === 1 ? 2 : 1}
-                      className={isLastRow ? "lowestCell" : ""}
+                      className={isLastRow ? "cell--low-end" : ""}
                       width={`${100 / adaptedOption.optionHeaders.length}%`}
                     >
                       {el}
@@ -103,7 +113,7 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
                   ))}
 
                   <AdaptedOptionTableData
-                    className={isLastRow ? "lowestCell" : ""}
+                    className={isLastRow ? "cell--low-end" : ""}
                     width={"80px"}
                   >
                     <AdaptedOptionPriceInput
@@ -134,7 +144,7 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
                     />
                   </AdaptedOptionTableData>
                   <AdaptedOptionTableData
-                    className={isLastRow ? "lowestCell" : ""}
+                    className={isLastRow ? "cell--low-end" : ""}
                     width={"64px"}
                   >
                     <AdaptedOptionStockInput
@@ -199,15 +209,15 @@ const AdaptedOptionTableHeader = styled.th<{
   borderBottom?: boolean;
 }>`
   width: ${({ width }) => (width ? width : "50%")};
+  min-width: 100px;
   padding: 10px;
 
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
-
   border-collapse: collapse;
-
   vertical-align: middle;
+  white-space: nowrap;
 
-  &.headerContainer {
+  &.header--container {
     padding: 0;
     border-top: 0px;
 
@@ -230,15 +240,15 @@ const AdaptedOptionTableHeader = styled.th<{
     }
   }
 
-  &.topestHeader {
+  &.header--top-end {
     border-top: 0px;
   }
 
-  &.priceCell {
+  &.header--price {
     width: 80px;
   }
 
-  &.stockCell {
+  &.header--stock {
     width: 64px;
   }
 `;
@@ -253,7 +263,7 @@ const AdaptedOptionTableData = styled.td<{ width: string }>`
   white-space: pre-wrap;
   vertical-align: middle;
 
-  &.lowestCell {
+  &.cell--low-end {
     border-bottom: 0px;
   }
 `;
