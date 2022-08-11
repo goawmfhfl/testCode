@@ -11,6 +11,8 @@ import Button from "@components/common/Button";
 import { modalVar, overModalVar, systemModalVar } from "@cache/index";
 import closeIconSource from "@icons/close.svg";
 import { ShipmentChargeType } from "@models/shipmentTemplate";
+import { isElementOverflown } from "@utils/index";
+import { tableScrollbarStyles } from "@styles/GlobalStyles";
 
 const GET_SHIPMENT_TEMPLATES = gql`
   query GetAllShipmentTemplates {
@@ -42,8 +44,28 @@ const DELETE_SHIPMENT_TEMPLATE = gql`
   }
 `;
 
+const templateListHeaders: Array<{ id: string; headerName: string }> = [
+  {
+    id: uuidv4(),
+    headerName: "템플릿명",
+  },
+  {
+    id: uuidv4(),
+    headerName: "수정일",
+  },
+  {
+    id: uuidv4(),
+    headerName: "수정/삭제",
+  },
+];
+
 const ShipmentChargeTemplateModal = () => {
   const theme = useTheme();
+
+  const [tableWrapperRef, setTableWrapperRef] =
+    useState<HTMLDivElement | null>(null);
+  const [isTemplateListOverflown, setIsTemplateListOverflown] =
+    useState<boolean>(false);
 
   const { loading, error, data, refetch } = useQuery<{
     getUserShipmentTemplates: {
@@ -77,13 +99,6 @@ const ShipmentChargeTemplateModal = () => {
   >(DELETE_SHIPMENT_TEMPLATE);
 
   const [lastRowRef, setLastRowRef] = useState<HTMLElement>(null);
-  const [templateHeaders] = useState<Array<{ id: string; headerName: string }>>(
-    [
-      { id: uuidv4(), headerName: "템플릿명" },
-      { id: uuidv4(), headerName: "수정일" },
-      { id: uuidv4(), headerName: "수정/삭제" },
-    ]
-  );
 
   const overModal = useReactiveVar(overModalVar);
 
@@ -161,6 +176,14 @@ const ShipmentChargeTemplateModal = () => {
     // alert("배송 템플릿을 불러오는 도중 에러가 발생하였습니다!");
   }
 
+  useEffect(() => {
+    const isTemplateListOverflown = isElementOverflown(
+      tableWrapperRef
+    ) as boolean;
+
+    setIsTemplateListOverflown(isTemplateListOverflown);
+  }, [tableWrapperRef, shipmentTemplates]);
+
   return (
     <Container>
       <CloseButton src={closeIconSource} onClick={handleCloseButtonClick} />
@@ -171,98 +194,113 @@ const ShipmentChargeTemplateModal = () => {
         배송 템플릿 만들기
       </CreateShipmentTemplateButton>
 
-      <TemplateListTable>
-        <tbody>
-          <TemplateHeader>
-            {templateHeaders.map(
-              (
-                { id, headerName }: { id: null | string; headerName: string },
-                headerIndex
-              ) => {
-                const lastRowCell = lastRowRef?.children[
-                  headerIndex
-                ] as HTMLElement | null;
+      <TableWrapper ref={(ref) => setTableWrapperRef(ref)}>
+        <TemplateListTable>
+          <tbody>
+            <TemplateHeader>
+              {templateListHeaders.map(
+                ({ id, headerName }, headerIndex, list) => {
+                  const lastRowCell = lastRowRef?.children[
+                    headerIndex
+                  ] as HTMLElement;
 
-                const width = lastRowCell?.getBoundingClientRect().width;
+                  const isLastCell = headerIndex + 1 === list.length;
+                  const cellWidth = lastRowCell?.offsetWidth;
 
-                return (
-                  <TemplateCell key={id} width={width ? `${width}px` : ""}>
-                    {headerName}
-                  </TemplateCell>
-                );
-              }
-            )}
-          </TemplateHeader>
+                  return (
+                    <TemplateCell
+                      className={clsx([
+                        "cell--top-end",
+                        "cell--left-end",
+                        isLastCell &&
+                          !isTemplateListOverflown &&
+                          "cell--right-end",
+                      ])}
+                      key={id}
+                      width={`${cellWidth}px`}
+                    >
+                      {headerName}
+                    </TemplateCell>
+                  );
+                }
+              )}
+            </TemplateHeader>
 
-          <tr>
-            <td colSpan={3}>
-              <TemplateList>
-                <table>
-                  <tbody>
-                    {shipmentTemplates?.map(
-                      ({ id, name, updatedAt }, index, shipmentTemplates) => {
-                        const isFirstRow = index === 0;
-                        const isLastRow =
-                          index + 1 === shipmentTemplates.length;
+            <tr>
+              <td colSpan={4}>
+                <TemplateList>
+                  <table>
+                    <tbody>
+                      {shipmentTemplates?.map(
+                        ({ id, name, updatedAt }, index, shipmentTemplates) => {
+                          const isFirstRow = index === 0;
+                          const isLastRow =
+                            index + 1 === shipmentTemplates.length;
 
-                        return (
-                          <TemplateRow
-                            key={id}
-                            ref={(ref) => isLastRow && setLastRowRef(ref)}
-                          >
-                            <TemplateCell
-                              className={clsx([
-                                isFirstRow && "cell--top-end",
-                                "cell--left-end",
-                                isLastRow && "cell--low-end",
-                              ])}
+                          return (
+                            <TemplateRow
+                              key={id}
+                              ref={(ref) => isLastRow && setLastRowRef(ref)}
                             >
-                              {name}
-                            </TemplateCell>
-
-                            <TemplateCell
-                              className={clsx([
-                                isFirstRow ? "cell--top-end" : "",
-                                isLastRow && "cell--low-end",
-                              ])}
-                            >
-                              {format(new Date(updatedAt), "yyyy-MM-dd")}
-                            </TemplateCell>
-
-                            <TemplateCell
-                              className={clsx([
-                                isFirstRow && "cell--top-end",
-                                isLastRow && "cell--low-end",
-                                "cell--button-container",
-                                "cell--right-end",
-                              ])}
-                            >
-                              <EditButton
-                                size="small"
-                                color={"white"}
-                                backgroundColor={theme.palette.grey700}
-                                onClick={handleEditButtonClick(id)}
+                              {/* 템플릿명 */}
+                              <TemplateCell
+                                className={clsx([
+                                  isFirstRow && "cell--top-end",
+                                  "cell--left-end",
+                                  isLastRow && "cell--low-end",
+                                ])}
+                                width={"100%"}
                               >
-                                수정
-                              </EditButton>
-                              <DeleteButton
-                                size="small"
-                                onClick={handleDeleteButtonClick(id)}
+                                {name}
+                              </TemplateCell>
+
+                              {/* 수정일 */}
+                              <TemplateCell
+                                className={clsx([
+                                  isFirstRow ? "cell--top-end" : "",
+                                  isLastRow && "cell--low-end",
+                                ])}
                               >
-                                삭제
-                              </DeleteButton>
-                            </TemplateCell>
-                          </TemplateRow>
-                        );
-                      }
-                    )}
-                  </tbody>
-                </table>
-              </TemplateList>
-            </td>
-          </tr>
-        </tbody>
-      </TemplateListTable>
+                                {format(new Date(updatedAt), "yyyy-MM-dd")}
+                              </TemplateCell>
+
+                              {/* 수정/삭제 */}
+                              <TemplateCell
+                                className={clsx([
+                                  isFirstRow && "cell--top-end",
+                                  isLastRow && "cell--low-end",
+                                  "cell--button-container",
+                                  !isTemplateListOverflown && "cell--right-end",
+                                ])}
+                              >
+                                <EditButton
+                                  size="small"
+                                  color={"white"}
+                                  backgroundColor={theme.palette.grey700}
+                                  onClick={handleEditButtonClick(id)}
+                                >
+                                  수정
+                                </EditButton>
+
+                                <DeleteButton
+                                  size="small"
+                                  onClick={handleDeleteButtonClick(id)}
+                                >
+                                  삭제
+                                </DeleteButton>
+                              </TemplateCell>
+                            </TemplateRow>
+                          );
+                        }
+                      )}
+                    </tbody>
+                  </table>
+                </TemplateList>
+              </td>
+            </tr>
+          </tbody>
+        </TemplateListTable>
+      </TableWrapper>
     </Container>
   );
 };
@@ -311,16 +349,21 @@ const CreateShipmentTemplateButton = styled.button`
   user-select: none;
 `;
 
-const TemplateListTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
+const TableWrapper = styled.div`
+  width: 504px;
+  max-height: 400px;
+  overflow-y: auto;
+  ${tableScrollbarStyles}
+
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 
-const TemplateList = styled.div`
-  overflow: auto;
-  max-height: 364px;
+const TemplateListTable = styled.table`
+  width: 100%;
+  border-collapse: separate;
 `;
+
+const TemplateList = styled.div``;
 
 const TemplateRow = styled.tr`
   font-family: "Spoqa Han Sans Neo";
@@ -336,14 +379,18 @@ const TemplateRow = styled.tr`
 const TemplateHeader = styled(TemplateRow)`
   background-color: ${({ theme: { palette } }) => palette.grey400};
   width: 504px;
-
   font-size: 14px;
   font-weight: 500;
   line-height: 18px;
   letter-spacing: 0.10000000149011612px;
+
+  position: sticky;
+  top: 0;
 `;
 
-const TemplateCell = styled.td<{ width?: string }>`
+const TemplateCell = styled.td<{
+  width?: string;
+}>`
   width: ${({ width }) => (width ? width : "100%")};
   min-width: 100px;
   height: 40px;
@@ -375,6 +422,11 @@ const TemplateCell = styled.td<{ width?: string }>`
 
   &.cell--low-end {
     border-bottom: 0px;
+  }
+
+  &.cell--scroll-container {
+    border-top: 0;
+    border-bottom: 0;
   }
 `;
 

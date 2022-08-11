@@ -1,4 +1,4 @@
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle, css } from "styled-components";
 import { reset } from "styled-reset";
 
 const GlobalStyles = createGlobalStyle<{ isModalVisible: boolean }>`
@@ -96,4 +96,22 @@ const GlobalStyles = createGlobalStyle<{ isModalVisible: boolean }>`
       src: url("@fonts/SpoqaHanSansNeo/Thin.woff2");
     }
 `;
+
+export const tableScrollbarStyles = css`
+  &::-webkit-scrollbar {
+    width: 14px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: none;
+    background-color: ${({ theme: { palette } }) => palette.grey500};
+  }
+
+  &::-webkit-scrollbar-track {
+    border-radius: none;
+    -webkit-box-shadow: inset 0 0 2px
+      ${({ theme: { palette } }) => palette.grey300};
+  }
+`;
+
 export default GlobalStyles;

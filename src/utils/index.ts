@@ -192,6 +192,12 @@ function validateInput(
   }
 }
 
+function isElementOverflown(element: HTMLDivElement | null): void | boolean {
+  if (!element) return;
+
+  return element?.scrollHeight > element?.clientHeight;
+}
+
 export {
   addImageOnServer,
   removeImageFromServer,
@@ -199,4 +205,5 @@ export {
   isNumber,
   removeLeadingZero,
   hasEveryInputFulfilled,
+  isElementOverflown,
 };

@@ -13,8 +13,10 @@ import AdaptedOption from "@components/ProductRegistration/OptionSection/Adapted
 
 import { requiredOptionVar } from "@cache/productRegistration/options";
 import { OptionInputType, OptionTypes } from "@models/options";
+import { isElementOverflown } from "@utils/index";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import smallDownwardArrowIconSrc from "@icons/arrow-downward-small-red.svg";
+import { tableScrollbarStyles } from "@styles/GlobalStyles";
 
 const RequiredOption = () => {
   const theme = useTheme();
@@ -92,17 +94,13 @@ const RequiredOption = () => {
   };
 
   const [tableRef, setTableRef] = useState<HTMLDivElement | null>(null);
-  const [isTableOverflown, setIsTableOverflown] = useState(false);
+  const [isTableOverflown, setIsTableOverflown] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsTableOverflown(isOverflown(tableRef));
+    const isTableOverflown = isElementOverflown(tableRef) as boolean;
+
+    setIsTableOverflown(isTableOverflown);
   }, [adaptedOption]);
-
-  function isOverflown(element: HTMLDivElement | null): undefined | boolean {
-    if (!element) return;
-
-    return element?.scrollHeight > element?.clientHeight;
-  }
 
   const hasOptionInputEnabled = getValues("hasRequiredOption") as boolean;
 
@@ -207,20 +205,7 @@ const AdaptedTableWrapper = styled.div<{
 
   margin-top: 16px;
 
-  &::-webkit-scrollbar {
-    width: 14px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    border-radius: none;
-    background-color: ${({ theme: { palette } }) => palette.grey500};
-  }
-
-  &::-webkit-scrollbar-track {
-    border-radius: none;
-    -webkit-box-shadow: inset 0 0 2px
-      ${({ theme: { palette } }) => palette.grey300};
-  }
+  ${tableScrollbarStyles}
 `;
 
 export default RequiredOption;

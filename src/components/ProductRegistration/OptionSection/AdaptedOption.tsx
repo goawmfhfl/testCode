@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import { useState } from "react";
 import { ReactiveVar, useReactiveVar } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
@@ -25,7 +25,7 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
     >
       {/* tr */}
       <tbody>
-        <AdaptedOptionTableHeaderRow>
+        <AdaptedOptionTableHeaderRow className="header--sticky-top">
           {/* th */}
           <AdaptedOptionTableHeader
             className={"header--container"}
@@ -204,6 +204,11 @@ const AdaptedOptionTableContainer = styled.table<{ hasManyColumns: boolean }>`
 
 const AdaptedOptionTableHeaderRow = styled.tr`
   background-color: ${({ theme: { palette } }) => palette.grey400};
+
+  &.header--sticky-top {
+    position: sticky;
+    top: 0;
+  }
 `;
 
 const AdaptedOptionTableHeader = styled.th<{

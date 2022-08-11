@@ -31,8 +31,9 @@ const Dropdown = ({
 }) => {
   return (
     <Select register={register} size={size} width={width} disabled={disabled}>
-      {options.map((option) => {
-        return <Option key={`${option}`}>{option}</Option>;
+      {options.map((option, index) => {
+        // TODO: FIX - index가 키에 들어가게 되면 동일한 키값을 보장할 수 없다.
+        return <Option key={`${option}-${index}`}>{option}</Option>;
       })}
     </Select>
   );
