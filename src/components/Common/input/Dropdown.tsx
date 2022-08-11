@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from "react";
 import styled from "styled-components/macro";
 import { UseFormRegisterReturn } from "react-hook-form";
-import { v4 as uuid } from "uuid";
 
 import downwordArrowMedium from "@icons/arrow-downward-medium.svg";
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
@@ -18,11 +16,6 @@ const arrowSet: arrowSetType = {
   big: downwordArrowBig,
 };
 
-interface OptionType {
-  key: string;
-  text: string;
-}
-
 const Dropdown = ({
   size,
   width,
@@ -36,27 +29,10 @@ const Dropdown = ({
   register: UseFormRegisterReturn;
   disabled?: boolean;
 }) => {
-  const [dropdownOptions, setDropdownOptions] = useState<Array<OptionType>>([]);
-
-  useEffect(() => {
-    if (!options) return;
-
-    const mappedOptions: Array<OptionType> = options.map((option) => {
-      const key: string = uuid();
-
-      return {
-        key,
-        text: option,
-      };
-    });
-
-    setDropdownOptions(mappedOptions);
-  }, [options]);
-
   return (
     <Select register={register} size={size} width={width} disabled={disabled}>
-      {dropdownOptions.map(({ key, text }) => {
-        return <Option key={key}>{text}</Option>;
+      {options.map((option) => {
+        return <Option key={`${option}`}>{option}</Option>;
       })}
     </Select>
   );
@@ -91,7 +67,7 @@ const Select = ({
 };
 
 const Option = ({ children }: { children: string }) => {
-  return <OptionInput>{children}</OptionInput>;
+  return <OptionInput value={children}>{children}</OptionInput>;
 };
 
 interface SelectProps {

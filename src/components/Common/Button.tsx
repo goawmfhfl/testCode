@@ -37,18 +37,18 @@ const Button = styled.button<{
   justify-content: center;
   align-items: center;
 
+  ${sizeStyles};
+  width: ${({ full, width }) => (full ? "100%" : width ? width : "")};
   border: 1px solid
     ${({ backgroundColor, theme: { palette } }) =>
       backgroundColor ? backgroundColor : palette.grey500};
-  word-break: keep-all;
   color: ${({ color }) => (color ? color : "black")};
   background-color: ${({ backgroundColor }) =>
     backgroundColor ? backgroundColor : "transparent"};
-  font-family: "SpoqaHanSansNeo";
 
-  width: ${({ full, width }) => (full ? "100%" : width ? width : "")};
-
-  ${sizeStyles};
+  font-family: "Spoqa Han Sans Neo";
+  word-break: keep-all;
+  cursor: pointer;
 
   &.positive {
     background-color: ${({ theme: { palette } }) => palette.grey700};

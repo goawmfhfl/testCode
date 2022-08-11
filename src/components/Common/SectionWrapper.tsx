@@ -67,6 +67,7 @@ const InputLabel = styled.label<{ isRequired: boolean; hasTopMargin: boolean }>`
 const Wrapper = styled.div`
   width: 100%;
   overflow: scroll;
+  -ms-overflow-style: none;
 `;
 
 export default SectionWrapper;

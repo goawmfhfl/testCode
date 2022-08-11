@@ -1,23 +1,140 @@
+import { useEffect, useState } from "react";
 import styled, { useTheme } from "styled-components/macro";
 import { useFormContext } from "react-hook-form";
+import { gql, useLazyQuery, useReactiveVar } from "@apollo/client";
 
-import TextInput from "@components/common/input/TextInput";
+import NumberInput from "@components/common/input/NumberInput";
 import Dropdown from "@components/common/input/Dropdown";
 import Button from "@components/common/Button";
-import { modalVar } from "@cache/index";
 import ShipmentChargeTemplateModal from "@components/ProductRegistration/ShipmentChargeTemplateModal";
+import { modalVar } from "@cache/index";
+import { shipmentTemplatesVar } from "@cache/productRegistration/shipmentTemplate";
+import {
+  CreateShipmentInputType,
+  ShipmentChargeType,
+} from "@models/shipmentTemplate";
+
+const GET_SHIPMENT_TEMPLATES = gql`
+  query GetAllShipmentTemplates {
+    getUserShipmentTemplates {
+      ok
+      error
+      shipmentTemplates {
+        id
+        name
+        createdAt
+        updatedAt
+        type
+        price
+        distantPrice
+        returnPrice
+        exchangePrice
+        isBundleShipment
+      }
+    }
+  }
+`;
 
 const ProductShipmentCharge = () => {
   const theme = useTheme();
-  const { register } = useFormContext();
+  const { register, setValue, watch } = useFormContext();
 
-  const handleShipmentChargeTemplateButtonClick = () => {
+  const [hasTemplateSelected, setHasTemplateSelected] = useState(false);
+  const shipmentTemplates = useReactiveVar(shipmentTemplatesVar);
+  const modal = useReactiveVar(modalVar);
+
+  const [getShipmentTemplates, { loading }] = useLazyQuery<{
+    getUserShipmentTemplates: {
+      ok: boolean;
+      error: string;
+      shipmentTemplates: Array<{
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        type: ShipmentChargeType;
+        name: string;
+        price: number;
+        distantPrice: number;
+        returnPrice: number;
+        exchangePrice: number;
+        isBundleShipment: boolean;
+      }>;
+    };
+  }>(GET_SHIPMENT_TEMPLATES);
+
+  const handleShipmentChargeTemplateButtonClick = (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.preventDefault();
+
     modalVar({
       ...modalVar(),
       isVisible: true,
       component: <ShipmentChargeTemplateModal />,
     });
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line
+    (async function () {
+      const { data } = await getShipmentTemplates();
+
+      const {
+        getUserShipmentTemplates: { shipmentTemplates },
+      } = data || { getUserShipmentTemplates: {} };
+
+      console.log("결과물!", shipmentTemplates);
+
+      shipmentTemplatesVar([...shipmentTemplates]);
+    })();
+  }, [modal.isVisible]);
+
+  const options = [
+    ...shipmentTemplates.map((template) => template.name),
+    "템플릿 선택 안함",
+  ];
+
+  const selectedTemplateName = watch("shipmentTemplate") as string;
+
+  useEffect(() => {
+    const selectedTemplate: CreateShipmentInputType = shipmentTemplates.find(
+      (template) => template.name === selectedTemplateName
+    );
+
+    if (!selectedTemplate) {
+      setValue("isBundlingEnabled", "불가능");
+      setValue("shipmentChargeOption", "무료");
+      setValue("shipmentChargeValue", 0);
+      setValue("additionalCharge", 0);
+      setValue("returnCharge", 0);
+      setValue("exchangeCharge", 0);
+
+      setHasTemplateSelected(false);
+
+      return;
+    }
+
+    const {
+      type,
+      price,
+      isBundleShipment,
+      distantPrice,
+      returnPrice,
+      exchangePrice,
+    } = selectedTemplate;
+
+    setValue("isBundlingShipmentEnabled", isBundleShipment ? "가능" : "불가능");
+    setValue(
+      "shipmentChargeOption",
+      type === ShipmentChargeType.Free ? "무료" : "유료"
+    );
+    setValue("shipmentChargeValue", price);
+    setValue("additionalCharge", distantPrice);
+    setValue("returnCharge", returnPrice);
+    setValue("exchangeCharge", exchangePrice);
+
+    setHasTemplateSelected(true);
+  }, [selectedTemplateName]);
 
   return (
     <Container>
@@ -28,7 +145,8 @@ const ProductShipmentCharge = () => {
           <Dropdown
             register={register("shipmentTemplate")}
             size="medium"
-            options={["기본 배송 설정", "배송 템플릿 1", "배송 템플릿 2"]}
+            options={options}
+            disabled={loading}
           />
         </DropdownWrapper>
 
@@ -48,18 +166,22 @@ const ProductShipmentCharge = () => {
         <RadioInputContainer>
           <label htmlFor="bundling-enabled">가능</label>
           <input
+            {...register("isBundlingShipmentEnabled")}
             type="radio"
-            name="shipment-bundling"
+            name="isBundlingEnabled"
             id="bundling-enabled"
             value="가능"
+            disabled={hasTemplateSelected}
           />
 
           <label htmlFor="bundling-disabled">불가능</label>
           <input
+            {...register("isBundlingShipmentEnabled")}
             type="radio"
-            name="shipment-bundling"
+            name="isBundlingEnabled"
             id="bundling-disabled"
             value="불가능"
+            disabled={hasTemplateSelected}
           />
         </RadioInputContainer>
       </InputContainer>
@@ -72,56 +194,92 @@ const ProductShipmentCharge = () => {
             size="medium"
             width="160px"
             options={["유료", "무료"]}
+            disabled={hasTemplateSelected}
           />
 
-          <TextInputContainer>
-            <TextInputWrapper>
-              <TextInput
+          <NumberInputContainer>
+            <NumberInputWrapper>
+              <NumberInput
                 width="138px"
-                register={register("shipmentChargeValue")}
+                {...register("shipmentChargeValue", {
+                  valueAsNumber: true,
+                })}
+                min={0}
+                step={1000}
+                placeholder={"숫자만 입력"}
+                value={
+                  watch("shipmentChargeOption") === "유료"
+                    ? Number(watch("shipmentChargeValue")).toString()
+                    : 0
+                }
+                disabled={
+                  hasTemplateSelected ||
+                  watch("shipmentChargeOption") === "무료"
+                }
               />
-            </TextInputWrapper>
+            </NumberInputWrapper>
             원
-          </TextInputContainer>
+          </NumberInputContainer>
         </ShipmentChargeInputContainer>
       </InputContainer>
 
       <InputContainer>
         <Label>제주 도서산간 추가 배송비 ●</Label>
 
-        <TextInputContainer>
-          <TextInputWrapper>
-            <TextInput
-              register={register("countrysideAdditionalShipmentCharge")}
+        <NumberInputContainer>
+          <NumberInputWrapper>
+            <NumberInput
+              {...register("additionalCharge", {
+                valueAsNumber: true,
+              })}
+              placeholder={"숫자만 입력"}
+              min={0}
+              step={1000}
+              value={Number(watch("additionalCharge")).toString()}
+              disabled={hasTemplateSelected}
             />
-          </TextInputWrapper>
+          </NumberInputWrapper>
           원
-        </TextInputContainer>
+        </NumberInputContainer>
       </InputContainer>
 
       <InputContainer>
         <Label>반품/교환 ●</Label>
 
         <ReturnExchangeFeeInputContainer>
-          <TextInputContainer>
+          <NumberInputContainer>
             반품배송비(편도)
-            <TextInputWrapper hasLeftMargin={true}>
-              <TextInput
-                register={register("countrysideAdditionalShipmentCharge")}
+            <NumberInputWrapper hasLeftMargin={true}>
+              <NumberInput
+                {...register("returnCharge", {
+                  valueAsNumber: true,
+                })}
+                placeholder={"숫자만 입력"}
+                min={0}
+                step={1000}
+                value={Number(watch("returnCharge")).toString()}
+                disabled={hasTemplateSelected}
               />{" "}
-            </TextInputWrapper>
+            </NumberInputWrapper>
             원
-          </TextInputContainer>
+          </NumberInputContainer>
 
-          <TextInputContainer>
+          <NumberInputContainer>
             교환배송비(왕복)
-            <TextInputWrapper hasLeftMargin={true}>
-              <TextInput
-                register={register("countrysideAdditionalShipmentCharge")}
+            <NumberInputWrapper hasLeftMargin={true}>
+              <NumberInput
+                {...register("exchangeCharge", {
+                  valueAsNumber: true,
+                })}
+                placeholder={"숫자만 입력"}
+                min={0}
+                step={1000}
+                value={Number(watch("exchangeCharge")).toString()}
+                disabled={hasTemplateSelected}
               />{" "}
-            </TextInputWrapper>
+            </NumberInputWrapper>
             원
-          </TextInputContainer>
+          </NumberInputContainer>
         </ReturnExchangeFeeInputContainer>
       </InputContainer>
     </Container>
@@ -185,14 +343,14 @@ export const Label = styled.label`
   text-align: left;
 `;
 
-export const TextInputContainer = styled.div`
+export const NumberInputContainer = styled.div`
   display: flex;
   align-items: center;
 
   margin-top: 9px;
 `;
 
-export const TextInputWrapper = styled.div<{
+export const NumberInputWrapper = styled.div<{
   hasLeftMargin?: boolean;
 }>`
   margin-left: ${({ hasLeftMargin }) => (hasLeftMargin ? "8px" : "")};

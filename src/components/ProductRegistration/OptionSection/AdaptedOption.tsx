@@ -4,7 +4,10 @@ import { ReactiveVar, useReactiveVar } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
 
 import { OptionRowType, OptionType, OptionTypes } from "@models/options";
-import { requiredOptionVar, selectiveOptionVar } from "@cache/options";
+import {
+  requiredOptionVar,
+  selectiveOptionVar,
+} from "@cache/productRegistration/options";
 import { isNumber } from "@utils/index";
 
 const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
