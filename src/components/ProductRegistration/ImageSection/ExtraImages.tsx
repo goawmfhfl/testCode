@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useState, useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 
-import ProductImage from "@components/ProductRegistration/ProductImageSection/ProductImage";
+import ProductImage from "@components/ProductRegistration/ImageSection/ProductImage";
 
 import {
   ProductImageType,

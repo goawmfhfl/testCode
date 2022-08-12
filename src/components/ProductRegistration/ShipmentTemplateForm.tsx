@@ -17,7 +17,7 @@ import {
   NumberInputWrapper,
   ReturnExchangeFeeInputContainer,
   ShipmentChargeInputContainer,
-} from "@components/ProductRegistration/ProductShipmentChargeSection";
+} from "@components/ProductRegistration/ShipmentChargeSection";
 import closeIconSource from "@icons/close.svg";
 import downwordArrowMedium from "@icons/arrow-downward-medium.svg";
 import {

@@ -3,7 +3,7 @@ import styled from "styled-components/macro";
 import { useFormContext } from "react-hook-form";
 import { useState, useEffect, useRef } from "react";
 
-import ProductImage from "@components/ProductRegistration/ProductImageSection/ProductImage";
+import ProductImage from "@components/ProductRegistration/ImageSection/ProductImage";
 
 import {
   ProductImageType,
@@ -73,43 +73,45 @@ const RequiredImages = () => {
 
     */
 
-    productImageValues.map(async (productImageValue: FileList, index) => {
-      try {
-        const previousImageValue: FileList | null =
-          previousProductImageValuesRef.current[index];
-        const hasImageChanged: boolean =
-          productImageValue !== previousImageValue &&
-          Boolean(productImageValue[0]);
+    productImageValues.map(
+      async (productImageValue: FileList, index: number) => {
+        try {
+          const previousImageValue: FileList | null =
+            previousProductImageValuesRef.current[index];
+          const hasImageChanged: boolean =
+            productImageValue !== previousImageValue &&
+            Boolean(productImageValue[0]);
 
-        if (!hasImageChanged) {
-          return;
-        }
-
-        if (productImages[index].url) {
-          const removeImageResult: {
-            result: string;
-            error: RemoveImageErrorType;
-          } = await removeImageFromServer(productImages[index].url);
-
-          if (removeImageResult.error) {
-            console.log(removeImageResult.error);
+          if (!hasImageChanged) {
+            return;
           }
+
+          if (productImages[index].url) {
+            const removeImageResult: {
+              result: string;
+              error: RemoveImageErrorType;
+            } = await removeImageFromServer(productImages[index].url);
+
+            if (removeImageResult.error) {
+              console.log(removeImageResult.error);
+            }
+          }
+
+          const addedImageUrl: string = await addImageOnServer(
+            productImageValue[0]
+          );
+
+          setProductImages((prev) => {
+            const newProductImages = [...prev];
+            newProductImages[index].url = addedImageUrl;
+
+            return newProductImages;
+          });
+        } catch (error) {
+          console.log(error);
         }
-
-        const addedImageUrl: string = await addImageOnServer(
-          productImageValue[0]
-        );
-
-        setProductImages((prev) => {
-          const newProductImages = [...prev];
-          newProductImages[index].url = addedImageUrl;
-
-          return newProductImages;
-        });
-      } catch (error) {
-        console.log(error);
       }
-    });
+    );
 
     previousProductImageValuesRef.current = productImageValues;
   }, [productImageValues]);

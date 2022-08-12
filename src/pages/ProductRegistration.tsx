@@ -7,19 +7,19 @@ import ContentsSection from "@components/common/ContentsSection";
 import SectionWrapper from "@components/common/SectionWrapper";
 import NoticeContainer from "@components/common/NoticeContainer";
 
-import ProductNameSection from "@components/ProductRegistration/ProductNameSection";
-import ProductCategorySection from "@components/ProductRegistration/ProductCategorySection";
-import ProductImageSection from "@components/ProductRegistration/ProductImageSection";
-import ProductColorSection from "@components/ProductRegistration/ProductColorSection";
-import ProductPriceSection from "@components/ProductRegistration/ProductPriceSection";
-import ProductDiscountSection from "@components/ProductRegistration/ProductDiscountSection";
-import ProductStockSection from "@components/ProductRegistration/ProductStockSection";
+import NameSection from "@components/ProductRegistration/NameSection";
+import CategorySection from "@components/ProductRegistration/CategorySection";
+import ImageSection from "@components/ProductRegistration/ImageSection/index";
+import ColorSection from "@components/ProductRegistration/ColorSection";
+import PriceSection from "@components/ProductRegistration/PriceSection";
+import DiscountSection from "@components/ProductRegistration/DiscountSection";
+import StockSection from "@components/ProductRegistration/StockSection";
 import RequiredOptionSection from "@components/ProductRegistration/OptionSection/RequiredOption";
 import SelectiveOptionSection from "@components/ProductRegistration/OptionSection/SelectiveOption";
 import OrderProductionSection from "@components/ProductRegistration/OrderProductionSection";
-import ShipmentChargeSection from "@components/ProductRegistration/ProductShipmentChargeSection";
-import ProductSpecificationSection from "@components/ProductRegistration/ProductSpecificationSection";
-import ProductDescriptionSection from "@components/ProductRegistration/ProductDescriptionSection";
+import ShipmentChargeSection from "@components/ProductRegistration/ShipmentChargeSection";
+import SpecificationSection from "@components/ProductRegistration/SpecificationSection";
+import DescriptionSection from "@components/ProductRegistration/DescriptionSection";
 
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 
@@ -68,19 +68,19 @@ const ProductRegistration = () => {
           <ContentsMain>
             <ContentsSection>
               <SectionWrapper label={"상품명"} isRequired={true}>
-                <ProductNameSection />
+                <NameSection />
               </SectionWrapper>
               <SectionWrapper label={"카테고리"} isRequired={true}>
-                <ProductCategorySection />
+                <CategorySection />
               </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
               <SectionWrapper label={"대표사진"} isRequired={true}>
-                <ProductImageSection />
+                <ImageSection />
               </SectionWrapper>
               <SectionWrapper label={"상품설명"} isRequired={true}>
-                <ProductDescriptionSection />
+                <DescriptionSection />
               </SectionWrapper>
               <SectionWrapper label={"상품 상세페이지"} isRequired={true}>
                 <input type="text" name="" id="" />
@@ -93,22 +93,22 @@ const ProductRegistration = () => {
                 isRequired={true}
                 labelMarginTop={false}
               >
-                <ProductColorSection />
+                <ColorSection />
               </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
               <SectionWrapper label={"판매가"} isRequired={true}>
-                <ProductPriceSection />
+                <PriceSection />
               </SectionWrapper>
               <SectionWrapper label={"할인"}>
-                <ProductDiscountSection />
+                <DiscountSection />
               </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
               <SectionWrapper label={"재고"} isRequired={true}>
-                <ProductStockSection />
+                <StockSection />
               </SectionWrapper>
               <SectionWrapper label={"필수 옵션 설정"}>
                 <RequiredOptionSection />
@@ -129,7 +129,13 @@ const ProductRegistration = () => {
 
             <ContentsSection>
               <SectionWrapper label={"작품정보제공고시"} isRequired={true}>
-                <ProductSpecificationSection />
+                <SpecificationSection />
+              </SectionWrapper>
+            </ContentsSection>
+
+            <ContentsSection>
+              <SectionWrapper label={"검색용 태그 설정"}>
+                <SpecificationSection />
               </SectionWrapper>
             </ContentsSection>
           </ContentsMain>
