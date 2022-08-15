@@ -45,15 +45,15 @@ const requiredInputStyle = css`
   &:after {
     content: "●";
     margin-left: 4px;
-    font-size: 0.5em;
   }
 `;
+``;
 
 const InputLabel = styled.label<{ isRequired: boolean; hasTopMargin: boolean }>`
   min-width: 178px;
   margin-top: ${({ hasTopMargin }) => (hasTopMargin ? "9px" : "")};
 
-  font-family: "SpoqaHanSansNeo";
+  font-family: "Spoqa Han Sans Neo";
   font-weight: 700;
   font-size: 14px;
   line-height: 13.86px;

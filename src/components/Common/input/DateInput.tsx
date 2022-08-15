@@ -4,7 +4,7 @@ const DateInput = styled.input.attrs({ type: "date" })`
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
   padding: 9px 8px;
 
-  font-family: "SpoqaHanSansNeo";
+  font-family: "Spoqa Han Sans Neo";
   font-style: normal;
   font-weight: 500;
   font-size: 12px;

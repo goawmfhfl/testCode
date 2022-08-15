@@ -52,7 +52,7 @@ const InputContainer = styled.div`
   display: flex;
   align-items: center;
 
-  font-family: "SpoqaHanSansNeo";
+  font-family: "Spoqa Han Sans Neo";
   font-style: normal;
   font-weight: 500;
   font-size: 12px;
@@ -88,7 +88,7 @@ const HorizontalLine = styled.div`
 `;
 
 const DiscountedPrice = styled.div`
-  font-family: "SpoqaHanSansNeo";
+  font-family: "Spoqa Han Sans Neo";
   font-style: normal;
   font-weight: 400;
   font-size: 13px;
@@ -97,7 +97,7 @@ const DiscountedPrice = styled.div`
 `;
 
 const PriceWrapper = styled.span`
-  font-family: "SpoqaHanSansNeo";
+  font-family: "Spoqa Han Sans Neo";
   font-style: normal;
   font-weight: 500;
   font-size: 18px;
@@ -109,7 +109,7 @@ const PriceWrapper = styled.span`
 `;
 
 const DiscountTimespanNotification = styled.span`
-  font-family: "SpoqaHanSansNeo";
+  font-family: "Spoqa Han Sans Neo";
   font-style: normal;
   font-weight: 300;
   font-size: 12px;

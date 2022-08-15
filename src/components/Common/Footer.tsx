@@ -36,7 +36,7 @@ const Footer = () => {
 };
 
 const Container = styled.footer`
-  font-family: "SpoqaHanSansNeo";
+  font-family: "Spoqa Han Sans Neo";
   font-weight: 300;
   display: flex;
   flex-direction: column;
@@ -59,7 +59,7 @@ const CompanyInfoContainer = styled.div`
   gap: 16px;
   margin-bottom: 36px;
 
-  font-family: "SpoqaHanSansNeo";
+  font-family: "Spoqa Han Sans Neo";
   font-weight: 300;
   font-size: 12px;
   line-height: 18px;

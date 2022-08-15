@@ -70,7 +70,7 @@ const ColorContainer = styled.div`
 `;
 
 const Label = styled.label`
-  font-family: "SpoqaHanSansNeo";
+  font-family: "Spoqa Han Sans Neo";
   font-weight: 300;
   font-size: 10px;
   line-height: 14px;

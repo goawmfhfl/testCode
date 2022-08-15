@@ -73,27 +73,27 @@ const GlobalStyles = createGlobalStyle<{ isModalVisible: boolean }>`
     @font-face {
       font-family: "Spoqa Han Sans Neo";
       font-weight: 600;
-      src: url("@fonts/SpoqaHanSansNeo/Bold.woff2");
+      src: url("/fonts/SpoqaHanSansNeo/Bold.woff2") format("woff2");
     }
     @font-face {
       font-family: "Spoqa Han Sans Neo";
       font-weight: 500;
-      src: url("@fonts/SpoqaHanSansNeo/Medium.woff2");
+      src: url("/fonts/SpoqaHanSansNeo/Medium.woff2") format("woff2");
     }
     @font-face {
       font-family: "Spoqa Han Sans Neo";
       font-weight: 400;
-      src: url("@fonts/SpoqaHanSansNeo/Regular.woff2");
+      src: url("/fonts/SpoqaHanSansNeo/Regular.woff2") format("woff2");
     }
     @font-face {
       font-family: "Spoqa Han Sans Neo";
       font-weight: 300;
-      src: url("@fonts/SpoqaHanSansNeo/Light.woff2");
+      src: url("/fonts/SpoqaHanSansNeo/Light.woff2") format("woff2");
     }
     @font-face {
       font-family: "Spoqa Han Sans Neo";
       font-weight: 200;
-      src: url("@fonts/SpoqaHanSansNeo/Thin.woff2");
+      src: url("/fonts/SpoqaHanSansNeo/Thin.woff2") format("woff2");
     }
 `;
 

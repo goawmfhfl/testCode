@@ -53,7 +53,7 @@ const InputContainer = styled.div`
 
 const Label = styled.label`
   min-width: 136px;
-  font-family: "SpoqaHanSansNeo";
+  font-family: "Spoqa Han Sans Neo";
   font-weight: 400;
   font-size: 13px;
 
