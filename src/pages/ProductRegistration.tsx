@@ -22,6 +22,7 @@ import SpecificationSection from "@components/ProductRegistration/SpecificationS
 import DescriptionSection from "@components/ProductRegistration/DescriptionSection";
 
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
+import SearchTagSection from "@components/ProductRegistration/SearchTagSection";
 
 export interface ProductRegistrationFormValues {
   productName: string;
@@ -61,7 +62,11 @@ const ProductRegistration = () => {
           onSubmit={methods.handleSubmit(onSubmit)}
         >
           <ContentsHeader headerName={"상품 등록"}>
-            <NoticeContainer width={"175px"} icon={exclamationMarkSrc}>
+            <NoticeContainer
+              width={"175px"}
+              icon={exclamationMarkSrc}
+              isOneLiner={true}
+            >
               '●'는 필수 항목입니다.
             </NoticeContainer>
           </ContentsHeader>
@@ -135,7 +140,7 @@ const ProductRegistration = () => {
 
             <ContentsSection>
               <SectionWrapper label={"검색용 태그 설정"}>
-                <SpecificationSection />
+                <SearchTagSection />
               </SectionWrapper>
             </ContentsSection>
           </ContentsMain>

@@ -11,7 +11,11 @@ const ProductDescriptionSection = () => {
   return (
     <div>
       <NoticeContainerWrapper>
-        <NoticeContainer icon={exclamationmarkSrc} width="502px">
+        <NoticeContainer
+          icon={exclamationmarkSrc}
+          width="502px"
+          isOneLiner={true}
+        >
           상품에 관한 간략한 설명을 작성해주세요. 입력하신 내용은 상품페이지
           상단에 노출됩니다.
         </NoticeContainer>

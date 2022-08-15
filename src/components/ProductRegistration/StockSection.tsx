@@ -12,7 +12,7 @@ const ProductStock = () => {
     <Container>
       <TextInput register={register("productStock")} /> 개
       <NoticeContainerWrapper>
-        <NoticeContainer icon={exclamationmarkSrc}>
+        <NoticeContainer icon={exclamationmarkSrc} isOneLiner={true}>
           옵션 설정시, 재고 입력란은 0으로 자동 적용되며, 옵션의 재고를
           따릅니다.
         </NoticeContainer>
