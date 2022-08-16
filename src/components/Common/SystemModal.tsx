@@ -31,6 +31,7 @@ const SystemModal = () => {
             full={false}
             className={hasAllButtons && "positive"}
             onClick={confirmButtonClickHandler}
+            autoFocus={true}
           >
             {confirmButtonText}
           </Button>
@@ -79,6 +80,7 @@ const Container = styled.div`
 `;
 
 const Text = styled.span`
+  font-family: "Spoqa Han Sans Neo";
   font-weight: 500;
   font-size: 14px;
   line-height: 18px;
