@@ -9,15 +9,21 @@ import ShopSetting from "@pages/ShopSetting";
 import ProductRegistration from "@pages/ProductRegistration";
 import GlobalStyles from "@styles/GlobalStyles";
 import theme from "@styles/theme";
-import { modalVar } from "@cache/index";
+import { modalVar, overModalVar, systemModalVar } from "@cache/index";
 
 function App() {
   const modal = useReactiveVar(modalVar);
+  const overModal = useReactiveVar(overModalVar);
+  const systemModal = useReactiveVar(systemModalVar);
 
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <GlobalStyles isModalVisible={modal.isVisible} />
+        <GlobalStyles
+          isModalVisible={
+            modal.isVisible || overModal.isVisible || systemModal.isVisible
+          }
+        />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="login" element={<Login />} />

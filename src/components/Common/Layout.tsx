@@ -35,7 +35,11 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
         <OverModalLayer>{overModal.component}</OverModalLayer>
       )}
       {systemModal.isVisible && (
-        <SystemModalLayer>{<SystemModal />}</SystemModalLayer>
+        <SystemModalLayer
+          hasOtherModal={modal.isVisible || overModal.isVisible}
+        >
+          {<SystemModal />}
+        </SystemModalLayer>
       )}
     </>
   );
@@ -105,7 +109,7 @@ const OverModalLayer = styled.div`
   }
 `;
 
-const SystemModalLayer = styled.div`
+const SystemModalLayer = styled.div<{ hasOtherModal: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
@@ -113,7 +117,8 @@ const SystemModalLayer = styled.div`
 
   width: 100vw;
   height: 100vh;
-  background-color: transparent;
+  background-color: ${({ hasOtherModal }) =>
+    hasOtherModal ? "transparent" : "rgba(1, 1, 1, 0.5)"};
 
   & > div {
     position: fixed;
