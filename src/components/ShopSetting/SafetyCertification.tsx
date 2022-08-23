@@ -9,7 +9,7 @@ import { modalVar } from "@cache/index";
 import { safetyCertificationVar } from "@cache/shopSettings";
 
 const SafetyCertification = () => {
-  const { isConfirmed } = useReactiveVar(safetyCertificationVar);
+  const safetyCerification = useReactiveVar(safetyCertificationVar);
 
   return (
     <Container>
@@ -20,7 +20,10 @@ const SafetyCertification = () => {
         </NoticeContainer>
         <ConfirmContainer>
           <ConfirmInfoText>안전기준 적합 확인 검사 신고번호</ConfirmInfoText>
-          {isConfirmed && <ConfirmText>인증완료</ConfirmText>}
+          {safetyCerification.isConfirmed && (
+            <ConfirmText>인증완료</ConfirmText>
+          )}
+
           <Button
             size="small"
             full={false}
@@ -49,8 +52,6 @@ const Container = styled.div`
 const SafetyContainer = styled.div`
   display: flex;
   flex-direction: column;
-
-  min-width: 736px;
 
   & > :first-child {
     margin-bottom: 24px;

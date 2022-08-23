@@ -25,15 +25,19 @@ const Dropdown = ({
 }: {
   size: string;
   width?: string;
-  options: Array<string> | undefined;
+  options: Array<{ name: string; value: any }> | undefined;
   register: UseFormRegisterReturn;
   disabled?: boolean;
 }) => {
   return (
     <Select register={register} size={size} width={width} disabled={disabled}>
-      {options.map((option, index) => {
-        // TODO: FIX - index가 키에 들어가게 되면 동일한 키값을 보장할 수 없다.
-        return <Option key={`${option}-${index}`}>{option}</Option>;
+      {options.map(({ name, value }) => {
+        return (
+          // eslint-disable-next-line
+          <Option key={`${name}`} value={value}>
+            {name}
+          </Option>
+        );
       })}
     </Select>
   );
@@ -67,8 +71,9 @@ const Select = ({
   );
 };
 
-const Option = ({ children }: { children: string }) => {
-  return <OptionInput value={children}>{children}</OptionInput>;
+const Option = ({ value, children }: { value: any; children: string }) => {
+  // eslint-disable-next-line
+  return <OptionInput value={value}>{children}</OptionInput>;
 };
 
 interface SelectProps {
@@ -119,11 +124,15 @@ export const SelectInput = styled.select<SelectProps>`
     }
   }};
 
+  font-family: "Spoqa Han Sans Neo";
   width: ${({ width }) => (width ? width : "")};
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
   padding-right: 54px;
+  background-color: #fff;
 `;
 
-export const OptionInput = styled.option``;
+export const OptionInput = styled.option`
+  font-family: "Spoqa Han Sans Neo";
+`;
 
 export default Dropdown;

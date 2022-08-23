@@ -29,7 +29,7 @@ const hideAccountNumber = (accountNumber: string) => {
 const SettlementAccount = () => {
   const settlementAccount = useReactiveVar(settlementAccountVar);
 
-  const { hasInformation, accountName, accountNumber, bankCode, bankName } =
+  const { hasInformation, accountName, accountNumber, bankName } =
     settlementAccount;
 
   const showSettlementAccountModal = () =>
@@ -73,17 +73,14 @@ const Container = styled.div`
 const AccountContainer = styled.div`
   display: flex;
   flex-direction: column;
-  min-width: 736px;
-
-  & > :first-child {
-    margin-bottom: 21px;
-  }
 `;
 
 const AccountInfoText = styled.span`
   font-weight: 400;
   font-size: 14px;
   line-height: 14px;
+  margin-top: 5px;
+  margin-bottom: 12px;
 `;
 
 const RegisterContainer = styled.div`

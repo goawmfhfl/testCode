@@ -5,6 +5,7 @@ import Button from "@components/common/Button";
 import BusinessLicenseModal from "@components/ShopSetting/BusinessLicenseModal";
 import { modalVar } from "@cache/index";
 import { businessLicenseVar } from "@cache/shopSettings";
+import { BusinessLicenseVariables } from "@models/shopSettings";
 
 export interface BusinessLicenseInfoType {
   rprsvNm: string; // 대표자명
@@ -16,19 +17,20 @@ export interface BusinessLicenseInfoType {
 }
 
 const BusinessLicense = () => {
-  const businessLicense = useReactiveVar(businessLicenseVar);
+  const businessLicense: BusinessLicenseVariables =
+    useReactiveVar(businessLicenseVar);
 
   const hasBusinessLicense = Object.values(businessLicense).find(
-    (el) => el !== ""
-  );
+    (el: string) => el !== ""
+  ) as boolean;
 
   const {
-    rprsvNm: ownerName,
-    bizrno: businessNumber,
-    crno: corporateNumber,
-    simTxtnTrgtYnDesc: isTaxPayer,
-    rdnAddr: address,
-    prmsnMgtNo: ecommerceRegistrationNumber,
+    representativeName,
+    businessRegistrationNumber,
+    corporateRegistrationNumber,
+    isSimpleTaxpayers,
+    companyLocation,
+    onlineSalesLicense,
   } = businessLicense;
 
   return (
@@ -55,27 +57,27 @@ const BusinessLicense = () => {
           <InfoList>
             <InfoContainer>
               <Text>대표자명</Text>
-              <Text>{ownerName}</Text>
+              <Text>{representativeName}</Text>
             </InfoContainer>
             <InfoContainer>
               <Text>사업자등록번호 </Text>
-              <Text>{businessNumber}</Text>
+              <Text>{businessRegistrationNumber}</Text>
             </InfoContainer>
             <InfoContainer>
               <Text>법인등록번호</Text>
-              <Text>{corporateNumber}</Text>
+              <Text>{corporateRegistrationNumber}</Text>
             </InfoContainer>
             <InfoContainer>
               <Text>간이과세대상자</Text>
-              <Text>{isTaxPayer}</Text>
+              <Text>{isSimpleTaxpayers}</Text>
             </InfoContainer>
             <InfoContainer>
               <Text>소재지</Text>
-              <Text>{address}</Text>
+              <Text>{companyLocation}</Text>
             </InfoContainer>
             <InfoContainer>
               <Text>통신판매업신고번호</Text>
-              <Text>{ecommerceRegistrationNumber}</Text>
+              <Text>{onlineSalesLicense}</Text>
             </InfoContainer>
           </InfoList>
         </HasInfoContainer>
@@ -105,11 +107,14 @@ const HasNoInfoContainer = styled.div`
   }
 
   & > button {
+    font-family: "Spoqa Han Sans Neo";
     font-weight: 500;
     font-size: 12px;
     line-height: 14px;
     text-align: center;
     letter-spacing: 0.1px;
+
+    background-color: #fff;
   }
 `;
 

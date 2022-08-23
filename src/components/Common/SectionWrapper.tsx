@@ -9,7 +9,7 @@ const SectionWrapper = ({
   marginBottom = "88px",
   labelMarginTop = true,
 }: {
-  label: string;
+  label: React.ReactNode;
   isRequired?: boolean;
   children: React.ReactNode;
   marginTop?: string;
@@ -36,6 +36,7 @@ const Container = styled.div<{ marginTop: string; marginBottom: string }>`
 
   display: flex;
 
+  font-family: "Spoqa Han Sans Neo";
   font-size: 13px;
   font-weight: 400;
   line-height: 15px;
@@ -51,12 +52,13 @@ const requiredInputStyle = css`
 
 const InputLabel = styled.label<{ isRequired: boolean; hasTopMargin: boolean }>`
   min-width: 178px;
-  margin-top: ${({ hasTopMargin }) => (hasTopMargin ? "9px" : "")};
+  margin-top: ${({ hasTopMargin }) => (hasTopMargin ? "5px" : "")};
 
   font-family: "Spoqa Han Sans Neo";
   font-weight: 700;
   font-size: 14px;
-  line-height: 13.86px;
+  line-height: 20px;
+  vertical-align: baseline;
 
   display: flex;
   align-items: start;

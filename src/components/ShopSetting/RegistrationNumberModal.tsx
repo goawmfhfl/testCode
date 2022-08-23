@@ -1,5 +1,5 @@
-/* eslint-disable */
-import { useFormContext } from "react-hook-form";
+import React, { useState } from "react";
+import { last } from "lodash";
 import axios from "axios";
 import styled from "styled-components/macro";
 
@@ -11,31 +11,98 @@ import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
 import Input from "@components/common/Input";
 import { modalVar, systemModalVar } from "@cache/index";
+import { registrationNumberVar } from "@cache/shopSettings";
+import AuthenticationLoader from "./AuthenticationLoader";
 
 const RegistrationNumberModal = () => {
-  const { register, watch } = useFormContext();
-  const watchFields = watch();
-  const { idName, firstDigits, lastDigits, issuance } = watchFields;
+  const [registrationInformation, setRegistrationInformation] = useState({
+    registerName: "",
+    registerNumber: ["", ""],
+    issueDate: "",
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const confirmRegistrationNumberCode = async () => {
+  const { registerName, registerNumber, issueDate } = registrationInformation;
+
+  const handleInputChange =
+    (inputName: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (inputName.includes("registerNumber")) {
+        const registerNumberIndex = last(inputName.split("-"));
+
+        setRegistrationInformation((prev) => {
+          const newRegisterNumber = [...prev.registerNumber];
+
+          newRegisterNumber[registerNumberIndex] = e.target.value;
+
+          return {
+            ...prev,
+            registerNumber: newRegisterNumber,
+          };
+        });
+
+        return;
+      }
+
+      setRegistrationInformation((prev) => ({
+        ...prev,
+        [inputName]: e.target.value,
+      }));
+    };
+
+  const handleAuthenticationButtonClick = async () => {
+    setIsLoading(true);
+
     try {
       const configs = {
         headers: { Authorization: process.env.REACT_APP_DATA_API_KEY || "" },
       };
 
-      const requestData = {
-        JUMIN: encryptedData([firstDigits, lastDigits].join("")),
-        NAME: encryptedData(idName),
-        ISSUEDATE: issuance,
-      };
-
-      const { data } = await axios.post(
-        "https://datahub-dev.scraping.co.kr/scrap/docInq/gov/ResidentPromotionCommittee",
-        requestData,
+      const response: {
+        data: {
+          result: string;
+          data: { ERRMSG: string };
+          errCode: string;
+          errMsg: string;
+        };
+      } = await axios.post(
+        `${process.env.REACT_APP_DATAHUB_API_URL_DEV}/scrap/docInq/gov/ResidentPromotionCommittee`,
+        {
+          JUMIN: encryptedData(registerNumber.join("")),
+          NAME: encryptedData(registerName),
+          ISSUEDATE: encryptedData(issueDate),
+        },
         configs
       );
 
-      if (data?.data?.ERRMSG) {
+      const {
+        data: { result, data, errCode, errMsg },
+      } = response;
+
+      if (result === "FAIL" || result === "ERROR") {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: (
+            <>
+              인증 서비스에 문제가 발생하였습니다.
+              <br />
+              찹스틱스로 문의해주시면
+              <br />
+              빠르게 조치하겠습니다.
+              <br />
+              (문의 전화 070-4187-3848)
+            </>
+          ),
+        });
+
+        console.log(`Error code: ${errCode}`);
+        console.log(`Error Message: ${errMsg}`);
+
+        return;
+      }
+
+      if (data.ERRMSG) {
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
@@ -54,23 +121,49 @@ const RegistrationNumberModal = () => {
               isVisible: false,
             }),
         });
-      } else {
-        systemModalVar({
-          ...systemModalVar(),
-          isVisible: true,
-          icon: "",
-          description: <>인증되었습니다.</>,
-          confirmButtonText: "확인",
-          confirmButtonClickHandler: () =>
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: false,
-            }),
-        });
+
+        return;
       }
+
+      setIsAuthenticated(true);
+
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        icon: "",
+        description: <>인증되었습니다.</>,
+        confirmButtonText: "확인",
+        confirmButtonClickHandler: () =>
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          }),
+      });
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleSaveButtonClick = () => {
+    const identificationCardNumber = registerNumber.join("");
+
+    const issueDateArray = Array.from(issueDate);
+    issueDateArray.splice(4, 0, "-");
+    issueDateArray.splice(7, 0, "-");
+
+    const identificationCardIssueDate = new Date(issueDateArray.join(""));
+
+    registrationNumberVar({
+      isConfirmed: true,
+      identificationCardOwner: registerName,
+      identificationCardNumber,
+      identificationCardIssueDate,
+    });
+
+    modalVar({
+      ...modalVar(),
+      isVisible: false,
+    });
   };
 
   const clearModal = () => modalVar({ ...modalVar(), isVisible: false });
@@ -89,21 +182,57 @@ const RegistrationNumberModal = () => {
       </NoticeContainer>
 
       <InfoContainer>
-        <NameContainer>
-          <SubTitle>성명</SubTitle>
-          <Input {...register("idName")} />
-        </NameContainer>
-        <IdContainer>
-          <SubTitle>주민등록번호</SubTitle>
+        <RegisterNameContainer>
+          <Label>성명</Label>
+          <Input
+            onChange={handleInputChange("registerName")}
+            value={registerName}
+          />
+        </RegisterNameContainer>
+
+        <RegisterNumberContainer>
+          <Label>주민등록번호</Label>
           <InputContainer>
-            <Input {...register("firstDigits")} />
+            <Input
+              onChange={handleInputChange("registerNumber-0")}
+              value={registerNumber[0]}
+            />
             <span>-</span>
-            <Input type="password" {...register("lastDigits")} />
+            <Input
+              type="password"
+              onChange={handleInputChange("registerNumber-1")}
+              value={registerNumber[1]}
+            />
           </InputContainer>
-        </IdContainer>
+        </RegisterNumberContainer>
+
         <DateContainer>
-          <SubTitle>발급일자</SubTitle>
-          <Input placeholder="YYYYMMDD" {...register("issuance")} />
+          <Label>발급일자</Label>
+          <Input
+            placeholder="YYYYMMDD"
+            onChange={handleInputChange("issueDate")}
+            value={issueDate}
+          />
+          <AuthenticationButton
+            size="small"
+            full={false}
+            // eslint-disable-next-line
+            onClick={async () => {
+              await handleAuthenticationButtonClick();
+              setIsLoading(false);
+            }}
+            disabled={isLoading}
+          >
+            인증
+          </AuthenticationButton>
+
+          <AuthenticationStatus>
+            {isLoading ? (
+              <AuthenticationLoader />
+            ) : (
+              isAuthenticated && <>인증되었습니다.</>
+            )}
+          </AuthenticationStatus>
         </DateContainer>
       </InfoContainer>
 
@@ -112,9 +241,10 @@ const RegistrationNumberModal = () => {
           size="small"
           full={false}
           className="positive"
-          onClick={confirmRegistrationNumberCode}
+          onClick={handleSaveButtonClick}
+          disabled={!isAuthenticated}
         >
-          저장
+          확인
         </Button>
 
         <Button size="small" full={false} onClick={handleCancelButtonClick}>
@@ -167,30 +297,23 @@ const InfoContainer = styled.div`
   flex-direction: column;
 `;
 
-const NameContainer = styled.div`
+const RegisterNameContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 16px;
 
-  & > h3 {
-    width: 152px;
-  }
-
   & > input {
+    font-weight: 300;
     width: 120px;
     height: 32px;
     padding: 9px 8px;
   }
 `;
 
-const IdContainer = styled.div`
+const RegisterNumberContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 16px;
-
-  & > h3 {
-    width: 152px;
-  }
 `;
 
 const DateContainer = styled.div`
@@ -198,28 +321,28 @@ const DateContainer = styled.div`
   align-items: center;
   margin-bottom: 16px;
 
-  & > h3 {
-    width: 152px;
-  }
-
   & > input {
+    font-weight: 300;
     width: 120px;
     height: 32px;
     padding: 9px 8px;
   }
 `;
 
-const SubTitle = styled.h3`
+const Label = styled.label`
   font-weight: 500;
   font-size: 14px;
   line-height: 18px;
   letter-spacing: 0.1px;
+
+  width: 152px;
 `;
 
 const InputContainer = styled.div`
   display: flex;
 
   & > input {
+    font-weight: 300;
     width: 120px;
     height: 32px;
     padding: 9px 8px;
@@ -227,6 +350,25 @@ const InputContainer = styled.div`
 
   & > span {
     margin: auto 8px;
+  }
+`;
+
+const AuthenticationButton = styled(Button)`
+  margin-left: 8px;
+`;
+
+const AuthenticationStatus = styled.div`
+  font-family: "Spoqa Han Sans Neo";
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 0.10000000149011612px;
+  text-align: left;
+
+  margin-left: 8px;
+
+  & > span {
+    font-weight: 500;
   }
 `;
 

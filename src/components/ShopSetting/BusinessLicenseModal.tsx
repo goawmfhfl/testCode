@@ -1,7 +1,7 @@
-/* eslint-disable */
-import { useFormContext } from "react-hook-form";
-import styled from "styled-components";
+import { useState } from "react";
+import styled from "styled-components/macro";
 import axios from "axios";
+import { last } from "lodash";
 
 import closeIconSource from "@icons/close.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -12,14 +12,47 @@ import { modalVar, systemModalVar } from "@cache/index";
 import { businessLicenseVar } from "@cache/shopSettings";
 
 const BusinessLicenseModal = () => {
-  const { register, watch, resetField } = useFormContext();
-  const watchFields = watch();
-  const { businessNumber, ecommerceRegistrationNumber } = watchFields;
+  const [businessInformation, setBusinessInformation] = useState({
+    businessNumber: "",
+    ecommerceNumber: ["", "", ""],
+  });
 
-  const postBusinessLicense = async () => {
+  const { businessNumber, ecommerceNumber } = businessInformation;
+
+  const handleChangeInput =
+    (inputName: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (inputName.includes("ecommerceNumber")) {
+        const inputIndex = last(inputName.split("-"));
+
+        setBusinessInformation(
+          (prev: {
+            businessNumber: string;
+            ecommerceNumber: Array<string>;
+          }) => {
+            const newEcommerceNumber = [...prev.ecommerceNumber];
+
+            newEcommerceNumber[inputIndex] = e.target.value;
+
+            return {
+              ...prev,
+              ["ecommerceNumber"]: [...newEcommerceNumber],
+            };
+          }
+        );
+
+        return;
+      }
+
+      setBusinessInformation((prev) => ({
+        ...prev,
+        [inputName]: e.target.value,
+      }));
+    };
+
+  const handleSaveButtonClick = async () => {
     try {
       // 사업자등록증, 혹은 통신판매업신고 번호를 입력하지 않았을 경우
-      if (!businessNumber || !ecommerceRegistrationNumber) {
+      if (!businessNumber || !ecommerceNumber.join("")) {
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
@@ -38,6 +71,7 @@ const BusinessLicenseModal = () => {
             });
           },
         });
+
         return;
       }
 
@@ -45,19 +79,45 @@ const BusinessLicenseModal = () => {
         params: {
           ServiceKey: process.env.REACT_APP_BUSINESS_AUTHENTICATION_API_KEY,
           pageNo: 1,
-          numOfRows: 10,
+          numOfRows: 1,
           resultType: "json",
           bizrno: businessNumber,
-          prmsnMgtNo: ecommerceRegistrationNumber,
+          prmsnMgtNo: ecommerceNumber.join("-"),
         },
       };
 
+      console.log("보내는 데이터", parameter);
+
       // 사업자등록번호 : 882-87-01829
       // 통신판매업신고번호 : 2020-서울송파-3260
-      const { data } = await axios.get(
+      const response = await axios.get(
         "http://apis.data.go.kr/1130000/MllBsDtlService/getMllBsInfoDetail",
         parameter
       );
+
+      const { data } = response as { data: { items: Array<any> } | string };
+
+      if (typeof data === "string") {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: (
+            <>
+              인증 서비스에 문제가 발생하였습니다.
+              <br />
+              찹스틱스로 문의해주시면
+              <br />
+              빠르게 조치하겠습니다.
+              <br />
+              (문의 전화 070-4187-3848)
+            </>
+          ),
+        });
+
+        console.log("인증 에러: ", data);
+
+        return;
+      }
 
       if (data?.items?.length === 0) {
         systemModalVar({
@@ -73,46 +133,78 @@ const BusinessLicenseModal = () => {
             });
           },
         });
-      } else {
-        systemModalVar({
-          ...systemModalVar(),
-          isVisible: true,
-          icon: "",
-          description: (
-            <>
-              사업자등록증과 통신판매업신고증이 <br />
-              등록되었습니다.
-            </>
-          ),
-          confirmButtonVisibility: true,
-          confirmButtonClickHandler: () => {
-            modalVar({
-              ...modalVar(),
-              isVisible: false,
-            });
-            onConfirm(data.items[0]);
-          },
-          cancelButtonVisibility: true,
-          cancelButtonClickHandler: () => {
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: false,
-            });
-          },
-        });
+
+        return;
       }
+
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        icon: "",
+        description: (
+          <>
+            사업자등록증과 통신판매업신고증이 <br />
+            등록되었습니다.
+          </>
+        ),
+        confirmButtonVisibility: true,
+        confirmButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+
+          modalVar({
+            ...modalVar(),
+            isVisible: false,
+          });
+
+          const businessLicense = data.items[0] as {
+            rprsvNm: string;
+            bizrno: string;
+            crno: string;
+            simTxtnTrgtYnDesc: string;
+            rdnAddr: string;
+            prmsnMgtNo: string;
+          };
+
+          const {
+            rprsvNm,
+            bizrno,
+            crno,
+            simTxtnTrgtYnDesc,
+            rdnAddr,
+            prmsnMgtNo,
+          } = businessLicense;
+
+          businessLicenseVar({
+            isConfirmed: true,
+            representativeName: rprsvNm,
+            businessRegistrationNumber: bizrno,
+            corporateRegistrationNumber: crno,
+            isSimpleTaxpayers: simTxtnTrgtYnDesc,
+            companyLocation: rdnAddr,
+            onlineSalesLicense: prmsnMgtNo,
+          });
+        },
+        cancelButtonVisibility: true,
+        cancelButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
+      });
     } catch (error) {
       console.log("error", error);
     }
   };
 
-  const onConfirm = (items) => {
-    businessLicenseVar({ ...items });
-  };
-
-  const onCancel = () => {
-    resetField("businessNumber");
-    resetField("ecommerceRegistrationNumber");
+  const handleCancelButtonClick = () => {
+    setBusinessInformation({
+      businessNumber: "",
+      ecommerceNumber: ["", "", ""],
+    });
 
     modalVar({
       ...modalVar(),
@@ -143,13 +235,33 @@ const BusinessLicenseModal = () => {
 
       <InfoContainer>
         <InputContainer>
-          <SubTitle>사업자등록번호</SubTitle>
-          <Input placeholder="숫자만 입력" {...register("businessNumber")} />
+          <Label>사업자등록번호</Label>
+          <Input
+            onChange={handleChangeInput("businessNumber")}
+            value={businessNumber}
+            placeholder="숫자만 입력"
+          />
         </InputContainer>
 
         <InputContainer>
-          <SubTitle>통신판매업신고 번호</SubTitle>
-          <Input {...register("ecommerceRegistrationNumber")} />
+          <Label>통신판매업신고 번호</Label>
+
+          <EcommerceNumber>
+            <Input
+              onChange={handleChangeInput("ecommerceNumber-0")}
+              value={ecommerceNumber[0]}
+            />
+            -
+            <Input
+              onChange={handleChangeInput("ecommerceNumber-1")}
+              value={ecommerceNumber[1]}
+            />
+            -
+            <Input
+              onChange={handleChangeInput("ecommerceNumber-2")}
+              value={ecommerceNumber[2]}
+            />
+          </EcommerceNumber>
         </InputContainer>
       </InfoContainer>
 
@@ -159,12 +271,13 @@ const BusinessLicenseModal = () => {
           size="small"
           full={false}
           className="positive"
-          onClick={postBusinessLicense}
+          // eslint-disable-next-line
+          onClick={handleSaveButtonClick}
         >
           저장
         </Button>
 
-        <Button size="small" full={false} onClick={onCancel}>
+        <Button size="small" full={false} onClick={handleCancelButtonClick}>
           취소
         </Button>
       </ButtonContainer>
@@ -207,14 +320,13 @@ const CloseButton = styled.img`
   position: absolute;
   top: 12.79px;
   right: 12.77px;
+
   cursor: pointer;
 `;
 
 const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
-
-  width: 320px;
   margin-bottom: 32px;
 
   & > :first-child {
@@ -226,7 +338,6 @@ const InputContainer = styled.div`
   height: 32px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
 
   & > input {
     padding: 9px 8px 9px 8px;
@@ -235,11 +346,33 @@ const InputContainer = styled.div`
   }
 `;
 
-const SubTitle = styled.h3`
+const EcommerceNumber = styled.div`
+  width: 200px;
+
+  display: flex;
+  align-items: center;
+
+  & > input {
+    width: 64px;
+    height: 32px;
+    margin: 0 8px;
+    padding: 9px 8px 9px 8px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+`;
+
+const Label = styled.label`
+  font-family: "Spoqa Han Sans Neo";
   font-weight: 500;
   font-size: 14px;
   line-height: 18px;
   letter-spacing: 0.1px;
+  white-space: nowrap;
+
+  width: 152px;
 `;
 
 const ButtonContainer = styled.div`

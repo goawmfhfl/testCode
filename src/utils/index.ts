@@ -7,15 +7,19 @@ export interface RemoveImageErrorType {
 }
 
 async function addImageOnServer(imageFile: File): Promise<string> {
-  const formData = new FormData();
-  formData.append("files", imageFile);
+  try {
+    const formData = new FormData();
+    formData.append("files", imageFile);
 
-  const response: { data: Array<string> } = await axios.post(
-    `${process.env.REACT_APP_SERVER_URI}/upload`,
-    formData
-  );
+    const response: { data: Array<string> } = await axios.post(
+      `${process.env.REACT_APP_SERVER_URI}/upload`,
+      formData
+    );
 
-  return response.data[0];
+    return response.data[0];
+  } catch (error) {
+    console.log("Error: 이미지 서버 등록 에러", error);
+  }
 }
 
 async function removeImageFromServer(url: string): Promise<{
@@ -41,16 +45,13 @@ async function removeImageFromServer(url: string): Promise<{
   };
 }
 
-function hasImageSmallerDimension({
-  file,
-  limitedDimension: { width, height },
-}: {
-  file: File;
-  limitedDimension: {
+function validateImageDimensionRatio(
+  file: File,
+  dimensionRatio: {
     width: number;
     height: number;
-  };
-}): Promise<boolean> {
+  }
+): Promise<boolean> {
   return new Promise((resolve, reject) => {
     try {
       const reader = new FileReader();
@@ -63,11 +64,11 @@ function hasImageSmallerDimension({
           const imageWidth = img.width;
           const imageHeight = img.height;
 
-          if (imageWidth < width || imageHeight < height) {
-            resolve(false);
-          } else {
-            resolve(true);
-          }
+          const hasImageDimensionRatioFulfilled =
+            imageWidth * dimensionRatio.height ===
+            imageHeight * dimensionRatio.width;
+
+          resolve(hasImageDimensionRatioFulfilled);
         };
       };
 
@@ -82,67 +83,33 @@ function validateImageSize(file: File, limitedSize: number): boolean {
   return file.size < limitedSize;
 }
 
-function validateFileExtension(file: File, extensions: Array<string>) {
-  const isValid = extensions.find((item) => item === file.type);
-
-  return Boolean(isValid);
-}
-
-interface ValidateImageArguments {
-  file: File;
-  validator: {
-    width: number;
-    height: number;
-    size: number;
-    extensions: Array<string>;
-  };
-}
-
-async function validateImage({
-  file,
-  validator: { width, height, size, extensions },
-}: ValidateImageArguments): Promise<string> {
-  const isDimensionValid: boolean = await hasImageSmallerDimension({
-    file,
-    limitedDimension: {
-      width,
-      height,
-    },
-  });
-
-  const isSizeValid = validateImageSize(file, size);
-
-  const isExtensionValid = validateFileExtension(file, extensions);
-
-  let invalidMessage = "";
-
-  invalidMessage += isDimensionValid
-    ? ``
-    : `이미지 크기를 확인해주세요! 이미지의 가로길이는 ${width}px, 높이는 ${height}px보다 커야합니다.`;
-
-  invalidMessage += isSizeValid
-    ? ``
-    : `\n이미지 사이즈를 확인해주세요! 이미지 사이즈는 ${
-        size / 1024 ** 2
-      }MB 이하여야 합니다.`;
-
-  invalidMessage += isExtensionValid
-    ? ``
-    : `이미지 확장자가 올바르지 않습니다! png, jpg, jpeg 확장자의 이미지만 등록이 가능합니다.`;
-
-  return invalidMessage;
-}
-
 function isNumber(value: string) {
   const regExp = /^[0-9]*$/g;
 
-  return regExp.test(value) && !isNaN(Number(value)) && value !== "";
+  return regExp.test(value) && !isNaN(Number(value));
+}
+
+function isVacantString(value) {
+  if (value === "") return false;
+
+  return true;
 }
 
 function removeLeadingZero(value: number) {
   return Number(value).toString();
 }
 
+function validatePhoneNumber(input: string) {
+  const regex = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
+
+  if (!regex.test(input)) {
+    return false;
+  }
+
+  return true;
+}
+
+// form 제출 시 전체 input validation을 위해 사용
 function hasEveryInputFulfilled(
   inputFields: object,
   allowsZeroInputNames?: Array<string>
@@ -201,9 +168,12 @@ function isElementOverflown(element: HTMLDivElement | null): void | boolean {
 export {
   addImageOnServer,
   removeImageFromServer,
-  validateImage,
+  validateImageDimensionRatio,
+  validateImageSize,
   isNumber,
+  isVacantString,
   removeLeadingZero,
+  validatePhoneNumber,
   hasEveryInputFulfilled,
   isElementOverflown,
 };

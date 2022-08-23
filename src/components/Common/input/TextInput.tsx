@@ -1,5 +1,8 @@
-import { UseFormRegisterReturn } from "react-hook-form";
+import React from "react";
 import styled from "styled-components/macro";
+import { UseFormRegisterReturn } from "react-hook-form";
+
+import { isNumber } from "@utils/index";
 
 const TextInput = ({
   register,
@@ -8,6 +11,7 @@ const TextInput = ({
   textAlign,
   maxLength,
   placeholder,
+  numbersOnly,
 }: {
   register: UseFormRegisterReturn;
   disabled?: boolean;
@@ -15,7 +19,18 @@ const TextInput = ({
   textAlign?: string;
   maxLength?: number;
   placeholder?: string;
+  numbersOnly?: boolean;
 }) => {
+  const preventNaNValues = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    if (!isNumber(e.key)) {
+      e.preventDefault();
+
+      return;
+    }
+
+    return;
+  };
+
   return (
     <Input
       {...register}
@@ -24,6 +39,7 @@ const TextInput = ({
       textAlign={textAlign}
       maxLength={maxLength}
       placeholder={placeholder}
+      onKeyPress={numbersOnly && preventNaNValues}
     />
   );
 };
@@ -38,7 +54,7 @@ export const Input = styled.input.attrs({ type: "text" })<{
   width: ${({ width }) => width};
   height: 32px;
   background-color: ${({ disabled, theme: { palette } }) =>
-    disabled ? palette.grey100 : ""};
+    disabled ? palette.grey100 : "#ffffff"};
 
   padding: 7px 8px;
   margin-right: 8px;
@@ -49,6 +65,13 @@ export const Input = styled.input.attrs({ type: "text" })<{
   line-height: 18px;
 
   text-align: ${({ textAlign }) => textAlign};
+
+  ${({ disabled }) =>
+    disabled &&
+    `
+    pointer-events: none;
+    cursor: default;
+  `};
 `;
 
 export default TextInput;

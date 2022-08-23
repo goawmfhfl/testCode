@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import format from "date-fns/format";
 import axios from "axios";
 import styled from "styled-components/macro";
-import Input from "@components/common/Input";
+import { Input as TextInput } from "@components/common/input/TextInput";
 import Button from "@components/common/Button";
 import ValidText from "@components/common/ValidText";
 import closeIconSource from "@icons/close.svg";
-import { modalVar } from "@cache/index";
+import { modalVar, systemModalVar } from "@cache/index";
 import { phoneNumberVar } from "@cache/shopSettings";
+import { validatePhoneNumber, isNumber } from "@utils/index";
 
 const bizm = axios.create({
   baseURL: process.env.REACT_APP_BIZM_PRODUCT_URL,
@@ -17,36 +19,77 @@ const formatNumber = (number: string) => {
   return "+82" + number.slice(1);
 };
 
-const postAuthenticationCode = (
+const postAuthenticationCode = async (
   phoneNumber: string,
   AuthenticationCode: string
 ) => {
-  const data = [
-    {
-      message_type: "AT",
-      phn: formatNumber(phoneNumber),
-      profile: process.env.REACT_APP_BIZM_PROFILE,
-      reserveDt: "00000000000000",
-      tmplId: "chopsticks_05",
-      msg: `[${AuthenticationCode}] 인증번호를 입력하시면 인증이 완료됩니다.`,
-    },
-  ];
+  try {
+    const data = [
+      {
+        message_type: "AT",
+        phn: formatNumber(phoneNumber),
+        profile: process.env.REACT_APP_BIZM_PROFILE,
+        reserveDt: "00000000000000",
+        tmplId: "chopsticks_05",
+        msg: `[${AuthenticationCode}] 인증번호를 입력하시면 인증이 완료됩니다.`,
+      },
+    ];
 
-  bizm
-    .post(`/v2/sender/send`, data)
-    .then((result) => {
-      console.log("bizm post Result", result);
-    })
-    .catch((error) => {
-      console.log("bizm post Error", error);
-    });
+    const {
+      data: bizmResponseData,
+    }: {
+      data: Array<{
+        code: string;
+        data: string;
+        message: string;
+        originMessage: string | null;
+      }>;
+    } = await bizm.post(`/v2/sender/send`, data);
+
+    console.log(bizmResponseData);
+
+    if (
+      bizmResponseData[0].code === "fail" &&
+      /InvalidPhoneNumber/gi.test(bizmResponseData[0].message)
+    ) {
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: <>전화번호를 올바르게 입력해주세요.</>,
+      });
+
+      return false;
+    }
+
+    if (bizmResponseData[0].code === "fail") {
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: (
+          <>
+            인증 서비스에 문제가 발생하였습니다.
+            <br />
+            찹스틱스로 문의해주시면
+            <br />
+            빠르게 조치하겠습니다.
+            <br />
+            (문의 전화 070-4187-3848)
+          </>
+        ),
+      });
+
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.log("Bizm API 요청 중 에러", error);
+  }
 };
 
 const PhoneNumberModal = () => {
-  const [time, setTime] = useState<{ minutes: number; seconds: number }>({
-    minutes: 0,
-    seconds: 0,
-  });
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [expirationTime, setExpirationTime] = useState<Date>(new Date());
 
   const [authentication, setAuthentication] = useState<{
     isStarted: boolean;
@@ -70,7 +113,39 @@ const PhoneNumberModal = () => {
     isVerified: false,
   });
 
-  const handleClickAuthenticationButton = () => {
+  function initializeTimer() {
+    setCurrentTime(new Date());
+    setExpirationTime(new Date(new Date().getTime() + 3 * 60000));
+  }
+
+  function clearModal() {
+    modalVar({
+      ...modalVar(),
+      isVisible: false,
+    });
+  }
+
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isNumber(e.target.value)) {
+      return;
+    }
+
+    setAuthentication((prev) => ({
+      ...prev,
+      userPhoneNumber: e.target.value,
+    }));
+  };
+
+  const handleAuthenticationCodeChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setAuthentication((prev) => ({
+      ...prev,
+      codeByUser: e.target.value,
+    }));
+  };
+
+  const handleClickAuthenticationButton = async () => {
     setAuthenticationValid(() => ({
       isVerified: false,
       isTimeout: false,
@@ -78,27 +153,26 @@ const PhoneNumberModal = () => {
     }));
 
     const randomNumber = String(Math.random()).slice(2, 8);
-    postAuthenticationCode(userPhoneNumber, randomNumber);
+
+    const hasAuthCodePosted: boolean = await postAuthenticationCode(
+      userPhoneNumber,
+      randomNumber
+    );
+
+    if (!hasAuthCodePosted) {
+      return;
+    }
+
     setAuthentication((prev) => ({
       ...prev,
       codeByService: randomNumber,
+      isStarted: true,
     }));
 
-    setAuthentication((prev) => ({ ...prev, isStarted: true }));
-
-    setTime(() => ({
-      minutes: 3,
-      seconds: 0,
-    }));
+    initializeTimer();
   };
 
-  const clearModal = () =>
-    modalVar({
-      ...modalVar(),
-      isVisible: false,
-    });
-
-  const confirmAuthenticationCode = (AuthenticationCodeByUser: any) => {
+  const confirmAuthenticationCode = (AuthenticationCodeByUser: string) => {
     if (codeByService !== AuthenticationCodeByUser) {
       setAuthenticationValid(() => ({
         isVerified: false,
@@ -124,7 +198,6 @@ const PhoneNumberModal = () => {
     clearModal();
   };
 
-  const { minutes, seconds } = time;
   const { isTimeout, isWrongNumber, isVerified } = authenticationValid;
   const { isStarted, codeByUser, codeByService, userPhoneNumber } =
     authentication;
@@ -133,17 +206,9 @@ const PhoneNumberModal = () => {
     if (!isStarted) return;
 
     const countdown = setInterval(() => {
-      if (seconds > 0) {
-        setTime((prev) => ({
-          ...prev,
-          seconds: seconds - 1,
-        }));
-      }
-
-      if (seconds !== 0) return;
-
-      if (minutes === 0) {
+      if (expirationTime.getTime() - currentTime.getTime() < 1000) {
         clearInterval(countdown);
+
         if (!isVerified) {
           setAuthenticationValid((prev) => ({
             ...prev,
@@ -151,18 +216,22 @@ const PhoneNumberModal = () => {
             isTimeout: true,
           }));
         }
-      } else {
-        setTime(() => ({
-          minutes: minutes - 1,
-          seconds: 59,
-        }));
+
+        return;
       }
+
+      setCurrentTime(new Date());
     }, 1000);
 
     return () => {
       clearInterval(countdown);
     };
-  }, [minutes, seconds, isStarted]);
+  }, [currentTime, expirationTime, isStarted]);
+
+  const isPhoneNumberValid = !(
+    authentication.userPhoneNumber &&
+    !validatePhoneNumber(authentication.userPhoneNumber)
+  );
 
   return (
     <Container>
@@ -176,50 +245,48 @@ const PhoneNumberModal = () => {
 
       <ConfirmContainer>
         <PhoneNumberContainer>
-          <Input
+          <PhoneNumberInput
             placeholder="전화번호 - 제외하고 입력해주세요"
             value={userPhoneNumber}
-            onChange={(event) =>
-              setAuthentication((prev) => ({
-                ...prev,
-                userPhoneNumber: event.target.value,
-              }))
-            }
+            onChange={handlePhoneNumberChange}
           />
-          <Button
+          <SendAuthenticationCodeButton
             size="small"
             full={false}
+            // eslint-disable-next-line
             onClick={handleClickAuthenticationButton}
+            disabled={!isPhoneNumberValid}
           >
             {isStarted ? "인증번호 재전송" : "인증번호 전송"}
-          </Button>
+          </SendAuthenticationCodeButton>
         </PhoneNumberContainer>
+
+        {!isPhoneNumberValid && (
+          <ValidityNotifier>올바르지 않은 번호 형식입니다.</ValidityNotifier>
+        )}
 
         {isStarted && (
           <AuthenticationCodeContainer>
-            <Input
+            <AuthenticationCodeInput
               value={codeByUser}
-              onChange={(event) =>
-                setAuthentication((prev) => ({
-                  ...prev,
-                  codeByUser: event.target.value,
-                }))
-              }
+              onChange={handleAuthenticationCodeChange}
             />
             {isVerified ? (
               <ValidText valid={isVerified}>인증완료!</ValidText>
             ) : (
               <>
-                <Button
+                <AuthenticationButton
                   size="small"
                   full={false}
                   onClick={() => confirmAuthenticationCode(codeByUser)}
                 >
                   인증
-                </Button>
+                </AuthenticationButton>
                 <CounterText>
-                  {minutes < 10 ? `0${minutes}` : minutes}:
-                  {seconds < 10 ? `0${seconds}` : seconds}
+                  {format(
+                    new Date(expirationTime.getTime() - currentTime.getTime()),
+                    "mm:ss"
+                  )}
                 </CounterText>
               </>
             )}
@@ -243,7 +310,6 @@ const PhoneNumberModal = () => {
         <Button
           size="small"
           full={false}
-          className={isVerified ? "positive" : "negative"}
           onClick={handleConfirmButtonClick}
           disabled={!isVerified}
         >
@@ -309,63 +375,55 @@ const ConfirmContainer = styled.div`
 const PhoneNumberContainer = styled.div`
   display: flex;
   margin-bottom: 12px;
+`;
 
-  & > input {
-    width: 246px;
-    margin-right: 8px;
-    padding: 9px 8px;
+const PhoneNumberInput = styled(TextInput)`
+  width: 246px;
+  margin-right: 8px;
+  padding: 9px 8px;
+`;
 
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 14px;
-    letter-spacing: 0.1px;
-  }
+const ValidityNotifier = styled.div`
+  font-family: "Spoqa Han Sans Neo";
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 0.10000000149011612px;
+  text-align: left;
+`;
 
-  & > button {
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 14px;
-    text-align: center;
-    letter-spacing: 0.1px;
-  }
+const SendAuthenticationCodeButton = styled(Button)`
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 14px;
+  text-align: center;
+  letter-spacing: 0.1px;
 `;
 
 const AuthenticationCodeContainer = styled.div`
   display: flex;
+  align-items: center;
   margin-bottom: 12px;
+`;
 
-  & > input {
-    width: 246px;
-    margin-right: 8px;
-    padding: 9px 8px;
+const AuthenticationButton = styled(Button)`
+  margin-right: 8px;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 14px;
+  text-align: center;
+  letter-spacing: 0.1px;
+`;
 
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 14px;
-    letter-spacing: 0.1px;
-  }
-
-  & > button {
-    margin-right: 8px;
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 14px;
-    text-align: center;
-    letter-spacing: 0.1px;
-  }
-
-  & > span {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  & > p {
-    margin: auto 0;
-  }
+const AuthenticationCodeInput = styled(TextInput)`
+  width: 246px;
+  margin-right: 8px;
+  padding: 9px 8px;
 `;
 
 const CounterText = styled.span`
+  width: 30px;
+
   font-weight: 500;
   font-size: 12px;
   line-height: 14px;

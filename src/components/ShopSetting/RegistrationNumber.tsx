@@ -5,9 +5,14 @@ import RegistrationNumberModal from "@components/ShopSetting/RegistrationNumberM
 import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
 import { modalVar } from "@cache/index";
+import { registrationNumberVar, businessLicenseVar } from "@cache/shopSettings";
+import { useReactiveVar } from "@apollo/client";
 
 const RegistrationNumber = () => {
-  const isRegistrationNumberAuthenticated = true; // TODO: 실제 데이터로 바인딩
+  // eslint-disable-next-line
+  const { isConfirmed } = useReactiveVar(registrationNumberVar);
+  const { isConfirmed: hasConfirmedBusinessLicense } =
+    useReactiveVar(businessLicenseVar);
 
   return (
     <Container>
@@ -23,10 +28,18 @@ const RegistrationNumber = () => {
 
       <InfoContainer>
         <InfoText>
-          {isRegistrationNumberAuthenticated
-            ? "주민등록이 인증되었습니다."
-            : "인증된 주민등록증이 없습니다."}
+          {hasConfirmedBusinessLicense &&
+            "사업자 정보 등록시 주민등록증 인증은 필수가 아닙니다. "}
+
+          {!hasConfirmedBusinessLicense &&
+            isConfirmed &&
+            "주민등록증이 인증되었습니다."}
+
+          {!hasConfirmedBusinessLicense &&
+            !isConfirmed &&
+            "인증된 주민등록증이 없습니다."}
         </InfoText>
+
         <Button
           size="small"
           full={false}
@@ -37,6 +50,8 @@ const RegistrationNumber = () => {
               component: <RegistrationNumberModal />,
             })
           }
+          // eslint-disable-next-line
+          disabled={hasConfirmedBusinessLicense}
         >
           인증하기
         </Button>
@@ -68,20 +83,25 @@ const InfoContainer = styled.div`
   }
 
   & > button {
+    font-family: "Spoqa Han Sans Neo";
     font-weight: 500;
     font-size: 12px;
     line-height: 14px;
     text-align: center;
     letter-spacing: 0.1px;
+
+    background-color: #fff;
   }
 `;
 
 const InfoText = styled.h3`
+  font-family: "Spoqa Han Sans Neo";
   font-weight: 400;
   font-size: 16px;
   line-height: 24px;
   text-align: center;
   letter-spacing: 0.1px;
+  white-space: nowrap;
 `;
 
 export default RegistrationNumber;

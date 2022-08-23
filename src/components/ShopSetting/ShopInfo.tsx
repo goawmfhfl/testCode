@@ -1,9 +1,9 @@
-/* eslint-disable */
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import axios from "axios";
 import styled from "styled-components/macro";
 
+import { validateImageDimensionRatio } from "@utils/index";
 import { systemModalVar } from "@cache/index";
 import NoticeContainer from "@components/common/NoticeContainer";
 import addImageSrc from "@icons/addImage.svg";
@@ -12,6 +12,7 @@ import infoIconSrc from "@icons/info.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
 import closeIconSource from "@icons/close.svg";
 import photochangeSrc from "@icons/photochange.svg";
+import { composeStories } from "@storybook/react";
 
 const ShopInfo = () => {
   const { register } = useFormContext();
@@ -20,71 +21,122 @@ const ShopInfo = () => {
   const [pcImage, setPcImage] = useState<string>("");
   const [textLengh, setTextLength] = useState<number>(0);
 
-  function setShopInfoSystemModal() {
-    systemModalVar({
-      ...systemModalVar(),
-      icon: exclamationmarkSrc,
-      confirmButtonText: "확인",
-      confirmButtonClickHandler: () => {
-        clearModal();
-      },
-    });
-  }
-
-  function showModal() {
-    systemModalVar({
-      ...systemModalVar(),
-      isVisible: true,
-    });
-  }
-
-  function clearModal() {
-    systemModalVar({
-      ...systemModalVar(),
-      isVisible: false,
-    });
-  }
-
-  const imageHandler = async (event: ChangeEvent<HTMLInputElement>) => {
+  const handleChangeImageInput = async (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
     try {
       const formData = new FormData();
       const version = event.target.name;
-      const targetImage = event.target.files as FileList;
-      const { size } = targetImage[0];
-      formData.append("files", targetImage[0]);
+      const [targetImage] = event.target.files;
+      const { size } = targetImage;
+      formData.append("files", targetImage);
 
-      // check Image size
-      if (version === "mobileImage" && size / 1024 / 1024 > 2) {
-        showModal();
+      // 이미지 비율 확인
+      if (version === "mobileImage") {
+        const isMobileImageRatioFulfilled = await validateImageDimensionRatio(
+          targetImage,
+          { width: 1, height: 1 }
+        );
+
+        if (!isMobileImageRatioFulfilled) {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: <>등록 가능한 이미지 비율은 1:1입니다.</>,
+          });
+
+          return;
+        }
+      }
+
+      if (version === "pcImage") {
+        const isPcImageRatioFulfilled = await validateImageDimensionRatio(
+          targetImage,
+          {
+            width: 2,
+            height: 1,
+          }
+        );
+
+        if (!isPcImageRatioFulfilled) {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: <>등록 가능한 이미지 비율은 2:1입니다.</>,
+          });
+
+          return;
+        }
+      }
+
+      // 이미지 사이즈 확인
+      const imageSizeAsMegabyte = size / 1000 / 1000;
+
+      if (version === "mobileImage" && imageSizeAsMegabyte > 2) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          icon: exclamationmarkSrc,
+          description: (
+            <>
+              모바일 이미지 사이즈는
+              <br />
+              2MB 이하로 부탁드려요!
+            </>
+          ),
+          cancelButtonVisibility: false,
+        });
 
         return;
       }
 
-      if (version === "pcImage" && size / 1024 / 1024 > 3) {
-        showModal();
+      if (version === "pcImage" && imageSizeAsMegabyte > 3) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          icon: exclamationmarkSrc,
+          description: (
+            <>
+              PC 이미지 사이즈는
+              <br />
+              3MB 이하로 부탁드려요!
+            </>
+          ),
+          cancelButtonVisibility: false,
+        });
 
         return;
       }
 
-      // delete duplicate image url
-      if (mobileImage && version === "mobileImage") deleteImageUrl(mobileImage);
-      if (pcImage && version === "pcImage") deleteImageUrl(pcImage);
-
-      // create & save image url
-      const { data } = await axios.post(
+      // 확인이 끝난 이미지들은 업로드 이후 상태로 세팅
+      const { data }: { data: Array<string> } = await axios.post(
         "https://dev.chopsticks-store.com/upload",
         formData
       );
-      if (version === "mobileImage") setMoboileImage(data);
-      if (version === "pcImage") setPcImage(data);
+
+      if (version === "mobileImage") {
+        if (mobileImage) {
+          await deleteImageUrl(mobileImage);
+        }
+
+        setMoboileImage(data[0]);
+      }
+
+      if (version === "pcImage") {
+        if (pcImage) {
+          await deleteImageUrl(pcImage);
+        }
+
+        setPcImage(data[0]);
+      }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const deleteImageUrl = async (imageUrl: any) => {
+  const deleteImageUrl = async (imageUrl: string) => {
     try {
-      const response = await axios.delete(
+      const response: { data: { result: boolean } } = await axios.delete(
         "https://dev.chopsticks-store.com/upload",
         {
           data: {
@@ -93,6 +145,10 @@ const ShopInfo = () => {
         }
       );
 
+      if (!response.data.result) {
+        console.log("이미지 삭제 서버 에러", response);
+      }
+
       if (imageUrl === mobileImage) setMoboileImage("");
       if (imageUrl === pcImage) setPcImage("");
     } catch (error) {
@@ -100,97 +156,101 @@ const ShopInfo = () => {
     }
   };
 
-  useEffect(() => {
-    setShopInfoSystemModal();
-  }, []);
-
   return (
     <Container>
       <ShopInfoContainer>
         <SectionContainer>
           <Description>샵 대표 사진</Description>
 
-          <NoticeContainer icon={infoIconSrc}>
+          <NoticeContainer icon={infoIconSrc} width={"627px"}>
             샵 대표 사진은 브랜드페이지 및 창작자 프로필 사진으로 노출됩니다.
             로고를 제외한 대표 상품 사진을 첨부해주세요.
-            <br />
-            권장 이미지 크기 : 750 px x 750px (정사각형만 가능)파일 크기 : 1장
-            당 2mb / 등록 가능 파일 확장자 : jpg, jpeg, png
           </NoticeContainer>
 
           <ShopImages>
             <ImageContainer>
               <ImageTitleText>모바일 버전</ImageTitleText>
+
               <ImageInfoText>
                 권장 이미지 크기 : 750 px x 750px (정사각형만 가능)
                 <br />
                 파일 크기 : 1장 당 2mb / 등록 가능 파일 확장자 : jpg, jpeg, png
               </ImageInfoText>
+
               {mobileImage ? (
-                <AddedMobileImageContainer>
+                <AddedMobileImageContainer htmlFor="mobileImage">
                   <AddedMobileImage src={mobileImage} />
                   <DeleteIcon
                     src={closeIconSource}
-                    onClick={() => deleteImageUrl(mobileImage)}
+                    // eslint-disable-next-line
+                    onClick={async () => await deleteImageUrl(mobileImage)}
                   />
                   <ChangeImageLabel htmlFor="mobileImage">
-                    <UploadImgInput
+                    <ImageInput
                       type="file"
                       id="mobileImage"
                       accept="image/jpg,image/png,image/jpeg"
                       {...register("mobileImage")}
-                      onChange={(event) => imageHandler(event)}
+                      // eslint-disable-next-line
+                      onChange={handleChangeImageInput}
                     />
                   </ChangeImageLabel>
                 </AddedMobileImageContainer>
               ) : (
-                <MobileImageContainer>
+                <MobileImageContainer htmlFor="mobileImage">
                   <UploadImageLabel htmlFor="mobileImage">
-                    <UploadImgInput
+                    <ImageInput
                       type="file"
                       id="mobileImage"
                       accept="image/jpg,image/png,image/jpeg"
                       {...register("mobileImage")}
-                      onChange={(event) => imageHandler(event)}
+                      // eslint-disable-next-line
+                      onChange={handleChangeImageInput}
                     />
                   </UploadImageLabel>
                   <p>사진 등록하기</p>
                 </MobileImageContainer>
               )}
             </ImageContainer>
+
             <ImageContainer>
               <ImageTitleText>PC 버전</ImageTitleText>
+
               <ImageInfoText>
                 권장 이미지 크기 : 1500 px x 750px
                 <br />
                 파일 크기 : 1장 당 3mb / 등록 가능 파일 확장자 : jpg, jpeg, png
               </ImageInfoText>
+
               {pcImage ? (
-                <AddedPcImageContainer>
+                <AddedPcImageContainer htmlFor="pcImage">
                   <AddedPcImage src={pcImage} />
                   <DeleteIcon
                     src={closeIconSource}
-                    onClick={() => deleteImageUrl(pcImage)}
+                    // eslint-disable-next-line
+                    onClick={async () => await deleteImageUrl(pcImage)}
                   />
                   <ChangeImageLabel htmlFor="pcImage">
-                    <UploadImgInput
+                    <ImageInput
                       type="file"
                       id="pcImage"
                       accept="image/jpg,image/png,image/jpeg"
                       {...register("pcImage")}
-                      onChange={(event) => imageHandler(event)}
+                      // eslint-disable-next-line
+                      onChange={handleChangeImageInput}
                     />
                   </ChangeImageLabel>
                 </AddedPcImageContainer>
               ) : (
-                <PcImageContainer>
+                <PcImageContainer htmlFor="pcImage">
                   <UploadImageLabel htmlFor="pcImage">
-                    <UploadImgInput
+                    <ImageInput
                       type="file"
                       id="pcImage"
                       accept="image/jpg,image/png,image/jpeg"
                       {...register("pcImage")}
-                      onChange={(event) => imageHandler(event)}
+                      // eslint-disable-next-line
+                      onChange={handleChangeImageInput}
                     />
                   </UploadImageLabel>
                   <p>사진 등록하기</p>
@@ -199,14 +259,15 @@ const ShopInfo = () => {
             </ImageContainer>
           </ShopImages>
         </SectionContainer>
+
         <SectionContainer>
           <Description>샵 소개</Description>
-          <NoticeContainer icon={questionmarkSrc}>
+          <NoticeContainer icon={questionmarkSrc} width={"349px"}>
             창작자 페이지, 작품 상세 페이지에 노출되는 소개말입니다.
           </NoticeContainer>
           <TextAreaContainer>
             <TextArea
-              {...register("shopInroduce")}
+              {...register("shopIntroduction")}
               onChange={(event) => setTextLength(event.target.value.length)}
               maxLength={200}
             />
@@ -247,10 +308,13 @@ const SectionContainer = styled.div`
 `;
 
 const Description = styled.span`
+  font-family: "Spoqa Han Sans Neo";
   font-weight: 400;
   font-size: 14px;
   line-height: 14px;
   letter-spacing: 0.1px;
+
+  margin-bottom: 8px;
 `;
 
 const ShopImages = styled.div`
@@ -299,7 +363,10 @@ const UploadImageLabel = styled.label`
   cursor: pointer;
 `;
 
-const UploadImgInput = styled.input`
+const ImageInput = styled.input.attrs({
+  type: "file",
+  accept: "image/jpg,image/png,image/jpeg",
+})`
   position: absolute;
   left: -10000px;
   top: auto;
@@ -309,17 +376,19 @@ const UploadImgInput = styled.input`
   padding: 0;
 `;
 
-const PcImageContainer = styled.div`
+const PcImageContainer = styled.label`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
-  width: 315px;
+  width: 280px;
   height: 140px;
   background-color: ${({ theme: { palette } }) => palette.white};
   border: 1px dashed ${({ theme: { palette } }) => palette.grey500};
   margin: 0 auto;
+
+  cursor: pointer;
 
   & > label {
     width: 48px;
@@ -336,7 +405,7 @@ const PcImageContainer = styled.div`
   }
 `;
 
-const MobileImageContainer = styled.div`
+const MobileImageContainer = styled.label`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -347,6 +416,8 @@ const MobileImageContainer = styled.div`
   background-color: ${({ theme: { palette } }) => palette.white};
   border: 1px dashed ${({ theme: { palette } }) => palette.grey500};
   margin: 0 auto;
+
+  cursor: pointer;
 
   & > label {
     width: 48px;
@@ -363,17 +434,17 @@ const MobileImageContainer = styled.div`
   }
 `;
 
-const AddedMobileImageContainer = styled.div`
+const AddedMobileImageContainer = styled.label`
   position: relative;
   margin: 0 auto;
   width: 140px;
   height: 140px;
 `;
 
-const AddedPcImageContainer = styled.div`
+const AddedPcImageContainer = styled.label`
   position: relative;
   margin: 0 auto;
-  width: 315px;
+  width: 280px;
   height: 140px;
 `;
 
@@ -383,7 +454,7 @@ const AddedMobileImage = styled.img`
 `;
 
 const AddedPcImage = styled.img`
-  width: 315px;
+  width: 280px;
   height: 140px;
 `;
 
@@ -408,6 +479,7 @@ const ChangeImageLabel = styled.label`
   background-image: url(${photochangeSrc});
   background-position: center;
   background-size: cover;
+
   cursor: pointer;
 `;
 

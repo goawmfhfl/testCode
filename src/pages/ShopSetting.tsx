@@ -9,6 +9,7 @@ import ContentsSection from "@components/common/ContentsSection";
 import ContentsNavigation from "@components/common/ContentsNavigation";
 import ContentsNavItem from "@components/common/ContentsNavItem";
 import SectionWrapper from "@components/common/SectionWrapper";
+
 import ShopInfo from "@components/ShopSetting/ShopInfo";
 import ShopPolicy from "@components/ShopSetting/ShopPolicy";
 import SafetyCertification from "@components/ShopSetting/SafetyCertification";
@@ -62,7 +63,7 @@ const ShopSetting = () => {
 
           <ContentsMain>
             <ContentsSection>
-              <SectionWrapper label="샵 정보">
+              <SectionWrapper label="샵 정보" labelMarginTop={false}>
                 <ShopInfo />
               </SectionWrapper>
               <SectionWrapper label="정책 설정">
@@ -71,23 +72,39 @@ const ShopSetting = () => {
             </ContentsSection>
 
             <ContentsSection>
-              <SectionWrapper label="안전기준적합확인검사 인증">
+              <SectionWrapper
+                label={
+                  <>
+                    안전기준적합 <br />
+                    확인검사 인증
+                  </>
+                }
+              >
                 <SafetyCertification />
               </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <SectionWrapper label="기본 배송 설정">
+              <SectionWrapper label="샵 배송 정보">
                 <ShipmentSettings />
               </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <SectionWrapper label="사업자 정보(간이, 법인)">
+              <SectionWrapper
+                label="사업자 정보(간이, 법인)"
+                labelMarginTop={false}
+              >
                 <BusinessLicense />
               </SectionWrapper>
 
-              <SectionWrapper label="개인판매자 주민등록증 인증">
+              <SectionWrapper
+                label={
+                  <>
+                    개인판매자 <br /> 주민등록증 인증
+                  </>
+                }
+              >
                 <RegistrationNumber />
               </SectionWrapper>
 
@@ -95,7 +112,7 @@ const ShopSetting = () => {
                 <PhoneNumber />
               </SectionWrapper>
 
-              <SectionWrapper label="정산 계좌 정보">
+              <SectionWrapper label="정산 계좌 정보" labelMarginTop={false}>
                 <SettlementAccount />
               </SectionWrapper>
             </ContentsSection>

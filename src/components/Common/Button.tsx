@@ -32,6 +32,7 @@ const Button = styled.button<{
   size: string;
   color?: string;
   backgroundColor?: string;
+  disabled?: boolean;
 }>`
   display: flex;
   justify-content: center;
@@ -56,11 +57,18 @@ const Button = styled.button<{
     color: ${({ theme: { palette } }) => palette.white};
   }
 
-  &.negative {
-    background-color: ${({ theme: { palette } }) => palette.grey300};
-    border: none;
-    color: ${({ theme: { palette } }) => palette.grey500};
-  }
+  ${({ disabled, theme: { palette } }) =>
+    disabled
+      ? `
+      background-color: ${palette.grey300} !important;
+      border: none !important;
+      color: ${palette.grey500} !important;
+
+      cursor: default;
+      user-select: none;
+      pointer-events: none;
+      `
+      : ""};
 `;
 
 export default Button;

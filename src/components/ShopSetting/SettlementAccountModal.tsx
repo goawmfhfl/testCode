@@ -1,8 +1,6 @@
-/* eslint-disable */
 import React, { useState } from "react";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import axios from "axios";
-import { useFormContext } from "react-hook-form";
 
 import closeIconSource from "@icons/close.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -13,76 +11,92 @@ import Input from "@components/common/Input";
 import ValidText from "@components/common/ValidText";
 import { modalVar, systemModalVar } from "@cache/index";
 import { settlementAccountVar } from "@cache/shopSettings";
+import { isNumber } from "@utils/index";
+import AuthenticationLoader from "@components/ShopSetting/AuthenticationLoader";
 
 const SettlementAccountModal = () => {
-  const [validation, setValidation] = useState<{
-    isWrongNumber: boolean;
-    isVerified: boolean;
-  }>({ isWrongNumber: false, isVerified: false });
-  const { isWrongNumber, isVerified } = validation;
+  const [accountInformation, setAccountInformation] = useState<{
+    accountNumber: string;
+    accountName: string;
+    bankCode: string;
+    bankName: string;
+  }>({
+    accountNumber: "",
+    accountName: "",
+    bankCode: "",
+    bankName: "",
+  });
+  const [hasTriedAuthentication, setHasTriedAuthentication] =
+    useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { register, watch, resetField } = useFormContext();
-  const watchField = watch();
-  const { accountNumber, accountName, bankCode } = watchField;
+  const handleAuthenticationButtonClick = async () => {
+    if (!hasTriedAuthentication) setHasTriedAuthentication(true);
 
-  const confirmAccountOwner = async () => {
     try {
       const configs = {
         headers: { Authorization: process.env.REACT_APP_DATA_API_KEY || "" },
       };
 
-      const requestData = {
-        ACCTNO: accountNumber,
-        BANKCODE: bankCode,
-        CUSTNM: accountName,
-      };
+      const { accountNumber, accountName, bankCode } = accountInformation;
 
-      const { data } = await axios.post(
-        "https://datahub-dev.scraping.co.kr/scrap/common/settlebank/accountOwner",
-        requestData,
+      setIsLoading(true);
+
+      const response: {
+        data: {
+          data: {
+            OUTRSLTMSG: string;
+            RESULT: string;
+          };
+          result: string;
+        };
+      } = await axios.post(
+        `${process.env.REACT_APP_DATAHUB_API_URL_DEV}/scrap/common/settlebank/accountOwner`,
+        {
+          ACCTNO: accountNumber,
+          BANKCODE: bankCode,
+          CUSTNM: accountName,
+        },
         configs
       );
 
-      if (data?.data.OUTRSLTMSG !== "정상처리") {
-        setValidation(() => ({
-          isVerified: false,
-          isWrongNumber: true,
-        }));
-      } else {
-        setValidation(() => ({
-          isVerified: true,
-          isWrongNumber: false,
-        }));
+      console.log(response);
 
+      // API Error
+      if (response.data.result === "ERROR") {
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
-          icon: "",
-          description: <>계좌정보가 등록되었습니다.</>,
-          confirmButtonText: "확인",
-          confirmButtonClickHandler: () => {
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: false,
-            });
-
-            settlementAccountVar({
-              ...settlementAccountVar(),
-              hasInformation: true,
-            });
-          },
+          description: (
+            <>
+              인증 서비스에 문제가 발생하였습니다.
+              <br />
+              찹스틱스로 문의해주시면
+              <br />
+              빠르게 조치하겠습니다.
+              <br />
+              (문의 전화 070-4187-3848)
+            </>
+          ),
         });
+
+        console.log("정산 계좌 확인 요청 에러", response.data);
+
+        return;
       }
+
+      // User Input Error
+      if (response.data.data.RESULT === "FAILURE") {
+        setIsAuthenticated(false);
+
+        return;
+      }
+
+      setIsAuthenticated(true);
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const pickBankName = (options: any) => {
-    settlementAccountVar({
-      ...settlementAccountVar(),
-      bankName: options[options.selectedIndex].textContent,
-    });
   };
 
   const clearModal = () => {
@@ -91,18 +105,75 @@ const SettlementAccountModal = () => {
       isVisible: false,
     });
 
-    resetField("accountName");
-    resetField("accountNumber");
-    resetField("bankCode");
+    setAccountInformation({
+      accountName: "",
+      accountNumber: "",
+      bankCode: "",
+      bankName: "",
+    });
   };
 
+  const handleInputChange =
+    (inputName: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      if (inputName === "bank") {
+        const [bankCode, bankName] = e.target.value.split(",");
+
+        setAccountInformation((prev) => ({
+          ...prev,
+          bankCode,
+          bankName,
+        }));
+
+        return;
+      }
+
+      if (inputName === "accountNumber" && !isNumber(e.target.value)) {
+        return;
+      }
+
+      setAccountInformation((prev) => ({
+        ...prev,
+        [inputName]: e.target.value,
+      }));
+    };
+
   const handleConfirmButtonClick = () => {
-    clearModal();
+    const { accountNumber, accountName, bankCode, bankName } =
+      accountInformation;
+
+    settlementAccountVar({
+      hasInformation: true,
+      accountName,
+      accountNumber,
+      bankCode,
+      bankName,
+    });
+
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      icon: "",
+      description: <>계좌정보가 등록되었습니다.</>,
+      confirmButtonText: "확인",
+      confirmButtonClickHandler: () => {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: false,
+        });
+
+        clearModal();
+      },
+    });
   };
 
   const handleCloseButtonClick = () => {
     clearModal();
   };
+
+  const { accountNumber, accountName, bankName } = accountInformation;
+  const hasAccountInformationFulfilled =
+    Boolean(accountNumber) && Boolean(accountName) && Boolean(bankName);
 
   return (
     <Container>
@@ -118,49 +189,74 @@ const SettlementAccountModal = () => {
       </NoticeContainer>
 
       <InfoContainer>
-        <SelectContainer
-          {...register("bankCode")}
-          onChange={(event) => pickBankName(event.target.options)}
-        >
+        <Select onChange={handleInputChange("bank")}>
           <Option defaultChecked>은행선택</Option>
-          <Option value={"001"}>한국은행</Option>
-          <Option value={"002"}>산업은행</Option>
-          <Option value={"003"}>기업은행</Option>
-          <Option value={"004"}>KB국민은행</Option>
-          <Option value={"007"}>수협은행</Option>
-          <Option value={"008"}>수출입은행</Option>
-          <Option value={"011"}>NH농협은행</Option>
-          <Option value={"012"}>농축협</Option>
-          <Option value={"020"}>우리은행</Option>
-        </SelectContainer>
+          <Option value={["001", "한국은행"]}>한국은행</Option>
+          <Option value={["002", "산업은행"]}>산업은행</Option>
+          <Option value={["003", "기업은행"]}>기업은행</Option>
+          <Option value={["004", "KB국민은행"]}>KB국민은행</Option>
+          <Option value={["007", "수협은행"]}>수협은행</Option>
+          <Option value={["008", "수출입은행"]}>수출입은행</Option>
+          <Option value={["011", "NH농협은행"]}>NH농협은행</Option>
+          <Option value={["012", "농축협"]}>농축협</Option>
+          <Option value={["020", "우리은행"]}>우리은행</Option>
+        </Select>
+
         <UserAccountContainer>
-          <Input placeholder="예금주명" {...register("accountName")} />
-          <Input
-            placeholder="계좌번호 (-없이 입력)"
-            {...register("accountNumber")}
+          <OwnerNameInput
+            placeholder="예금주명"
+            onChange={handleInputChange("accountName")}
+            value={accountInformation.accountName}
           />
-          <Button size="small" full={false} onClick={confirmAccountOwner}>
+
+          <AccountNumberInput
+            placeholder="계좌번호 (-없이 입력)"
+            onChange={handleInputChange("accountNumber")}
+            value={accountInformation.accountNumber}
+          />
+
+          <Button
+            size="small"
+            full={false}
+            // eslint-disable-next-line
+            onClick={async () => {
+              await handleAuthenticationButtonClick();
+              setIsLoading(false);
+            }}
+            disabled={isLoading || !hasAccountInformationFulfilled}
+          >
             인증
           </Button>
-          {isVerified && <ValidText valid={true}>인증되었습니다</ValidText>}
-          {isWrongNumber && (
-            <ValidText valid={false}>인증 실패하였습니다.</ValidText>
+
+          {isLoading ? (
+            <AuthenticationLoader />
+          ) : (
+            <>
+              {hasTriedAuthentication && isAuthenticated && (
+                <ValidText valid={true}>인증되었습니다.</ValidText>
+              )}
+              {hasTriedAuthentication && !isAuthenticated && (
+                <ValidText valid={false}>인증 실패하였습니다.</ValidText>
+              )}
+            </>
           )}
         </UserAccountContainer>
-        {isWrongNumber && (
+
+        {!isLoading && hasTriedAuthentication && !isAuthenticated && (
           <ValidText valid={true}>
             입력하신 계좌 정보가 실제 계좌 정보와 일치하지 않습니다.
             <br />
-            입력하신 번호를 다시 한번 확인해주세요.
+            입력하신 은행, 예금주, 계좌번호를 다시 한번 확인해주세요.
           </ValidText>
         )}
       </InfoContainer>
+
       <ButtonContainer>
         <Button
           size="small"
           full={false}
-          className={isVerified ? "positive" : "negative"}
-          disabled={!isVerified}
+          className="positive"
+          disabled={!isAuthenticated}
           onClick={handleConfirmButtonClick}
         >
           확인
@@ -179,15 +275,20 @@ const Container = styled.div`
   top: 50%;
   transform: translateY(-50%);
   z-index: 100;
+
+  width: 603px;
   padding: 40px 24px 24px 24px;
-  display: flex;
-  flex-direction: column;
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
   background-color: ${({ theme: { palette } }) => palette.white};
   box-shadow: ${({ theme: { shadow } }) => shadow.boxShadow};
+
+  display: flex;
+  flex-direction: column;
+
   & > h2 {
     margin-bottom: 24px;
   }
+
   & > h2 + div {
     margin-bottom: 24px;
   }
@@ -201,6 +302,7 @@ const CloseButton = styled.img`
 `;
 
 const Title = styled.h2`
+  font-family: "Spoqa Han Sans Neo";
   font-weight: 800;
   font-size: 20px;
   line-height: 20px;
@@ -213,7 +315,7 @@ const InfoContainer = styled.div`
   margin-bottom: 58px;
 `;
 
-const SelectContainer = styled.select`
+const Select = styled.select`
   width: 134px;
   border: 1px solid ${({ theme: { palette } }) => palette.grey400};
   padding: 8px 45px 8px 8px;
@@ -258,6 +360,14 @@ const UserAccountContainer = styled.div`
   & > p {
     margin: auto 0;
   }
+`;
+
+const OwnerNameInput = styled(Input)`
+  font-weight: 300 !important;
+`;
+
+const AccountNumberInput = styled(Input)`
+  font-weight: 300 !important;
 `;
 
 const ButtonContainer = styled.div`
