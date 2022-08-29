@@ -1,12 +1,19 @@
 import styled from "styled-components/macro";
+import { useReactiveVar } from "@apollo/client";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import RegistrationNumberModal from "@components/ShopSetting/RegistrationNumberModal";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
+import InputStatusMessage from "@components/common/InputStatusMessage";
+
 import { modalVar } from "@cache/index";
-import { registrationNumberVar, businessLicenseVar } from "@cache/shopSettings";
-import { useReactiveVar } from "@apollo/client";
+import {
+  registrationNumberVar,
+  businessLicenseVar,
+  sectionFulfillmentVar,
+  SECTIONS,
+} from "@cache/shopSettings";
 
 const RegistrationNumber = () => {
   // eslint-disable-next-line
@@ -14,8 +21,31 @@ const RegistrationNumber = () => {
   const { isConfirmed: hasConfirmedBusinessLicense } =
     useReactiveVar(businessLicenseVar);
 
+  const handleAuthenticationButtonClick = () => {
+    const isSectionFulfilled = sectionFulfillmentVar().REGISTRATION_NUMBER;
+
+    if (!isSectionFulfilled) {
+      sectionFulfillmentVar({
+        ...sectionFulfillmentVar(),
+        [SECTIONS.REGISTRATION_NUMBER]: true,
+      });
+    }
+
+    modalVar({
+      ...modalVar(),
+      isVisible: true,
+      component: <RegistrationNumberModal />,
+    });
+  };
+
   return (
     <Container>
+      {!useReactiveVar(sectionFulfillmentVar).REGISTRATION_NUMBER && (
+        <InputStatusMessage color="red" topMargin="8px" bottomMargin="10px">
+          ※필수 입력사항입니다.
+        </InputStatusMessage>
+      )}
+
       <NoticeContainer icon={exclamationmarkSrc} width={"100%"}>
         사업자등록증 없이 판매하시는 경우 주민등록증 인증을 해주세요. 인증된
         주민등록번호는 정산에만 활용됩니다.
@@ -43,13 +73,7 @@ const RegistrationNumber = () => {
         <Button
           size="small"
           full={false}
-          onClick={() =>
-            modalVar({
-              ...modalVar(),
-              isVisible: true,
-              component: <RegistrationNumberModal />,
-            })
-          }
+          onClick={handleAuthenticationButtonClick}
           // eslint-disable-next-line
           disabled={hasConfirmedBusinessLicense}
         >

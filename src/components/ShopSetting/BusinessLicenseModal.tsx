@@ -86,8 +86,6 @@ const BusinessLicenseModal = () => {
         },
       };
 
-      console.log("보내는 데이터", parameter);
-
       // 사업자등록번호 : 882-87-01829
       // 통신판매업신고번호 : 2020-서울송파-3260
       const response = await axios.get(

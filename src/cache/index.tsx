@@ -39,6 +39,9 @@ export const systemModalVar = makeVar<{
   cancelButtonClickHandler: () => closeSystemModal(),
 });
 
+export const GNBReferenceVar = makeVar<HTMLElement | null>(null);
+export const contentsContainerReferenceVar = makeVar<HTMLElement | null>(null);
+
 function closeSystemModal() {
   systemModalVar({
     ...systemModalVar(),

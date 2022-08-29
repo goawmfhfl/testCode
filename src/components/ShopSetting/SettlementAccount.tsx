@@ -1,10 +1,16 @@
 import styled from "styled-components/macro";
+import { useReactiveVar } from "@apollo/client";
 
 import Button from "@components/common/Button";
 import SettlementAccountModal from "@components/ShopSetting/SettlementAccountModal";
+import InputStatusMessage from "@components/common/InputStatusMessage";
+
 import { modalVar } from "@cache/index";
-import { settlementAccountVar } from "@cache/shopSettings";
-import { useReactiveVar } from "@apollo/client";
+import {
+  settlementAccountVar,
+  sectionFulfillmentVar,
+  SECTIONS,
+} from "@cache/shopSettings";
 
 export interface accountInformationType {
   hasInformation: boolean;
@@ -40,11 +46,26 @@ const SettlementAccount = () => {
     });
 
   const handleRegisterButtonClick = () => {
+    const isSectionFulfilled = sectionFulfillmentVar().SETTLEMENT_ACCOUNT;
+
+    if (!isSectionFulfilled) {
+      sectionFulfillmentVar({
+        ...sectionFulfillmentVar(),
+        [SECTIONS.SETTLEMENT_ACCOUNT]: true,
+      });
+    }
+
     showSettlementAccountModal();
   };
 
   return (
     <Container>
+      {!useReactiveVar(sectionFulfillmentVar).SETTLEMENT_ACCOUNT && (
+        <InputStatusMessage color="red" topMargin="3px" bottomMargin="10px">
+          ※필수 입력사항입니다.
+        </InputStatusMessage>
+      )}
+
       <AccountContainer>
         <AccountInfoText>등록된 계좌 정보</AccountInfoText>
         <RegisterContainer>
@@ -65,9 +86,11 @@ const SettlementAccount = () => {
 };
 
 const Container = styled.div`
-  position: relative;
-  display: flex;
   width: 100%;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
 `;
 
 const AccountContainer = styled.div`

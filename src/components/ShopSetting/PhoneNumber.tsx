@@ -3,8 +3,14 @@ import { useReactiveVar } from "@apollo/client";
 
 import PhoneNumberModal from "./PhoneNumberModal";
 import Button from "@components/common/Button";
+import InputStatusMessage from "@components/common/InputStatusMessage";
+
 import { modalVar } from "@cache/index";
-import { phoneNumberVar } from "@cache/shopSettings";
+import {
+  phoneNumberVar,
+  sectionFulfillmentVar,
+  SECTIONS,
+} from "@cache/shopSettings";
 
 const PhoneNumber = () => {
   const phoneNumber = useReactiveVar(phoneNumberVar);
@@ -22,6 +28,15 @@ const PhoneNumber = () => {
   };
 
   const handleChangePhoneNumberButtonClick = () => {
+    const isSectionFulfilled = sectionFulfillmentVar().PHONE_NUMBER;
+
+    if (!isSectionFulfilled) {
+      sectionFulfillmentVar({
+        ...sectionFulfillmentVar(),
+        [SECTIONS.PHONE_NUMBER]: true,
+      });
+    }
+
     modalVar({
       ...modalVar(),
       isVisible: true,
@@ -31,6 +46,12 @@ const PhoneNumber = () => {
 
   return (
     <Container>
+      {!useReactiveVar(sectionFulfillmentVar).PHONE_NUMBER && (
+        <InputStatusMessage color="red" topMargin="8px" bottomMargin="10px">
+          ※필수 입력사항입니다.
+        </InputStatusMessage>
+      )}
+
       <PhoneNumberContainer>
         <NumberText>
           등록된 전화번호 : {hidePhoneNumber(phoneNumber)}
@@ -51,6 +72,7 @@ const PhoneNumber = () => {
 const Container = styled.div`
   position: relative;
   display: flex;
+  flex-direction: column;
 
   width: 100%;
 `;

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import styled from "styled-components/macro";
 import axios from "axios";
 
-import closeIconSource from "@icons/close.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import triangleSrc from "@icons/triangle.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
@@ -167,7 +166,7 @@ const SettlementAccountModal = () => {
     });
   };
 
-  const handleCloseButtonClick = () => {
+  const handleCancelButtonClick = () => {
     clearModal();
   };
 
@@ -177,8 +176,6 @@ const SettlementAccountModal = () => {
 
   return (
     <Container>
-      <CloseButton src={closeIconSource} onClick={handleCloseButtonClick} />
-
       <Title>정산 계좌 등록하기</Title>
       <NoticeContainer icon={exclamationmarkSrc}>
         예금주명은 사업자등록증의 법인 명의(상호명)과 동일해야 합니다.
@@ -259,10 +256,10 @@ const SettlementAccountModal = () => {
           disabled={!isAuthenticated}
           onClick={handleConfirmButtonClick}
         >
-          확인
+          등록
         </Button>
 
-        <Button size="small" full={false} onClick={handleCloseButtonClick}>
+        <Button size="small" full={false} onClick={handleCancelButtonClick}>
           취소
         </Button>
       </ButtonContainer>
@@ -277,7 +274,7 @@ const Container = styled.div`
   z-index: 100;
 
   width: 603px;
-  padding: 40px 24px 24px 24px;
+  padding: 24px 24px 24px 24px;
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
   background-color: ${({ theme: { palette } }) => palette.white};
   box-shadow: ${({ theme: { shadow } }) => shadow.boxShadow};
@@ -292,13 +289,6 @@ const Container = styled.div`
   & > h2 + div {
     margin-bottom: 24px;
   }
-`;
-
-const CloseButton = styled.img`
-  position: absolute;
-  top: 12.79px;
-  right: 12.77px;
-  cursor: pointer;
 `;
 
 const Title = styled.h2`

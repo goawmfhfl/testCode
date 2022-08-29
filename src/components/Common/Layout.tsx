@@ -5,12 +5,17 @@ import GlobalNavigationBar from "@components/common/GlobalNavigationBar";
 import SideNavigationBar from "@components/common/SideNavigationBar";
 import Footer from "@components/common/Footer";
 import SaveBar from "@components/common/SaveBar";
-import { modalVar, overModalVar, systemModalVar } from "@cache/index";
+import {
+  modalVar,
+  overModalVar,
+  systemModalVar,
+  contentsContainerReferenceVar,
+} from "@cache/index";
 import SystemModal from "@components/common/SystemModal";
 
 interface LayoutProps {
-  hasSaveBar?: boolean;
   children: React.ReactNode;
+  hasSaveBar?: boolean;
 }
 
 const Layout = ({ children, hasSaveBar }: LayoutProps) => {
@@ -20,10 +25,13 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
 
   return (
     <>
-      <Container hasSaveBar={hasSaveBar}>
+      <Container>
         <GlobalNavigationBar />
         <SideNavigationBar />
-        <ContentsContainer>
+
+        <ContentsContainer
+          ref={(newRef: HTMLElement) => contentsContainerReferenceVar(newRef)}
+        >
           <ContentsWrapper>{children}</ContentsWrapper>
           <Footer />
         </ContentsContainer>
@@ -45,20 +53,23 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
   );
 };
 
-const Container = styled.div<{ hasSaveBar: boolean | undefined }>`
+const Container = styled.div`
   display: flex;
   flex-direction: column;
 
   min-height: 100vh;
-  margin-bottom: ${({ hasSaveBar }) => (hasSaveBar ? "72px" : "")}; ;
 `;
 
 const ContentsContainer = styled.div`
-  flex: 1;
+  flex: 1 1 0;
+
   display: flex;
   flex-direction: column;
   margin-left: 210px;
   margin-top: 56px;
+  margin-bottom: 72px;
+
+  overflow: scroll;
 `;
 
 const ContentsWrapper = styled.div`

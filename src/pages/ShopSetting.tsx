@@ -19,6 +19,8 @@ import PhoneNumber from "@components/ShopSetting/PhoneNumber";
 import SettlementAccount from "@components/ShopSetting/SettlementAccount";
 import RegistrationNumber from "@components/ShopSetting/RegistrationNumber";
 
+import { SECTIONS } from "@cache/shopSettings";
+
 export interface ShopSettingFormInputType {
   pcImage: string;
   mobileImage: string;
@@ -43,10 +45,6 @@ const ShopSetting = () => {
 
   const hasUserLoggedIn = false; // TODO: session storage에서 가져온 토큰정보로 판단
 
-  const formData = methods.watch();
-
-  console.log(formData);
-
   return (
     <FormProvider {...methods}>
       <Layout hasSaveBar={true}>
@@ -63,10 +61,17 @@ const ShopSetting = () => {
 
           <ContentsMain>
             <ContentsSection>
-              <SectionWrapper label="샵 정보" labelMarginTop={false}>
+              <SectionWrapper
+                label="샵 정보"
+                labelMarginTop={false}
+                referenceKey={SECTIONS.SHOP_INFO}
+              >
                 <ShopInfo />
               </SectionWrapper>
-              <SectionWrapper label="정책 설정">
+              <SectionWrapper
+                label="정책 설정"
+                referenceKey={SECTIONS.SHOP_POLICY}
+              >
                 <ShopPolicy />
               </SectionWrapper>
             </ContentsSection>
@@ -79,13 +84,17 @@ const ShopSetting = () => {
                     확인검사 인증
                   </>
                 }
+                referenceKey={SECTIONS.SAFETY_CERTIFICATION}
               >
                 <SafetyCertification />
               </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <SectionWrapper label="샵 배송 정보">
+              <SectionWrapper
+                label="샵 배송 정보"
+                referenceKey={SECTIONS.SHIPMENT_SETTINGS}
+              >
                 <ShipmentSettings />
               </SectionWrapper>
             </ContentsSection>
@@ -94,6 +103,7 @@ const ShopSetting = () => {
               <SectionWrapper
                 label="사업자 정보(간이, 법인)"
                 labelMarginTop={false}
+                referenceKey={SECTIONS.BUSINESS_LICENSE}
               >
                 <BusinessLicense />
               </SectionWrapper>
@@ -104,15 +114,23 @@ const ShopSetting = () => {
                     개인판매자 <br /> 주민등록증 인증
                   </>
                 }
+                referenceKey={SECTIONS.REGISTRATION_NUMBER}
               >
                 <RegistrationNumber />
               </SectionWrapper>
 
-              <SectionWrapper label="전화번호 변경">
+              <SectionWrapper
+                label="전화번호 변경"
+                referenceKey={SECTIONS.PHONE_NUMBER}
+              >
                 <PhoneNumber />
               </SectionWrapper>
 
-              <SectionWrapper label="정산 계좌 정보" labelMarginTop={false}>
+              <SectionWrapper
+                label="정산 계좌 정보"
+                labelMarginTop={false}
+                referenceKey={SECTIONS.SETTLEMENT_ACCOUNT}
+              >
                 <SettlementAccount />
               </SectionWrapper>
             </ContentsSection>

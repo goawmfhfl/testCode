@@ -6,14 +6,25 @@ const Textarea = ({
   height,
   size,
   register,
+  onFocus,
 }: {
   width?: string;
   height?: string;
   size: string;
   register: UseFormRegisterReturn;
+  onFocus?: () => void;
 }) => {
-  return <Container width={width} height={height} size={size} {...register} />;
+  return (
+    <Container
+      width={width}
+      height={height}
+      size={size}
+      {...register}
+      onFocus={onFocus}
+    />
+  );
 };
+
 const fontSizing = css<{ size: string }>`
   ${({ size }) => {
     switch (size) {

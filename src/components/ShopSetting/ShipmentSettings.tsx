@@ -1,33 +1,63 @@
+import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import styled from "styled-components/macro";
+import { useReactiveVar } from "@apollo/client";
 
 import TextInput from "@components/common/input/TextInput";
 import Dropdown from "@components/common/input/Dropdown";
 import Radio from "@components/common/input/Radio";
 import NoticeContainer from "@components/common/NoticeContainer";
+import InputStatusMessage from "@components/common/InputStatusMessage";
+
 import informationMarkSource from "@icons/info.svg";
 import { ShipmentChargeType } from "@models/shipmentTemplate";
-import { useEffect } from "react";
+import {
+  SHIPMENT_PRICE_TYPE,
+  SHIPMENT_PRICE,
+  SHIPMENT_DISTANT_PRICE,
+  SHIPMENT_RETURN_PRICE,
+  SHIPMENT_EXCHANGE_PRICE,
+  SHIPMENT_CONDITIONAL_PRICE,
+  SHIPMENT_BUNDLING,
+  sectionFulfillmentVar,
+  SECTIONS,
+} from "@cache/shopSettings";
 
 const ShipmentSettings = () => {
   const { register, watch, setValue } = useFormContext();
+  const sectionFulfillment = useReactiveVar(sectionFulfillmentVar);
 
-  const shipmentPriceType = watch("shipmentPriceType") as ShipmentChargeType;
+  const shipmentPriceType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
 
   const isShipmentPriceFree = shipmentPriceType === ShipmentChargeType.Free;
 
+  const handleFocusContents = () => {
+    if (!sectionFulfillmentVar().SHIPMENT_SETTINGS) {
+      sectionFulfillmentVar({
+        ...sectionFulfillmentVar(),
+        [SECTIONS.SHIPMENT_SETTINGS]: true,
+      });
+    }
+  };
+
   useEffect(() => {
     if (shipmentPriceType === ShipmentChargeType.Free) {
-      setValue("shipmentPrice", 0);
-      setValue("shipmentConditionalPrice", null);
+      setValue(SHIPMENT_PRICE, 0);
+      setValue(SHIPMENT_CONDITIONAL_PRICE, null);
     } else {
-      setValue("shipmentPrice", null);
+      setValue(SHIPMENT_PRICE, null);
     }
   }, [shipmentPriceType]);
 
   return (
     <Container>
-      <Section>
+      {!sectionFulfillment.SHIPMENT_SETTINGS && (
+        <InputStatusMessage color="red" topMargin="10px" bottomMargin="16px">
+          ※필수 입력사항입니다.
+        </InputStatusMessage>
+      )}
+
+      <DefaultShipmentSection hasInputStatusMessage={true}>
         <SectionLabelContainer>
           <SectionLabel>기본 배송 설정</SectionLabel>
           <NoticeContainer
@@ -39,11 +69,16 @@ const ShipmentSettings = () => {
           </NoticeContainer>
         </SectionLabelContainer>
 
-        <Contents>
+        <Contents onFocus={handleFocusContents}>
           <InputContainer>
             <InputLabel>묶음 배송</InputLabel>
-            가능 <Radio name="bundleShipment" defaultChecked />
-            불가능 <Radio name="bundleShipment" />
+            가능{" "}
+            <Radio
+              {...register(SHIPMENT_BUNDLING)}
+              value="가능"
+              defaultChecked
+            />
+            불가능 <Radio {...register(SHIPMENT_BUNDLING)} value="불가능" />
           </InputContainer>
 
           <InputContainer>
@@ -62,14 +97,14 @@ const ShipmentSettings = () => {
                     value: ShipmentChargeType.Free,
                   },
                 ]}
-                register={register("shipmentPriceType")}
+                register={register(SHIPMENT_PRICE_TYPE)}
               />
 
               <PriceInputContainer>
                 <TextInput
                   placeholder="숫자만 입력"
                   numbersOnly={true}
-                  register={register("shipmentPrice")}
+                  register={register(SHIPMENT_PRICE)}
                   disabled={isShipmentPriceFree}
                 />
                 원
@@ -82,7 +117,7 @@ const ShipmentSettings = () => {
             <TextInput
               placeholder="숫자만 입력"
               numbersOnly={true}
-              register={register("shipmentDistantPrice")}
+              register={register(SHIPMENT_DISTANT_PRICE)}
             />{" "}
             원
           </InputContainer>
@@ -96,7 +131,7 @@ const ShipmentSettings = () => {
                 <ReturnPriceInput
                   placeholder="숫자만 입력"
                   numbersOnly={true}
-                  register={register("shipmentReturnPrice")}
+                  register={register(SHIPMENT_RETURN_PRICE)}
                 />{" "}
                 원
               </ReturnPriceInputContainer>
@@ -106,16 +141,16 @@ const ShipmentSettings = () => {
                 <ExchangePriceInput
                   placeholder="숫자만 입력"
                   numbersOnly={true}
-                  register={register("shipmentExchangePrice")}
+                  register={register(SHIPMENT_EXCHANGE_PRICE)}
                 />{" "}
                 원
               </ExchangePriceInputContainer>
             </ShipmentPriceContainer>
           </InputContainer>
         </Contents>
-      </Section>
+      </DefaultShipmentSection>
 
-      <Section>
+      <ConditionalShipmentSection>
         <SectionLabelContainer>
           <SectionLabel>샵 조건부 무료배송</SectionLabel>
           <NoticeContainer
@@ -127,10 +162,10 @@ const ShipmentSettings = () => {
           </NoticeContainer>
         </SectionLabelContainer>
 
-        <Contents>
+        <Contents onFocus={handleFocusContents}>
           <InputContainer>
             <TextInput
-              register={register("shipmentConditionalPrice")}
+              register={register(SHIPMENT_CONDITIONAL_PRICE)}
               placeholder={"숫자만 입력"}
               numbersOnly={true}
               disabled={isShipmentPriceFree}
@@ -138,7 +173,7 @@ const ShipmentSettings = () => {
             원 이상 구매시 무료배송
           </InputContainer>
         </Contents>
-      </Section>
+      </ConditionalShipmentSection>
     </Container>
   );
 };
@@ -146,10 +181,6 @@ const ShipmentSettings = () => {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-
-  & > :first-child {
-    margin-bottom: 24px;
-  }
 `;
 
 const Section = styled.div`
@@ -160,6 +191,14 @@ const Section = styled.div`
     width: 234px;
   }
 `;
+
+const DefaultShipmentSection = styled(Section)<{
+  hasInputStatusMessage: boolean;
+}>`
+  margin-bottom: 24px;
+`;
+
+const ConditionalShipmentSection = styled(Section)``;
 
 const SectionLabelContainer = styled.div`
   display: flex;

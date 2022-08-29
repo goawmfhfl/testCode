@@ -160,21 +160,31 @@ const RegistrationNumberModal = () => {
       identificationCardIssueDate,
     });
 
-    modalVar({
-      ...modalVar(),
-      isVisible: false,
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: <>인증사항이 저장되었습니다.</>,
+      confirmButtonClickHandler: () => {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: false,
+        });
+
+        modalVar({
+          ...modalVar(),
+          isVisible: false,
+        });
+      },
+      cancelButtonVisibility: false,
     });
   };
 
   const clearModal = () => modalVar({ ...modalVar(), isVisible: false });
 
-  const handleCloseButtonClick = () => clearModal();
   const handleCancelButtonClick = () => clearModal();
 
   return (
     <Container>
-      <Icon src={closeIconSource} onClick={handleCloseButtonClick} />
-
       <Title>주민등록증 인증하기</Title>
 
       <NoticeContainer icon={exclamationmarkSrc}>
@@ -244,7 +254,7 @@ const RegistrationNumberModal = () => {
           onClick={handleSaveButtonClick}
           disabled={!isAuthenticated}
         >
-          확인
+          저장
         </Button>
 
         <Button size="small" full={false} onClick={handleCancelButtonClick}>
@@ -263,7 +273,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   width: 530px;
-  padding: 40px 24px 24px 24px;
+  padding: 24px 24px 24px 24px;
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
   background-color: ${({ theme: { palette } }) => palette.white};
   box-shadow: ${({ theme: { shadow } }) => shadow.boxShadow};

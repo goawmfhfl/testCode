@@ -9,7 +9,7 @@ import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import ValidText from "@components/common/ValidText";
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
-import { modalVar } from "@cache/index";
+import { modalVar, systemModalVar } from "@cache/index";
 import { safetyCertificationVar } from "@cache/shopSettings";
 import AuthenticationLoader from "@components/ShopSetting/AuthenticationLoader";
 import { Input as TextInput } from "@components/common/input/TextInput";
@@ -128,14 +128,27 @@ const SafetyModal = () => {
       safetyAuthenticationExpiredDate: safetyExpiredDate,
     });
 
-    modalVar({
-      ...modalVar(),
-      isVisible: false,
-    });
-
     setSafetyInformation({
       safetyNumber: "",
       safetyExpiredDate: null,
+    });
+
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: <>인증사항이 저장되었습니다.</>,
+      confirmButtonClickHandler: () => {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: false,
+        });
+
+        modalVar({
+          ...modalVar(),
+          isVisible: false,
+        });
+      },
+      cancelButtonVisibility: false,
     });
   };
 

@@ -1,20 +1,20 @@
 import styled from "styled-components/macro";
 
+import { GNBReferenceVar } from "@cache/index";
+
 import logoSrc from "@images/logo-white.png";
 import loginSrc from "@icons/login.svg";
-import applySrc from "@icons/apply.svg";
 
 const GlobalNavigationBar = () => {
   return (
-    <Container>
+    <Container
+      // eslint-disable-next-line
+      ref={(newRef: HTMLElement) => GNBReferenceVar(newRef)}
+    >
       <LogoWrapper>
         <Logo src={logoSrc} />
       </LogoWrapper>
       <NavList>
-        <NavItem>
-          <Icon src={applySrc} />
-          <Text>입점신청</Text>
-        </NavItem>
         <NavItem>
           <Icon src={loginSrc} />
           <Text>로그인</Text>
@@ -24,7 +24,7 @@ const GlobalNavigationBar = () => {
   );
 };
 
-const Container = styled.header`
+const Container = styled.div`
   width: 100%;
 
   position: fixed;

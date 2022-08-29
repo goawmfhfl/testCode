@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import { InputValueTypes as ShopSettingInputValueTypes } from "@models/shopSettings";
+
 export interface RemoveImageErrorType {
   code: string;
   message: string;
@@ -112,35 +114,86 @@ function validatePhoneNumber(input: string) {
 // form 제출 시 전체 input validation을 위해 사용
 function hasEveryInputFulfilled(
   inputFields: object,
-  allowsZeroInputNames?: Array<string>
+  optionalInputNames?: Array<string>, // null 또는 undefined 허용
+  allowsZeroInputNames?: Array<string> // 0 허용
 ): {
   isFulfilled: boolean;
   unfulfilledInputNames: Array<string>;
 } {
+  const unfulfilledInputNames = [];
+
   const inputNames = Object.keys(inputFields);
   const inputValues = Object.values(inputFields);
 
   const isFulfilled = inputValues.reduce(
-    (acc: boolean, cur: string, index: number) => {
+    (acc: boolean, inputValue: ShopSettingInputValueTypes, index: number) => {
       const inputName = inputNames[index];
 
-      const hasAllowedZero = allowsZeroInputNames.find(
-        (allowedInputName) => allowedInputName === inputName
+      const isOptionalInput = optionalInputNames.find(
+        (name) => name === inputName
       );
 
-      return acc && validateInput(cur, Boolean(hasAllowedZero));
+      console.log(inputName, isOptionalInput, inputValue);
+
+      if (isOptionalInput) {
+        return acc;
+      }
+
+      // Array - shop images (uploadedFileInfos)
+      if (inputValue instanceof Array && inputName === "uploadedFileInfos") {
+        // eslint-disable-next-line
+        const hasFulfilled = inputValue.reduce(
+          (acc: boolean, cur: { url: string; type: string }) =>
+            acc && Boolean(cur.url) && Boolean(cur.type),
+          true
+        );
+
+        if (!hasFulfilled) {
+          unfulfilledInputNames.push(inputName);
+
+          return false;
+        }
+
+        return acc;
+      }
+
+      // number
+      if (typeof inputValue === "number") {
+        const hasAllowedZero = allowsZeroInputNames.find(
+          (allowedInputName) => allowedInputName === inputName
+        );
+
+        const isValidNumber = validateInput(
+          inputValue,
+          Boolean(hasAllowedZero)
+        );
+
+        if (!isValidNumber) {
+          unfulfilledInputNames.push(inputName);
+
+          return false;
+        }
+
+        return acc;
+      }
+
+      if (!validateInput(inputValue)) {
+        unfulfilledInputNames.push(inputName);
+      }
+
+      return acc && validateInput(inputValue);
     },
     true
   ) as boolean;
 
   return {
     isFulfilled,
-    unfulfilledInputNames: [],
+    unfulfilledInputNames,
   };
 }
 
 function validateInput(
-  input: string | number | boolean | undefined | null,
+  input: ShopSettingInputValueTypes,
   allowsZero?: boolean
 ) {
   switch (typeof input) {

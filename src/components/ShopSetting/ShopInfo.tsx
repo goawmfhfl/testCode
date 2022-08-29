@@ -1,25 +1,33 @@
-import { ChangeEvent, useState } from "react";
+import React, { ChangeEvent } from "react";
+import { useReactiveVar } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
 import axios from "axios";
 import styled from "styled-components/macro";
 
-import { validateImageDimensionRatio } from "@utils/index";
-import { systemModalVar } from "@cache/index";
 import NoticeContainer from "@components/common/NoticeContainer";
+import InputStatusMessage from "@components/common/InputStatusMessage";
+import Textarea from "@components/common/input/Textarea";
+
 import addImageSrc from "@icons/addImage.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import infoIconSrc from "@icons/info.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
 import closeIconSource from "@icons/close.svg";
 import photochangeSrc from "@icons/photochange.svg";
-import { composeStories } from "@storybook/react";
+import {
+  shopImagesVar,
+  sectionFulfillmentVar,
+  SHOP_INTRODUCTION,
+  SECTIONS,
+} from "@cache/shopSettings";
+import { systemModalVar } from "@cache/index";
+import { validateImageDimensionRatio } from "@utils/index";
 
 const ShopInfo = () => {
-  const { register } = useFormContext();
+  const { register, watch } = useFormContext();
 
-  const [mobileImage, setMoboileImage] = useState<string>("");
-  const [pcImage, setPcImage] = useState<string>("");
-  const [textLengh, setTextLength] = useState<number>(0);
+  const shopImages = useReactiveVar(shopImagesVar);
+  const { mobileImage, pcImage } = shopImages;
 
   const handleChangeImageInput = async (
     event: ChangeEvent<HTMLInputElement>
@@ -114,12 +122,19 @@ const ShopInfo = () => {
         formData
       );
 
+      console.log(data);
+
+      console.log(version);
+
       if (version === "mobileImage") {
         if (mobileImage) {
           await deleteImageUrl(mobileImage);
         }
 
-        setMoboileImage(data[0]);
+        shopImagesVar({
+          ...shopImagesVar(),
+          mobileImage: data[0],
+        });
       }
 
       if (version === "pcImage") {
@@ -127,10 +142,24 @@ const ShopInfo = () => {
           await deleteImageUrl(pcImage);
         }
 
-        setPcImage(data[0]);
+        shopImagesVar({
+          ...shopImagesVar(),
+          pcImage: data[0],
+        });
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleFocusImageInput = () => {
+    const isSectionFulfilled = sectionFulfillmentVar().SHOP_INFO;
+
+    if (!isSectionFulfilled) {
+      sectionFulfillmentVar({
+        ...sectionFulfillmentVar(),
+        [SECTIONS.SHOP_INFO]: true,
+      });
     }
   };
 
@@ -149,12 +178,35 @@ const ShopInfo = () => {
         console.log("이미지 삭제 서버 에러", response);
       }
 
-      if (imageUrl === mobileImage) setMoboileImage("");
-      if (imageUrl === pcImage) setPcImage("");
+      if (imageUrl === mobileImage) {
+        shopImagesVar({
+          ...shopImagesVar(),
+          mobileImage: "",
+        });
+      }
+
+      if (imageUrl === pcImage) {
+        shopImagesVar({
+          ...shopImagesVar(),
+          pcImage: "",
+        });
+      }
     } catch (error) {
       console.log(error);
     }
   };
+
+  const handleDeleteButtonClick =
+    (imageUrl: string) => async (e: React.MouseEvent<HTMLImageElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      await deleteImageUrl(imageUrl);
+    };
+
+  const shopIntroduction = watch(SHOP_INTRODUCTION) as string;
+
+  const isSectionFulfilled = useReactiveVar(sectionFulfillmentVar).SHOP_INFO;
 
   return (
     <Container>
@@ -167,93 +219,103 @@ const ShopInfo = () => {
             로고를 제외한 대표 상품 사진을 첨부해주세요.
           </NoticeContainer>
 
+          {!isSectionFulfilled && (
+            <InputStatusMessage color="red" topMargin="12px">
+              ※필수 입력사항입니다.
+            </InputStatusMessage>
+          )}
+
           <ShopImages>
             <ImageContainer>
-              <ImageTitleText>모바일 버전</ImageTitleText>
+              <ImageInputType>모바일 버전</ImageInputType>
 
-              <ImageInfoText>
-                권장 이미지 크기 : 750 px x 750px (정사각형만 가능)
+              <ImageInputDescription>
+                이미지 크기 : 1:1 정사각형(권장 750px x 750px)
                 <br />
-                파일 크기 : 1장 당 2mb / 등록 가능 파일 확장자 : jpg, jpeg, png
-              </ImageInfoText>
+                파일 크기 : 3mb / 등록 가능 파일 확장자 : jpg, jpeg, png
+              </ImageInputDescription>
 
               {mobileImage ? (
                 <AddedMobileImageContainer htmlFor="mobileImage">
                   <AddedMobileImage src={mobileImage} />
-                  <DeleteIcon
+                  <DeleteButton
                     src={closeIconSource}
                     // eslint-disable-next-line
-                    onClick={async () => await deleteImageUrl(mobileImage)}
+                    onClick={handleDeleteButtonClick(mobileImage)}
                   />
                   <ChangeImageLabel htmlFor="mobileImage">
                     <ImageInput
                       type="file"
                       id="mobileImage"
+                      name="mobileImage"
                       accept="image/jpg,image/png,image/jpeg"
-                      {...register("mobileImage")}
                       // eslint-disable-next-line
                       onChange={handleChangeImageInput}
+                      onFocus={handleFocusImageInput}
                     />
                   </ChangeImageLabel>
                 </AddedMobileImageContainer>
               ) : (
                 <MobileImageContainer htmlFor="mobileImage">
-                  <UploadImageLabel htmlFor="mobileImage">
+                  <ImageInputLabel htmlFor="mobileImage">
                     <ImageInput
                       type="file"
                       id="mobileImage"
+                      name="mobileImage"
                       accept="image/jpg,image/png,image/jpeg"
-                      {...register("mobileImage")}
                       // eslint-disable-next-line
                       onChange={handleChangeImageInput}
+                      onFocus={handleFocusImageInput}
                     />
-                  </UploadImageLabel>
-                  <p>사진 등록하기</p>
+                  </ImageInputLabel>
+                  사진 등록하기
                 </MobileImageContainer>
               )}
             </ImageContainer>
 
             <ImageContainer>
-              <ImageTitleText>PC 버전</ImageTitleText>
+              <ImageInputType>PC 버전</ImageInputType>
 
-              <ImageInfoText>
-                권장 이미지 크기 : 1500 px x 750px
+              <ImageInputDescription>
+                이미지 크기 : 2:1 직사각형(권장 1500px x 750px)
                 <br />
-                파일 크기 : 1장 당 3mb / 등록 가능 파일 확장자 : jpg, jpeg, png
-              </ImageInfoText>
+                파일 크기 : 5mb / 등록 가능 파일 확장자 : jpg, jpeg, png
+              </ImageInputDescription>
 
               {pcImage ? (
                 <AddedPcImageContainer htmlFor="pcImage">
                   <AddedPcImage src={pcImage} />
-                  <DeleteIcon
+                  <DeleteButton
                     src={closeIconSource}
                     // eslint-disable-next-line
-                    onClick={async () => await deleteImageUrl(pcImage)}
+                    onClick={handleDeleteButtonClick(pcImage)}
                   />
                   <ChangeImageLabel htmlFor="pcImage">
                     <ImageInput
                       type="file"
                       id="pcImage"
+                      name="pcImage"
                       accept="image/jpg,image/png,image/jpeg"
-                      {...register("pcImage")}
                       // eslint-disable-next-line
                       onChange={handleChangeImageInput}
+                      onFocus={handleFocusImageInput}
                     />
                   </ChangeImageLabel>
                 </AddedPcImageContainer>
               ) : (
                 <PcImageContainer htmlFor="pcImage">
-                  <UploadImageLabel htmlFor="pcImage">
+                  <ImageInputLabel htmlFor="pcImage">
                     <ImageInput
                       type="file"
                       id="pcImage"
+                      name="pcImage"
                       accept="image/jpg,image/png,image/jpeg"
-                      {...register("pcImage")}
                       // eslint-disable-next-line
                       onChange={handleChangeImageInput}
+                      onFocus={handleFocusImageInput}
                     />
-                  </UploadImageLabel>
-                  <p>사진 등록하기</p>
+                  </ImageInputLabel>
+                  사진 등록하기
                 </PcImageContainer>
               )}
             </ImageContainer>
@@ -262,17 +324,28 @@ const ShopInfo = () => {
 
         <SectionContainer>
           <Description>샵 소개</Description>
+
           <NoticeContainer icon={questionmarkSrc} width={"349px"}>
             창작자 페이지, 작품 상세 페이지에 노출되는 소개말입니다.
           </NoticeContainer>
-          <TextAreaContainer>
-            <TextArea
-              {...register("shopIntroduction")}
-              onChange={(event) => setTextLength(event.target.value.length)}
-              maxLength={200}
+
+          <TextareaContainer>
+            <Textarea
+              size="big"
+              width={"377px"}
+              height={"156px"}
+              register={register(SHOP_INTRODUCTION)}
+              onFocus={() => {
+                if (!isSectionFulfilled) {
+                  sectionFulfillmentVar({
+                    ...sectionFulfillmentVar(),
+                    [SECTIONS.SHOP_INFO]: true,
+                  });
+                }
+              }}
             />
-            <TextCounter>{textLengh}/200</TextCounter>
-          </TextAreaContainer>
+            <TextCounter>{shopIntroduction?.length}/200</TextCounter>
+          </TextareaContainer>
         </SectionContainer>
       </ShopInfoContainer>
     </Container>
@@ -288,23 +361,11 @@ const ShopInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 736px;
-
-  & > div:first-child {
-    margin-bottom: 48px;
-  }
 `;
 
 const SectionContainer = styled.div`
   display: flex;
   flex-direction: column;
-
-  & > span {
-    margin-bottom: 8px;
-  }
-
-  & > span + div {
-    margin-bottom: 12px;
-  }
 `;
 
 const Description = styled.span`
@@ -319,6 +380,12 @@ const Description = styled.span`
 
 const ShopImages = styled.div`
   display: flex;
+  margin-top: 12px;
+  margin-bottom: 48px;
+
+  & > div:first-child {
+    margin-right: 10px;
+  }
 `;
 
 const ImageContainer = styled.div`
@@ -328,38 +395,36 @@ const ImageContainer = styled.div`
   width: 363px;
   padding: 16px 24px;
   background-color: ${({ theme: { palette } }) => palette.grey100};
-
-  &:nth-child(1) {
-    margin-right: 10px;
-  }
-
-  & > h3 {
-    padding-bottom: 12px;
-  }
-
-  & > p {
-    margin-bottom: 35px;
-  }
 `;
 
-const ImageTitleText = styled.h3`
+const ImageInputType = styled.h3`
+  margin-bottom: 12px;
+
   font-weight: 700;
   font-size: 14px;
   line-height: 16px;
   letter-spacing: 0.1px;
 `;
 
-const ImageInfoText = styled.p`
+const ImageInputDescription = styled.p`
   font-weight: 300;
   font-size: 12px;
   line-height: 18px;
   letter-spacing: 0.1px;
+
+  margin-bottom: 35px;
 `;
 
-const UploadImageLabel = styled.label`
+const ImageInputLabel = styled.label`
+  width: 48px;
+  height: 48px;
+
+  margin-bottom: 8px;
+
   background-image: url(${addImageSrc});
   background-position: center;
   background-size: cover;
+
   cursor: pointer;
 `;
 
@@ -376,74 +441,47 @@ const ImageInput = styled.input.attrs({
   padding: 0;
 `;
 
-const PcImageContainer = styled.label`
+const ImageInputContainer = styled.label`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
+  background-color: ${({ theme: { palette } }) => palette.white};
+  border: 1px dashed ${({ theme: { palette } }) => palette.grey500};
+  margin: 0 auto;
+
+  cursor: pointer;
+
+  font-family: "Spoqa Han Sans Neo";
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.10000000149011612px;
+  text-align: center;
+`;
+
+const PcImageContainer = styled(ImageInputContainer)`
   width: 280px;
   height: 140px;
-  background-color: ${({ theme: { palette } }) => palette.white};
-  border: 1px dashed ${({ theme: { palette } }) => palette.grey500};
-  margin: 0 auto;
-
-  cursor: pointer;
-
-  & > label {
-    width: 48px;
-    height: 48px;
-    margin-bottom: 14px;
-  }
-
-  & > p {
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 18px;
-    text-align: center;
-    letter-spacing: 0.1px;
-  }
 `;
 
-const MobileImageContainer = styled.label`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  width: 140px;
-  height: 140px;
-  background-color: ${({ theme: { palette } }) => palette.white};
-  border: 1px dashed ${({ theme: { palette } }) => palette.grey500};
-  margin: 0 auto;
-
-  cursor: pointer;
-
-  & > label {
-    width: 48px;
-    height: 48px;
-    margin-bottom: 14px;
-  }
-
-  & > p {
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 18px;
-    text-align: center;
-    letter-spacing: 0.1px;
-  }
-`;
-
-const AddedMobileImageContainer = styled.label`
-  position: relative;
-  margin: 0 auto;
+const MobileImageContainer = styled(ImageInputContainer)`
   width: 140px;
   height: 140px;
 `;
 
-const AddedPcImageContainer = styled.label`
+const AddedImageContainer = styled.label`
   position: relative;
   margin: 0 auto;
+`;
+
+const AddedMobileImageContainer = styled(AddedImageContainer)`
+  width: 140px;
+  height: 140px;
+`;
+
+const AddedPcImageContainer = styled(AddedImageContainer)`
   width: 280px;
   height: 140px;
 `;
@@ -458,7 +496,7 @@ const AddedPcImage = styled.img`
   height: 140px;
 `;
 
-const DeleteIcon = styled.img`
+const DeleteButton = styled.img`
   position: absolute;
   top: 0;
   right: 0;
@@ -466,6 +504,8 @@ const DeleteIcon = styled.img`
 
   width: 24px;
   height: 24px;
+
+  cursor: pointer;
 `;
 
 const ChangeImageLabel = styled.label`
@@ -483,32 +523,17 @@ const ChangeImageLabel = styled.label`
   cursor: pointer;
 `;
 
-const TextAreaContainer = styled.div`
+const TextareaContainer = styled.div`
   display: flex;
 
-  & > span {
-    display: flex;
-    align-items: flex-end;
-    margin-left: 8px;
-  }
-`;
-
-const TextArea = styled.textarea`
-  width: 377px;
-  height: 156px;
-  background: ${({ theme: { palette } }) => palette.white};
-  border: 1px solid ${({ theme: { palette } }) => palette.grey500};
-
-  padding: 8px;
-  font-weight: 300;
-  font-size: 12px;
-  line-height: 18px;
-  letter-spacing: 0.1px;
-
-  resize: none;
+  margin-top: 10px;
 `;
 
 const TextCounter = styled.span`
+  display: flex;
+  align-items: flex-end;
+  margin-left: 8px;
+
   font-weight: 400;
   font-size: 16px;
   line-height: 22px;

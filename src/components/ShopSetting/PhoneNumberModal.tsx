@@ -5,7 +5,6 @@ import styled from "styled-components/macro";
 import { Input as TextInput } from "@components/common/input/TextInput";
 import Button from "@components/common/Button";
 import ValidText from "@components/common/ValidText";
-import closeIconSource from "@icons/close.svg";
 import { modalVar, systemModalVar } from "@cache/index";
 import { phoneNumberVar } from "@cache/shopSettings";
 import { validatePhoneNumber, isNumber } from "@utils/index";
@@ -45,8 +44,6 @@ const postAuthenticationCode = async (
         originMessage: string | null;
       }>;
     } = await bizm.post(`/v2/sender/send`, data);
-
-    console.log(bizmResponseData);
 
     if (
       bizmResponseData[0].code === "fail" &&
@@ -188,10 +185,29 @@ const PhoneNumberModal = () => {
     }
   };
 
-  const handleConfirmButtonClick = () => {
+  const handleSaveButtonClick = () => {
     phoneNumberVar(userPhoneNumber);
 
-    clearModal();
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: (
+        <>
+          전화번호 변경사항이
+          <br />
+          저장되었습니다.
+        </>
+      ),
+      confirmButtonClickHandler: () => {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: false,
+        });
+
+        clearModal();
+      },
+      cancelButtonVisibility: false,
+    });
   };
 
   const handleCancelButtonClick = () => {
@@ -235,7 +251,6 @@ const PhoneNumberModal = () => {
 
   return (
     <Container>
-      <CloseButton src={closeIconSource} onClick={clearModal} />
       <Title>전화번호 변경하기</Title>
       <DescriptText>
         {isStarted
@@ -307,17 +322,21 @@ const PhoneNumberModal = () => {
       </ConfirmContainer>
 
       <ButtonContainer>
-        <Button
+        <SaveButton
           size="small"
           full={false}
-          onClick={handleConfirmButtonClick}
+          onClick={handleSaveButtonClick}
           disabled={!isVerified}
         >
-          확인
-        </Button>
-        <Button size="small" full={false} onClick={handleCancelButtonClick}>
+          저장
+        </SaveButton>
+        <CancelButton
+          size="small"
+          full={false}
+          onClick={handleCancelButtonClick}
+        >
           취소
-        </Button>
+        </CancelButton>
       </ButtonContainer>
     </Container>
   );
@@ -329,7 +348,7 @@ const Container = styled.div`
   transform: translateY(-50%);
   z-index: 100;
 
-  padding: 40px 24px 24px 24px;
+  padding: 24px 24px 24px 24px;
   display: flex;
   flex-direction: column;
 
@@ -434,17 +453,12 @@ const ButtonContainer = styled.div`
   display: flex;
   width: 100%;
   justify-content: flex-end;
-
-  & > button:first-child {
-    margin-right: 16px;
-  }
-
-  & > button {
-    font-weight: 500;
-    font-size: 12px;
-    line-height: 14px;
-    text-align: center;
-    letter-spacing: 0.1px;
-  }
 `;
+
+const SaveButton = styled(Button)`
+  margin-right: 16px;
+`;
+
+const CancelButton = styled(Button)``;
+
 export default PhoneNumberModal;

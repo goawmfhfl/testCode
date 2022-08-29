@@ -1,5 +1,6 @@
 import React from "react";
 import styled, { css } from "styled-components/macro";
+import { sectionReferenceVar } from "@cache/shopSettings";
 
 const SectionWrapper = ({
   label,
@@ -8,6 +9,7 @@ const SectionWrapper = ({
   marginTop = "88px",
   marginBottom = "88px",
   labelMarginTop = true,
+  referenceKey,
 }: {
   label: React.ReactNode;
   isRequired?: boolean;
@@ -15,9 +17,21 @@ const SectionWrapper = ({
   marginTop?: string;
   marginBottom?: string;
   labelMarginTop?: boolean;
+  referenceKey?: string;
 }) => {
   return (
-    <Container marginTop={marginTop} marginBottom={marginBottom}>
+    <Container
+      marginTop={marginTop}
+      marginBottom={marginBottom}
+      ref={(newRef) => {
+        if (!referenceKey) return;
+
+        sectionReferenceVar({
+          ...sectionReferenceVar(),
+          [referenceKey]: newRef,
+        });
+      }}
+    >
       <InputLabel
         htmlFor=""
         isRequired={isRequired}

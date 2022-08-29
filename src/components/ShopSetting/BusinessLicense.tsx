@@ -3,9 +3,15 @@ import { useReactiveVar } from "@apollo/client";
 
 import Button from "@components/common/Button";
 import BusinessLicenseModal from "@components/ShopSetting/BusinessLicenseModal";
+import InputStatusMessage from "@components/common/InputStatusMessage";
+
 import { modalVar } from "@cache/index";
-import { businessLicenseVar } from "@cache/shopSettings";
 import { BusinessLicenseVariables } from "@models/shopSettings";
+import {
+  businessLicenseVar,
+  sectionFulfillmentVar,
+  SECTIONS,
+} from "@cache/shopSettings";
 
 export interface BusinessLicenseInfoType {
   rprsvNm: string; // 대표자명
@@ -17,12 +23,31 @@ export interface BusinessLicenseInfoType {
 }
 
 const BusinessLicense = () => {
+  const sectionFulfillment = sectionFulfillmentVar();
+
   const businessLicense: BusinessLicenseVariables =
     useReactiveVar(businessLicenseVar);
 
   const hasBusinessLicense = Object.values(businessLicense).find(
     (el: string) => el !== ""
   ) as boolean;
+
+  const handleRegisterButtonClick = () => {
+    const isSectionFulfilled = sectionFulfillmentVar().BUSINESS_LICENSE;
+
+    if (!isSectionFulfilled) {
+      sectionFulfillmentVar({
+        ...sectionFulfillmentVar(),
+        [SECTIONS.BUSINESS_LICENSE]: true,
+      });
+    }
+
+    modalVar({
+      ...modalVar(),
+      isVisible: true,
+      component: <BusinessLicenseModal />,
+    });
+  };
 
   const {
     representativeName,
@@ -35,50 +60,46 @@ const BusinessLicense = () => {
 
   return (
     <Container>
+      {!sectionFulfillment.BUSINESS_LICENSE && (
+        <InputStatusMessage color="red" topMargin={"5px"} bottomMargin={"10px"}>
+          ※필수 입력사항입니다.
+        </InputStatusMessage>
+      )}
+
       {!hasBusinessLicense ? (
-        <HasNoInfoContainer>
+        <HasNoInfoContainer hasInputStatusMessage={true}>
           <InfoText>등록된 사업자등록증/통신판매업신고증이 없습니다.</InfoText>
-          <Button
-            size="small"
-            full={false}
-            onClick={() =>
-              modalVar({
-                ...modalVar(),
-                isVisible: true,
-                component: <BusinessLicenseModal />,
-              })
-            }
-          >
+          <Button size="small" full={false} onClick={handleRegisterButtonClick}>
             등록하기
           </Button>
         </HasNoInfoContainer>
       ) : (
         <HasInfoContainer>
           <InfoList>
-            <InfoContainer>
+            <Info>
               <Text>대표자명</Text>
               <Text>{representativeName}</Text>
-            </InfoContainer>
-            <InfoContainer>
+            </Info>
+            <Info>
               <Text>사업자등록번호 </Text>
               <Text>{businessRegistrationNumber}</Text>
-            </InfoContainer>
-            <InfoContainer>
+            </Info>
+            <Info>
               <Text>법인등록번호</Text>
               <Text>{corporateRegistrationNumber}</Text>
-            </InfoContainer>
-            <InfoContainer>
+            </Info>
+            <Info>
               <Text>간이과세대상자</Text>
               <Text>{isSimpleTaxpayers}</Text>
-            </InfoContainer>
-            <InfoContainer>
+            </Info>
+            <Info>
               <Text>소재지</Text>
               <Text>{companyLocation}</Text>
-            </InfoContainer>
-            <InfoContainer>
+            </Info>
+            <Info>
               <Text>통신판매업신고번호</Text>
               <Text>{onlineSalesLicense}</Text>
-            </InfoContainer>
+            </Info>
           </InfoList>
         </HasInfoContainer>
       )}
@@ -89,18 +110,24 @@ const BusinessLicense = () => {
 const Container = styled.div`
   position: relative;
   display: flex;
+  flex-direction: column;
 
   width: 100%;
 `;
 
-const HasNoInfoContainer = styled.div`
+const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  min-width: 736px;
-  padding: 16px 174px;
   background-color: ${({ theme: { palette } }) => palette.grey100};
+  width: 702px;
+`;
+
+const HasNoInfoContainer = styled(InfoContainer)<{
+  hasInputStatusMessage: boolean;
+}>`
+  padding: 16px 174px;
 
   & > :first-child {
     margin-bottom: 16px;
@@ -118,13 +145,8 @@ const HasNoInfoContainer = styled.div`
   }
 `;
 
-const HasInfoContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  min-width: 736px;
+const HasInfoContainer = styled(InfoContainer)`
   padding: 24px 40px;
-  background-color: ${({ theme: { palette } }) => palette.grey100};
 `;
 
 const InfoList = styled.ul`
@@ -132,7 +154,7 @@ const InfoList = styled.ul`
   flex-direction: column;
 `;
 
-const InfoContainer = styled.li`
+const Info = styled.li`
   display: flex;
   padding-bottom: 8px;
   margin-bottom: 8px;
