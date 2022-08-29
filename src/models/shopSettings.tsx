@@ -1,5 +1,5 @@
 import { UploadFileType } from "@models/index";
-import { ShipmentChargeType } from "./shipmentTemplate";
+import { ShipmentChargeType } from "./productRegistration/shipmentTemplate";
 
 export type InputValueTypes =
   | string

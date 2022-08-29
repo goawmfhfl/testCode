@@ -1,3 +1,4 @@
+import React from "react";
 import styled, { useTheme } from "styled-components/macro";
 import { gql, useMutation } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
@@ -8,37 +9,28 @@ import {
   requiredImagesVar,
   optionalImagesVar,
 } from "@cache/productRegistration/productImages";
-import React from "react";
+
 import {
-  SHOP_INTRODUCTION,
-  SHIPMENT_POLICY,
-  RETURN_POLICY,
-  SHIPMENT_BUNDLING,
   SHIPMENT_PRICE_TYPE,
-  SHIPMENT_PRICE,
-  SHIPMENT_DISTANT_PRICE,
-  SHIPMENT_RETURN_PRICE,
-  SHIPMENT_EXCHANGE_PRICE,
-  SHIPMENT_CONDITIONAL_PRICE,
-  shopImagesVar,
-  safetyCertificationVar,
-  businessLicenseVar,
-  registrationNumberVar,
-  phoneNumberVar,
-  settlementAccountVar,
   sectionMapperVar,
   sectionReferenceVar,
   sectionFulfillmentVar,
 } from "@cache/shopSettings";
-import { TemporarySaveShopSettingsInputType } from "@models/shopSettings";
-import { UploadFileType } from "@models/index";
-import { ShipmentChargeType } from "@models/shipmentTemplate";
 import {
   systemModalVar,
   contentsContainerReferenceVar,
   GNBReferenceVar,
 } from "@cache/index";
+
+import {
+  TemporarySaveShopSettingsInputType,
+  SaveShopSettingsInputType,
+} from "@models/shopSettings";
+import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
+import { CreateProductInputType } from "@models/productRegistration/index";
+
 import { hasEveryInputFulfilled } from "@utils/index";
+import { reorganizeShopSettingStates } from "@utils/shopSettings";
 
 const TEMPORARY_SAVE_SHOP_SETTINGS = gql`
   mutation TemporarySaveShop($input: TemporarySaveShopInput!) {
@@ -49,9 +41,27 @@ const TEMPORARY_SAVE_SHOP_SETTINGS = gql`
   }
 `;
 
-const SUBMIT_SHOP_SETTINGS = gql`
+const SAVE_SHOP_SETTINGS = gql`
   mutation SubmitShop($input: RegisterShopInput!) {
     registerShop(input: $input) {
+      ok
+      error
+    }
+  }
+`;
+
+const TEMPORARY_SAVE_PRODUCT = gql`
+  mutation TemporarySaveProduct($input: TemporarySaveProductInput!) {
+    temporarySaveProduct(input: $input) {
+      ok
+      error
+    }
+  }
+`;
+
+const CREATE_PRODUCT = gql`
+  mutation CreateProduct($input: CreateProductInput!) {
+    createProduct(input: $input) {
       ok
       error
     }
@@ -84,16 +94,33 @@ const SaveBar = () => {
         };
       },
       {
-        input: TemporarySaveShopSettingsInputType;
+        input: SaveShopSettingsInputType;
       }
-    >(SUBMIT_SHOP_SETTINGS);
+    >(SAVE_SHOP_SETTINGS);
 
-  // useMutation<{
-  //   ok: boolean;
-  //   error: string;
-  // }, {
-  //   name
-  // }>(TEMPORARY_SAVE_PRODUCT);
+  useMutation<
+    {
+      temporarySaveProduct: {
+        ok: boolean;
+        error: string;
+      };
+    },
+    {
+      name;
+    }
+  >(TEMPORARY_SAVE_PRODUCT);
+
+  useMutation<
+    {
+      createProduct: {
+        ok: boolean;
+        error: string;
+      };
+    },
+    {
+      input: CreateProductInputType;
+    }
+  >(CREATE_PRODUCT);
 
   const handleTemporarySaveButtonClick = async (
     e: React.MouseEvent<HTMLButtonElement>
@@ -101,88 +128,7 @@ const SaveBar = () => {
     e.preventDefault();
 
     if (location.pathname === "/shopSetting") {
-      const description = watch(SHOP_INTRODUCTION) as string;
-      const shipmentPolicy = watch(SHIPMENT_POLICY) as string;
-      const returnPolicy = watch(RETURN_POLICY) as string;
-
-      const { safetyAuthenticationNumber, safetyAuthenticationExpiredDate } =
-        safetyCertificationVar();
-
-      const isBundleShipment =
-        watch(SHIPMENT_BUNDLING) === "가능" ? true : false;
-      const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
-      const shipmentPrice = Number(watch(SHIPMENT_PRICE));
-      const shipmentDistantPrice = Number(watch(SHIPMENT_DISTANT_PRICE));
-      const shipmentConditionalPrice = Number(watch(SHIPMENT_RETURN_PRICE));
-      const shipmentReturnPrice = Number(watch(SHIPMENT_EXCHANGE_PRICE));
-      const shipmentExchangePrice = Number(watch(SHIPMENT_CONDITIONAL_PRICE));
-
-      const uploadedFileInfos = [
-        {
-          url: shopImagesVar().mobileImage,
-          type: UploadFileType.SHOP_MOBILE,
-        },
-        {
-          url: shopImagesVar().pcImage,
-          type: UploadFileType.SHOP_PC,
-        },
-      ];
-
-      const {
-        representativeName,
-        businessRegistrationNumber,
-        corporateRegistrationNumber,
-        isSimpleTaxpayers,
-        companyLocation,
-        onlineSalesLicense,
-      } = businessLicenseVar();
-
-      const {
-        identificationCardOwner,
-        identificationCardNumber,
-        identificationCardIssueDate,
-      } = registrationNumberVar();
-
-      const contactNumber = phoneNumberVar();
-
-      const {
-        accountNumber: bankAccountNumber,
-        accountName: bankAccountHolder,
-        bankName,
-      } = settlementAccountVar();
-
-      const temporarySaveShopInput = {
-        uploadedFileInfos,
-        description,
-        shipmentPolicy,
-        returnPolicy,
-        safetyAuthentication: safetyAuthenticationNumber,
-        safetyAuthenticationExpiredDate: new Date(
-          safetyAuthenticationExpiredDate
-        ),
-        shipmentType,
-        shipmentPrice,
-        shipmentDistantPrice,
-        shipmentConditionalPrice,
-        shipmentReturnPrice,
-        shipmentExchangePrice,
-        isBundleShipment,
-        representativeName,
-        businessRegistrationNumber,
-        corporateRegistrationNumber,
-        isSimpleTaxpayers: isSimpleTaxpayers === "대상" ? true : false,
-        companyLocation,
-        onlineSalesLicense,
-        identificationCardOwner,
-        identificationCardNumber,
-        identificationCardIssueDate,
-        contactNumber,
-        bankAccountNumber,
-        bankAccountHolder,
-        bankName,
-      };
-
-      console.log("샵 임시 저장", temporarySaveShopInput);
+      const temporarySaveShopInput = reorganizeShopSettingStates(watch);
 
       const {
         data: {
@@ -236,87 +182,11 @@ const SaveBar = () => {
     e.preventDefault();
 
     if (location.pathname === "/shopSetting") {
-      const description = watch(SHOP_INTRODUCTION) as string;
-      const shipmentPolicy = watch(SHIPMENT_POLICY) as string;
-      const returnPolicy = watch(RETURN_POLICY) as string;
+      const input = reorganizeShopSettingStates(watch);
 
-      const { safetyAuthenticationNumber, safetyAuthenticationExpiredDate } =
-        safetyCertificationVar();
+      console.log("제대로 가져왔나! - shop submit", input);
 
-      const isBundleShipment =
-        watch(SHIPMENT_BUNDLING) === "가능" ? true : false;
       const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
-      const shipmentPrice = Number(watch(SHIPMENT_PRICE));
-      const shipmentDistantPrice = Number(watch(SHIPMENT_DISTANT_PRICE));
-      const shipmentConditionalPrice = Number(watch(SHIPMENT_RETURN_PRICE));
-      const shipmentReturnPrice = Number(watch(SHIPMENT_EXCHANGE_PRICE));
-      const shipmentExchangePrice = Number(watch(SHIPMENT_CONDITIONAL_PRICE));
-
-      const uploadedFileInfos = [
-        {
-          url: shopImagesVar().mobileImage,
-          type: UploadFileType.SHOP_MOBILE,
-        },
-        {
-          url: shopImagesVar().pcImage,
-          type: UploadFileType.SHOP_PC,
-        },
-      ];
-
-      const {
-        representativeName,
-        businessRegistrationNumber,
-        corporateRegistrationNumber,
-        isSimpleTaxpayers,
-        companyLocation,
-        onlineSalesLicense,
-      } = businessLicenseVar();
-
-      const {
-        identificationCardOwner,
-        identificationCardNumber,
-        identificationCardIssueDate,
-      } = registrationNumberVar();
-
-      const contactNumber = phoneNumberVar();
-
-      const {
-        accountNumber: bankAccountNumber,
-        accountName: bankAccountHolder,
-        bankName,
-      } = settlementAccountVar();
-
-      const input = {
-        uploadedFileInfos,
-        description,
-        shipmentPolicy,
-        returnPolicy,
-        safetyAuthentication: safetyAuthenticationNumber,
-        safetyAuthenticationExpiredDate: new Date(
-          safetyAuthenticationExpiredDate
-        ),
-        shipmentType,
-        shipmentPrice,
-        shipmentDistantPrice,
-        shipmentConditionalPrice,
-        shipmentReturnPrice,
-        shipmentExchangePrice,
-        isBundleShipment,
-        representativeName,
-        businessRegistrationNumber,
-        corporateRegistrationNumber,
-        isSimpleTaxpayers: isSimpleTaxpayers === "대상" ? true : false,
-        companyLocation,
-        onlineSalesLicense,
-        identificationCardOwner,
-        identificationCardNumber,
-        identificationCardIssueDate,
-        contactNumber,
-        bankAccountNumber,
-        bankAccountHolder,
-        bankName,
-      };
-
       const isShipmentPriceFree = shipmentType === ShipmentChargeType.Free;
 
       const { isFulfilled, unfulfilledInputNames } = hasEveryInputFulfilled(
@@ -337,9 +207,6 @@ const SaveBar = () => {
       console.log("unfulfilled", unfulfilledInputNames);
 
       if (!isFulfilled) {
-        // 1
-        // unfulfilledInputNames를 각각 섹션으로 매핑
-        // 중복되는 섹션 이름은 제거
         const sectionMapper = sectionMapperVar();
 
         const unfulfilledSectionNames = [
@@ -350,21 +217,12 @@ const SaveBar = () => {
           ),
         ];
 
-        // 2
-        // 그렇게 unfulfilledSectionName을 얻어내고
-
-        // 2-1
-        // 가장 처음으로 등장하는 섹션의 reference를 잡아낸다 (미리 잡아두고 동일한 섹션 키 이름으로 저장해둔다 => Reactive Variable로 관리)
         const targetSection = sectionMapper[unfulfilledInputNames[0]];
-
         const sectionReferenceList = sectionReferenceVar();
-
         const targetSectionReference = sectionReferenceList[
           targetSection
         ] as HTMLElement;
 
-        // 2-2
-        // 섹션들에 대하여 "인풋 없음" 으로 상태를 변경한다
         unfulfilledSectionNames.forEach((sectionName) => {
           sectionFulfillmentVar({
             ...sectionFulfillmentVar(),
@@ -372,12 +230,7 @@ const SaveBar = () => {
           });
         });
 
-        // 3
-        // 레퍼런스 위치로 컨텐츠 스크롤 이동
-
-        // eslint-disable-next-line
         const GNBReference: HTMLElement = GNBReferenceVar();
-
         const SECTION_TOP_MARGIN = 88;
 
         const scrollTo =

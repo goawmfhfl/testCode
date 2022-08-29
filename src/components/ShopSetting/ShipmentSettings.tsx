@@ -10,7 +10,7 @@ import NoticeContainer from "@components/common/NoticeContainer";
 import InputStatusMessage from "@components/common/InputStatusMessage";
 
 import informationMarkSource from "@icons/info.svg";
-import { ShipmentChargeType } from "@models/shipmentTemplate";
+import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
 import {
   SHIPMENT_PRICE_TYPE,
   SHIPMENT_PRICE,
