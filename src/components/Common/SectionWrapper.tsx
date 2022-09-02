@@ -39,6 +39,7 @@ const SectionWrapper = ({
       >
         {label}
       </InputLabel>
+
       <Wrapper>{children}</Wrapper>
     </Container>
   );
@@ -69,10 +70,11 @@ const InputLabel = styled.label<{ isRequired: boolean; hasTopMargin: boolean }>`
   margin-top: ${({ hasTopMargin }) => (hasTopMargin ? "5px" : "")};
 
   font-family: "Spoqa Han Sans Neo";
-  font-weight: 700;
   font-size: 14px;
-  line-height: 20px;
-  vertical-align: baseline;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.10000000149011612px;
+  text-align: left;
 
   display: flex;
   align-items: start;

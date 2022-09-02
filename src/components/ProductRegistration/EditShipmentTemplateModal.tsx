@@ -6,7 +6,7 @@ import {
   shipmentTemplateVar,
   initialState as shipmentTemplateInitialState,
 } from "@cache/productRegistration/shipmentTemplate";
-import { CreateShipmentInputType } from "@models/shipmentTemplate";
+import { CreateShipmentInputType } from "@models/productRegistration/shipmentTemplate";
 
 interface EditShipmentTemplateModalProps {
   templateId: number;
@@ -134,6 +134,17 @@ const EditShipmentTemplateModal = ({
             ...systemModalVar(),
             isVisible: true,
             description: "템플릿이 수정되었습니다.",
+            confirmButtonClickHandler: () => {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+
+              overModalVar({
+                ...overModalVar(),
+                isVisible: false,
+              });
+            },
           });
         }
       } catch (error) {

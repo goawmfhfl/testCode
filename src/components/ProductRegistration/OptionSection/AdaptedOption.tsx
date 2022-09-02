@@ -1,13 +1,17 @@
 import styled from "styled-components/macro";
-import { useState } from "react";
+import React, { useState } from "react";
 import { ReactiveVar, useReactiveVar } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
 
-import { OptionRowType, OptionType, OptionTypes } from "@models/options";
+import {
+  OptionRowType,
+  OptionType,
+  OptionTypes,
+} from "@models/productRegistration/options";
 import {
   requiredOptionVar,
   selectiveOptionVar,
-} from "@cache/productRegistration/options";
+} from "@cache/productRegistration/productOptions";
 import { isNumber } from "@utils/index";
 
 const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
@@ -115,6 +119,7 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
                     </AdaptedOptionTableData>
                   ))}
 
+                  {/* 옵션가 */}
                   <AdaptedOptionTableData
                     className={isLastRow ? "cell--low-end" : ""}
                     width={"80px"}
@@ -123,7 +128,9 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
                       {...register(`optionPrice-${id}`, {
                         valueAsNumber: true,
                       })}
+                      min="0"
                       step="1000"
+                      defaultValue={0}
                       onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const nativeEvent = e.nativeEvent as InputEvent;
                         const inputKey: string = nativeEvent.data;
@@ -144,8 +151,15 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
                           setValue(`optionPrice-${id}`, previousValue);
                         }
                       }}
+                      onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                        if (!e.target.value) {
+                          setValue(`optionStock-${id}`, 0);
+                        }
+                      }}
                     />
                   </AdaptedOptionTableData>
+
+                  {/* 재고 */}
                   <AdaptedOptionTableData
                     className={isLastRow ? "cell--low-end" : ""}
                     width={"64px"}
@@ -154,8 +168,9 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
                       {...register(`optionStock-${id}`, {
                         valueAsNumber: true,
                       })}
-                      step="10"
                       min="0"
+                      step="10"
+                      defaultValue={0}
                       onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const nativeEvent = e.nativeEvent as InputEvent;
                         const inputKey: string = nativeEvent.data;
@@ -171,6 +186,11 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
                           ) as string;
 
                           setValue(`optionStock-${id}`, previousValue);
+                        }
+                      }}
+                      onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                        if (!e.target.value) {
+                          setValue(`optionStock-${id}`, 0);
                         }
                       }}
                     />
@@ -266,6 +286,7 @@ const AdaptedOptionTableRow = styled.tr``;
 const AdaptedOptionTableData = styled.td<{ width: string }>`
   width: ${({ width }) => width};
   padding: 10px;
+  padding-right: 0px;
   border: 1px solid ${({ theme: { palette } }) => palette.grey500};
   text-align: center;
   white-space: pre-wrap;

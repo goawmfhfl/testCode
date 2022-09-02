@@ -4,7 +4,7 @@ import {
   ShipmentChargeType,
   ShipmentTemplateType,
   CreateShipmentInputType,
-} from "@models/shipmentTemplate";
+} from "@models/productRegistration/shipmentTemplate";
 
 export const initialState = {
   name: "",

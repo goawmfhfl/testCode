@@ -7,12 +7,14 @@ const Textarea = ({
   size,
   register,
   onFocus,
+  placeholder,
 }: {
   width?: string;
   height?: string;
   size: string;
   register: UseFormRegisterReturn;
   onFocus?: () => void;
+  placeholder?: string;
 }) => {
   return (
     <Container
@@ -21,6 +23,7 @@ const Textarea = ({
       size={size}
       {...register}
       onFocus={onFocus}
+      placeholder={placeholder}
     />
   );
 };
@@ -84,6 +87,13 @@ const Container = styled.textarea<{
 
   ${fontSizing}
   ${paddingSizing}
+
+  font-family: "Spoqa Han Sans Neo";
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 18px;
+  letter-spacing: 0.10000000149011612px;
+  text-align: left;
 `;
 
 export default Textarea;

@@ -1,60 +1,35 @@
-import { v4 as uuidv4 } from "uuid";
 import styled from "styled-components/macro";
 import { useFormContext } from "react-hook-form";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
-import ProductImage from "@components/ProductRegistration/ImageSection/ProductImage";
-
-import {
-  ProductImageType,
-  ImageType,
-  ProductImageContainer,
-  AddImageInputWrapper,
-  AddImageInput,
-} from "./index";
+import ProductImageContainer from "@components/ProductRegistration/ImageSection/common/ProductImageContainer";
+import ProductImage from "@components/ProductRegistration/ImageSection/common/ProductImage";
+import AddImageInputWrapper from "@components/ProductRegistration/ImageSection/common/AddImageInputWrapper";
+import AddImageInput from "@components/ProductRegistration/ImageSection/common/AddImageInput";
 
 import {
   addImageOnServer,
   removeImageFromServer,
   RemoveImageErrorType,
+  validateImageDimensionRatio,
+  validateImageSize,
 } from "@utils/index";
 
+import { ProductImageType } from "@models/productImages";
+
+import { systemModalVar } from "@cache/index";
+import { useReactiveVar } from "@apollo/client";
+import { requiredImagesVar } from "@cache/productRegistration/productImages";
+
 const RequiredImages = () => {
-  const [productImages, setProductImages] = useState<Array<ProductImageType>>([
-    {
-      id: uuidv4(),
-      url: "",
-      type: ImageType.SQUARE,
-      isThumbnail: true,
-    },
-    {
-      id: uuidv4(),
-      url: "",
-      type: ImageType.SQUARE,
-    },
-    {
-      id: uuidv4(),
-      url: "",
-      type: ImageType.SQUARE,
-    },
-    {
-      id: uuidv4(),
-      url: "",
-      type: ImageType.SQUARE,
-    },
-    {
-      id: uuidv4(),
-      url: "",
-      type: ImageType.SQUARE,
-    },
-  ]);
+  const requiredImages = useReactiveVar(requiredImagesVar);
 
   const { register, setValue, watch } = useFormContext();
 
   const previousProductImageValuesRef = useRef<Array<FileList> | null>(null);
 
   const productImageValues: Array<FileList> | Array<null> = watch(
-    productImages.map(({ id }) => id)
+    requiredImages.map(({ id }) => id)
   );
 
   useEffect(() => {
@@ -68,7 +43,7 @@ const RequiredImages = () => {
 
       새로운 사진이 추가되거나 기존 사진이 변경되었을 때,
       변경된 이미지 데이터만을 확인하여 서버에 새롭게 등록하고 (+ 기존 이미지는 서버에서 삭제)
-      등록된 url을 컴포넌트 내부의 상태(productImages)에 반영하여
+      등록된 url을 컴포넌트 내부의 상태(requiredImages)에 반영하여
       등록된 이미지가 새롭게 렌더링 될 수 있도록 합니다.
 
     */
@@ -86,11 +61,36 @@ const RequiredImages = () => {
             return;
           }
 
-          if (productImages[index].url) {
+          const isImageRatioFulfilled = await validateImageDimensionRatio(
+            productImageValue[0],
+            { width: 1, height: 1 }
+          );
+
+          if (!isImageRatioFulfilled) {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: true,
+              description: <>등록 가능한 이미지 비율은 1:1 입니다.</>,
+            });
+
+            return;
+          }
+
+          if (!validateImageSize(productImageValue[0], 2 * 1000 * 1000)) {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: true,
+              description: <>등록 가능한 파일 크기는 2MB 입니다.</>,
+            });
+
+            return;
+          }
+
+          if (requiredImages[index].url) {
             const removeImageResult: {
               result: string;
               error: RemoveImageErrorType;
-            } = await removeImageFromServer(productImages[index].url);
+            } = await removeImageFromServer(requiredImages[index].url);
 
             if (removeImageResult.error) {
               console.log(removeImageResult.error);
@@ -101,12 +101,10 @@ const RequiredImages = () => {
             productImageValue[0]
           );
 
-          setProductImages((prev) => {
-            const newProductImages = [...prev];
-            newProductImages[index].url = addedImageUrl;
+          const newRequiredImages = [...requiredImagesVar()];
+          newRequiredImages[index].url = addedImageUrl;
 
-            return newProductImages;
-          });
+          requiredImagesVar(newRequiredImages);
         } catch (error) {
           console.log(error);
         }
@@ -117,25 +115,23 @@ const RequiredImages = () => {
   }, [productImageValues]);
 
   const handleProductImageRemoveButtonClick = async (targetId: string) => {
-    const productImage: ProductImageType = productImages.find(
+    const productImage: ProductImageType = requiredImages.find(
       (image) => image.id === targetId
     );
 
-    // 1. productImages에서 해당 url을 삭제한다
-    setProductImages((prev) => {
-      const newProductImages = [...prev].map((image) => {
-        if (image.id === targetId) {
-          return {
-            ...image,
-            url: "",
-          };
-        }
+    // 1. 로컬 상태에서 해당 이미지 url을 삭제한다
+    const newRequiredImages = [...requiredImagesVar()].map((image) => {
+      if (image.id === targetId) {
+        return {
+          ...image,
+          url: "",
+        };
+      }
 
-        return image;
-      });
-
-      return newProductImages;
+      return image;
     });
+
+    requiredImagesVar(newRequiredImages);
 
     // 2. react hook form에서 인풋 데이터를 빈 File 객체로 바꿔준다
     const dataTransfer = new DataTransfer();
@@ -153,7 +149,7 @@ const RequiredImages = () => {
     }
   };
 
-  const [thumbnailImage, ...requiredImages] = productImages;
+  const [thumbnailImage, ...requiredImagesExceptThumbnail] = requiredImages;
 
   return (
     <Container>
@@ -185,7 +181,7 @@ const RequiredImages = () => {
       <RequiredImageContainer>
         <RequiredImageHeader>필수 첨부 이미지</RequiredImageHeader>
         <RequiredImageList>
-          {requiredImages.map(({ id, url }) => {
+          {requiredImagesExceptThumbnail.map(({ id, url }) => {
             return (
               <ProductImageContainer key={id}>
                 {url ? (
@@ -215,18 +211,31 @@ const RequiredImages = () => {
 
 const Container = styled.div`
   display: flex;
-
+  background-color: ${({ theme: { palette } }) => palette.grey100};
   margin-top: 16px;
+  padding: 8px;
+
+  width: 756px;
 `;
 
 const ThumbnailImageContainer = styled.div`
   margin-right: 16px;
 `;
-const ThumbnailImageHeader = styled.div``;
+const ThumbnailImageHeader = styled.div`
+  margin-bottom: 4px;
+`;
+const RequiredImageHeader = styled.div`
+  margin-bottom: 4px;
+`;
+
 const RequiredImageContainer = styled.div``;
-const RequiredImageHeader = styled.div``;
+
 const RequiredImageList = styled.div`
   display: flex;
+
+  & > div {
+    margin-right: 8px;
+  }
 `;
 
 export default RequiredImages;

@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components/macro";
-import { UseFormRegisterReturn } from "react-hook-form";
+import { UseFormRegisterReturn, useFormContext } from "react-hook-form";
 
 import { isNumber } from "@utils/index";
 
@@ -21,14 +21,38 @@ const TextInput = ({
   placeholder?: string;
   numbersOnly?: boolean;
 }) => {
+  const { setValue } = useFormContext();
+
   const preventNaNValues = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    const {
+      nativeEvent: { altKey, metaKey, shiftKey },
+    } = e;
+
+    const hasMetaComposing = altKey || metaKey || shiftKey;
+
+    if (
+      e.key === "Backspace" ||
+      e.key === "Tab" ||
+      e.key === "ArrowRight" ||
+      e.key === "ArrowLeft" ||
+      e.key === "Meta" ||
+      e.key === "Alt" ||
+      hasMetaComposing
+    ) {
+      return;
+    }
+
     if (!isNumber(e.key)) {
       e.preventDefault();
 
       return;
     }
+  };
 
-    return;
+  const changeVacancyToZero = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (!e.target.value) {
+      setValue(register.name, 0);
+    }
   };
 
   return (
@@ -39,7 +63,10 @@ const TextInput = ({
       textAlign={textAlign}
       maxLength={maxLength}
       placeholder={placeholder}
-      onKeyPress={numbersOnly && preventNaNValues}
+      // eslint-disable-next-line
+      onKeyDown={numbersOnly ? preventNaNValues : () => {}}
+      // eslint-disable-next-line
+      onBlur={numbersOnly ? changeVacancyToZero : () => {}}
     />
   );
 };

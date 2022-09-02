@@ -2,13 +2,20 @@ import styled from "styled-components/macro";
 import { useFormContext } from "react-hook-form";
 
 import TextInput from "@components/common/input/TextInput";
+import { PRODUCT_PRICE } from "@cache/productRegistration/index";
 
 const ProductPrice = () => {
   const { register } = useFormContext();
 
   return (
     <Container>
-      <TextInput width={"112px"} register={register("productPrice")} /> 원
+      <TextInput
+        width={"112px"}
+        register={register(PRODUCT_PRICE)}
+        numbersOnly={true}
+        placeholder={"숫자만 입력"}
+      />{" "}
+      원
     </Container>
   );
 };

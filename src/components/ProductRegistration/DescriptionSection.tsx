@@ -1,9 +1,10 @@
 import styled from "styled-components";
-import Textarea from "@components/common/input/Textarea";
 import { useFormContext } from "react-hook-form";
 
+import Textarea from "@components/common/input/Textarea";
 import NoticeContainer from "@components/common/NoticeContainer";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
+import { PRODUCT_DESCRIPTION } from "@cache/productRegistration/index";
 
 const ProductDescriptionSection = () => {
   const { register } = useFormContext();
@@ -23,9 +24,12 @@ const ProductDescriptionSection = () => {
 
       <Textarea
         size="small"
-        width={"716px"}
-        height={"126px"}
-        register={register("productDescription")}
+        width={"757px"}
+        height={"120px"}
+        register={register(PRODUCT_DESCRIPTION)}
+        placeholder={
+          "상품에 관한 상세 설명을 작성해주세요. ‘- (대쉬)’는 ‘・(글머리 기호)’로 나옵니다."
+        }
       />
     </div>
   );

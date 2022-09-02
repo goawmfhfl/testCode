@@ -10,7 +10,7 @@ import EditShipmentTemplateModal from "@components/ProductRegistration/EditShipm
 import Button from "@components/common/Button";
 import { modalVar, overModalVar, systemModalVar } from "@cache/index";
 import closeIconSource from "@icons/close.svg";
-import { ShipmentChargeType } from "@models/shipmentTemplate";
+import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
 import { isElementOverflown } from "@utils/index";
 import { tableScrollbarStyles } from "@styles/GlobalStyles";
 

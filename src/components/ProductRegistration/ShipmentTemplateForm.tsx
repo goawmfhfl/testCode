@@ -4,7 +4,6 @@ import { useReactiveVar } from "@apollo/client";
 
 import Button from "@components/common/Button";
 import { Input as TextInput } from "@components/common/input/TextInput";
-import NumberInput from "@components/common/input/NumberInput";
 import {
   SelectInput as Dropdown,
   OptionInput as DropdownOption,
@@ -13,19 +12,15 @@ import {
   InputContainer,
   Label,
   RadioInputContainer,
-  NumberInputContainer,
-  NumberInputWrapper,
+  TextInputContainer,
+  TextInputWrapper,
   ReturnExchangeFeeInputContainer,
   ShipmentChargeInputContainer,
 } from "@components/ProductRegistration/ShipmentChargeSection";
 import closeIconSource from "@icons/close.svg";
 import downwordArrowMedium from "@icons/arrow-downward-medium.svg";
-import {
-  removeLeadingZero,
-  isNumber,
-  hasEveryInputFulfilled,
-} from "@utils/index";
-import { ShipmentChargeType } from "@models/shipmentTemplate";
+import { hasEveryInputFulfilled } from "@utils/index";
+import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
 import { overModalVar } from "@cache/index";
 import { shipmentTemplateVar } from "@cache/productRegistration/shipmentTemplate";
 
@@ -51,6 +46,7 @@ const ShipmentTemplateForm = ({
 
     const { isFulfilled } = hasEveryInputFulfilled(
       shipmentTemplate,
+      [],
       allowsZeroInputNames
     );
 
@@ -97,9 +93,7 @@ const ShipmentTemplateForm = ({
 
       shipmentTemplateVar({
         ...shipmentTemplateVar(),
-        [inputName]: isNumber(e.target.value)
-          ? Number(e.target.value)
-          : e.target.value,
+        [inputName]: e.target.value,
       });
     };
 
@@ -169,75 +163,63 @@ const ShipmentTemplateForm = ({
               </DropdownOption>
             </Dropdown>
 
-            <NumberInputContainer>
-              <NumberInputWrapper hasLeftMargin={false}>
-                <NumberInput
+            <TextInputContainer>
+              <TextInputWrapper hasLeftMargin={false}>
+                <TextInput
                   width={"138px"}
                   onChange={handleInputChange("shipmentCharge")}
-                  value={removeLeadingZero(shipmentCharge)}
+                  value={shipmentCharge}
                   disabled={shipmentChargeType === ShipmentChargeType.Free}
-                  hasHandle={false}
-                  step={1000}
-                  min={0}
                   placeholder={"숫자만 입력"}
                 />
-              </NumberInputWrapper>
+              </TextInputWrapper>
               원
-            </NumberInputContainer>
+            </TextInputContainer>
           </ShipmentChargeInputContainer>
         </InputContainer>
 
         <InputContainer>
           <Label>제주 도서산간 추가 배송비</Label>
 
-          <NumberInputContainer>
-            <NumberInputWrapper>
-              <NumberInput
-                hasHandle={false}
-                step={1000}
-                min={0}
-                value={removeLeadingZero(additionalCharge)}
+          <TextInputContainer>
+            <TextInputWrapper>
+              <TextInput
+                value={additionalCharge}
                 onChange={handleInputChange("additionalCharge")}
                 placeholder="숫자만 입력"
               />
-            </NumberInputWrapper>
+            </TextInputWrapper>
             원
-          </NumberInputContainer>
+          </TextInputContainer>
         </InputContainer>
 
         <InputContainer>
           <Label>반품/교환</Label>
 
           <ReturnExchangeFeeInputContainer>
-            <NumberInputContainer>
+            <TextInputContainer>
               반품배송비(편도)
-              <NumberInputWrapper hasLeftMargin={true}>
-                <NumberInput
-                  hasHandle={false}
-                  step={1000}
-                  min={0}
-                  value={removeLeadingZero(returnCharge)}
+              <TextInputWrapper hasLeftMargin={true}>
+                <TextInput
+                  value={returnCharge}
                   onChange={handleInputChange("returnCharge")}
                   placeholder="숫자만 입력"
                 />{" "}
-              </NumberInputWrapper>
+              </TextInputWrapper>
               원
-            </NumberInputContainer>
+            </TextInputContainer>
 
-            <NumberInputContainer>
+            <TextInputContainer>
               교환배송비(왕복)
-              <NumberInputWrapper hasLeftMargin={true}>
-                <NumberInput
-                  hasHandle={false}
-                  step={1000}
-                  min={0}
-                  value={removeLeadingZero(exchangeCharge)}
+              <TextInputWrapper hasLeftMargin={true}>
+                <TextInput
+                  value={exchangeCharge}
                   onChange={handleInputChange("exchangeCharge")}
                   placeholder="숫자만 입력"
                 />{" "}
-              </NumberInputWrapper>
+              </TextInputWrapper>
               원
-            </NumberInputContainer>
+            </TextInputContainer>
           </ReturnExchangeFeeInputContainer>
         </InputContainer>
       </InputList>

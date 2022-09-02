@@ -4,16 +4,19 @@ import styled from "styled-components/macro";
 import { useFormContext } from "react-hook-form";
 import { useReactiveVar } from "@apollo/client";
 
+import Checkbox from "@components/common/input/Checkbox";
 import { Input as TextInput } from "@components/common/input/TextInput";
 import NoticeContainer from "@components/common/NoticeContainer";
 import SearchTag from "@components/ProductRegistration/SearchTagSection/SearchTag";
-import { tagListVar } from "@cache/productRegistration/searchTag";
 import questionMarkIconSource from "@icons/questionmark.svg";
 import rightArrowIconSource from "@icons/arrow-rightward-small.svg";
+import { tagListVar } from "@cache/productRegistration/searchTag";
 import { systemModalVar } from "@cache/index";
-import { TagTypes } from "@models/searchTag";
+import { HAS_TAG_INFOS } from "@cache/productRegistration/index";
+import { TagTypes } from "@models/productRegistration/searchTag";
 
 const SearchTagSection = () => {
+  const { register, watch } = useFormContext();
   const [tagInput, setTagInput] = useState("");
   const tagList = useReactiveVar(tagListVar);
 
@@ -23,8 +26,8 @@ const SearchTagSection = () => {
     setTagInput(eventTarget.value);
   };
 
-  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const isEnterKey = e.keyCode === 13;
+  const handleTagInputKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const isEnterKey = e.key === "Enter";
 
     if (!isEnterKey) return;
 
@@ -70,8 +73,14 @@ const SearchTagSection = () => {
     setTagInput("");
   };
 
+  const hasSearchTags = watch(HAS_TAG_INFOS) as boolean;
+
   return (
     <Container>
+      <CheckboxWrapper>
+        <Checkbox {...register(HAS_TAG_INFOS)} /> 검색용 태그 설정하기
+      </CheckboxWrapper>
+
       <NoticeContainer icon={questionMarkIconSource} width={"741px"}>
         <NoticeContents>
           <NoticeDescription>
@@ -94,8 +103,9 @@ const SearchTagSection = () => {
         width={"741px"}
         placeholder={"태그를 입력해주세요."}
         onChange={handleTagInputChange}
-        onKeyDown={handleTagInputKeyDown}
+        onKeyUp={handleTagInputKeyUp}
         value={tagInput}
+        disabled={!hasSearchTags}
       />
 
       <TagContainer>
@@ -108,6 +118,17 @@ const SearchTagSection = () => {
 };
 
 const Container = styled.div``;
+
+const CheckboxWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  line-height: 14px;
+  margin-bottom: 24px;
+
+  & > input {
+    margin-right: 16px;
+  }
+`;
 
 const NoticeContents = styled.div`
   vertical-align: middle;

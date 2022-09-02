@@ -3,11 +3,14 @@ import styled from "styled-components/macro";
 import { useState, useRef } from "react";
 import { useReactiveVar } from "@apollo/client";
 
-import { tagListVar } from "@cache/productRegistration/searchTag";
 import closeIconSource from "@icons/close.svg";
 import whiteCloseIconSource from "@icons/close-white.svg";
-import { TagTypes, SearchTag as SearchTagType } from "@models/searchTag";
+import {
+  TagTypes,
+  SearchTag as SearchTagType,
+} from "@models/productRegistration/searchTag";
 import { systemModalVar } from "@cache/index";
+import { tagListVar } from "@cache/productRegistration/searchTag";
 
 interface SearchTagProps {
   id?: string;
@@ -18,7 +21,6 @@ interface SearchTagProps {
 const SearchTag = ({ id, name, type }: SearchTagProps) => {
   const tagList = useReactiveVar<Array<SearchTagType>>(tagListVar);
   const [isHovered, setIsHovered] = useState(false);
-
   const deleteButtonRef = useRef<HTMLImageElement | null>(null);
 
   const handleSearchTagClick = (id: string, type: TagTypes) => () => {
@@ -97,6 +99,7 @@ const SearchTag = ({ id, name, type }: SearchTagProps) => {
       source={{ black: closeIconSource, white: whiteCloseIconSource }}
     >
       <TagName>{name}</TagName>
+
       <DeleteButton
         className="button--delete"
         ref={deleteButtonRef}

@@ -13,7 +13,9 @@ export interface ShipmentTemplateType {
   exchangeCharge: number;
 }
 
+// TODO: 네이밍 재검토
 export interface CreateShipmentInputType {
+  id?: number;
   name: string;
   isBundleShipment: boolean;
   type: ShipmentChargeType;

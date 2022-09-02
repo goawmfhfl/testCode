@@ -1,52 +1,230 @@
+import React, { useEffect, useState } from "react";
 import styled from "styled-components/macro";
-import { useFormContext } from "react-hook-form";
+import {
+  useFormContext,
+  Controller,
+  ControllerFieldState,
+  ControllerRenderProps,
+} from "react-hook-form";
 
 import TextInput from "@components/common/input/TextInput";
 import Dropdown from "@components/common/input/Dropdown";
 import DateInput from "@components/common/input/DateInput";
 import Checkbox from "@components/common/input/Checkbox";
 
-const ProductDiscount = () => {
-  const { register } = useFormContext();
+import {
+  PRODUCT_PRICE,
+  DISCOUNT_AMOUNT,
+  DISCOUNT_OPTION,
+  DISCOUNT_STARTS_AT,
+  DISCOUNT_ENDS_AT,
+  discountAppliedPriceVar,
+  HAS_DISCOUNT_SPAN,
+  IS_DISCOUNTED,
+} from "@cache/productRegistration/index";
+import { DiscountMethod } from "@models/productRegistration";
 
-  const discountedPrice = "-";
+const ProductDiscount = () => {
+  const { register, watch, control, getValues } = useFormContext();
+
+  function getDiscountedPrice(): number | string {
+    const productPrice = watch(PRODUCT_PRICE) as string;
+    const discountAmount = watch(DISCOUNT_AMOUNT) as string;
+    const discountOption = watch(DISCOUNT_OPTION) as string;
+
+    if (!discountAmount) {
+      return "-";
+    }
+
+    if (discountOption === "PERCENT") {
+      return (
+        Number(productPrice) -
+        Number(productPrice) * Number(discountAmount) * 0.01
+      );
+    }
+
+    if (discountOption === "WON") {
+      return Number(productPrice) - Number(discountAmount);
+    }
+
+    return productPrice;
+  }
+
+  const isDiscounted = watch(IS_DISCOUNTED) as boolean;
+  const discountAmount = watch(DISCOUNT_AMOUNT) as string;
+  const discountedPrice = getDiscountedPrice();
+  const hasDiscountSpan = watch(HAS_DISCOUNT_SPAN) as boolean;
+  const discountStartsAt = watch(DISCOUNT_STARTS_AT) as boolean;
+  const discountEndsAt = watch(DISCOUNT_ENDS_AT) as boolean;
+
+  useEffect(() => {
+    if (typeof discountedPrice === "number") {
+      discountAppliedPriceVar(discountedPrice);
+    }
+  }, [discountedPrice]);
 
   return (
     <Container>
       <InputContainer>
-        <TextInput register={register("discountValue")} />
+        <DiscountCheckbox {...register(IS_DISCOUNTED)} /> 할인 설정하기
+      </InputContainer>
+
+      <InputContainer>
+        <TextInput
+          register={register(DISCOUNT_AMOUNT)}
+          numbersOnly={true}
+          placeholder={"숫자만 입력"}
+          width={"112px"}
+          disabled={!isDiscounted}
+        />
         <DropdownWrapper>
-          {/* Dropdown name="discountUnit" */}
           <Dropdown
             size={"medium"}
-            options={["%", "₩"]}
-            register={register("discountOption")}
+            // eslint-disable-next-line
+            options={[
+              { name: "%", value: DiscountMethod.PERCENT },
+              { name: "₩", value: DiscountMethod.WON },
+            ]}
+            register={register(DISCOUNT_OPTION)}
+            disabled={!isDiscounted}
           />
         </DropdownWrapper>
         할인
-        <DiscountCheckbox name="" id="" /> 기간할인 설정하기
+        <Controller
+          control={control}
+          name={HAS_DISCOUNT_SPAN}
+          defaultValue={false}
+          render={({
+            field: { onChange, onBlur, value, ref },
+          }: {
+            field: {
+              onChange: () => void;
+              onBlur: () => void;
+              value: boolean;
+              ref: React.RefCallback<HTMLInputElement>;
+            };
+          }) => (
+            <DiscountSpanCheckbox
+              onChange={onChange}
+              onBlur={onBlur}
+              checked={value}
+              ref={ref}
+              disabled={!isDiscounted}
+            />
+          )}
+        />
+        기간할인 설정하기
       </InputContainer>
 
       <CalendarContainer>
-        <StartAt />
+        {/* TODO: Controller 필요성 검토 */}
+        <Controller
+          control={control}
+          name={DISCOUNT_STARTS_AT}
+          defaultValue={""}
+          render={({
+            field: { onChange, onBlur, value },
+          }: {
+            field: ControllerRenderProps<Record<string, string>>;
+          }) => {
+            return (
+              <StartAt
+                onBlur={onBlur}
+                onChange={(e) => {
+                  const {
+                    target: { value },
+                  } = e;
+
+                  const startAt = new Date(value).getTime();
+                  const endAt = new Date(
+                    watch(DISCOUNT_ENDS_AT) as string
+                  ).getTime();
+                  const today = new Date().getTime();
+
+                  const isBeforeToday = startAt < today;
+
+                  if (isBeforeToday) {
+                    return;
+                  }
+
+                  if (startAt > endAt) return;
+
+                  onChange(e);
+                }}
+                value={value}
+                disabled={!hasDiscountSpan || !isDiscounted}
+              />
+            );
+          }}
+        />
         ~
-        <EndAt />
+        <Controller
+          control={control}
+          name={DISCOUNT_ENDS_AT}
+          defaultValue={""}
+          render={({
+            field: { onChange, onBlur, value, ref },
+          }: {
+            field: ControllerRenderProps<Record<string, string>>;
+          }) => {
+            return (
+              <EndAt
+                onBlur={onBlur}
+                onChange={(e) => {
+                  const {
+                    target: { value },
+                  } = e;
+
+                  const startAt = new Date(
+                    getValues(DISCOUNT_STARTS_AT) as string
+                  ).getTime();
+                  const endAt = new Date(value).getTime();
+                  const today = new Date().getTime();
+
+                  const isBeforeToday = endAt < today;
+
+                  if (isBeforeToday) {
+                    return;
+                  }
+
+                  if (startAt > endAt) return;
+
+                  onChange(e);
+                }}
+                value={value}
+                disabled={!hasDiscountSpan || !isDiscounted}
+                inputRef={ref}
+              />
+            );
+          }}
+        />
       </CalendarContainer>
 
       <HorizontalLine />
 
       <DiscountedPrice>
         최종 가격
-        <PriceWrapper>{discountedPrice}</PriceWrapper>
-        <DiscountTimespanNotification>
-          (2022.02.06 부터 2022.02.16 까지 할인됩니다.)
-        </DiscountTimespanNotification>
+        <PriceWrapper>
+          {isDiscounted &&
+            discountAmount &&
+            `${discountedPrice.toLocaleString()}원`}
+        </PriceWrapper>
+        {hasDiscountSpan && (
+          <DiscountTimespanNotification>
+            ({discountStartsAt ? discountStartsAt : "-"} 부터{" "}
+            {discountEndsAt ? discountEndsAt : "-"} 까지 할인됩니다.)
+          </DiscountTimespanNotification>
+        )}
       </DiscountedPrice>
     </Container>
   );
 };
 
-const Container = styled.div``;
+const Container = styled.div`
+  & > div:first-child {
+    margin-bottom: 16px;
+  }
+`;
 
 const InputContainer = styled.div`
   display: flex;
@@ -54,16 +232,21 @@ const InputContainer = styled.div`
 
   font-family: "Spoqa Han Sans Neo";
   font-style: normal;
-  font-weight: 500;
-  font-size: 12px;
-  line-height: 14px;
-`;
-
-const DropdownWrapper = styled.span`
-  margin-right: 8px;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 18px;
 `;
 
 const DiscountCheckbox = styled(Checkbox)`
+  margin-right: 8px;
+`;
+
+const DropdownWrapper = styled.span`
+  margin-left: 16px;
+  margin-right: 8px;
+`;
+
+const DiscountSpanCheckbox = styled(Checkbox)`
   margin-left: 24px;
   margin-right: 8px;
 `;
@@ -76,9 +259,13 @@ const CalendarContainer = styled.div`
 
 const StartAt = styled(DateInput)`
   margin-right: 16px;
+  width: 112px;
 `;
-const EndAt = styled(DateInput)`
+const EndAt = styled(DateInput)<{
+  inputRef: React.RefCallback<HTMLInputElement>;
+}>`
   margin-left: 16px;
+  width: 112px;
 `;
 
 const HorizontalLine = styled.div`

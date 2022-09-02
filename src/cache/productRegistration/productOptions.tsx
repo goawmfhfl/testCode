@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { makeVar } from "@apollo/client";
-import { OptionType } from "@models/options";
+import { OptionType } from "@models/productRegistration/options";
 
 const requiredOptionInitialState: OptionType = {
   optionInputList: [{ id: uuidv4() }],

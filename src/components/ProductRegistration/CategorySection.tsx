@@ -4,59 +4,80 @@ import { useFormContext } from "react-hook-form";
 
 import Dropdown from "@components/common/input/Dropdown";
 import NoticeContainer from "@components/common/NoticeContainer";
+import {
+  CATEGORY_FIRST,
+  CATEGORY_SECOND,
+  CATEGORY_THIRD,
+} from "@cache/productRegistration";
+import { CategoryName } from "@models/productRegistration";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
+import { categoryMapper } from "constants/index";
 
 interface CategoryType {
   depthFirst: Array<string>;
-  depthSecond: CategoryDepthSecondType;
-}
-
-interface CategoryDepthSecondType {
-  HOMEDECO: Array<string>;
-  FABRIC: Array<string>;
-  TABLEWARE: Array<string>;
-  FURNITURE: Array<string>;
-  TECH: Array<string>;
-  DESKWARE: Array<string>;
-  "WEAR&ACC": Array<string>;
+  depthSecond: {
+    HOMEDECO: Array<string>;
+    FABRIC: Array<string>;
+    TABLEWARE: Array<string>;
+    FURNITURE: Array<string>;
+    TECH: Array<string>;
+    DESKWARE: Array<string>;
+    "WEAR&ACC": Array<string>;
+  };
 }
 
 const ProductCategory = () => {
   const { watch } = useFormContext();
 
-  const categoryDepthFirst: string = watch("categoryDepthFirst") as string;
+  const categoryDepthFirst: string = watch(CATEGORY_FIRST) as string;
 
+  // TODO: 로컬 상태로 관리되는 것이 적합한지 검토
   const [category, setCategory] = useState<CategoryType>({
     depthFirst: [
-      "대분류를 선택해주세요",
-      "HOMEDECO",
-      "FABRIC",
-      "TABLEWARE",
-      "FURNITURE",
-      "TECH",
-      "DESKWARE",
-      "WEAR&ACC",
+      CategoryName.HOMEDECO,
+      CategoryName.FABRIC,
+      CategoryName.TABLEWARE,
+      CategoryName.FURNITURE,
+      CategoryName.TECH,
+      CategoryName.DESKWARE,
+      CategoryName.WEAR_ACC,
     ],
     depthSecond: {
       HOMEDECO: [
-        "인센스/캔들",
-        "포스터",
-        "오브제",
-        "화병/화분",
-        "조명",
-        "거울",
-        "트레이",
-        "모빌",
-        "비누/디퓨저",
-        "티슈커버",
-        "홈 DIY",
+        CategoryName.INCENSE_CANDLE,
+        CategoryName.POSTER,
+        CategoryName.OBJET,
+        CategoryName.VASE_FLOWERPOT,
+        CategoryName.LIGHTING,
+        CategoryName.MIRROR,
+        CategoryName.TRAY,
+        CategoryName.MOBILE,
+        CategoryName.SOAP_DIFFUSER,
+        CategoryName.TISSUE_COVER,
+        CategoryName.HOME_DIY,
       ],
-      FABRIC: ["포스터/블랭킷", "쿠션", "러그/매트", "침구", "기타"],
-      TABLEWARE: ["컵", "접시/그릇", "보울"],
+      FABRIC: [
+        CategoryName.POSTER_BLANKET,
+        CategoryName.CUSHION,
+        CategoryName.RUG_MAT,
+        CategoryName.BEDDING,
+        CategoryName.FABRIC_ETC,
+      ],
+      TABLEWARE: [CategoryName.CUP, CategoryName.PLATE, CategoryName.BOWL],
       FURNITURE: [],
-      TECH: ["멀티탭/콘센트", "시계"],
-      DESKWARE: ["노트/메모", "문구", "카드/엽서"],
-      "WEAR&ACC": ["폰", "액세서리", "쥬얼리", "가방/파우치", "기타"],
+      TECH: [CategoryName.MULTITAP_SOCKET, CategoryName.WATCH],
+      DESKWARE: [
+        CategoryName.NOTE_MEMO,
+        CategoryName.STATIONERY,
+        CategoryName.CARD_POSTCARD,
+      ],
+      "WEAR&ACC": [
+        CategoryName.PHONE,
+        CategoryName.ACCESSORIES,
+        CategoryName.JEWELLERY,
+        CategoryName.BAG_POUCH,
+        CategoryName.WEAR_ACC_ETC,
+      ],
     },
   });
 
@@ -77,8 +98,18 @@ const ProductCategory = () => {
           <DropdownLabel>대분류</DropdownLabel>
           <Dropdown
             size={"big"}
-            options={category.depthFirst}
-            register={register("categoryDepthFirst")}
+            width={"231px"}
+            options={[
+              {
+                name: "대분류를 선택해주세요",
+                value: null,
+              },
+              ...category.depthFirst.map((value: string) => ({
+                name: categoryMapper[value],
+                value,
+              })),
+            ]}
+            register={register(CATEGORY_FIRST)}
           />
         </DropdownWrapper>
 
@@ -86,8 +117,15 @@ const ProductCategory = () => {
           <DropdownLabel>중분류</DropdownLabel>
           <Dropdown
             size={"big"}
-            options={["중분류를 선택해주세요", ...depthSecondCategory]}
-            register={register("categoryDepthSecond")}
+            width={"231px"}
+            options={[
+              { name: "중분류를 선택해주세요", value: null },
+              ...depthSecondCategory.map((value) => ({
+                name: categoryMapper[value],
+                value,
+              })),
+            ]}
+            register={register(CATEGORY_SECOND)}
             disabled={!depthSecondCategory.length ? true : false}
           />
         </DropdownWrapper>
@@ -96,8 +134,9 @@ const ProductCategory = () => {
           <DropdownLabel>소분류</DropdownLabel>
           <Dropdown
             size={"big"}
-            options={["소분류를 선택해주세요"]}
-            register={register("categoryDepthThird")}
+            width={"247px"}
+            options={[{ name: "소분류를 선택해주세요", value: null }]}
+            register={register(CATEGORY_THIRD)}
             disabled={true}
           />
         </DropdownWrapper>
@@ -135,6 +174,8 @@ const DropdownLabel = styled.label`
 const DropdownWrapper = styled.div`
   display: flex;
   flex-direction: column;
+
+  margin-right: 16px;
 `;
 
 export default ProductCategory;

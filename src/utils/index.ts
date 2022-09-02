@@ -1,7 +1,5 @@
 import axios from "axios";
 
-import { InputValueTypes as ShopSettingInputValueTypes } from "@models/shopSettings";
-
 export interface RemoveImageErrorType {
   code: string;
   message: string;
@@ -88,7 +86,7 @@ function validateImageSize(file: File, limitedSize: number): boolean {
 function isNumber(value: string) {
   const regExp = /^[0-9]*$/g;
 
-  return regExp.test(value) && !isNaN(Number(value));
+  return regExp.test(value);
 }
 
 function isVacantString(value) {
@@ -126,14 +124,12 @@ function hasEveryInputFulfilled(
   const inputValues = Object.values(inputFields);
 
   const isFulfilled = inputValues.reduce(
-    (acc: boolean, inputValue: ShopSettingInputValueTypes, index: number) => {
+    (acc: boolean, inputValue: unknown, index: number) => {
       const inputName = inputNames[index];
 
       const isOptionalInput = optionalInputNames.find(
         (name) => name === inputName
       );
-
-      console.log(inputName, isOptionalInput, inputValue);
 
       if (isOptionalInput) {
         return acc;
@@ -141,12 +137,11 @@ function hasEveryInputFulfilled(
 
       // Array - shop images (uploadedFileInfos)
       if (inputValue instanceof Array && inputName === "uploadedFileInfos") {
-        // eslint-disable-next-line
         const hasFulfilled = inputValue.reduce(
           (acc: boolean, cur: { url: string; type: string }) =>
             acc && Boolean(cur.url) && Boolean(cur.type),
           true
-        );
+        ) as boolean;
 
         if (!hasFulfilled) {
           unfulfilledInputNames.push(inputName);
@@ -157,13 +152,144 @@ function hasEveryInputFulfilled(
         return acc;
       }
 
+      // Array - colors
+      if (inputValue instanceof Array && inputName === "colors") {
+        if (!inputValue.length) {
+          unfulfilledInputNames.push(inputName);
+
+          return false;
+        }
+
+        return acc;
+      }
+
+      if (inputValue instanceof Array && inputName === "optionCombinations") {
+        const optionCombinations = inputValue as Array<{
+          isRequired: boolean;
+          quantity: number;
+        }>;
+        let result = true;
+
+        const { requiredOptions, selectiveOptions } = optionCombinations.reduce(
+          (
+            counter: {
+              requiredOptions: {
+                numberOfOptions: number;
+                stockSum: number;
+              };
+              selectiveOptions: {
+                numberOfOptions: number;
+                stockSum: number;
+              };
+            },
+            {
+              isRequired,
+              quantity,
+            }: {
+              isRequired: boolean;
+              quantity: number;
+            }
+          ) => {
+            if (isRequired) {
+              console.log(quantity);
+              counter.requiredOptions.numberOfOptions++;
+              counter.requiredOptions.stockSum += quantity;
+            } else {
+              counter.selectiveOptions.numberOfOptions++;
+              counter.selectiveOptions.stockSum += quantity;
+            }
+
+            return counter;
+          },
+          {
+            requiredOptions: {
+              numberOfOptions: 0,
+              stockSum: 0,
+            },
+            selectiveOptions: {
+              numberOfOptions: 0,
+              stockSum: 0,
+            },
+          }
+        );
+
+        const hasRequiredOptions = !optionalInputNames.find(
+          (inputName) => inputName === "requiredOptions"
+        );
+        const hasSelectiveOptions = !optionalInputNames.find(
+          (inputName) => inputName === "selectiveOptions"
+        );
+
+        const isRequiredOptionValid =
+          Boolean(requiredOptions.numberOfOptions) &&
+          Boolean(requiredOptions.stockSum);
+        const isSelectiveOptionValid =
+          Boolean(selectiveOptions.numberOfOptions) &&
+          Boolean(selectiveOptions.stockSum);
+
+        if (hasRequiredOptions && !isRequiredOptionValid) {
+          unfulfilledInputNames.push("requiredOptions");
+          result = false;
+        }
+
+        if (hasSelectiveOptions && !isSelectiveOptionValid) {
+          unfulfilledInputNames.push("selectiveOptions");
+          result = false;
+        }
+
+        return acc && result;
+      }
+
+      // Object - manufacturingLeadTime
+      if (
+        typeof inputValue === "object" &&
+        inputName === "manufacturingLeadTime"
+      ) {
+        if (!inputValue || !Object.keys(inputValue).length) {
+          return false;
+        }
+
+        const hasValidMinProperty = Object.prototype.hasOwnProperty.call(
+          inputValue,
+          "min"
+        ) as boolean;
+        const hasValidMaxProperty = Object.prototype.hasOwnProperty.call(
+          inputValue,
+          "max"
+        ) as boolean;
+
+        return acc && hasValidMinProperty && hasValidMaxProperty;
+      }
+
+      // Array - tagInfos
+      if (inputValue instanceof Array && inputName === "tagInfos") {
+        if (!inputValue.length) {
+          unfulfilledInputNames.push(inputName);
+
+          return false;
+        }
+
+        return acc;
+      }
+
+      // string
+      if (typeof inputValue === "string") {
+        const isValid = isVacantString(inputValue);
+
+        if (!isValid) {
+          unfulfilledInputNames.push(inputName);
+        }
+
+        return acc && isValid;
+      }
+
       // number
       if (typeof inputValue === "number") {
         const hasAllowedZero = allowsZeroInputNames.find(
           (allowedInputName) => allowedInputName === inputName
         );
 
-        const isValidNumber = validateInput(
+        const isValidNumber = validateNumber(
           inputValue,
           Boolean(hasAllowedZero)
         );
@@ -177,11 +303,19 @@ function hasEveryInputFulfilled(
         return acc;
       }
 
-      if (!validateInput(inputValue)) {
-        unfulfilledInputNames.push(inputName);
+      // boolean
+      if (typeof inputValue === "boolean") {
+        return acc;
       }
 
-      return acc && validateInput(inputValue);
+      // Date
+      if (inputValue instanceof Date) {
+        return acc;
+      }
+
+      unfulfilledInputNames.push(inputName);
+
+      return false;
     },
     true
   ) as boolean;
@@ -192,24 +326,12 @@ function hasEveryInputFulfilled(
   };
 }
 
-function validateInput(
-  input: ShopSettingInputValueTypes,
-  allowsZero?: boolean
-) {
-  switch (typeof input) {
-    case "string":
-      return input !== "" ? true : false;
-    case "number":
-      if (allowsZero) {
-        return true;
-      }
-
-      return input !== 0 ? true : false;
-    case "boolean":
-      return true;
-    default:
-      return false;
+function validateNumber(input: number, allowsZero: boolean) {
+  if (allowsZero) {
+    return true;
   }
+
+  return input !== 0 ? true : false;
 }
 
 function isElementOverflown(element: HTMLDivElement | null): void | boolean {

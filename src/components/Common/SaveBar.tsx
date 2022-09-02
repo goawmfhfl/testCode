@@ -2,14 +2,14 @@ import React from "react";
 import styled, { useTheme } from "styled-components/macro";
 import { gql, useMutation } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
-import { last } from "lodash";
 
 import Button from "@components/common/Button";
-import {
-  requiredImagesVar,
-  optionalImagesVar,
-} from "@cache/productRegistration/productImages";
 
+import {
+  systemModalVar,
+  contentsContainerReferenceVar,
+  GNBReferenceVar,
+} from "@cache/index";
 import {
   SHIPMENT_PRICE_TYPE,
   sectionMapperVar,
@@ -17,20 +17,28 @@ import {
   sectionFulfillmentVar,
 } from "@cache/shopSettings";
 import {
-  systemModalVar,
-  contentsContainerReferenceVar,
-  GNBReferenceVar,
-} from "@cache/index";
+  HAS_REQUIRED_OPTION,
+  HAS_MANUFACTURING_LEAD_TIME,
+  SHIPMENT_TEMPLATE,
+  IS_DISCOUNTED,
+  HAS_SELECTIVE_OPTION,
+  HAS_TAG_INFOS,
+} from "@cache/productRegistration";
 
 import {
   TemporarySaveShopSettingsInputType,
   SaveShopSettingsInputType,
 } from "@models/shopSettings";
 import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
-import { CreateProductInputType } from "@models/productRegistration/index";
+import {
+  CreateProductInputType,
+  TemporarySaveProductInputType,
+} from "@models/productRegistration/index";
 
 import { hasEveryInputFulfilled } from "@utils/index";
-import { reorganizeShopSettingStates } from "@utils/shopSettings";
+import { restructureShopSettingStates } from "@utils/shopSettings";
+import { restructureProductRegistrationStates } from "@utils/productRegistration";
+import { shipmentTemplatesVar } from "@cache/productRegistration/shipmentTemplate";
 
 const TEMPORARY_SAVE_SHOP_SETTINGS = gql`
   mutation TemporarySaveShop($input: TemporarySaveShopInput!) {
@@ -71,7 +79,8 @@ const CREATE_PRODUCT = gql`
 const SaveBar = () => {
   const theme = useTheme();
 
-  const { watch, getValues } = useFormContext();
+  const formContext = useFormContext();
+  const { watch } = formContext;
 
   const [temporarySaveShopSettings] = useMutation<
     {
@@ -98,7 +107,7 @@ const SaveBar = () => {
       }
     >(SAVE_SHOP_SETTINGS);
 
-  useMutation<
+  const [temporarySaveProduct] = useMutation<
     {
       temporarySaveProduct: {
         ok: boolean;
@@ -106,21 +115,22 @@ const SaveBar = () => {
       };
     },
     {
-      name;
+      input: TemporarySaveProductInputType;
     }
   >(TEMPORARY_SAVE_PRODUCT);
 
-  useMutation<
-    {
-      createProduct: {
-        ok: boolean;
-        error: string;
-      };
-    },
-    {
-      input: CreateProductInputType;
-    }
-  >(CREATE_PRODUCT);
+  const [createProduct] =
+    useMutation<
+      {
+        createProduct: {
+          ok: boolean;
+          error: string;
+        };
+      },
+      {
+        input: CreateProductInputType;
+      }
+    >(CREATE_PRODUCT);
 
   const handleTemporarySaveButtonClick = async (
     e: React.MouseEvent<HTMLButtonElement>
@@ -128,7 +138,7 @@ const SaveBar = () => {
     e.preventDefault();
 
     if (location.pathname === "/shopSetting") {
-      const temporarySaveShopInput = reorganizeShopSettingStates(watch);
+      const temporarySaveShopInput = restructureShopSettingStates(watch);
 
       const {
         data: {
@@ -164,13 +174,13 @@ const SaveBar = () => {
     }
 
     if (location.pathname === "/productRegistration") {
-      const categoryName = getCategoryName();
+      const input = restructureProductRegistrationStates(formContext);
 
-      console.log("categoryName", categoryName);
-
-      const photoInfos = getPhotoInfos();
-
-      console.log("photoInfos", photoInfos);
+      const result = await temporarySaveProduct({
+        variables: {
+          input,
+        },
+      });
 
       return;
     }
@@ -182,9 +192,7 @@ const SaveBar = () => {
     e.preventDefault();
 
     if (location.pathname === "/shopSetting") {
-      const input = reorganizeShopSettingStates(watch);
-
-      console.log("제대로 가져왔나! - shop submit", input);
+      const input = restructureShopSettingStates(watch);
 
       const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
       const isShipmentPriceFree = shipmentType === ShipmentChargeType.Free;
@@ -203,8 +211,6 @@ const SaveBar = () => {
           isShipmentPriceFree && "shipmentConditionalPrice",
         ].filter(Boolean)
       );
-
-      console.log("unfulfilled", unfulfilledInputNames);
 
       if (!isFulfilled) {
         const sectionMapper = sectionMapperVar();
@@ -276,43 +282,62 @@ const SaveBar = () => {
     }
 
     if (location.pathname === "/productRegistration") {
-      const photoInfos = getPhotoInfos();
+      const input = restructureProductRegistrationStates(formContext);
 
-      console.log("photoInfos", photoInfos);
+      const isDiscounted = watch(IS_DISCOUNTED) as boolean;
+      const hasTemplateSelected = shipmentTemplatesVar().find(
+        (template) => template.name === watch(SHIPMENT_TEMPLATE)
+      );
+      const hasRequiredOption = watch(HAS_REQUIRED_OPTION) as boolean;
+      const hasSelectiveOption = watch(HAS_SELECTIVE_OPTION) as boolean;
+      const hasLeadtime = watch(HAS_MANUFACTURING_LEAD_TIME) as boolean;
+      const isShipmentPriceFree =
+        watch(SHIPMENT_PRICE_TYPE) === ShipmentChargeType.Free;
+      const hasTagInfo = watch(HAS_TAG_INFOS) as boolean;
 
-      getCategoryName();
+      const { isFulfilled, unfulfilledInputNames } = hasEveryInputFulfilled(
+        input,
+        [
+          !isDiscounted && "discountAmount",
+          !isDiscounted && "discountMethod",
+          !isDiscounted && "discountAppliedPrice",
+          !isDiscounted && "startDiscountDate",
+          !isDiscounted && "endDiscountDate",
+          !hasRequiredOption && !hasSelectiveOption && "optionCombinations",
+          !hasRequiredOption && "requiredOptions",
+          !hasSelectiveOption && "selectiveOptions",
+          !hasLeadtime && "manufacturingLeadTime",
+          "shipmentId",
+          hasTemplateSelected && "isBundleShipment",
+          hasTemplateSelected && "shipmentType",
+          hasTemplateSelected && "shipmentPrice",
+          hasTemplateSelected && "shipmentDistantPrice",
+          hasTemplateSelected && "shipmentReturnPrice",
+          hasTemplateSelected && "shipmentExchangePrice",
+          "authorization",
+          !hasTagInfo && "tagInfos",
+        ],
+        [
+          !isDiscounted && "discountAmount",
+          !isDiscounted && "discountAppliedPrice",
+          hasRequiredOption && "quantity",
+          isShipmentPriceFree && "shipmentPrice",
+        ]
+      );
+
+      if (!isFulfilled) {
+        return;
+      }
+
+      const result = await createProduct({
+        variables: {
+          input,
+        },
+      });
 
       return;
     }
   };
-
-  function getPhotoInfos() {
-    const requiredImages = [...requiredImagesVar()].map(({ type, url }) => ({
-      type,
-      url,
-    }));
-
-    const optionalImages = [...optionalImagesVar()].map(({ type, url }) => ({
-      type,
-      url,
-    }));
-
-    return [...requiredImages, ...optionalImages].filter((image) => image.url);
-  }
-
-  function getCategoryName(): string | void {
-    const categories = getValues([
-      "categoryDepthFirst",
-      "categoryDepthSecond",
-      "categoryDepthThird",
-    ]);
-
-    console.log("categories", categories);
-
-    return last(categories.filter((category) => category)) as
-      | string
-      | undefined;
-  }
 
   return (
     <Container>

@@ -11,19 +11,23 @@ import Button from "@components/common/Button";
 import OptionInput from "@components/ProductRegistration/OptionSection/OptionInput";
 import AdaptedOption from "@components/ProductRegistration/OptionSection/AdaptedOption";
 
-import { selectiveOptionVar } from "@cache/productRegistration/options";
-import { OptionInputType, OptionTypes } from "@models/options";
+import { selectiveOptionVar } from "@cache/productRegistration/productOptions";
+import {
+  OptionInputType,
+  OptionTypes,
+} from "@models/productRegistration/options";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import smallDownwardArrowIconSrc from "@icons/arrow-downward-small-red.svg";
+import { HAS_SELECTIVE_OPTION } from "@cache/productRegistration";
 
-const RequiredOption = () => {
+const SelectiveOption = () => {
   const theme = useTheme();
   const { register, getValues } = useFormContext();
   const productRegistrationInputs = useWatch<ProductRegistrationFormValues>();
   const { optionInputList, adaptedOption } = useReactiveVar(selectiveOptionVar);
 
   const handleAdaptButtonClick = () => {
-    if (!getValues("hasSelectiveOption")) return;
+    if (!getValues(HAS_SELECTIVE_OPTION)) return;
 
     const optionHeaders = ["추가 옵션명", "추가 옵션값"].map((header) => {
       return {
@@ -103,12 +107,12 @@ const RequiredOption = () => {
     return element?.scrollHeight > element?.clientHeight;
   }
 
-  const hasOptionInputEnabled = getValues("hasSelectiveOption") as boolean;
+  const hasOptionInputEnabled = getValues(HAS_SELECTIVE_OPTION) as boolean;
 
   return (
     <Container>
       <CheckboxContainer>
-        <PurchaseOptionCheckbox {...register("hasSelectiveOption")} /> 옵션
+        <PurchaseOptionCheckbox {...register(HAS_SELECTIVE_OPTION)} /> 옵션
         설정하기
       </CheckboxContainer>
 
@@ -209,4 +213,4 @@ const AdaptedTableWrapper = styled.div<{ isOverflown: boolean | undefined }>`
   }
 `;
 
-export default RequiredOption;
+export default SelectiveOption;

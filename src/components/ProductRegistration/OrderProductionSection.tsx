@@ -5,14 +5,19 @@ import Checkbox from "@components/common/input/Checkbox";
 import TextInput from "@components/common/input/TextInput";
 import NoticeContainer from "@components/common/NoticeContainer";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
+import {
+  HAS_MANUFACTURING_LEAD_TIME,
+  LEAD_TIME_MIN,
+  LEAD_TIME_MAX,
+} from "@cache/productRegistration/index";
 
 const OrderProduction = () => {
-  const { register } = useFormContext();
+  const { register, watch } = useFormContext();
 
   return (
     <Container>
       <CheckboxWrapper>
-        <Checkbox /> 주문 후 제작
+        <Checkbox {...register(HAS_MANUFACTURING_LEAD_TIME)} /> 주문 후 제작
       </CheckboxWrapper>
       <NoticeContainerWrapper>
         <NoticeContainer icon={exclamationMarkSrc} width="539px">
@@ -24,11 +29,23 @@ const OrderProduction = () => {
       </NoticeContainerWrapper>
       제작 기간 최소{" "}
       <TextInputWrapper>
-        <TextInput register={register("minLeadTime")} textAlign="right" />
+        <TextInput
+          width={"104px"}
+          register={register(LEAD_TIME_MIN)}
+          textAlign="right"
+          disabled={!watch(HAS_MANUFACTURING_LEAD_TIME)}
+          numbersOnly={true}
+        />
       </TextInputWrapper>
       일에서 최대{" "}
       <TextInputWrapper>
-        <TextInput register={register("maxLeadTime")} textAlign="right" />
+        <TextInput
+          width={"104px"}
+          register={register(LEAD_TIME_MAX)}
+          textAlign="right"
+          disabled={!watch(HAS_MANUFACTURING_LEAD_TIME)}
+          numbersOnly={true}
+        />
       </TextInputWrapper>
       일까지 소요
     </Container>

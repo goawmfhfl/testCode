@@ -1,6 +1,7 @@
+import { ImageType } from "@models/productImages";
 import { ShipmentChargeType } from "./shipmentTemplate";
 
-enum CategoryName {
+export enum CategoryName {
   HOMEDECO = "HOMEDECO",
   INCENSE_CANDLE = "INCENSE_CANDLE",
   POSTER = "POSTER",
@@ -39,23 +40,12 @@ enum CategoryName {
   WEAR_ACC_ETC = "WEAR_ACC_ETC",
 }
 
-enum UploadedFileType {
-  PRODUCT_THUMBNAIL = "PRODUCT_THUMBNAIL",
-  PRODUCT_REQUIRED = "PRODUCT_REQUIRED",
-  PRODUCT_OPTIONAL = "PRODUCT_OPTIONAL",
-  SHOP_MOBILE = "SHOP_MOBILE",
-  SHOP_PC = "SHOP_PC",
-  SHOP_REGISTER_PDF = "SHOP_REGISTER_PDF",
-  SHOP_REGISTER_ZIP = "SHOP_REGISTER_ZIP",
-  PROMOTION_MAIN_IMAGE = "PROMOTION_MAIN_IMAGE",
-}
-
 export interface UploadedFileInfos {
   url: string;
-  type: UploadedFileType;
+  type: ImageType;
 }
 
-enum Color {
+export enum ColorType {
   RED = "RED",
   ORANGE = "ORANGE",
   YELLOW = "YELLOW",
@@ -76,40 +66,73 @@ enum Color {
   PATTERN_ILLUST = "PATTERN_ILLUST",
 }
 
-interface ColorOptionInputType {
-  name: Color;
-}
-
-interface OptionCombinationInputType {
-  name: [{ name: string; value: string }];
-  price: number;
-  quantity: number;
-  isRequired: boolean;
-}
-
-export interface CreateProductInputType {
+export interface ColorInputType {
   name: string;
+  hex: string;
+  value: ColorType;
+  darkCheckedIcon?: boolean;
+}
+
+export enum DiscountMethod {
+  PERCENT = "PERCENT",
+  WON = "WON",
+}
+
+export interface TemporarySaveProductInputType {
+  // 상품명
+  name: string;
+
+  // 카테고리
   categoryName: CategoryName;
-  uploadedFileInfos: [UploadedFileInfos];
+
+  // 대표사진
+  uploadedFileInfos: Array<UploadedFileInfos>;
+
+  // 상품설명
   description: string;
-  colors: [ColorOptionInputType];
+
+  // 상품컬러
+  colors: Array<{
+    name: ColorType;
+  }>;
+
+  // 판매가
   originalPrice: number;
+
+  // 할인
   discountAmount: number;
   discountMethod: string;
   startDiscountDate: Date;
   endDiscountDate: Date;
   discountAppliedPrice: number;
+
+  // 재고
   quantity: number;
-  optionCombinations: [OptionCombinationInputType];
-  productionAfterOrder: string;
-  shipmentId: number;
-  isBundleShipment: boolean;
-  shipmentType: ShipmentChargeType;
-  shipmentPrice: number;
-  shipmentDistantPrice: number;
-  shipmentConditionalPrice: number;
-  shipmentReturnPrice: number;
-  shipmentExchangePrice: number;
+
+  // 옵션 (필수 + 선택)
+  optionCombinations: Array<{
+    name: Array<{ name: string; value: string }>;
+    price: number;
+    quantity: number;
+    isRequired: boolean;
+  }>;
+
+  // 주문 후 제작 여부
+  manufacturingLeadTime: {
+    min: number;
+    max: number;
+  };
+
+  // 배송 설정
+  shipmentId?: number;
+  isBundleShipment?: boolean;
+  shipmentType?: ShipmentChargeType;
+  shipmentPrice?: number;
+  shipmentDistantPrice?: number;
+  shipmentReturnPrice?: number;
+  shipmentExchangePrice?: number;
+
+  // 작품정보제공고시
   specName: string;
   material: string;
   size: string;
@@ -117,12 +140,80 @@ export interface CreateProductInputType {
   precaution: string;
   authorization: string;
   personInCharge: string;
-  tagInfos: [
-    {
-      name: string;
-      isExposed: boolean;
-    }
-  ];
-  temporaryProductId: number;
-  productId: number;
+
+  // 검색용 태그 설정
+  tagInfos: Array<{
+    name: string;
+    isExposed: boolean;
+  }>;
+}
+
+export interface CreateProductInputType {
+  // 상품명
+  name: string;
+
+  // 카테고리
+  categoryName: CategoryName;
+
+  // 대표사진
+  uploadedFileInfos: Array<UploadedFileInfos>;
+
+  // 상품설명
+  description: string;
+
+  // 상품컬러
+  colors: Array<{
+    name: ColorType;
+  }>;
+
+  // 판매가
+  originalPrice: number;
+
+  // 할인
+  discountAmount: number;
+  discountMethod: string;
+  startDiscountDate: Date;
+  endDiscountDate: Date;
+  discountAppliedPrice: number;
+
+  // 재고
+  quantity: number;
+
+  // 옵션 (필수 + 선택)
+  optionCombinations: Array<{
+    name: Array<{ name: string; value: string }>;
+    price: number;
+    quantity: number;
+    isRequired: boolean;
+  }>;
+
+  // 주문 후 제작 여부
+  manufacturingLeadTime: {
+    min: number;
+    max: number;
+  };
+
+  // 배송 설정
+  shipmentId?: number;
+  isBundleShipment?: boolean;
+  shipmentType?: ShipmentChargeType;
+  shipmentPrice?: number;
+  shipmentDistantPrice?: number;
+  shipmentReturnPrice?: number;
+  shipmentExchangePrice?: number;
+
+  // 작품정보제공고시
+  specName: string;
+  material: string;
+  size: string;
+  manufacturer: string;
+  precaution: string;
+  authorization: string;
+  personInCharge: string;
+
+  // 검색용 태그 설정
+  tagInfos: Array<{
+    name: string;
+    isExposed: boolean;
+  }>;
 }

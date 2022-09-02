@@ -4,13 +4,19 @@ import { useFormContext } from "react-hook-form";
 import NoticeContainer from "@components/common/NoticeContainer";
 import TextInput from "@components/common/input/TextInput";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
+import { PRODUCT_STOCK } from "@cache/productRegistration/index";
 
 const ProductStock = () => {
   const { register } = useFormContext();
 
   return (
     <Container>
-      <TextInput register={register("productStock")} /> 개
+      <TextInput
+        register={register(PRODUCT_STOCK)}
+        numbersOnly={true}
+        placeholder={"숫자만 입력"}
+      />{" "}
+      개
       <NoticeContainerWrapper>
         <NoticeContainer icon={exclamationmarkSrc} isOneLiner={true}>
           옵션 설정시, 재고 입력란은 0으로 자동 적용되며, 옵션의 재고를

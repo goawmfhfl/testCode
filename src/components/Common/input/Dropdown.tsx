@@ -25,7 +25,13 @@ const Dropdown = ({
 }: {
   size: string;
   width?: string;
-  options: Array<{ name: string; value: any }> | undefined;
+  options:
+    | Array<{
+        name: string;
+        value: string | number | Array<string>;
+        selected?: boolean;
+      }>
+    | undefined;
   register: UseFormRegisterReturn;
   disabled?: boolean;
 }) => {
@@ -33,7 +39,6 @@ const Dropdown = ({
     <Select register={register} size={size} width={width} disabled={disabled}>
       {options.map(({ name, value }) => {
         return (
-          // eslint-disable-next-line
           <Option key={`${name}`} value={value}>
             {name}
           </Option>
@@ -71,8 +76,13 @@ const Select = ({
   );
 };
 
-const Option = ({ value, children }: { value: any; children: string }) => {
-  // eslint-disable-next-line
+const Option = ({
+  value,
+  children,
+}: {
+  value: string | number | Array<string>;
+  children: string;
+}) => {
   return <OptionInput value={value}>{children}</OptionInput>;
 };
 

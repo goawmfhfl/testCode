@@ -7,11 +7,11 @@ import { useReactiveVar } from "@apollo/client";
 import TextInput from "@components/common/input/TextInput";
 import removeOptionIconSrc from "@icons/remove-option.svg";
 import addOptionInputIconSrc from "@icons/add-option-input.svg";
-import { OptionTypes } from "@models/options";
+import { OptionTypes } from "@models/productRegistration/options";
 import {
   requiredOptionVar,
   selectiveOptionVar,
-} from "@cache/productRegistration/options";
+} from "@cache/productRegistration/productOptions";
 
 const OptionInput = ({
   optionType,
@@ -153,7 +153,7 @@ const OptionInputRow = ({
               : `selectiveOptionName-${optionId}`
           )}
           disabled={disabled}
-          maxLength={5}
+          maxLength={25}
         />
       </TableData>
       <TableData>
@@ -173,7 +173,7 @@ const OptionInputRow = ({
                   .split(",")
                   .map((el) => el.trim())
                   .reduce((acc, cur) => {
-                    return cur.length > 5 || acc;
+                    return cur.length > 25 || acc;
                   }, false);
 
                 if (hasInvalidOptionValue) {

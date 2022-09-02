@@ -11,8 +11,12 @@ import Button from "@components/common/Button";
 import OptionInput from "@components/ProductRegistration/OptionSection/OptionInput";
 import AdaptedOption from "@components/ProductRegistration/OptionSection/AdaptedOption";
 
-import { requiredOptionVar } from "@cache/productRegistration/options";
-import { OptionInputType, OptionTypes } from "@models/options";
+import { HAS_REQUIRED_OPTION } from "@cache/productRegistration/index";
+import { requiredOptionVar } from "@cache/productRegistration/productOptions";
+import {
+  OptionInputType,
+  OptionTypes,
+} from "@models/productRegistration/options";
 import { isElementOverflown } from "@utils/index";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import smallDownwardArrowIconSrc from "@icons/arrow-downward-small-red.svg";
@@ -25,7 +29,7 @@ const RequiredOption = () => {
   const { optionInputList, adaptedOption } = useReactiveVar(requiredOptionVar);
 
   const handleAdaptButtonClick = () => {
-    if (!getValues("hasRequiredOption")) return;
+    if (!getValues(HAS_REQUIRED_OPTION)) return;
 
     const optionHeaders = optionInputList.map(({ id }) => {
       return {
@@ -102,12 +106,12 @@ const RequiredOption = () => {
     setIsTableOverflown(isTableOverflown);
   }, [adaptedOption]);
 
-  const hasOptionInputEnabled = getValues("hasRequiredOption") as boolean;
+  const hasOptionInputEnabled = getValues(HAS_REQUIRED_OPTION) as boolean;
 
   return (
     <Container>
       <CheckboxContainer>
-        <PurchaseOptionCheckbox {...register("hasRequiredOption")} /> 옵션
+        <PurchaseOptionCheckbox {...register(HAS_REQUIRED_OPTION)} /> 옵션
         설정하기
       </CheckboxContainer>
 
