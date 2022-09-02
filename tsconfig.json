@@ -26,7 +26,8 @@
       "@styles/*": ["styles/*"],
       "@utils/*": ["utils/*"],
       "@models/*": ["models/*"],
-      "@cache/*": ["cache/*"]
+      "@cache/*": ["cache/*"],
+      "@constants/*": ["constants/*"]
     },
     "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": false,

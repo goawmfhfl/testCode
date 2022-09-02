@@ -24,6 +24,7 @@ module.exports = {
       "@utils": path.resolve(__dirname, "utils"),
       "@models": path.resolve(__dirname, "models"),
       "@cache": path.resolve(__dirname, "cache"),
+      "@constants": path.resolve(__dirname, "constants"),
     },
     configure: {
       resolve: {
