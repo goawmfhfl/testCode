@@ -1,13 +1,11 @@
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import styled from "styled-components/macro";
-import { useReactiveVar } from "@apollo/client";
 
 import TextInput from "@components/common/input/TextInput";
 import Dropdown from "@components/common/input/Dropdown";
 import Radio from "@components/common/input/Radio";
 import NoticeContainer from "@components/common/NoticeContainer";
-import InputStatusMessage from "@components/common/InputStatusMessage";
 
 import informationMarkSource from "@icons/info.svg";
 import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
@@ -19,26 +17,13 @@ import {
   SHIPMENT_EXCHANGE_PRICE,
   SHIPMENT_CONDITIONAL_PRICE,
   SHIPMENT_BUNDLING,
-  sectionFulfillmentVar,
-  SECTIONS,
 } from "@cache/shopSettings";
 
 const ShipmentSettings = () => {
   const { register, watch, setValue } = useFormContext();
-  const sectionFulfillment = useReactiveVar(sectionFulfillmentVar);
-
   const shipmentPriceType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
 
   const isShipmentPriceFree = shipmentPriceType === ShipmentChargeType.Free;
-
-  const handleFocusContents = () => {
-    if (!sectionFulfillmentVar().SHIPMENT_SETTINGS) {
-      sectionFulfillmentVar({
-        ...sectionFulfillmentVar(),
-        [SECTIONS.SHIPMENT_SETTINGS]: true,
-      });
-    }
-  };
 
   useEffect(() => {
     if (shipmentPriceType === ShipmentChargeType.Free) {
@@ -51,13 +36,7 @@ const ShipmentSettings = () => {
 
   return (
     <Container>
-      {!sectionFulfillment.SHIPMENT_SETTINGS && (
-        <InputStatusMessage color="red" topMargin="10px" bottomMargin="16px">
-          ※필수 입력사항입니다.
-        </InputStatusMessage>
-      )}
-
-      <DefaultShipmentSection hasInputStatusMessage={true}>
+      <DefaultShipmentSection>
         <SectionLabelContainer>
           <SectionLabel>기본 배송 설정</SectionLabel>
           <NoticeContainer
@@ -69,7 +48,7 @@ const ShipmentSettings = () => {
           </NoticeContainer>
         </SectionLabelContainer>
 
-        <Contents onFocus={handleFocusContents}>
+        <Contents>
           <InputContainer>
             <InputLabel>묶음 배송</InputLabel>
             가능{" "}
@@ -162,7 +141,7 @@ const ShipmentSettings = () => {
           </NoticeContainer>
         </SectionLabelContainer>
 
-        <Contents onFocus={handleFocusContents}>
+        <Contents>
           <InputContainer>
             <TextInput
               register={register(SHIPMENT_CONDITIONAL_PRICE)}
@@ -192,9 +171,7 @@ const Section = styled.div`
   }
 `;
 
-const DefaultShipmentSection = styled(Section)<{
-  hasInputStatusMessage: boolean;
-}>`
+const DefaultShipmentSection = styled(Section)`
   margin-bottom: 24px;
 `;
 

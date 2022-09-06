@@ -1,35 +1,20 @@
 import { useFormContext } from "react-hook-form";
-import { useReactiveVar } from "@apollo/client";
 import styled from "styled-components/macro";
 
 import Textarea from "@components/common/input/Textarea";
 import NoticeContainer from "@components/common/NoticeContainer";
-import InputStatusMessage from "@components/common/InputStatusMessage";
 
 import questionMarkIconSource from "@icons/questionmark.svg";
-import {
-  sectionFulfillmentVar,
-  SHIPMENT_POLICY,
-  RETURN_POLICY,
-  SECTIONS,
-} from "@cache/shopSettings";
+import { SHIPMENT_POLICY, RETURN_POLICY } from "@cache/shopSettings";
 
 const ShopPolicy = () => {
   const { register } = useFormContext();
-
-  const isSectionFulfilled = useReactiveVar(sectionFulfillmentVar).SHOP_POLICY;
 
   return (
     <ShopPolicyContainer>
       <NoticeContainer icon={questionMarkIconSource} width={"379px"}>
         배송 정책, 교환/환불 정책은 상품 상세페이지 하단에 노출됩니다.
       </NoticeContainer>
-
-      {!isSectionFulfilled && (
-        <InputStatusMessage color="red" topMargin="12px">
-          ※필수 입력사항입니다.
-        </InputStatusMessage>
-      )}
 
       <SectionContainer>
         <Description>배송 정책</Description>
@@ -39,14 +24,6 @@ const ShopPolicy = () => {
             height={"156px"}
             size="small"
             register={register(SHIPMENT_POLICY)}
-            onFocus={() => {
-              if (!isSectionFulfilled) {
-                sectionFulfillmentVar({
-                  ...sectionFulfillmentVar(),
-                  [SECTIONS.SHOP_POLICY]: true,
-                });
-              }
-            }}
           />
         </TextareaContainer>
       </SectionContainer>
@@ -59,14 +36,6 @@ const ShopPolicy = () => {
             height={"156px"}
             size="small"
             register={register(RETURN_POLICY)}
-            onFocus={() => {
-              if (!isSectionFulfilled) {
-                sectionFulfillmentVar({
-                  ...sectionFulfillmentVar(),
-                  [SECTIONS.SHOP_POLICY]: true,
-                });
-              }
-            }}
           />
         </TextareaContainer>
       </SectionContainer>

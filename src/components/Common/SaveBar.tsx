@@ -9,13 +9,10 @@ import {
   systemModalVar,
   contentsContainerReferenceVar,
   GNBReferenceVar,
-} from "@cache/index";
-import {
-  SHIPMENT_PRICE_TYPE,
-  sectionMapperVar,
   sectionReferenceVar,
   sectionFulfillmentVar,
-} from "@cache/shopSettings";
+} from "@cache/index";
+import { SHIPMENT_PRICE_TYPE } from "@cache/shopSettings";
 import {
   HAS_REQUIRED_OPTION,
   HAS_MANUFACTURING_LEAD_TIME,
@@ -24,6 +21,11 @@ import {
   HAS_SELECTIVE_OPTION,
   HAS_TAG_INFOS,
 } from "@cache/productRegistration";
+import { shipmentTemplatesVar } from "@cache/productRegistration/shipmentTemplate";
+import {
+  shopSettingsSectionMapper,
+  productRegistrationSectionMapper,
+} from "@constants/index";
 
 import {
   TemporarySaveShopSettingsInputType,
@@ -38,7 +40,6 @@ import {
 import { hasEveryInputFulfilled } from "@utils/index";
 import { restructureShopSettingStates } from "@utils/shopSettings";
 import { restructureProductRegistrationStates } from "@utils/productRegistration";
-import { shipmentTemplatesVar } from "@cache/productRegistration/shipmentTemplate";
 
 const TEMPORARY_SAVE_SHOP_SETTINGS = gql`
   mutation TemporarySaveShop($input: TemporarySaveShopInput!) {
@@ -213,21 +214,19 @@ const SaveBar = () => {
       );
 
       if (!isFulfilled) {
-        const sectionMapper = sectionMapperVar();
-
         const unfulfilledSectionNames = [
           ...new Set(
             unfulfilledInputNames.map(
-              (inputName: string): string => sectionMapper[inputName]
+              (inputName: string): string =>
+                shopSettingsSectionMapper[inputName]
             )
           ),
         ];
 
-        const targetSection = sectionMapper[unfulfilledInputNames[0]];
+        const targetSection =
+          shopSettingsSectionMapper[unfulfilledInputNames[0]];
         const sectionReferenceList = sectionReferenceVar();
-        const targetSectionReference = sectionReferenceList[
-          targetSection
-        ] as HTMLElement;
+        const targetSectionReference = sectionReferenceList[targetSection];
 
         unfulfilledSectionNames.forEach((sectionName) => {
           sectionFulfillmentVar({
@@ -245,6 +244,7 @@ const SaveBar = () => {
           SECTION_TOP_MARGIN;
 
         contentsContainerReferenceVar().scrollTo(0, scrollTo);
+
         return;
       }
 
@@ -326,6 +326,35 @@ const SaveBar = () => {
       );
 
       if (!isFulfilled) {
+        const unfulfilledSectionNames = [
+          ...new Set(
+            unfulfilledInputNames.map((inputName: string): string => {
+              return productRegistrationSectionMapper[inputName];
+            })
+          ),
+        ];
+
+        unfulfilledSectionNames.forEach((sectionName) => {
+          sectionFulfillmentVar({
+            ...sectionFulfillmentVar(),
+            [sectionName]: false,
+          });
+        });
+
+        const targetSection = unfulfilledSectionNames[0];
+        const sectionReferenceList = sectionReferenceVar();
+        const targetSectionReference = sectionReferenceList[targetSection];
+
+        const GNBReference: HTMLElement = GNBReferenceVar();
+        const SECTION_TOP_MARGIN = 88;
+
+        const scrollTo =
+          targetSectionReference.offsetTop -
+          GNBReference.offsetHeight -
+          SECTION_TOP_MARGIN;
+
+        contentsContainerReferenceVar().scrollTo(0, scrollTo);
+
         return;
       }
 
@@ -334,6 +363,8 @@ const SaveBar = () => {
           input,
         },
       });
+
+      // TODO: 등록 상태에 따른 systemModal 메시지
 
       return;
     }

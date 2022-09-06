@@ -1,6 +1,8 @@
 import React from "react";
 import styled, { css } from "styled-components/macro";
-import { sectionReferenceVar } from "@cache/shopSettings";
+import { useReactiveVar } from "@apollo/client";
+
+import { sectionFulfillmentVar, sectionReferenceVar } from "@cache/index";
 
 const SectionWrapper = ({
   label,
@@ -19,6 +21,10 @@ const SectionWrapper = ({
   labelMarginTop?: boolean;
   referenceKey?: string;
 }) => {
+  const isFulfilledSection = useReactiveVar(sectionFulfillmentVar)[
+    referenceKey
+  ];
+
   return (
     <Container
       marginTop={marginTop}
@@ -31,14 +37,25 @@ const SectionWrapper = ({
           [referenceKey]: newRef,
         });
       }}
+      onFocus={() => {
+        sectionFulfillmentVar({
+          ...sectionFulfillmentVar(),
+          [referenceKey]: true,
+        });
+      }}
     >
-      <InputLabel
-        htmlFor=""
-        isRequired={isRequired}
-        hasTopMargin={labelMarginTop}
-      >
-        {label}
-      </InputLabel>
+      <InputLabelWrapper>
+        <InputLabel
+          htmlFor=""
+          isRequired={isRequired}
+          hasTopMargin={labelMarginTop}
+        >
+          {label}
+        </InputLabel>
+        <UnfulfilledMessageWrapper>
+          {!isFulfilledSection && "※필수 입력사항입니다."}
+        </UnfulfilledMessageWrapper>
+      </InputLabelWrapper>
 
       <Wrapper>{children}</Wrapper>
     </Container>
@@ -65,6 +82,11 @@ const requiredInputStyle = css`
 `;
 ``;
 
+const InputLabelWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 const InputLabel = styled.label<{ isRequired: boolean; hasTopMargin: boolean }>`
   min-width: 178px;
   margin-top: ${({ hasTopMargin }) => (hasTopMargin ? "5px" : "")};
@@ -80,6 +102,18 @@ const InputLabel = styled.label<{ isRequired: boolean; hasTopMargin: boolean }>`
   align-items: start;
 
   ${({ isRequired }) => (isRequired ? requiredInputStyle : "")};
+`;
+
+const UnfulfilledMessageWrapper = styled.div`
+  color: red;
+  font-family: "Spoqa Han Sans Neo";
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 0.10000000149011612px;
+  text-align: left;
+
+  margin-top: 4px;
 `;
 
 const Wrapper = styled.div`

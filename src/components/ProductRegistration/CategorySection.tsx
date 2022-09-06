@@ -1,90 +1,39 @@
 import styled from "styled-components/macro";
-import { useState } from "react";
+import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
-import Dropdown from "@components/common/input/Dropdown";
+import {
+  SelectInput as Dropdown,
+  OptionInput as Option,
+} from "@components/common/input/Dropdown";
 import NoticeContainer from "@components/common/NoticeContainer";
 import {
   CATEGORY_FIRST,
   CATEGORY_SECOND,
   CATEGORY_THIRD,
 } from "@cache/productRegistration";
-import { CategoryName } from "@models/productRegistration";
+
+import downwordArrowBig from "@icons/arrow-downward-big.svg";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
-import { categoryMapper } from "constants/index";
+import { CATEGORIES, categoryMapper } from "constants/index";
 
-interface CategoryType {
-  depthFirst: Array<string>;
-  depthSecond: {
-    HOMEDECO: Array<string>;
-    FABRIC: Array<string>;
-    TABLEWARE: Array<string>;
-    FURNITURE: Array<string>;
-    TECH: Array<string>;
-    DESKWARE: Array<string>;
-    "WEAR&ACC": Array<string>;
-  };
-}
+const CategorySection = () => {
+  const { watch, register, setValue } = useFormContext();
 
-const ProductCategory = () => {
-  const { watch } = useFormContext();
+  const selectedFirstCategory: string = watch(CATEGORY_FIRST) as string;
+  const selectedSecondCategory: string = watch(CATEGORY_SECOND) as string;
+  const categoryDepthFirst: Array<string> = CATEGORIES.CATEGORY_FIRST;
+  const categoryDepthSecond: Array<string> =
+    (CATEGORIES.CATEGORY_SECOND[selectedFirstCategory] as Array<string>) || [];
 
-  const categoryDepthFirst: string = watch(CATEGORY_FIRST) as string;
+  useEffect(() => {
+    setValue(CATEGORY_SECOND, "");
+    setValue(CATEGORY_THIRD, "");
+  }, [selectedFirstCategory]);
 
-  // TODO: 로컬 상태로 관리되는 것이 적합한지 검토
-  const [category, setCategory] = useState<CategoryType>({
-    depthFirst: [
-      CategoryName.HOMEDECO,
-      CategoryName.FABRIC,
-      CategoryName.TABLEWARE,
-      CategoryName.FURNITURE,
-      CategoryName.TECH,
-      CategoryName.DESKWARE,
-      CategoryName.WEAR_ACC,
-    ],
-    depthSecond: {
-      HOMEDECO: [
-        CategoryName.INCENSE_CANDLE,
-        CategoryName.POSTER,
-        CategoryName.OBJET,
-        CategoryName.VASE_FLOWERPOT,
-        CategoryName.LIGHTING,
-        CategoryName.MIRROR,
-        CategoryName.TRAY,
-        CategoryName.MOBILE,
-        CategoryName.SOAP_DIFFUSER,
-        CategoryName.TISSUE_COVER,
-        CategoryName.HOME_DIY,
-      ],
-      FABRIC: [
-        CategoryName.POSTER_BLANKET,
-        CategoryName.CUSHION,
-        CategoryName.RUG_MAT,
-        CategoryName.BEDDING,
-        CategoryName.FABRIC_ETC,
-      ],
-      TABLEWARE: [CategoryName.CUP, CategoryName.PLATE, CategoryName.BOWL],
-      FURNITURE: [],
-      TECH: [CategoryName.MULTITAP_SOCKET, CategoryName.WATCH],
-      DESKWARE: [
-        CategoryName.NOTE_MEMO,
-        CategoryName.STATIONERY,
-        CategoryName.CARD_POSTCARD,
-      ],
-      "WEAR&ACC": [
-        CategoryName.PHONE,
-        CategoryName.ACCESSORIES,
-        CategoryName.JEWELLERY,
-        CategoryName.BAG_POUCH,
-        CategoryName.WEAR_ACC_ETC,
-      ],
-    },
-  });
-
-  const { register } = useFormContext();
-
-  const depthSecondCategory: Array<string> =
-    (category.depthSecond[categoryDepthFirst] as Array<string>) || [];
+  useEffect(() => {
+    setValue(CATEGORY_THIRD, "");
+  }, [selectedSecondCategory]);
 
   return (
     <Container>
@@ -97,48 +46,67 @@ const ProductCategory = () => {
         <DropdownWrapper>
           <DropdownLabel>대분류</DropdownLabel>
           <Dropdown
-            size={"big"}
+            sizing={"big"}
+            arrowSrc={downwordArrowBig}
             width={"231px"}
-            options={[
+            {...register(CATEGORY_FIRST)}
+            value={watch(CATEGORY_FIRST) as string}
+          >
+            {[
               {
                 name: "대분류를 선택해주세요",
-                value: null,
+                value: "",
               },
-              ...category.depthFirst.map((value: string) => ({
+              ...categoryDepthFirst.map((value: string) => ({
                 name: categoryMapper[value],
                 value,
               })),
-            ]}
-            register={register(CATEGORY_FIRST)}
-          />
+            ].map((option) => (
+              <Option key={option.value} value={option.value}>
+                {option.name}
+              </Option>
+            ))}
+          </Dropdown>
         </DropdownWrapper>
 
         <DropdownWrapper>
           <DropdownLabel>중분류</DropdownLabel>
           <Dropdown
-            size={"big"}
+            sizing={"big"}
+            arrowSrc={downwordArrowBig}
             width={"231px"}
-            options={[
-              { name: "중분류를 선택해주세요", value: null },
-              ...depthSecondCategory.map((value) => ({
+            {...register(CATEGORY_SECOND)}
+            disabled={!categoryDepthSecond.length ? true : false}
+          >
+            {[
+              { name: "중분류를 선택해주세요", value: "" },
+              ...categoryDepthSecond.map((value) => ({
                 name: categoryMapper[value],
                 value,
               })),
-            ]}
-            register={register(CATEGORY_SECOND)}
-            disabled={!depthSecondCategory.length ? true : false}
-          />
+            ].map((option) => (
+              <Option key={option.value} value={option.value}>
+                {option.name}
+              </Option>
+            ))}
+          </Dropdown>
         </DropdownWrapper>
 
         <DropdownWrapper>
           <DropdownLabel>소분류</DropdownLabel>
           <Dropdown
-            size={"big"}
+            sizing={"big"}
+            arrowSrc={downwordArrowBig}
             width={"247px"}
-            options={[{ name: "소분류를 선택해주세요", value: null }]}
-            register={register(CATEGORY_THIRD)}
+            {...register(CATEGORY_THIRD)}
             disabled={true}
-          />
+          >
+            {[{ name: "소분류를 선택해주세요", value: "" }].map((option) => (
+              <Option key={option.value} value={option.value}>
+                {option.name}
+              </Option>
+            ))}
+          </Dropdown>
         </DropdownWrapper>
       </DropdownContainer>
     </Container>
@@ -178,4 +146,4 @@ const DropdownWrapper = styled.div`
   margin-right: 16px;
 `;
 
-export default ProductCategory;
+export default CategorySection;

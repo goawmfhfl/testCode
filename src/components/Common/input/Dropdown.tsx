@@ -1,5 +1,5 @@
 import styled from "styled-components/macro";
-import { UseFormRegisterReturn } from "react-hook-form";
+import { useFormContext, UseFormRegisterReturn } from "react-hook-form";
 
 import downwordArrowMedium from "@icons/arrow-downward-medium.svg";
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
@@ -63,6 +63,10 @@ const Select = ({
 }) => {
   const downwardArrowSrc: string = arrowSet[size as keyof arrowSetType];
 
+  const { watch } = useFormContext();
+
+  const inputName = register.name;
+
   return (
     <SelectInput
       sizing={size}
@@ -70,6 +74,7 @@ const Select = ({
       arrowSrc={downwardArrowSrc}
       {...register}
       disabled={disabled}
+      defaultValue={watch(inputName) as string}
     >
       {children}
     </SelectInput>
@@ -80,7 +85,7 @@ const Option = ({
   value,
   children,
 }: {
-  value: string | number | Array<string>;
+  value: string | number | Array<string> | null;
   children: string;
 }) => {
   return <OptionInput value={value}>{children}</OptionInput>;

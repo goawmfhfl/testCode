@@ -1,4 +1,4 @@
-/* eslint-disable */
+// eslint-disable
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 
 import Layout from "@components/common/Layout";
@@ -18,8 +18,7 @@ import BusinessLicense from "@components/ShopSetting/BusinessLicense";
 import PhoneNumber from "@components/ShopSetting/PhoneNumber";
 import SettlementAccount from "@components/ShopSetting/SettlementAccount";
 import RegistrationNumber from "@components/ShopSetting/RegistrationNumber";
-
-import { SECTIONS } from "@cache/shopSettings";
+import { SHOP_SETTING_SECTIONS } from "@constants/index";
 
 export interface ShopSettingFormInputType {
   pcImage: string;
@@ -64,13 +63,13 @@ const ShopSetting = () => {
               <SectionWrapper
                 label="샵 정보"
                 labelMarginTop={false}
-                referenceKey={SECTIONS.SHOP_INFO}
+                referenceKey={SHOP_SETTING_SECTIONS.SHOP_INFO}
               >
                 <ShopInfo />
               </SectionWrapper>
               <SectionWrapper
                 label="정책 설정"
-                referenceKey={SECTIONS.SHOP_POLICY}
+                referenceKey={SHOP_SETTING_SECTIONS.SHOP_POLICY}
               >
                 <ShopPolicy />
               </SectionWrapper>
@@ -84,7 +83,7 @@ const ShopSetting = () => {
                     확인검사 인증
                   </>
                 }
-                referenceKey={SECTIONS.SAFETY_CERTIFICATION}
+                referenceKey={SHOP_SETTING_SECTIONS.SAFETY_CERTIFICATION}
               >
                 <SafetyCertification />
               </SectionWrapper>
@@ -93,7 +92,7 @@ const ShopSetting = () => {
             <ContentsSection>
               <SectionWrapper
                 label="샵 배송 정보"
-                referenceKey={SECTIONS.SHIPMENT_SETTINGS}
+                referenceKey={SHOP_SETTING_SECTIONS.SHIPMENT_SETTINGS}
               >
                 <ShipmentSettings />
               </SectionWrapper>
@@ -103,7 +102,7 @@ const ShopSetting = () => {
               <SectionWrapper
                 label="사업자 정보(간이, 법인)"
                 labelMarginTop={false}
-                referenceKey={SECTIONS.BUSINESS_LICENSE}
+                referenceKey={SHOP_SETTING_SECTIONS.BUSINESS_LICENSE}
               >
                 <BusinessLicense />
               </SectionWrapper>
@@ -114,14 +113,14 @@ const ShopSetting = () => {
                     개인판매자 <br /> 주민등록증 인증
                   </>
                 }
-                referenceKey={SECTIONS.REGISTRATION_NUMBER}
+                referenceKey={SHOP_SETTING_SECTIONS.REGISTRATION_NUMBER}
               >
                 <RegistrationNumber />
               </SectionWrapper>
 
               <SectionWrapper
                 label="전화번호 변경"
-                referenceKey={SECTIONS.PHONE_NUMBER}
+                referenceKey={SHOP_SETTING_SECTIONS.PHONE_NUMBER}
               >
                 <PhoneNumber />
               </SectionWrapper>
@@ -129,7 +128,7 @@ const ShopSetting = () => {
               <SectionWrapper
                 label="정산 계좌 정보"
                 labelMarginTop={false}
-                referenceKey={SECTIONS.SETTLEMENT_ACCOUNT}
+                referenceKey={SHOP_SETTING_SECTIONS.SETTLEMENT_ACCOUNT}
               >
                 <SettlementAccount />
               </SectionWrapper>

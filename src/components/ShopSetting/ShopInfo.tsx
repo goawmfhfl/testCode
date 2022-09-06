@@ -1,3 +1,4 @@
+// eslint-disable
 import React, { ChangeEvent } from "react";
 import { useReactiveVar } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
@@ -5,7 +6,6 @@ import axios from "axios";
 import styled from "styled-components/macro";
 
 import NoticeContainer from "@components/common/NoticeContainer";
-import InputStatusMessage from "@components/common/InputStatusMessage";
 import Textarea from "@components/common/input/Textarea";
 
 import addImageSrc from "@icons/addImage.svg";
@@ -14,12 +14,7 @@ import infoIconSrc from "@icons/info.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
 import closeIconSource from "@icons/close.svg";
 import photochangeSrc from "@icons/photochange.svg";
-import {
-  shopImagesVar,
-  sectionFulfillmentVar,
-  SHOP_INTRODUCTION,
-  SECTIONS,
-} from "@cache/shopSettings";
+import { shopImagesVar, SHOP_INTRODUCTION } from "@cache/shopSettings";
 import { systemModalVar } from "@cache/index";
 import { validateImageDimensionRatio } from "@utils/index";
 
@@ -152,17 +147,6 @@ const ShopInfo = () => {
     }
   };
 
-  const handleFocusImageInput = () => {
-    const isSectionFulfilled = sectionFulfillmentVar().SHOP_INFO;
-
-    if (!isSectionFulfilled) {
-      sectionFulfillmentVar({
-        ...sectionFulfillmentVar(),
-        [SECTIONS.SHOP_INFO]: true,
-      });
-    }
-  };
-
   const deleteImageUrl = async (imageUrl: string) => {
     try {
       const response: { data: { result: boolean } } = await axios.delete(
@@ -206,8 +190,6 @@ const ShopInfo = () => {
 
   const shopIntroduction = watch(SHOP_INTRODUCTION) as string;
 
-  const isSectionFulfilled = useReactiveVar(sectionFulfillmentVar).SHOP_INFO;
-
   return (
     <Container>
       <ShopInfoContainer>
@@ -218,12 +200,6 @@ const ShopInfo = () => {
             샵 대표 사진은 브랜드페이지 및 창작자 프로필 사진으로 노출됩니다.
             로고를 제외한 대표 상품 사진을 첨부해주세요.
           </NoticeContainer>
-
-          {!isSectionFulfilled && (
-            <InputStatusMessage color="red" topMargin="12px">
-              ※필수 입력사항입니다.
-            </InputStatusMessage>
-          )}
 
           <ShopImages>
             <ImageContainer>
@@ -251,7 +227,6 @@ const ShopInfo = () => {
                       accept="image/jpg,image/png,image/jpeg"
                       // eslint-disable-next-line
                       onChange={handleChangeImageInput}
-                      onFocus={handleFocusImageInput}
                     />
                   </ChangeImageLabel>
                 </AddedMobileImageContainer>
@@ -265,7 +240,6 @@ const ShopInfo = () => {
                       accept="image/jpg,image/png,image/jpeg"
                       // eslint-disable-next-line
                       onChange={handleChangeImageInput}
-                      onFocus={handleFocusImageInput}
                     />
                   </ImageInputLabel>
                   사진 등록하기
@@ -298,7 +272,6 @@ const ShopInfo = () => {
                       accept="image/jpg,image/png,image/jpeg"
                       // eslint-disable-next-line
                       onChange={handleChangeImageInput}
-                      onFocus={handleFocusImageInput}
                     />
                   </ChangeImageLabel>
                 </AddedPcImageContainer>
@@ -312,7 +285,6 @@ const ShopInfo = () => {
                       accept="image/jpg,image/png,image/jpeg"
                       // eslint-disable-next-line
                       onChange={handleChangeImageInput}
-                      onFocus={handleFocusImageInput}
                     />
                   </ImageInputLabel>
                   사진 등록하기
@@ -335,14 +307,6 @@ const ShopInfo = () => {
               width={"377px"}
               height={"156px"}
               register={register(SHOP_INTRODUCTION)}
-              onFocus={() => {
-                if (!isSectionFulfilled) {
-                  sectionFulfillmentVar({
-                    ...sectionFulfillmentVar(),
-                    [SECTIONS.SHOP_INFO]: true,
-                  });
-                }
-              }}
             />
             <TextCounter>{shopIntroduction?.length}/200</TextCounter>
           </TextareaContainer>

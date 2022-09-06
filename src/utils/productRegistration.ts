@@ -72,7 +72,7 @@ export function restructureProductRegistrationStates(
 
   const name = watch(TITLE) as string;
   const description = watch(PRODUCT_DESCRIPTION) as string;
-  const colors = watch(PRODUCT_COLOR) as Array<ColorType>;
+  const colors = (watch(PRODUCT_COLOR) as Array<ColorType>) || [];
   const originalPrice = watch(PRODUCT_PRICE) as string;
 
   const isDiscounted = watch(IS_DISCOUNTED) as boolean;
@@ -173,13 +173,26 @@ function getPhotoInfos(): Array<UploadedFileInfos> {
 function getCategoryName(formContext: UseFormReturn): CategoryName {
   const { getValues } = formContext;
 
-  const categories = getValues([
+  const categories: Array<CategoryName> = getValues([
     CATEGORY_FIRST,
     CATEGORY_SECOND,
     CATEGORY_THIRD,
   ]);
 
-  return last(categories.filter((category) => category)) as CategoryName;
+  for (let i = 0; i < categories.length; i++) {
+    const previousCategoryName: CategoryName | undefined = categories[i - 1];
+    const categoryName = categories[i];
+
+    if (!categoryName) {
+      if (!previousCategoryName) {
+        return null;
+      }
+
+      return previousCategoryName;
+    }
+  }
+
+  return last(categories);
 }
 
 function getRequiredOptions(formContext: UseFormReturn) {

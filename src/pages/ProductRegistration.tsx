@@ -26,6 +26,7 @@ import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import questionMarkSource from "@icons/questionmark.svg";
 import SearchTagSection from "@components/ProductRegistration/SearchTagSection";
 import { useState } from "react";
+import { PRODUCT_REGISTRATION_SECTIONS } from "@constants/index";
 
 export interface ProductRegistrationFormValues {
   productName: string;
@@ -75,22 +76,39 @@ const ProductRegistration = () => {
           </ContentsHeader>
           <ContentsMain>
             <ContentsSection>
-              <SectionWrapper label={"상품명"} isRequired={true}>
+              <SectionWrapper
+                referenceKey={PRODUCT_REGISTRATION_SECTIONS.PRODUCT_NAME}
+                label={"상품명"}
+                isRequired={true}
+              >
                 <NameSection />
               </SectionWrapper>
-              <SectionWrapper label={"카테고리"} isRequired={true}>
+              <SectionWrapper
+                referenceKey={PRODUCT_REGISTRATION_SECTIONS.CATEGORY}
+                label={"카테고리"}
+                isRequired={true}
+              >
                 <CategorySection />
               </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <SectionWrapper label={"대표사진"} isRequired={true}>
+              <SectionWrapper
+                referenceKey={PRODUCT_REGISTRATION_SECTIONS.PRODUCT_IMAGE}
+                label={"대표사진"}
+                isRequired={true}
+              >
                 <ImageSection />
               </SectionWrapper>
-              <SectionWrapper label={<DescriptionGuide />} isRequired={true}>
+              <SectionWrapper
+                referenceKey={PRODUCT_REGISTRATION_SECTIONS.DESCRIPTION}
+                label={<DescriptionGuide />}
+                isRequired={true}
+              >
                 <DescriptionSection />
               </SectionWrapper>
               <SectionWrapper
+                referenceKey={PRODUCT_REGISTRATION_SECTIONS.COLOR}
                 label={"상품 컬러"}
                 isRequired={true}
                 labelMarginTop={false}
@@ -100,43 +118,72 @@ const ProductRegistration = () => {
             </ContentsSection>
 
             <ContentsSection>
-              <SectionWrapper label={"판매가"} isRequired={true}>
+              <SectionWrapper
+                referenceKey={PRODUCT_REGISTRATION_SECTIONS.PRICE}
+                label={"판매가"}
+                isRequired={true}
+              >
                 <PriceSection />
               </SectionWrapper>
-              <SectionWrapper label={"할인"}>
+              <SectionWrapper
+                referenceKey={PRODUCT_REGISTRATION_SECTIONS.DISCOUNT}
+                label={"할인"}
+              >
                 <DiscountSection />
               </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <SectionWrapper label={"재고"} isRequired={true}>
+              <SectionWrapper
+                referenceKey={PRODUCT_REGISTRATION_SECTIONS.STOCK}
+                label={"재고"}
+                isRequired={true}
+              >
                 <StockSection />
               </SectionWrapper>
-              <SectionWrapper label={"필수 옵션 설정"}>
+              <SectionWrapper
+                referenceKey={PRODUCT_REGISTRATION_SECTIONS.REQUIRED_OPTION}
+                label={"필수 옵션 설정"}
+              >
                 <RequiredOptionSection />
               </SectionWrapper>
-              <SectionWrapper label={"추가 상품 설정"}>
+              <SectionWrapper
+                referenceKey={PRODUCT_REGISTRATION_SECTIONS.SELECTIVE_OPTION}
+                label={"추가 상품 설정"}
+              >
                 <SelectiveOptionSection />
               </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <SectionWrapper label={"주문 후 제작 여부"}>
+              <SectionWrapper
+                referenceKey={PRODUCT_REGISTRATION_SECTIONS.ORDER_PRODUCTION}
+                label={"주문 후 제작 여부"}
+              >
                 <OrderProductionSection />
               </SectionWrapper>
-              <SectionWrapper label={"배송 설정"}>
+              <SectionWrapper
+                referenceKey={PRODUCT_REGISTRATION_SECTIONS.SHIPMENT_SETTINGS}
+                label={"배송 설정"}
+              >
                 <ShipmentChargeSection />
               </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <SectionWrapper label={"작품정보제공고시"}>
+              <SectionWrapper
+                referenceKey={PRODUCT_REGISTRATION_SECTIONS.SPECIFICATION}
+                label={"작품정보제공고시"}
+              >
                 <SpecificationSection />
               </SectionWrapper>
             </ContentsSection>
 
             <ContentsSection>
-              <SectionWrapper label={"검색용 태그 설정"}>
+              <SectionWrapper
+                referenceKey={PRODUCT_REGISTRATION_SECTIONS.SEARCH_TAG}
+                label={"검색용 태그 설정"}
+              >
                 <SearchTagSection />
               </SectionWrapper>
             </ContentsSection>

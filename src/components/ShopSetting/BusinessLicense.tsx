@@ -3,15 +3,10 @@ import { useReactiveVar } from "@apollo/client";
 
 import Button from "@components/common/Button";
 import BusinessLicenseModal from "@components/ShopSetting/BusinessLicenseModal";
-import InputStatusMessage from "@components/common/InputStatusMessage";
 
 import { modalVar } from "@cache/index";
 import { BusinessLicenseVariables } from "@models/shopSettings";
-import {
-  businessLicenseVar,
-  sectionFulfillmentVar,
-  SECTIONS,
-} from "@cache/shopSettings";
+import { businessLicenseVar } from "@cache/shopSettings";
 
 export interface BusinessLicenseInfoType {
   rprsvNm: string; // 대표자명
@@ -23,8 +18,6 @@ export interface BusinessLicenseInfoType {
 }
 
 const BusinessLicense = () => {
-  const sectionFulfillment = sectionFulfillmentVar();
-
   const businessLicense: BusinessLicenseVariables =
     useReactiveVar(businessLicenseVar);
 
@@ -33,15 +26,6 @@ const BusinessLicense = () => {
   ) as boolean;
 
   const handleRegisterButtonClick = () => {
-    const isSectionFulfilled = sectionFulfillmentVar().BUSINESS_LICENSE;
-
-    if (!isSectionFulfilled) {
-      sectionFulfillmentVar({
-        ...sectionFulfillmentVar(),
-        [SECTIONS.BUSINESS_LICENSE]: true,
-      });
-    }
-
     modalVar({
       ...modalVar(),
       isVisible: true,
@@ -60,14 +44,8 @@ const BusinessLicense = () => {
 
   return (
     <Container>
-      {!sectionFulfillment.BUSINESS_LICENSE && (
-        <InputStatusMessage color="red" topMargin={"5px"} bottomMargin={"10px"}>
-          ※필수 입력사항입니다.
-        </InputStatusMessage>
-      )}
-
       {!hasBusinessLicense ? (
-        <HasNoInfoContainer hasInputStatusMessage={true}>
+        <HasNoInfoContainer>
           <InfoText>등록된 사업자등록증/통신판매업신고증이 없습니다.</InfoText>
           <Button size="small" full={false} onClick={handleRegisterButtonClick}>
             등록하기
@@ -124,9 +102,7 @@ const InfoContainer = styled.div`
   width: 702px;
 `;
 
-const HasNoInfoContainer = styled(InfoContainer)<{
-  hasInputStatusMessage: boolean;
-}>`
+const HasNoInfoContainer = styled(InfoContainer)`
   padding: 16px 174px;
 
   & > :first-child {
