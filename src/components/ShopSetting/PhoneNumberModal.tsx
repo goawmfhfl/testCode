@@ -20,7 +20,7 @@ const formatNumber = (number: string) => {
 
 const postAuthenticationCode = async (
   phoneNumber: string,
-  AuthenticationCode: string
+  authenticationCode: string
 ) => {
   try {
     const data = [
@@ -30,7 +30,7 @@ const postAuthenticationCode = async (
         profile: process.env.REACT_APP_BIZM_PROFILE,
         reserveDt: "00000000000000",
         tmplId: "chopsticks_05",
-        msg: `[${AuthenticationCode}] 인증번호를 입력하시면 인증이 완료됩니다.`,
+        msg: `[${authenticationCode}] 인증번호를 입력하시면 인증이 완료됩니다.`,
       },
     ];
 

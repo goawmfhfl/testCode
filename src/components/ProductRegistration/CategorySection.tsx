@@ -15,7 +15,7 @@ import {
 
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
-import { CATEGORIES, categoryMapper } from "constants/index";
+import { CATEGORIES, categoryMapper } from "@constants/index";
 
 const CategorySection = () => {
   const { watch, register, setValue } = useFormContext();

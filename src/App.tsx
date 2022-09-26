@@ -6,7 +6,8 @@ import Home from "@pages/Home";
 import Login from "@pages/Login";
 import OAuth from "@pages/OAuth";
 import ShopSetting from "@pages/ShopSetting";
-import ProductRegistration from "@pages/ProductRegistration";
+import ProductManagement from "@pages/product/index";
+import ProductRegistration from "@pages/product/registration";
 import GlobalStyles from "@styles/GlobalStyles";
 import theme from "@styles/theme";
 import { modalVar, overModalVar, systemModalVar } from "@cache/index";
@@ -30,9 +31,10 @@ function App() {
           <Route path="oauth" element={<OAuth />}>
             <Route path=":oauthProvider" element={<OAuth />} />
           </Route>
-          <Route path="shopSetting" element={<ShopSetting />} />
+          <Route path="/shop/settings" element={<ShopSetting />} />
+          <Route path="/product" element={<ProductManagement />} />
           <Route
-            path="/productRegistration"
+            path="/product/registration"
             element={<ProductRegistration />}
           />
         </Routes>
