@@ -1,11 +1,57 @@
 import styled from "styled-components";
+import { useQuery, gql } from "@apollo/client";
 
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
 import ContentsHeader from "@components/common/ContentsHeader";
 import Button from "@components/common/Button";
 
+const GET_ALL_PRODUCTS_BY_SELLER = gql`
+  query GetAllProductsBySeller($input: GetAllProductsBySellerInput!) {
+    getAllproductsBySeller(input: $input) {
+      ok
+      error
+      totalPages
+      totalResults
+      products {
+        id
+        name
+        originalPrice
+        quantity
+        status
+      }
+    }
+  }
+`;
+
 const Product = () => {
+  const result = useQuery<
+    {
+      getAllproductsBySeller: {
+        ok: boolean;
+        error: string;
+        totalPages: number;
+        totalResults: number;
+        products: Array<{
+          id: number;
+          name: string;
+          originalPrice: number;
+          quantity: number;
+          status: string;
+        }>;
+      };
+    },
+    { input: { page: number } }
+  >(GET_ALL_PRODUCTS_BY_SELLER, {
+    variables: {
+      input: {
+        page: 1,
+      },
+    },
+  });
+
+  console.log(result);
+
   return (
     <Layout>
       <ContentsContainer>
@@ -37,57 +83,30 @@ const Product = () => {
           </ControllerContainer>
 
           <ProductListTable>
-            <tr>
-              <th>상품 번호</th>
-              <th>-</th>
-              <th>상품명</th>
-            </tr>
-            <tr>
-              <td>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Possimus tempora ipsam nisi adipisci repellat veritatis est
-                maiores voluptas excepturi aperiam quod aliquid, ipsa error vero
-                libero neque vel amet quo nemo unde? Fugiat repellendus ab
-                tenetur odio facere inventore qui, nihil rem enim repudiandae
-                aperiam reiciendis dolores? Quidem, animi earum.
-              </td>
-              <td>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Excepturi explicabo doloribus earum nihil tempore facere
-                molestiae vel? Exercitationem necessitatibus quibusdam explicabo
-                perspiciatis natus ipsa expedita tenetur eius, facere officia
-                optio architecto ipsam accusantium modi. Adipisci, doloremque
-                debitis rem quis accusamus temporibus veniam et natus fugit! Est
-                accusantium porro autem fugiat.
-              </td>
-              <td>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione
-                sit sint hic animi consectetur? Odit officia aperiam, quam,
-                commodi aut, saepe ipsa rem nisi quasi sequi tempora
-                perspiciatis porro laboriosam! Optio deserunt molestias
-                excepturi repellendus ullam nihil aliquam deleniti similique
-                animi maxime dolores sapiente, temporibus quae dolore harum
-                consequuntur asperiores.
-              </td>
-            </tr>
-            <tr>
-              <td>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Magni,
-                cum odit necessitatibus eum nemo, repellat voluptates incidunt
-                in laborum consectetur quo facilis distinctio neque excepturi!
-                Sunt nulla incidunt velit animi.
-              </td>
-              <td>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Itaque,
-                laudantium?
-              </td>
-              <td>
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                Veritatis placeat laboriosam nulla labore numquam. Aliquid
-                placeat amet molestias officiis magni possimus, corporis
-                architecto blanditiis suscipit.
-              </td>
-            </tr>
+            <thead>
+              <tr>
+                <th>상품 번호</th>
+                <th>상품명</th>
+                <th>상품 가격</th>
+                <th>재고</th>
+                <th>상태</th>
+              </tr>
+            </thead>
+            <tbody>
+              {result.data?.getAllproductsBySeller.products.map(
+                ({ id, name, originalPrice, quantity, status }) => {
+                  return (
+                    <tr>
+                      <td>{id}</td>
+                      <td>{name}</td>
+                      <td>{originalPrice}</td>
+                      <td>{quantity}</td>
+                      <td>{status}</td>
+                    </tr>
+                  );
+                }
+              )}
+            </tbody>
           </ProductListTable>
         </ProductManagerContainer>
       </ContentsContainer>
@@ -125,6 +144,11 @@ const ControllerContainer = styled.div`
 
 const ProductListTable = styled.table`
   background-color: skyblue;
+
+  & td,
+  th {
+    padding: 1em;
+  }
 `;
 
 export default Product;
