@@ -191,7 +191,6 @@ function hasEveryInputFulfilled(
             }
           ) => {
             if (isRequired) {
-              console.log(quantity);
               counter.requiredOptions.numberOfOptions++;
               counter.requiredOptions.stockSum += quantity;
             } else {

@@ -8,7 +8,7 @@ import Button from "@components/common/Button";
 
 const GET_ALL_PRODUCTS_BY_SELLER = gql`
   query GetAllProductsBySeller($input: GetAllProductsBySellerInput!) {
-    getAllproductsBySeller(input: $input) {
+    getAllProductsBySeller(input: $input) {
       ok
       error
       totalPages
@@ -16,7 +16,14 @@ const GET_ALL_PRODUCTS_BY_SELLER = gql`
       products {
         id
         name
+        category {
+          id
+          name
+        }
         originalPrice
+        discountAmount
+        discountMethod
+        discountAppliedPrice
         quantity
         status
       }
@@ -27,7 +34,7 @@ const GET_ALL_PRODUCTS_BY_SELLER = gql`
 const Product = () => {
   const result = useQuery<
     {
-      getAllproductsBySeller: {
+      getAllProductsBySeller: {
         ok: boolean;
         error: string;
         totalPages: number;
@@ -36,6 +43,9 @@ const Product = () => {
           id: number;
           name: string;
           originalPrice: number;
+          discountMethod: string;
+          discountAmount: number;
+          discountAppliedPrice: number;
           quantity: number;
           status: string;
         }>;
@@ -88,18 +98,35 @@ const Product = () => {
                 <th>상품 번호</th>
                 <th>상품명</th>
                 <th>상품 가격</th>
+                <th>할인율</th>
+                <th>할인가</th>
                 <th>재고</th>
                 <th>상태</th>
               </tr>
             </thead>
             <tbody>
-              {result.data?.getAllproductsBySeller.products.map(
-                ({ id, name, originalPrice, quantity, status }) => {
+              {result.data?.getAllProductsBySeller.products.map(
+                ({
+                  id,
+                  name,
+                  originalPrice,
+                  discountMethod,
+                  discountAmount,
+                  discountAppliedPrice,
+                  quantity,
+                  status,
+                }) => {
                   return (
-                    <tr>
+                    <tr key={id}>
                       <td>{id}</td>
                       <td>{name}</td>
                       <td>{originalPrice}</td>
+                      <td>
+                        {discountMethod &&
+                          discountAmount &&
+                          `${discountAmount} ${discountMethod}`}
+                      </td>
+                      <td>{discountAppliedPrice}</td>
                       <td>{quantity}</td>
                       <td>{status}</td>
                     </tr>

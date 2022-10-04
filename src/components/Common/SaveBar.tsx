@@ -138,7 +138,7 @@ const SaveBar = () => {
   ) => {
     e.preventDefault();
 
-    if (location.pathname === "/shopSetting") {
+    if (location.pathname === "/shop/settings") {
       const temporarySaveShopInput = restructureShopSettingStates(watch);
 
       const {
@@ -174,7 +174,7 @@ const SaveBar = () => {
       return;
     }
 
-    if (location.pathname === "/productRegistration") {
+    if (location.pathname === "/product/registration") {
       const input = restructureProductRegistrationStates(formContext);
 
       const result = await temporarySaveProduct({
@@ -192,7 +192,7 @@ const SaveBar = () => {
   ) => {
     e.preventDefault();
 
-    if (location.pathname === "/shopSetting") {
+    if (location.pathname === "/shop/settings") {
       const input = restructureShopSettingStates(watch);
 
       const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
@@ -258,6 +258,8 @@ const SaveBar = () => {
         },
       });
 
+      console.log(ok, error);
+
       if (!ok) {
         systemModalVar({
           ...systemModalVar(),
@@ -281,7 +283,8 @@ const SaveBar = () => {
       return;
     }
 
-    if (location.pathname === "/productRegistration") {
+    if (location.pathname === "/product/registration") {
+      console.log("?");
       const input = restructureProductRegistrationStates(formContext);
 
       const isDiscounted = watch(IS_DISCOUNTED) as boolean;
@@ -325,6 +328,8 @@ const SaveBar = () => {
         ]
       );
 
+      console.log(isFulfilled);
+
       if (!isFulfilled) {
         const unfulfilledSectionNames = [
           ...new Set(
@@ -363,6 +368,7 @@ const SaveBar = () => {
           input,
         },
       });
+      console.log(result);
 
       // TODO: 등록 상태에 따른 systemModal 메시지
 

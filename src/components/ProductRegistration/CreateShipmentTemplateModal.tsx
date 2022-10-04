@@ -8,16 +8,16 @@ import {
   initialState as shipmentTemplateInitialState,
 } from "@cache/productRegistration/shipmentTemplate";
 
-const ShipmentTemplateModal = () => {
-  const CREATE_SHIPMENT_TEMPLATE = gql`
-    mutation CreateShipmentTemplate($input: CreateShipmentTemplateInput!) {
-      createShipmentTemplate(input: $input) {
-        ok
-        error
-      }
+const CREATE_SHIPMENT_TEMPLATE = gql`
+  mutation CreateShipmentTemplate($input: CreateShipmentTemplateInput!) {
+    createShipmentTemplate(input: $input) {
+      ok
+      error
     }
-  `;
+  }
+`;
 
+const ShipmentTemplateModal = () => {
   const [createShipmentTemplate] = useMutation<
     { createShipmentTemplate: { ok: boolean; error: string } },
     { input: CreateShipmentInputType }
