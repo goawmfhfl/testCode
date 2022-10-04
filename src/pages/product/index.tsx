@@ -1,5 +1,11 @@
+import { useEffect } from "react";
 import styled from "styled-components";
-import { useQuery, gql } from "@apollo/client";
+import { useLazyQuery, useReactiveVar } from "@apollo/client";
+import GET_ALL_PRODUCTS_BY_SELLER, {
+  GetAllProductsBySellerType,
+  GetAllProductsBySellerInputType,
+} from "@graphql/queries/getAllProductsBySeller";
+import { filterOptionNameVar } from "@cache/productRegistration/productManagement";
 
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
@@ -55,23 +61,30 @@ const Product = () => {
     variables: {
       input: {
         page: 1,
+        skip: 20,
+        status: null,
       },
     },
   });
 
-  console.log(result);
+  useEffect(() => {
+    // eslint-disable-next-line
+    getProductBySeller({
+      variables: {
+        input: {
+          page: 1,
+          skip: 20,
+          status: filterOptionName,
+        },
+      },
+    });
+  }, [filterOptionName]);
 
   return (
     <Layout>
       <ContentsContainer>
         <ContentsHeader headerName="상품관리"></ContentsHeader>
-        <FilterBar>
-          <FilterItem>전체</FilterItem>
-          <FilterItem>판매중</FilterItem>
-          <FilterItem>숨김</FilterItem>
-          <FilterItem>품절</FilterItem>
-        </FilterBar>
-
+        <FilterBar />
         <ProductManagerContainer>
           <ControllerContainer>
             <Button size="small" backgroundColor="white">
@@ -104,7 +117,7 @@ const Product = () => {
               </tr>
             </thead>
             <tbody>
-              {result.data?.getAllProductsBySeller.products.map(
+              {data?.getAllProductsBySeller.products.map(
                 ({
                   id,
                   name,
@@ -144,19 +157,6 @@ const Product = () => {
     </Layout>
   );
 };
-
-const FilterBar = styled.ul`
-  background-color: pink;
-  padding: 1em;
-
-  display: flex;
-`;
-
-const FilterItem = styled.li`
-  background-color: yellow;
-  padding: 1em;
-  margin-right: 1em;
-`;
 
 const ProductManagerContainer = styled.div`
   background-color: greenyellow;
