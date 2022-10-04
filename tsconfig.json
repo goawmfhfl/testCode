@@ -27,7 +27,8 @@
       "@utils/*": ["utils/*"],
       "@models/*": ["models/*"],
       "@cache/*": ["cache/*"],
-      "@constants/*": ["constants/*"]
+      "@constants/*": ["constants/*"],
+      "@graphql/*": ["graphql/*"]
     },
     "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": false,
