@@ -17,7 +17,6 @@ export interface GetAllProductsBySellerType {
       };
       originalPrice: number;
       discountAmount: number | null;
-      discountAppliedPrice: number | null;
       discountMethod: string | null;
       status: string;
       thumbnail: string;
@@ -58,7 +57,6 @@ export const GET_ALL_PRODUCTS_BY_SELLER = gql`
           }
         }
         originalPrice
-        discountAppliedPrice
         discountAmount
         discountMethod
         quantity
