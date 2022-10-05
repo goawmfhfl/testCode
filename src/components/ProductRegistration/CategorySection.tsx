@@ -22,7 +22,9 @@ const CategorySection = () => {
 
   const selectedFirstCategory: string = watch(CATEGORY_FIRST) as string;
   const selectedSecondCategory: string = watch(CATEGORY_SECOND) as string;
+
   const categoryDepthFirst: Array<string> = CATEGORIES.CATEGORY_FIRST;
+
   const categoryDepthSecond: Array<string> =
     (CATEGORIES.CATEGORY_SECOND[selectedFirstCategory] as Array<string>) || [];
 

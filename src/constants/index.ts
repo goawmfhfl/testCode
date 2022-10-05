@@ -9,7 +9,10 @@ interface CategoryType {
     FURNITURE: Array<string>;
     TECH: Array<string>;
     DESKWARE: Array<string>;
-    "WEAR&ACC": Array<string>;
+    WEAR_ACC: Array<string>;
+  };
+  CATEGORY_THIRD: {
+    NATURE: Array<string>;
   };
 }
 
@@ -52,13 +55,17 @@ export const CATEGORIES: CategoryType = {
       CategoryName.STATIONERY,
       CategoryName.CARD_POSTCARD,
     ],
-    "WEAR&ACC": [
+    WEAR_ACC: [
       CategoryName.PHONE,
       CategoryName.ACCESSORIES,
       CategoryName.JEWELLERY,
       CategoryName.BAG_POUCH,
       CategoryName.WEAR_ACC_ETC,
+      CategoryName.NATURE,
     ],
+  },
+  CATEGORY_THIRD: {
+    NATURE: [CategoryName.NATURE],
   },
 };
 
@@ -94,12 +101,13 @@ export const categoryMapper: { [key: string]: string } = {
   NOTE_MEMO: "노트/메모",
   STATIONERY: "문구",
   CARD_POSTCARD: "카드/엽서",
-  WEAR_ACC: "WEAR&ACC",
+  WEAR_ACC: `WEAR&ACC`,
   PHONE: "폰",
   ACCESSORIES: "액세서리",
   JEWELLERY: "쥬얼리",
   BAG_POUCH: "가방/파우치",
   WEAR_ACC_ETC: "WEAR_ACC/기타",
+  NATURE: "자연",
 };
 
 export enum SHOP_SETTING_SECTIONS {

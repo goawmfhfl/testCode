@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useLazyQuery, useReactiveVar } from "@apollo/client";
 import GET_ALL_PRODUCTS_BY_SELLER, {
@@ -37,8 +37,12 @@ const GET_ALL_PRODUCTS_BY_SELLER = gql`
   }
 `;
 
+import { modalVar } from "@cache/index";
+import ChangeCategoryModal from "@components/ProductRegistration/ProductManagement/ChangeCategoryModal";
+
 const Product = () => {
   const filterOptionStatus = useReactiveVar(filterOptionStatusVar);
+
   const [filterOptionSkipQuantity, setFilterOptionSkipQuantity] =
     useState<number>(20);
 
@@ -59,6 +63,13 @@ const Product = () => {
     setFilterOptionSkipQuantity(Number(value));
   };
 
+  const handleChangeCategoryModalButtonClick = () => {
+    modalVar({
+      isVisible: true,
+      component: <ChangeCategoryModal />,
+    });
+  };
+
   useEffect(() => {
     // eslint-disable-next-line
     getProductBySeller({
@@ -75,14 +86,18 @@ const Product = () => {
   return (
     <Layout>
       <ContentsContainer>
-        <ContentsHeader headerName="상품관리"></ContentsHeader>
+        <ContentsHeader headerName="상품관리" />
         <FilterBar />
         <ProductManagerContainer>
           <ControllerContainer>
             <Button size="small" backgroundColor="white">
               판매상태 변경
             </Button>
-            <Button size="small" backgroundColor="white">
+            <Button
+              size="small"
+              backgroundColor="white"
+              onClick={handleChangeCategoryModalButtonClick}
+            >
               카테고리 변경
             </Button>
             <Button size="small" backgroundColor="white">

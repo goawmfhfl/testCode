@@ -38,6 +38,7 @@ export enum CategoryName {
   JEWELLERY = "JEWELLERY",
   BAG_POUCH = "BAG_POUCH",
   WEAR_ACC_ETC = "WEAR_ACC_ETC",
+  NATURE = "NATURE",
 }
 
 export interface UploadedFileInfos {
