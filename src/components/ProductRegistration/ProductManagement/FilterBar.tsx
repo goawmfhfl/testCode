@@ -1,12 +1,12 @@
 import React from "react";
 import styled from "styled-components";
 
-import { filterOptionNameVar } from "@cache/productRegistration/productManagement";
+import { filterOptionStatusVar } from "@cache/productRegistration/productManagement";
 
 const FilterBar = () => {
   const changeFilterOptionNameClick =
     (filterOptionName: string | null) => () => {
-      filterOptionNameVar(filterOptionName);
+      filterOptionStatusVar(filterOptionName);
     };
 
   return (

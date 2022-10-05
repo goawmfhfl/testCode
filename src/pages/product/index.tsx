@@ -1,11 +1,11 @@
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useLazyQuery, useReactiveVar } from "@apollo/client";
 import GET_ALL_PRODUCTS_BY_SELLER, {
   GetAllProductsBySellerType,
   GetAllProductsBySellerInputType,
 } from "@graphql/queries/getAllProductsBySeller";
-import { filterOptionNameVar } from "@cache/productRegistration/productManagement";
+import { filterOptionStatusVar } from "@cache/productRegistration/productManagement";
 
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
@@ -38,25 +38,13 @@ const GET_ALL_PRODUCTS_BY_SELLER = gql`
 `;
 
 const Product = () => {
-  const result = useQuery<
-    {
-      getAllProductsBySeller: {
-        ok: boolean;
-        error: string;
-        totalPages: number;
-        totalResults: number;
-        products: Array<{
-          id: number;
-          name: string;
-          originalPrice: number;
-          discountMethod: string;
-          discountAmount: number;
-          quantity: number;
-          status: string;
-        }>;
-      };
-    },
-    { input: { page: number } }
+  const filterOptionStatus = useReactiveVar(filterOptionStatusVar);
+  const [filterOptionSkipQuantity, setFilterOptionSkipQuantity] =
+    useState<number>(20);
+
+  const [getProductBySeller, { data }] = useLazyQuery<
+    GetAllProductsBySellerType,
+    GetAllProductsBySellerInputType
   >(GET_ALL_PRODUCTS_BY_SELLER, {
     variables: {
       input: {
@@ -67,18 +55,22 @@ const Product = () => {
     },
   });
 
+  const changeSkipQuantityHandler = ({ target: { value } }) => {
+    setFilterOptionSkipQuantity(Number(value));
+  };
+
   useEffect(() => {
     // eslint-disable-next-line
     getProductBySeller({
       variables: {
         input: {
           page: 1,
-          skip: 20,
-          status: filterOptionName,
+          skip: filterOptionSkipQuantity,
+          status: filterOptionStatus,
         },
       },
     });
-  }, [filterOptionName]);
+  }, [filterOptionStatus, filterOptionSkipQuantity]);
 
   return (
     <Layout>
@@ -102,6 +94,12 @@ const Product = () => {
             <Button size="small" backgroundColor="white">
               삭제
             </Button>
+
+            <Select onChange={changeSkipQuantityHandler}>
+              <Option value={20}>20개씩보기</Option>
+              <Option value={50}>50개씩보기</Option>
+              <Option value={100}>100개씩보기</Option>
+            </Select>
           </ControllerContainer>
 
           <ProductListTable>
@@ -181,5 +179,10 @@ const ProductListTable = styled.table`
     padding: 1em;
   }
 `;
+
+const Select = styled.select`
+  background-color: skyblue;
+`;
+const Option = styled.option``;
 
 export default Product;
