@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-import { filterOptionStatusVar } from "@cache/productRegistration/productManagement";
+import { filterOptionStatusVar } from "@cache/ProductManagement";
 
 const FilterBar = () => {
   const changeFilterOptionNameClick =

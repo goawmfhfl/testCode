@@ -5,42 +5,28 @@ import GET_ALL_PRODUCTS_BY_SELLER, {
   GetAllProductsBySellerType,
   GetAllProductsBySellerInputType,
 } from "@graphql/queries/getAllProductsBySeller";
-import { filterOptionStatusVar } from "@cache/productRegistration/productManagement";
+import {
+  checkedProductsListVar,
+  filterOptionStatusVar,
+} from "@cache/ProductManagement";
 
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
 import ContentsHeader from "@components/common/ContentsHeader";
 import Button from "@components/common/Button";
-import { getDiscountedPrice } from "@utils/productRegistration";
-
-const GET_ALL_PRODUCTS_BY_SELLER = gql`
-  query GetAllProductsBySeller($input: GetAllProductsBySellerInput!) {
-    getAllProductsBySeller(input: $input) {
-      ok
-      error
-      totalPages
-      totalResults
-      products {
-        id
-        name
-        category {
-          id
-          name
-        }
-        originalPrice
-        discountAmount
-        discountMethod
-        quantity
-        status
-      }
-    }
-  }
-`;
+import Checkbox from "@components/common/input/Checkbox";
+import FilterBar from "@components/ProductRegistration/ProductManagement/FilterBar";
+import ChangeCategoryModal from "@components/ProductRegistration/ProductManagement/ChangeCategoryModal";
+import ChangeDiscountModal from "@components/ProductRegistration/ProductManagement/ChangeDiscountModal";
 
 import { modalVar } from "@cache/index";
-import ChangeCategoryModal from "@components/ProductRegistration/ProductManagement/ChangeCategoryModal";
+import { CheckedProductsListVarType } from "@cache/ProductManagement";
 
 const Product = () => {
+  const selectedProductList: Array<CheckedProductsListVarType> = useReactiveVar(
+    checkedProductsListVar
+  );
+
   const filterOptionStatus = useReactiveVar(filterOptionStatusVar);
 
   const [filterOptionSkipQuantity, setFilterOptionSkipQuantity] =
@@ -59,14 +45,32 @@ const Product = () => {
     },
   });
 
+  console.log("data", data);
+
   const changeSkipQuantityHandler = ({ target: { value } }) => {
     setFilterOptionSkipQuantity(Number(value));
+  };
+
+  const checkTableRowClick = (index: number) => () => {
+    if (data) {
+      checkedProductsListVar([
+        ...selectedProductList,
+        data.getAllProductsBySeller.products[index],
+      ]);
+    }
   };
 
   const handleChangeCategoryModalButtonClick = () => {
     modalVar({
       isVisible: true,
       component: <ChangeCategoryModal />,
+    });
+  };
+
+  const handleChangeDiscountModalButtonClick = () => {
+    modalVar({
+      isVisible: true,
+      component: <ChangeDiscountModal />,
     });
   };
 
@@ -100,7 +104,11 @@ const Product = () => {
             >
               카테고리 변경
             </Button>
-            <Button size="small" backgroundColor="white">
+            <Button
+              size="small"
+              backgroundColor="white"
+              onClick={handleChangeDiscountModalButtonClick}
+            >
               할인율 변경
             </Button>
             <Button size="small" backgroundColor="white">
@@ -120,6 +128,9 @@ const Product = () => {
           <ProductListTable>
             <thead>
               <tr>
+                <th>
+                  <Checkbox />
+                </th>
                 <th>상품 번호</th>
                 <th>상품명</th>
                 <th>상품 가격</th>
@@ -131,17 +142,24 @@ const Product = () => {
             </thead>
             <tbody>
               {data?.getAllProductsBySeller.products.map(
-                ({
-                  id,
-                  name,
-                  originalPrice,
-                  discountMethod,
-                  discountAmount,
-                  quantity,
-                  status,
-                }) => {
+                (
+                  {
+                    id,
+                    name,
+                    originalPrice,
+                    discountMethod,
+                    discountAmount,
+                    discountAppliedPrice,
+                    quantity,
+                    status,
+                  },
+                  index
+                ) => {
                   return (
                     <tr key={id}>
+                      <td>
+                        <Checkbox onClick={checkTableRowClick(index)} />
+                      </td>
                       <td>{id}</td>
                       <td>{name}</td>
                       <td>{originalPrice}</td>

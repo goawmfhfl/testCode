@@ -1,12 +1,12 @@
 import styled from "styled-components";
-import { modalVar } from "@cache/index";
+import { modalVar, systemModalVar } from "@cache/index";
 import { useForm } from "react-hook-form";
 import {
   CATEGORY_FIRST,
   CATEGORY_SECOND,
   CATEGORY_THIRD,
 } from "@cache/productRegistration";
-import { CATEGORIES, categoryMapper } from "@constants/index";
+import { useMutation, useReactiveVar } from "@apollo/client";
 
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
 import questionMarkIconSrc from "@icons/questionmark.svg";
@@ -15,15 +15,30 @@ import {
   OptionInput as Option,
 } from "@components/common/input/Dropdown";
 
+import { CHANGE_PRODUCTS_INFO } from "@graphql/mutations/changeProductsInfo";
+import { CATEGORIES, categoryMapper } from "@constants/index";
+import {
+  checkedProductsListVar,
+  CheckedProductsListVarType,
+} from "@cache/ProductManagement";
+
+import {
+  ChangeProductsInfoType,
+  ChangeProductsInfoInputType,
+} from "@graphql/mutations/changeProductsInfo";
+
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
+  const [updateCategory] =
+    useMutation<ChangeProductsInfoType, ChangeProductsInfoInputType>(
+      CHANGE_PRODUCTS_INFO
+    );
 
-  const handleCloseButtonClick = () => {
-    modalVar({
-      ...modalVar(),
-      isVisible: false,
-    });
-  };
+  const selectedProductList: Array<CheckedProductsListVarType> = useReactiveVar(
+    checkedProductsListVar
+  );
+
+  console.log("selectedProductList", selectedProductList);
 
   const selectedFirstCategory: string = watch(CATEGORY_FIRST) as string;
   const selectedSecondCategory: string = watch(CATEGORY_SECOND) as string;
@@ -33,6 +48,64 @@ const ChangeCategoryModal = () => {
     (CATEGORIES.CATEGORY_SECOND[selectedFirstCategory] as Array<string>) || [];
   const categoryDepthThird: Array<string> =
     (CATEGORIES.CATEGORY_THIRD[selectedSecondCategory] as Array<string>) || [];
+
+  const changeProductCategoryIdList: number[] = selectedProductList?.map(
+    (product) => product.id
+  );
+
+  const handleCloseButtonClick = () => {
+    modalVar({
+      ...modalVar(),
+      isVisible: false,
+    });
+  };
+
+  const updateCategoryClick = () => {
+    console.log("clicked");
+
+    try {
+      console.log("Second Step");
+
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      (async () => {
+        console.log("Third Step");
+        console.log(false || false);
+
+        console.log("changeProductCategoryIdList", changeProductCategoryIdList);
+        console.log("selectedSecondCategory", selectedSecondCategory);
+
+        const {
+          data: {
+            changeProductsInfo: { ok, error },
+          },
+        } = await updateCategory({
+          variables: {
+            input: {
+              productIds: changeProductCategoryIdList,
+              categoryName: selectedSecondCategory,
+            },
+          },
+        });
+
+        if (ok && selectedSecondCategory) {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: "카테고리가 변경되었습니다.",
+          });
+        }
+        if (error || !selectedSecondCategory) {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: "카테고리를 선택해주세요.",
+          });
+        }
+      })();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Container>
@@ -121,7 +194,7 @@ const ChangeCategoryModal = () => {
         </DropdownWrapper>
       </CategoryContainer>
       <ButtonContainer>
-        <Button>확인</Button>
+        <Button onClick={updateCategoryClick}>확인</Button>
         <Button>취소</Button>
       </ButtonContainer>
     </Container>
