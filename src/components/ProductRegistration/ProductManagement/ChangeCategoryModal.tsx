@@ -38,8 +38,24 @@ import {
   GetAllProductsBySellerType,
 } from "@graphql/queries/getAllProductsBySeller";
 
+import { CHANGE_PRODUCTS_INFO } from "@graphql/mutations/changeProductsInfo";
+import { CATEGORIES, categoryMapper } from "@constants/index";
+import {
+  checkedProductsListVar,
+  CheckedProductsListVarType,
+} from "@cache/ProductManagement";
+
+import {
+  ChangeProductsInfoType,
+  ChangeProductsInfoInputType,
+} from "@graphql/mutations/changeProductsInfo";
+
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
+  const [updateCategory] =
+    useMutation<ChangeProductsInfoType, ChangeProductsInfoInputType>(
+      CHANGE_PRODUCTS_INFO
+    );
 
   const filterOptionPageNumber: number = useReactiveVar(
     filterOptionPageNumberVar
