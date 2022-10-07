@@ -14,14 +14,12 @@ import {
   SelectInput as Dropdown,
   OptionInput as Option,
 } from "@components/common/input/Dropdown";
-
 import { CHANGE_PRODUCTS_INFO } from "@graphql/mutations/changeProductsInfo";
 import { CATEGORIES, categoryMapper } from "@constants/index";
 import {
   checkedProductsListVar,
   CheckedProductsListVarType,
 } from "@cache/ProductManagement";
-
 import {
   ChangeProductsInfoType,
   ChangeProductsInfoInputType,
@@ -77,20 +75,37 @@ const ChangeCategoryModal = () => {
           systemModalVar({
             ...systemModalVar(),
             isVisible: true,
-            description: "카테고리가 변경되었습니다.",
+            description: (
+              <>
+                {changeProductCategoryIdList.length}개 상품의 카테고리를 <br />
+                이대로 변경하시겠습니까?
+              </>
+            ),
+
             confirmButtonClickHandler: () => {
               systemModalVar({
                 ...systemModalVar(),
-                isVisible: false,
-              });
+                isVisible: true,
+                description: "카테고리가 변경되었습니다.",
 
-              modalVar({
-                ...modalVar(),
-                isVisible: false,
+                confirmButtonClickHandler: () => {
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+
+                  modalVar({
+                    ...modalVar(),
+                    isVisible: false,
+                  });
+                },
+                cancelButtonVisibility: false,
               });
             },
+            cancelButtonVisibility: true,
           });
         }
+
         if (error || !selectedSecondCategory) {
           systemModalVar({
             ...systemModalVar(),
