@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useLazyQuery, useReactiveVar } from "@apollo/client";
 import GET_ALL_PRODUCTS_BY_SELLER, {
@@ -23,15 +23,6 @@ import { modalVar } from "@cache/index";
 import { CheckedProductsListVarType } from "@cache/ProductManagement";
 
 const Product = () => {
-  const selectedProductList: Array<CheckedProductsListVarType> = useReactiveVar(
-    checkedProductsListVar
-  );
-
-  const filterOptionStatus = useReactiveVar(filterOptionStatusVar);
-
-  const [filterOptionSkipQuantity, setFilterOptionSkipQuantity] =
-    useState<number>(20);
-
   const [getProductBySeller, { data }] = useLazyQuery<
     GetAllProductsBySellerType,
     GetAllProductsBySellerInputType
@@ -44,21 +35,33 @@ const Product = () => {
       },
     },
   });
-
-  console.log("data", data);
+  const selectedProductList: Array<CheckedProductsListVarType> = useReactiveVar(
+    checkedProductsListVar
+  );
+  const filterOptionStatus = useReactiveVar(filterOptionStatusVar);
+  const [filterOptionSkipQuantity, setFilterOptionSkipQuantity] =
+    useState<number>(20);
 
   const changeSkipQuantityHandler = ({ target: { value } }) => {
     setFilterOptionSkipQuantity(Number(value));
   };
 
-  const checkTableRowClick = (index: number) => () => {
-    if (data) {
-      checkedProductsListVar([
-        ...selectedProductList,
-        data.getAllProductsBySeller.products[index],
-      ]);
-    }
-  };
+  const handleTableRowClick =
+    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!data) return;
+      console.log(e.target.checked);
+
+      if (e.target.checked) {
+        console.log("체크 할 경우");
+        checkedProductsListVar([
+          ...selectedProductList,
+          data.getAllProductsBySeller.products[index],
+        ]);
+      }
+      if (!e.target.checked) {
+        console.log("체크를 해제 할 경우");
+      }
+    };
 
   const handleChangeCategoryModalButtonClick = () => {
     modalVar({
@@ -158,7 +161,7 @@ const Product = () => {
                   return (
                     <tr key={id}>
                       <td>
-                        <Checkbox onClick={checkTableRowClick(index)} />
+                        <Checkbox onChange={handleTableRowClick(index)} />
                       </td>
                       <td>{id}</td>
                       <td>{name}</td>

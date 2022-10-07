@@ -33,13 +33,9 @@ const ChangeCategoryModal = () => {
     useMutation<ChangeProductsInfoType, ChangeProductsInfoInputType>(
       CHANGE_PRODUCTS_INFO
     );
-
   const selectedProductList: Array<CheckedProductsListVarType> = useReactiveVar(
     checkedProductsListVar
   );
-
-  console.log("selectedProductList", selectedProductList);
-
   const selectedFirstCategory: string = watch(CATEGORY_FIRST) as string;
   const selectedSecondCategory: string = watch(CATEGORY_SECOND) as string;
 
@@ -61,19 +57,9 @@ const ChangeCategoryModal = () => {
   };
 
   const updateCategoryClick = () => {
-    console.log("clicked");
-
     try {
-      console.log("Second Step");
-
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       (async () => {
-        console.log("Third Step");
-        console.log(false || false);
-
-        console.log("changeProductCategoryIdList", changeProductCategoryIdList);
-        console.log("selectedSecondCategory", selectedSecondCategory);
-
         const {
           data: {
             changeProductsInfo: { ok, error },
@@ -92,6 +78,17 @@ const ChangeCategoryModal = () => {
             ...systemModalVar(),
             isVisible: true,
             description: "카테고리가 변경되었습니다.",
+            confirmButtonClickHandler: () => {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+
+              modalVar({
+                ...modalVar(),
+                isVisible: false,
+              });
+            },
           });
         }
         if (error || !selectedSecondCategory) {
@@ -195,7 +192,7 @@ const ChangeCategoryModal = () => {
       </CategoryContainer>
       <ButtonContainer>
         <Button onClick={updateCategoryClick}>확인</Button>
-        <Button>취소</Button>
+        <Button onClick={handleCloseButtonClick}>취소</Button>
       </ButtonContainer>
     </Container>
   );
