@@ -55,67 +55,89 @@ const ChangeCategoryModal = () => {
   };
 
   const updateCategoryClick = () => {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      (async () => {
-        const {
-          data: {
-            changeProductsInfo: { ok, error },
-          },
-        } = await updateCategory({
-          variables: {
-            input: {
-              productIds: changeProductCategoryIdList,
-              categoryName: selectedSecondCategory,
-            },
-          },
-        });
-
-        if (ok && selectedSecondCategory) {
+    if (!selectedSecondCategory)
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: "카테고리를 선택해주세요.",
+        confirmButtonClickHandler: () => {
           systemModalVar({
             ...systemModalVar(),
-            isVisible: true,
-            description: (
-              <>
-                {changeProductCategoryIdList.length}개 상품의 카테고리를 <br />
-                이대로 변경하시겠습니까?
-              </>
-            ),
+            isVisible: false,
+          });
+        },
+      });
 
-            confirmButtonClickHandler: () => {
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: "카테고리가 변경되었습니다.",
+    if (selectedSecondCategory) {
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: (
+          <>
+            {selectedProductList.length}개 상품의 카테고리를 <br />
+            이대로 변경하시겠습니까?
+          </>
+        ),
 
-                confirmButtonClickHandler: () => {
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-
-                  modalVar({
-                    ...modalVar(),
-                    isVisible: false,
-                  });
+        confirmButtonClickHandler: () => {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            (async () => {
+              const {
+                data: {
+                  changeProductsInfo: { ok, error },
                 },
-                cancelButtonVisibility: false,
+              } = await updateCategory({
+                variables: {
+                  input: {
+                    productIds: changeProductCategoryIdList,
+                    categoryName: selectedSecondCategory,
+                  },
+                },
               });
-            },
-            cancelButtonVisibility: true,
-          });
-        }
 
-        if (error || !selectedSecondCategory) {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: true,
-            description: "카테고리를 선택해주세요.",
-          });
-        }
-      })();
-    } catch (error) {
-      console.log(error);
+              if (ok) {
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: true,
+                  description: "카테고리가 변경되었습니다.",
+
+                  confirmButtonClickHandler: () => {
+                    systemModalVar({
+                      ...systemModalVar(),
+                      isVisible: false,
+                    });
+
+                    modalVar({
+                      ...modalVar(),
+                      isVisible: false,
+                    });
+                  },
+                  cancelButtonVisibility: false,
+                });
+              }
+
+              if (error) {
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: true,
+                  description: <>{error}</>,
+                  confirmButtonClickHandler: () => {
+                    systemModalVar({
+                      ...systemModalVar(),
+                      isVisible: false,
+                    });
+                  },
+                  cancelButtonVisibility: false,
+                });
+              }
+            })();
+          } catch (error) {
+            console.log(error);
+          }
+        },
+        cancelButtonVisibility: true,
+      });
     }
   };
 
