@@ -9,7 +9,7 @@ import {
   checkedProductsListVar,
   filterOptionStatusVar,
 } from "@cache/ProductManagement";
-import { modalVar } from "@cache/index";
+import { modalVar, systemModalVar } from "@cache/index";
 import {
   ProductsListVarType,
   getProductBySellerVar,
@@ -49,6 +49,85 @@ const Product = () => {
 
   const changeSkipQuantityHandler = ({ target: { value } }) => {
     setFilterOptionSkipQuantity(Number(value));
+  };
+
+  const showHaveCheckAnyProductModal = () => {
+    return systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: (
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요.
+        </>
+      ),
+      confirmButtonVisibility: true,
+      confirmButtonClickHandler: () => {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: false,
+        });
+      },
+      cancelButtonVisibility: false,
+    });
+  };
+
+  const handleChangeSaleStatusButtonClick = () => {
+    if (!selectedProductList.length) {
+      return showHaveCheckAnyProductModal();
+    }
+  };
+
+  const handleChangeCategoryModalButtonClick = () => {
+    if (!selectedProductList.length) {
+      return showHaveCheckAnyProductModal();
+    }
+
+    modalVar({
+      isVisible: true,
+      component: <ChangeCategoryModal />,
+    });
+  };
+
+  const handleChangeDiscountModalButtonClick = () => {
+    if (!selectedProductList.length) {
+      return showHaveCheckAnyProductModal();
+    }
+  };
+
+  const handleDuplicateButtonClick = () => {
+    if (!selectedProductList.length) {
+      return showHaveCheckAnyProductModal();
+    }
+  };
+
+  const handleDeleteButtonClick = () => {
+    if (!selectedProductList.length) {
+      return showHaveCheckAnyProductModal();
+    }
+  };
+
+  const handleAllCheckBoxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      const checkAllProductList = productsList.map((product) => ({
+        ...product,
+        isChecked: true,
+      }));
+
+      getProductBySellerVar(checkAllProductList);
+      checkedProductsListVar(checkAllProductList);
+    }
+
+    if (!e.target.checked) {
+      const checkAllProductList = productsList.map((product) => ({
+        ...product,
+        isChecked: false,
+      }));
+
+      getProductBySellerVar(checkAllProductList);
+      checkedProductsListVar([]);
+    }
   };
 
   const handleCheckBoxChange =
@@ -92,42 +171,6 @@ const Product = () => {
         }
       }
     };
-
-  const handleAllCheckBoxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      const checkAllProductList = productsList.map((product) => ({
-        ...product,
-        isChecked: true,
-      }));
-
-      getProductBySellerVar(checkAllProductList);
-      checkedProductsListVar(checkAllProductList);
-    }
-
-    if (!e.target.checked) {
-      const checkAllProductList = productsList.map((product) => ({
-        ...product,
-        isChecked: false,
-      }));
-
-      getProductBySellerVar(checkAllProductList);
-      checkedProductsListVar([]);
-    }
-  };
-
-  const handleChangeCategoryModalButtonClick = () => {
-    modalVar({
-      isVisible: true,
-      component: <ChangeCategoryModal />,
-    });
-  };
-
-  const handleChangeDiscountModalButtonClick = () => {
-    modalVar({
-      isVisible: true,
-      component: <ChangeDiscountModal />,
-    });
-  };
 
   useEffect(() => {
     try {
@@ -177,7 +220,11 @@ const Product = () => {
         <FilterBar />
         <ProductManagerContainer>
           <ControllerContainer>
-            <Button size="small" backgroundColor="white">
+            <Button
+              size="small"
+              backgroundColor="white"
+              onClick={handleChangeSaleStatusButtonClick}
+            >
               판매상태 변경
             </Button>
             <Button
@@ -194,10 +241,18 @@ const Product = () => {
             >
               할인율 변경
             </Button>
-            <Button size="small" backgroundColor="white">
+            <Button
+              size="small"
+              backgroundColor="white"
+              onClick={handleDuplicateButtonClick}
+            >
               복제
             </Button>
-            <Button size="small" backgroundColor="white">
+            <Button
+              size="small"
+              backgroundColor="white"
+              onClick={handleDeleteButtonClick}
+            >
               삭제
             </Button>
 
