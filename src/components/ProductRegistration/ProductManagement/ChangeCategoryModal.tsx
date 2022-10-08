@@ -18,7 +18,7 @@ import { CHANGE_PRODUCTS_INFO } from "@graphql/mutations/changeProductsInfo";
 import { CATEGORIES, categoryMapper } from "@constants/index";
 import {
   checkedProductsListVar,
-  CheckedProductsListVarType,
+  ProductsListVarType,
 } from "@cache/ProductManagement";
 import {
   ChangeProductsInfoType,
@@ -31,7 +31,7 @@ const ChangeCategoryModal = () => {
     useMutation<ChangeProductsInfoType, ChangeProductsInfoInputType>(
       CHANGE_PRODUCTS_INFO
     );
-  const selectedProductList: Array<CheckedProductsListVarType> = useReactiveVar(
+  const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
     checkedProductsListVar
   );
   const selectedFirstCategory: string = watch(CATEGORY_FIRST) as string;
@@ -121,7 +121,12 @@ const ChangeCategoryModal = () => {
                 systemModalVar({
                   ...systemModalVar(),
                   isVisible: true,
-                  description: <>{error}</>,
+                  description: (
+                    <>
+                      에러메세지 <br />
+                      {error}
+                    </>
+                  ),
                   confirmButtonClickHandler: () => {
                     systemModalVar({
                       ...systemModalVar(),
