@@ -9,6 +9,11 @@ import {
   checkedProductsListVar,
   filterOptionStatusVar,
 } from "@cache/ProductManagement";
+import { modalVar } from "@cache/index";
+import {
+  ProductsListVarType,
+  getProductBySellerVar,
+} from "@cache/ProductManagement";
 
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
@@ -19,11 +24,8 @@ import FilterBar from "@components/ProductRegistration/ProductManagement/FilterB
 import ChangeCategoryModal from "@components/ProductRegistration/ProductManagement/ChangeCategoryModal";
 import ChangeDiscountModal from "@components/ProductRegistration/ProductManagement/ChangeDiscountModal";
 
-import { modalVar } from "@cache/index";
-import { CheckedProductsListVarType } from "@cache/ProductManagement";
-
 const Product = () => {
-  const [getProductBySeller, { data }] = useLazyQuery<
+  const [getProductBySeller] = useLazyQuery<
     GetAllProductsBySellerType,
     GetAllProductsBySellerInputType
   >(GET_ALL_PRODUCTS_BY_SELLER, {
@@ -35,9 +37,12 @@ const Product = () => {
       },
     },
   });
-  const selectedProductList: Array<CheckedProductsListVarType> = useReactiveVar(
+
+  const productsList = useReactiveVar(getProductBySellerVar);
+  const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
     checkedProductsListVar
   );
+
   const filterOptionStatus = useReactiveVar(filterOptionStatusVar);
   const [filterOptionSkipQuantity, setFilterOptionSkipQuantity] =
     useState<number>(20);
@@ -46,22 +51,69 @@ const Product = () => {
     setFilterOptionSkipQuantity(Number(value));
   };
 
-  const handleTableRowClick =
+  const handleCheckBoxChange =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (!data) return;
-      console.log(e.target.checked);
-
       if (e.target.checked) {
-        console.log("체크 할 경우");
-        checkedProductsListVar([
-          ...selectedProductList,
-          data.getAllProductsBySeller.products[index],
-        ]);
+        const checkedProductList = { ...productsList[index], isChecked: true };
+        checkedProductsListVar([...selectedProductList, checkedProductList]);
+
+        productsList[index].isChecked = true;
+        getProductBySellerVar(productsList);
       }
+
       if (!e.target.checked) {
-        console.log("체크를 해제 할 경우");
+        const isCheckedList = selectedProductList.filter(
+          (product) => product.id === productsList[index].id
+        );
+
+        if (isCheckedList) {
+          const checkedListIndex = selectedProductList.findIndex(
+            (product) => product.id === productsList[index].id
+          );
+
+          checkedProductsListVar([
+            ...selectedProductList.slice(0, checkedListIndex),
+            ...selectedProductList.slice(checkedListIndex + 1),
+          ]);
+
+          productsList[index].isChecked = false;
+          getProductBySellerVar(productsList);
+        }
+
+        if (!isCheckedList) {
+          const checkedProductList = {
+            ...productsList[index],
+            isChecked: false,
+          };
+          checkedProductsListVar([...selectedProductList, checkedProductList]);
+
+          productsList[index].isChecked = false;
+          getProductBySellerVar(productsList);
+        }
       }
     };
+
+  const handleAllCheckBoxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      const checkAllProductList = productsList.map((product) => ({
+        ...product,
+        isChecked: true,
+      }));
+
+      getProductBySellerVar(checkAllProductList);
+      checkedProductsListVar(checkAllProductList);
+    }
+
+    if (!e.target.checked) {
+      const checkAllProductList = productsList.map((product) => ({
+        ...product,
+        isChecked: false,
+      }));
+
+      getProductBySellerVar(checkAllProductList);
+      checkedProductsListVar([]);
+    }
+  };
 
   const handleChangeCategoryModalButtonClick = () => {
     modalVar({
@@ -78,16 +130,44 @@ const Product = () => {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line
-    getProductBySeller({
-      variables: {
-        input: {
-          page: 1,
-          skip: filterOptionSkipQuantity,
-          status: filterOptionStatus,
-        },
-      },
-    });
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      (async () => {
+        const {
+          data: {
+            getAllProductsBySeller: { error, ok, products },
+          },
+          loading,
+        } = await getProductBySeller({
+          variables: {
+            input: {
+              page: 1,
+              skip: filterOptionSkipQuantity,
+              status: filterOptionStatus,
+            },
+          },
+        });
+
+        if (loading) {
+          return <div>로딩중입니다...</div>;
+        }
+
+        if (ok) {
+          getProductBySellerVar(
+            products.map((list) => ({
+              ...list,
+              isChecked: false,
+            }))
+          );
+        }
+
+        if (error) {
+          console.log("error", error);
+        }
+      })();
+    } catch (error) {
+      console.log("error", error);
+    }
   }, [filterOptionStatus, filterOptionSkipQuantity]);
 
   return (
@@ -132,7 +212,7 @@ const Product = () => {
             <thead>
               <tr>
                 <th>
-                  <Checkbox />
+                  <Checkbox onChange={handleAllCheckBoxChange} />
                 </th>
                 <th>상품 번호</th>
                 <th>상품명</th>
@@ -144,7 +224,7 @@ const Product = () => {
               </tr>
             </thead>
             <tbody>
-              {data?.getAllProductsBySeller.products.map(
+              {productsList?.map(
                 (
                   {
                     id,
@@ -155,13 +235,17 @@ const Product = () => {
                     discountAppliedPrice,
                     quantity,
                     status,
+                    isChecked,
                   },
                   index
                 ) => {
                   return (
                     <tr key={id}>
                       <td>
-                        <Checkbox onChange={handleTableRowClick(index)} />
+                        <Checkbox
+                          onChange={handleCheckBoxChange(index)}
+                          checked={isChecked}
+                        />
                       </td>
                       <td>{id}</td>
                       <td>{name}</td>
