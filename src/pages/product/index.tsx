@@ -51,7 +51,7 @@ const Product = () => {
     setFilterOptionSkipQuantity(Number(value));
   };
 
-  const showHaveCheckAnyProductModal = () => {
+  const showHasCheckedAnyProductModal = () => {
     return systemModalVar({
       ...systemModalVar(),
       isVisible: true,
@@ -75,13 +75,13 @@ const Product = () => {
 
   const handleChangeSaleStatusButtonClick = () => {
     if (!selectedProductList.length) {
-      return showHaveCheckAnyProductModal();
+      return showHasCheckedAnyProductModal();
     }
   };
 
   const handleChangeCategoryModalButtonClick = () => {
     if (!selectedProductList.length) {
-      return showHaveCheckAnyProductModal();
+      return showHasCheckedAnyProductModal();
     }
 
     modalVar({
@@ -92,19 +92,19 @@ const Product = () => {
 
   const handleChangeDiscountModalButtonClick = () => {
     if (!selectedProductList.length) {
-      return showHaveCheckAnyProductModal();
+      return showHasCheckedAnyProductModal();
     }
   };
 
   const handleDuplicateButtonClick = () => {
     if (!selectedProductList.length) {
-      return showHaveCheckAnyProductModal();
+      return showHasCheckedAnyProductModal();
     }
   };
 
   const handleDeleteButtonClick = () => {
     if (!selectedProductList.length) {
-      return showHaveCheckAnyProductModal();
+      return showHasCheckedAnyProductModal();
     }
   };
 
