@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useLazyQuery, useReactiveVar } from "@apollo/client";
+import { useLazyQuery, useMutation, useReactiveVar } from "@apollo/client";
 import GET_ALL_PRODUCTS_BY_SELLER, {
   GetAllProductsBySellerType,
   GetAllProductsBySellerInputType,
@@ -13,6 +13,8 @@ import { modalVar, systemModalVar } from "@cache/index";
 import {
   ProductsListVarType,
   getProductBySellerVar,
+  SaleStatusType,
+  SaleStatusName,
 } from "@cache/ProductManagement";
 
 import Layout from "@components/common/Layout";
@@ -23,33 +25,52 @@ import Checkbox from "@components/common/input/Checkbox";
 import FilterBar from "@components/ProductRegistration/ProductManagement/FilterBar";
 import ChangeCategoryModal from "@components/ProductRegistration/ProductManagement/ChangeCategoryModal";
 import ChangeDiscountModal from "@components/ProductRegistration/ProductManagement/ChangeDiscountModal";
+import {
+  ChangeProductsInfoInputType,
+  ChangeProductsInfoType,
+  CHANGE_PRODUCTS_INFO,
+} from "@graphql/mutations/changeProductsInfo";
 
 const Product = () => {
-  const [getProductBySeller] = useLazyQuery<
+  const filterOptionStatus: string | null = useReactiveVar(
+    filterOptionStatusVar
+  );
+
+  const [filterOptionSkipQuantity, setFilterOptionSkipQuantity] =
+    useState<number>(20);
+
+  const [getProductListBySeller, { refetch }] = useLazyQuery<
     GetAllProductsBySellerType,
     GetAllProductsBySellerInputType
   >(GET_ALL_PRODUCTS_BY_SELLER, {
     variables: {
       input: {
         page: 1,
-        skip: 20,
-        status: null,
+        skip: filterOptionSkipQuantity,
+        status: filterOptionStatus,
       },
     },
+    fetchPolicy: "no-cache",
   });
 
-  const productsList = useReactiveVar(getProductBySellerVar);
+  const [updateCategory] =
+    useMutation<ChangeProductsInfoType, ChangeProductsInfoInputType>(
+      CHANGE_PRODUCTS_INFO
+    );
+
+  const productsList: Array<ProductsListVarType> = useReactiveVar(
+    getProductBySellerVar
+  );
+
   const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
     checkedProductsListVar
   );
 
-  const filterOptionStatus = useReactiveVar(filterOptionStatusVar);
-  const [filterOptionSkipQuantity, setFilterOptionSkipQuantity] =
-    useState<number>(20);
+  const [selectedProductListIds, setSelectedProductListIds] = useState<
+    Array<number>
+  >([]);
 
-  const changeSkipQuantityHandler = ({ target: { value } }) => {
-    setFilterOptionSkipQuantity(Number(value));
-  };
+  const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
 
   const showHasCheckedAnyProductModal = () => {
     return systemModalVar({
@@ -73,7 +94,105 @@ const Product = () => {
     });
   };
 
-  const handleChangeSaleStatusButtonClick = () => {
+  const handleSaleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+
+    if (value === "판매상태 변경") return;
+
+    const saleStatus = {
+      ON_SALE: "판매중",
+      STOP_SALE: "숨김",
+      SOLD_OUT: "품절",
+    };
+
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: (
+        <>
+          선택하신 상품을
+          <br />
+          {saleStatus[value]}(으)로 변경하시겠습니까?
+        </>
+      ),
+      confirmButtonClickHandler: () => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          (async () => {
+            const {
+              data: {
+                changeProductsInfo: { error, ok },
+              },
+            } = await updateCategory({
+              variables: {
+                input: {
+                  productIds: selectedProductListIds,
+                  productStatus: value,
+                },
+              },
+            });
+
+            if (error) {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: (
+                  <>
+                    에러메세지
+                    <br />
+                    {error}
+                  </>
+                ),
+                cancelButtonVisibility: false,
+
+                confirmButtonClickHandler: () => {
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+                },
+              });
+            }
+
+            if (ok) {
+              const {
+                data: {
+                  getAllProductsBySeller: { products },
+                },
+              } = await refetch();
+
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: <>{saleStatus[value]}(으)로 변경되었습니다</>,
+                cancelButtonVisibility: false,
+
+                confirmButtonClickHandler: () => {
+                  getProductBySellerVar(
+                    products.map((list) => ({ ...list, isChecked: false }))
+                  );
+
+                  e.target.selectedIndex = 0;
+                  setIsAllChecked(false);
+                  checkedProductsListVar([]);
+
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+                },
+              });
+            }
+          })();
+        } catch (error) {
+          console.log(error);
+        }
+      },
+      cancelButtonVisibility: true,
+    });
+  };
+
+  const handleSaleStatusClick = () => {
     if (!selectedProductList.length) {
       return showHasCheckedAnyProductModal();
     }
@@ -109,6 +228,7 @@ const Product = () => {
   };
 
   const handleAllCheckBoxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsAllChecked(e.target.checked);
     if (e.target.checked) {
       const checkAllProductList = productsList.map((product) => ({
         ...product,
@@ -141,6 +261,7 @@ const Product = () => {
       }
 
       if (!e.target.checked) {
+        const newProductList = [...productsList];
         const isCheckedList = selectedProductList.filter(
           (product) => product.id === productsList[index].id
         );
@@ -155,7 +276,7 @@ const Product = () => {
             ...selectedProductList.slice(checkedListIndex + 1),
           ]);
 
-          productsList[index].isChecked = false;
+          newProductList[index].isChecked = false;
           getProductBySellerVar(productsList);
         }
 
@@ -164,13 +285,22 @@ const Product = () => {
             ...productsList[index],
             isChecked: false,
           };
+
           checkedProductsListVar([...selectedProductList, checkedProductList]);
 
-          productsList[index].isChecked = false;
+          newProductList[index].isChecked = false;
           getProductBySellerVar(productsList);
         }
       }
     };
+
+  const changeSkipQuantityHandler = ({ target: { value } }) => {
+    setFilterOptionSkipQuantity(Number(value));
+  };
+
+  useEffect(() => {
+    setSelectedProductListIds(selectedProductList?.map((list) => list.id));
+  }, [selectedProductList]);
 
   useEffect(() => {
     try {
@@ -178,10 +308,9 @@ const Product = () => {
       (async () => {
         const {
           data: {
-            getAllProductsBySeller: { error, ok, products },
+            getAllProductsBySeller: { ok, error, products },
           },
-          loading,
-        } = await getProductBySeller({
+        } = await getProductListBySeller({
           variables: {
             input: {
               page: 1,
@@ -191,8 +320,26 @@ const Product = () => {
           },
         });
 
-        if (loading) {
-          return <div>로딩중입니다...</div>;
+        if (error) {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: (
+              <>
+                에러메세지
+                <br />
+                {error}
+              </>
+            ),
+            cancelButtonVisibility: false,
+
+            confirmButtonClickHandler: () => {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+            },
+          });
         }
 
         if (ok) {
@@ -203,13 +350,9 @@ const Product = () => {
             }))
           );
         }
-
-        if (error) {
-          console.log("error", error);
-        }
       })();
     } catch (error) {
-      console.log("error", error);
+      console.log(error);
     }
   }, [filterOptionStatus, filterOptionSkipQuantity]);
 
@@ -220,13 +363,15 @@ const Product = () => {
         <FilterBar />
         <ProductManagerContainer>
           <ControllerContainer>
-            <Button
-              size="small"
-              backgroundColor="white"
-              onClick={handleChangeSaleStatusButtonClick}
+            <Select
+              onChange={handleSaleStatusChange}
+              onClick={handleSaleStatusClick}
             >
-              판매상태 변경
-            </Button>
+              <Option defaultChecked>판매상태 변경</Option>
+              <Option value={"ON_SALE"}>판매중</Option>
+              <Option value={"STOP_SALE"}>숨김</Option>
+              <Option value={"SOLD_OUT"}>품절</Option>
+            </Select>
             <Button
               size="small"
               backgroundColor="white"
@@ -267,7 +412,10 @@ const Product = () => {
             <thead>
               <tr>
                 <th>
-                  <Checkbox onChange={handleAllCheckBoxChange} />
+                  <Checkbox
+                    onChange={handleAllCheckBoxChange}
+                    checked={isAllChecked}
+                  />
                 </th>
                 <th>상품 번호</th>
                 <th>상품명</th>

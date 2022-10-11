@@ -10,7 +10,12 @@ export interface ChangeProductsInfoType {
 export interface ChangeProductsInfoInputType {
   input: {
     productIds: number[];
-    categoryName: string;
+    categoryName?: string;
+    productStatus?: string;
+    discountAmount?: string;
+    discountMethod?: string;
+    startDiscountDate?: string;
+    endDiscountDate?: string;
   };
 }
 
