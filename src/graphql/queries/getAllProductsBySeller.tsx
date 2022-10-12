@@ -31,7 +31,7 @@ export interface GetAllProductsBySellerInputType {
 }
 
 const GET_ALL_PRODUCTS_BY_SELLER = gql`
-  query getAllProductsBySeller($input: GetAllProductsBySellerInput!) {
+  query GetAllProductsBySeller($input: GetAllProductsBySellerInput!) {
     getAllProductsBySeller(input: $input) {
       ok
       error

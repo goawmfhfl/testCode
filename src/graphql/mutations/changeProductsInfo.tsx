@@ -20,7 +20,7 @@ export interface ChangeProductsInfoInputType {
 }
 
 export const CHANGE_PRODUCTS_INFO = gql`
-  mutation changeProductsInfo($input: ChangeProductInfoInput!) {
+  mutation ChangeProductsInfo($input: ChangeProductInfoInput!) {
     changeProductsInfo(input: $input) {
       ok
       error
