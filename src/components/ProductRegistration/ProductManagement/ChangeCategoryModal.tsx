@@ -17,7 +17,7 @@ import {
 import { CHANGE_PRODUCTS_INFO } from "@graphql/mutations/changeProductsInfo";
 import { CATEGORIES, categoryMapper } from "@constants/index";
 import {
-  checkedProductsListVar,
+  selectedProductListVar,
   ProductsListVarType,
 } from "@cache/ProductManagement";
 import {
@@ -27,12 +27,14 @@ import {
 
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
+
   const [updateCategory] =
     useMutation<ChangeProductsInfoType, ChangeProductsInfoInputType>(
       CHANGE_PRODUCTS_INFO
     );
+
   const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
-    checkedProductsListVar
+    selectedProductListVar
   );
   const selectedFirstCategory: string = watch(CATEGORY_FIRST) as string;
   const selectedSecondCategory: string = watch(CATEGORY_SECOND) as string;

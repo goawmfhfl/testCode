@@ -1,10 +1,8 @@
 import { makeVar } from "@apollo/client";
 
 export const getProductBySellerVar = makeVar<Array<ProductsListVarType>>([]);
-
 export const filterOptionStatusVar = makeVar<string | null>(null);
-
-export const checkedProductsListVar = makeVar<Array<ProductsListVarType>>([]);
+export const selectedProductListVar = makeVar<Array<ProductsListVarType>>([]);
 
 export interface ProductsListVarType {
   category: string;
