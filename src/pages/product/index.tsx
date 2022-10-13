@@ -42,9 +42,10 @@ import {
 } from "@graphql/mutations/duplicateProductsBySeller";
 
 const saleStatusList = [
-  { id: 0, label: "ON_SALE", name: "판매중" },
-  { id: 1, label: "STOP_SALE", name: "숨김" },
-  { id: 2, label: "SOLD_OUT", name: "품절" },
+  { id: 0, label: "DEFAULT", name: "판매상태 변경" },
+  { id: 1, label: "ON_SALE", name: "판매중" },
+  { id: 2, label: "STOP_SALE", name: "숨김" },
+  { id: 3, label: "SOLD_OUT", name: "품절" },
 ];
 
 const Product = () => {
@@ -63,11 +64,9 @@ const Product = () => {
     selectedProductListVar
   );
 
-  // const selectedProductListIds: Array<number> = selectedProductList.map(
-  //   (list) => list.id
-  // );
-
-  const selectedProductListIds: Array<number> = [2000];
+  const selectedProductListIds: Array<number> = selectedProductList.map(
+    (list) => list.id
+  );
 
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
 
@@ -130,6 +129,7 @@ const Product = () => {
     if (value === "판매상태 변경") return;
 
     const saleStatus = {
+      DEFAULT: "판매상태 변경",
       ON_SALE: "판매중",
       STOP_SALE: "숨김",
       SOLD_OUT: "품절",
@@ -189,7 +189,7 @@ const Product = () => {
                     products.map((list) => ({ ...list, isChecked: false }))
                   );
 
-                  e.target.selectedIndex = 0;
+                  e.target.value = saleStatus["DEFAULT"];
                   checkAllBoxStatusVar(false);
                   selectedProductListVar([]);
 
@@ -826,8 +826,9 @@ const Product = () => {
             <Select
               onChange={handleMultiSaleStatusChange}
               onClick={handleSaleStatusClick}
+              value={"DEFAULT"}
             >
-              <Option selected disabled hidden>
+              <Option value={"DEFAULT"} disabled hidden>
                 판매상태 변경
               </Option>
               <Option value={"ON_SALE"}>판매중</Option>
@@ -863,7 +864,7 @@ const Product = () => {
               삭제
             </Button>
 
-            <Select onChange={changeSkipQuantityHandler}>
+            <Select onChange={changeSkipQuantityHandler} defaultValue={20}>
               <Option value={20}>20개씩보기</Option>
               <Option value={50}>50개씩보기</Option>
               <Option value={100}>100개씩보기</Option>
@@ -936,8 +937,8 @@ const Product = () => {
                           {saleStatusList.map(({ id, label, name }) => (
                             <Option
                               key={id}
-                              selected={status === label}
                               value={label}
+                              hidden={label === "DEFAULT"}
                             >
                               {name}
                             </Option>
