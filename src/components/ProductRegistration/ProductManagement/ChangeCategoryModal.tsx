@@ -27,7 +27,6 @@ import {
   filterOptionSkipQuantityVar,
   filterOptionStatusVar,
   getProductBySellerVar,
-  selectedProductListIdsVar,
   selectedProductListVar,
 } from "@cache/ProductManagement";
 import GET_ALL_PRODUCTS_BY_SELLER, {
@@ -46,7 +45,9 @@ const ChangeCategoryModal = () => {
   );
 
   const selectedProdcutList = useReactiveVar(selectedProductListVar);
-  const selectedProductListIds = useReactiveVar(selectedProductListIdsVar);
+  const selectedProductListIds: Array<number> = selectedProdcutList.map(
+    (list) => list.id
+  );
 
   const [isBmarketChecked, setIsBmarketChecked] = useState<boolean>(false);
 

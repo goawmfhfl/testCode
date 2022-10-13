@@ -9,7 +9,7 @@ export interface DeleteProductsBySeller {
 
 export interface DeleteProductsBySellerInputType {
   input: {
-    productsIds: number[];
+    productIds: Array<number>;
   };
 }
 

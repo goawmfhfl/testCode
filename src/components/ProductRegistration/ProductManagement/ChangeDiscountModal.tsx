@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import {
   FormProvider,
@@ -53,8 +53,10 @@ const ChangeDiscountModal = () => {
     filterOptionSkipQuantityVar
   );
 
-  const selectedProductList = useReactiveVar(selectedProductListVar);
-  const selectedProductIds = selectedProductList.map((list) => list.id);
+  const selectedProdcutList = useReactiveVar(selectedProductListVar);
+  const selectedProductListIds: Array<number> = selectedProdcutList.map(
+    (list) => list.id
+  );
 
   const discountAmount: number | string = Number(
     watch(DISCOUNT_AMOUNT) as string
@@ -128,7 +130,7 @@ const ChangeDiscountModal = () => {
       isVisible: true,
       description: (
         <>
-          {selectedProductList.length}개 상품의 할인율을
+          {selectedProdcutList.length}개 상품의 할인율을
           <br />
           이대로 변경하시겠습니까?
         </>
@@ -146,7 +148,7 @@ const ChangeDiscountModal = () => {
             } = await updateDiscount({
               variables: {
                 input: {
-                  productIds: selectedProductIds,
+                  productIds: selectedProductListIds,
                   discountAmount,
                   discountMethod: discountOption,
                   startDiscountDate: discountStartsAt ? discountStartsAt : null,
