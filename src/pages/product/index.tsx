@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useLazyQuery, useMutation, useReactiveVar } from "@apollo/client";
 import GET_ALL_PRODUCTS_BY_SELLER, {
@@ -52,14 +52,6 @@ const Product = () => {
   const productsList: Array<ProductsListVarType> = useReactiveVar(
     getProductBySellerVar
   );
-  const filterOptionStatus: string | null = useReactiveVar(
-    filterOptionStatusVar
-  );
-
-  const filterOptionSkipQuantity: number = useReactiveVar(
-    filterOptionSkipQuantityVar
-  );
-
   const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
     selectedProductListVar
   );
@@ -67,6 +59,15 @@ const Product = () => {
   const selectedProductListIds: Array<number> = selectedProductList.map(
     (list) => list.id
   );
+
+  const filterOptionStatus: string | null = useReactiveVar(
+    filterOptionStatusVar
+  );
+  const filterOptionSkipQuantity: number = useReactiveVar(
+    filterOptionSkipQuantityVar
+  );
+  const [filterQuery, setFilterQuery] = useState<string>("");
+  const [temporaryQuery, setTemporaryQuery] = useState<string>("");
 
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
 
@@ -79,6 +80,7 @@ const Product = () => {
         page: 1,
         skip: filterOptionSkipQuantity,
         status: filterOptionStatus,
+        query: filterQuery,
       },
     },
     fetchPolicy: "no-cache",
@@ -121,7 +123,7 @@ const Product = () => {
     });
   };
 
-  const handleMultiSaleStatusChange = (
+  const changeMultiSaleStatusHandler = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const value = e.target.value;
@@ -263,7 +265,7 @@ const Product = () => {
     });
   };
 
-  const handleSingleSaleStatusChange =
+  const changeSingleSaleStatusHandler =
     (id: number) => (e: React.ChangeEvent<HTMLSelectElement>) => {
       const saleStatus = {
         ON_SALE: "판매중",
@@ -662,7 +664,7 @@ const Product = () => {
     });
   };
 
-  const handleAllCheckBoxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     checkAllBoxStatusVar(e.target.checked);
     if (e.target.checked) {
       const checkAllProductList = productsList.map((product) => ({
@@ -685,7 +687,7 @@ const Product = () => {
     }
   };
 
-  const handleCheckBoxChange =
+  const changeSingleCheckBoxHandler =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.checked) {
         const checkedProductList = { ...productsList[index], isChecked: true };
@@ -729,9 +731,21 @@ const Product = () => {
       }
     };
 
+  const changeFilterQueryHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTemporaryQuery(e.target.value);
+  };
+
   const changeSkipQuantityHandler = ({ target: { value } }) => {
     filterOptionSkipQuantityVar(Number(value));
   };
+
+  useEffect(() => {
+    const debounce = setTimeout(() => {
+      return setFilterQuery(temporaryQuery);
+    }, 500);
+
+    return () => clearTimeout(debounce);
+  }, [temporaryQuery]);
 
   useEffect(() => {
     try {
@@ -747,6 +761,7 @@ const Product = () => {
               page: 1,
               skip: filterOptionSkipQuantity,
               status: filterOptionStatus,
+              query: filterQuery,
             },
           },
         });
@@ -814,7 +829,7 @@ const Product = () => {
         },
       });
     }
-  }, [filterOptionStatus, filterOptionSkipQuantity]);
+  }, [filterOptionStatus, filterOptionSkipQuantity, filterQuery]);
 
   return (
     <Layout>
@@ -824,7 +839,7 @@ const Product = () => {
         <ProductManagerContainer>
           <ControllerContainer>
             <Select
-              onChange={handleMultiSaleStatusChange}
+              onChange={changeMultiSaleStatusHandler}
               onClick={handleSaleStatusClick}
               value={"DEFAULT"}
             >
@@ -863,6 +878,13 @@ const Product = () => {
             >
               삭제
             </Button>
+            {/* filterfilterfilterfilterfilterfilterfilterfilterfilterfilter */}
+            <Input
+              type="text"
+              onChange={changeFilterQueryHandler}
+              value={temporaryQuery}
+            />
+            {/* filterfilterfilterfilterfilterfilterfilterfilterfilterfilter */}
 
             <Select onChange={changeSkipQuantityHandler} defaultValue={20}>
               <Option value={20}>20개씩보기</Option>
@@ -876,7 +898,7 @@ const Product = () => {
               <tr>
                 <th>
                   <Checkbox
-                    onChange={handleAllCheckBoxChange}
+                    onChange={changeAllCheckBoxHandler}
                     checked={checkAllBoxStatus}
                   />
                 </th>
@@ -909,7 +931,7 @@ const Product = () => {
                     <tr key={id}>
                       <td>
                         <Checkbox
-                          onChange={handleCheckBoxChange(index)}
+                          onChange={changeSingleCheckBoxHandler(index)}
                           checked={isChecked}
                         />
                       </td>
@@ -931,7 +953,7 @@ const Product = () => {
                       <td>{quantity}</td>
                       <td>
                         <Select
-                          onChange={handleSingleSaleStatusChange(id)}
+                          onChange={changeSingleSaleStatusHandler(id)}
                           value={status}
                         >
                           {saleStatusList.map(({ id, label, name }) => (
@@ -979,6 +1001,13 @@ const ProductListTable = styled.table`
   th {
     padding: 1em;
   }
+`;
+
+const Input = styled.input`
+  width: 100px;
+
+  color: #000;
+  background-color: #fff;
 `;
 
 const Select = styled.select`
