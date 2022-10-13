@@ -12,10 +12,11 @@ export interface ChangeProductsInfoInputType {
     productIds: number[];
     categoryName?: string;
     productStatus?: string;
-    discountAmount?: string;
+    discountAmount?: number;
     discountMethod?: string;
-    startDiscountDate?: string;
-    endDiscountDate?: string;
+    startDiscountDate?: string | null;
+    endDiscountDate?: string | null;
+    isBmarket?: boolean;
   };
 }
 

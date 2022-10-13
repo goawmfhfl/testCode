@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import styled from "styled-components";
 import { modalVar, systemModalVar } from "@cache/index";
 import { useForm } from "react-hook-form";
@@ -6,7 +7,7 @@ import {
   CATEGORY_SECOND,
   CATEGORY_THIRD,
 } from "@cache/productRegistration";
-import { useMutation, useReactiveVar } from "@apollo/client";
+import { useLazyQuery, useMutation, useReactiveVar } from "@apollo/client";
 
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
 import questionMarkIconSrc from "@icons/questionmark.svg";
@@ -16,26 +17,39 @@ import {
 } from "@components/common/input/Dropdown";
 import { CHANGE_PRODUCTS_INFO } from "@graphql/mutations/changeProductsInfo";
 import { CATEGORIES, categoryMapper } from "@constants/index";
-import {
-  selectedProductListVar,
-  ProductsListVarType,
-} from "@cache/ProductManagement";
+
 import {
   ChangeProductsInfoType,
   ChangeProductsInfoInputType,
 } from "@graphql/mutations/changeProductsInfo";
+import {
+  checkAllBoxStatusVar,
+  filterOptionSkipQuantityVar,
+  filterOptionStatusVar,
+  getProductBySellerVar,
+  selectedProductListIdsVar,
+  selectedProductListVar,
+} from "@cache/ProductManagement";
+import GET_ALL_PRODUCTS_BY_SELLER, {
+  GetAllProductsBySellerInputType,
+  GetAllProductsBySellerType,
+} from "@graphql/queries/getAllProductsBySeller";
 
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
 
-  const [updateCategory] =
-    useMutation<ChangeProductsInfoType, ChangeProductsInfoInputType>(
-      CHANGE_PRODUCTS_INFO
-    );
-
-  const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
-    selectedProductListVar
+  const filterOptionStatus: string | null = useReactiveVar(
+    filterOptionStatusVar
   );
+  const filterOptionSkipQuantity: number = useReactiveVar(
+    filterOptionSkipQuantityVar
+  );
+
+  const selectedProdcutList = useReactiveVar(selectedProductListVar);
+  const selectedProductListIds = useReactiveVar(selectedProductListIdsVar);
+
+  const [isBmarketChecked, setIsBmarketChecked] = useState<boolean>(false);
+
   const selectedFirstCategory: string = watch(CATEGORY_FIRST) as string;
   const selectedSecondCategory: string = watch(CATEGORY_SECOND) as string;
 
@@ -45,9 +59,29 @@ const ChangeCategoryModal = () => {
   const categoryDepthThird: Array<string> =
     (CATEGORIES.CATEGORY_THIRD[selectedSecondCategory] as Array<string>) || [];
 
-  const changeProductCategoryIdList: number[] = selectedProductList?.map(
-    (product) => product.id
-  );
+  const [updateCategory] =
+    useMutation<ChangeProductsInfoType, ChangeProductsInfoInputType>(
+      CHANGE_PRODUCTS_INFO
+    );
+
+  const [getProductList, { refetch }] = useLazyQuery<
+    GetAllProductsBySellerType,
+    GetAllProductsBySellerInputType
+  >(GET_ALL_PRODUCTS_BY_SELLER, {
+    variables: {
+      input: {
+        page: 1,
+        skip: filterOptionSkipQuantity,
+        status: filterOptionStatus,
+      },
+    },
+  });
+
+  const handleCheckBoxChange = ({
+    target: { checked },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setIsBmarketChecked(checked);
+  };
 
   const handleCloseButtonClick = () => {
     modalVar({
@@ -76,11 +110,12 @@ const ChangeCategoryModal = () => {
         isVisible: true,
         description: (
           <>
-            {selectedProductList.length}개 상품의 카테고리를 <br />
+            {selectedProdcutList.length}개 상품의 카테고리를 <br />
             이대로 변경하시겠습니까?
           </>
         ),
-
+        cancelButtonVisibility: true,
+        confirmButtonVisibility: true,
         confirmButtonClickHandler: () => {
           try {
             // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -92,19 +127,35 @@ const ChangeCategoryModal = () => {
               } = await updateCategory({
                 variables: {
                   input: {
-                    productIds: changeProductCategoryIdList,
+                    productIds: selectedProductListIds,
                     categoryName: selectedSecondCategory,
+                    isBmarket: isBmarketChecked,
                   },
                 },
               });
 
               if (ok) {
+                const {
+                  data: {
+                    getAllProductsBySeller: { products },
+                  },
+                } = await refetch();
+
                 systemModalVar({
                   ...systemModalVar(),
                   isVisible: true,
                   description: "카테고리가 변경되었습니다.",
+                  confirmButtonVisibility: true,
+                  cancelButtonVisibility: false,
 
                   confirmButtonClickHandler: () => {
+                    getProductBySellerVar(
+                      products.map((list) => ({
+                        ...list,
+                        isChecked: false,
+                      }))
+                    );
+
                     systemModalVar({
                       ...systemModalVar(),
                       isVisible: false,
@@ -114,12 +165,16 @@ const ChangeCategoryModal = () => {
                       ...modalVar(),
                       isVisible: false,
                     });
+
+                    selectedProductListVar([]);
+                    checkAllBoxStatusVar(false);
                   },
-                  cancelButtonVisibility: false,
                 });
               }
 
               if (error) {
+                console.log(error);
+
                 systemModalVar({
                   ...systemModalVar(),
                   isVisible: true,
@@ -129,13 +184,14 @@ const ChangeCategoryModal = () => {
                       {error}
                     </>
                   ),
+                  cancelButtonVisibility: false,
+
                   confirmButtonClickHandler: () => {
                     systemModalVar({
                       ...systemModalVar(),
                       isVisible: false,
                     });
                   },
-                  cancelButtonVisibility: false,
                 });
               }
             })();
@@ -143,7 +199,6 @@ const ChangeCategoryModal = () => {
             console.log(error);
           }
         },
-        cancelButtonVisibility: true,
       });
     }
   };
@@ -154,7 +209,7 @@ const ChangeCategoryModal = () => {
       <Title>카테고리 변경하기</Title>
       <Notice>상품 다중 선택시 카테고리가 일괄 변경됩니다.</Notice>
       <BmarketContainer>
-        <CheckBox />
+        <CheckBox onChange={handleCheckBoxChange} checked={isBmarketChecked} />
         <Description>이 상품은 B-MARKET 상품입니다</Description>
         <NoticeIcon src={questionMarkIconSrc} />
       </BmarketContainer>

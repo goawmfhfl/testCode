@@ -8,6 +8,9 @@ import GET_ALL_PRODUCTS_BY_SELLER, {
 import {
   selectedProductListVar,
   filterOptionStatusVar,
+  selectedProductListIdsVar,
+  checkAllBoxStatusVar,
+  filterOptionSkipQuantityVar,
 } from "@cache/ProductManagement";
 import { modalVar, systemModalVar } from "@cache/index";
 import {
@@ -41,12 +44,27 @@ const saleStatusList = [
 ];
 
 const Product = () => {
+  const productsList: Array<ProductsListVarType> = useReactiveVar(
+    getProductBySellerVar
+  );
+
+  const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
+    selectedProductListVar
+  );
+
   const filterOptionStatus: string | null = useReactiveVar(
     filterOptionStatusVar
   );
 
-  const [filterOptionSkipQuantity, setFilterOptionSkipQuantity] =
-    useState<number>(20);
+  const filterOptionSkipQuantity: number = useReactiveVar(
+    filterOptionSkipQuantityVar
+  );
+
+  const selectedProductListIds: Array<number> = selectedProductListIdsVar(
+    selectedProductList.map((list) => list.id)
+  );
+
+  const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
 
   const [getProductListBySeller, { refetch }] = useLazyQuery<
     GetAllProductsBySellerType,
@@ -71,20 +89,6 @@ const Product = () => {
     DeleteProductsBySeller,
     DeleteProductsBySellerInputType
   >(DELETE_PRODUCTS_BY_SELLER);
-
-  const productsList: Array<ProductsListVarType> = useReactiveVar(
-    getProductBySellerVar
-  );
-
-  const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
-    selectedProductListVar
-  );
-
-  const [selectedProductListIds, setSelectedProductListIds] = useState<
-    Array<number>
-  >([]);
-
-  const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
 
   const showHasCheckedAnyProductModal = () => {
     return systemModalVar({
@@ -191,7 +195,7 @@ const Product = () => {
                   );
 
                   e.target.selectedIndex = 0;
-                  setIsAllChecked(false);
+                  checkAllBoxStatusVar(false);
                   selectedProductListVar([]);
 
                   systemModalVar({
@@ -278,7 +282,7 @@ const Product = () => {
                       products.map((list) => ({ ...list, isChecked: false }))
                     );
 
-                    setIsAllChecked(false);
+                    checkAllBoxStatusVar(false);
                     selectedProductListVar([]);
 
                     systemModalVar({
@@ -346,6 +350,11 @@ const Product = () => {
     if (!selectedProductList.length) {
       return showHasCheckedAnyProductModal();
     }
+
+    modalVar({
+      isVisible: true,
+      component: <ChangeDiscountModal />,
+    });
   };
 
   const handleDuplicateButtonClick = () => {
@@ -404,7 +413,7 @@ const Product = () => {
                     }))
                   );
 
-                  setIsAllChecked(false);
+                  checkAllBoxStatusVar(false);
                   selectedProductListVar([]);
 
                   systemModalVar({
@@ -439,14 +448,33 @@ const Product = () => {
             }
           })();
         } catch (error) {
-          console.log(error);
+          // TODO: 요청 조차 못한 상태 처리하기
+          console.log("error", error);
+
+          if (error) {
+            return systemModalVar({
+              ...systemModalVar(),
+              isVisible: true,
+              description: (
+                <>
+                  인터넷 서버 장애로 인해
+                  <br />
+                  할인율 변경을 완료하지 못했습니다.
+                  <br />
+                  다시 시도해 주시길 바랍니다.
+                </>
+              ),
+              confirmButtonVisibility: true,
+              cancelButtonVisibility: false,
+            });
+          }
         }
       },
     });
   };
 
   const handleAllCheckBoxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsAllChecked(e.target.checked);
+    checkAllBoxStatusVar(e.target.checked);
     if (e.target.checked) {
       const checkAllProductList = productsList.map((product) => ({
         ...product,
@@ -513,12 +541,8 @@ const Product = () => {
     };
 
   const changeSkipQuantityHandler = ({ target: { value } }) => {
-    setFilterOptionSkipQuantity(Number(value));
+    filterOptionSkipQuantityVar(Number(value));
   };
-
-  useEffect(() => {
-    setSelectedProductListIds(selectedProductList?.map((list) => list.id));
-  }, [selectedProductList]);
 
   useEffect(() => {
     try {
@@ -567,6 +591,9 @@ const Product = () => {
               isChecked: false,
             }))
           );
+
+          selectedProductListVar([]);
+          checkAllBoxStatusVar(false);
         }
       })();
     } catch (error) {
@@ -634,7 +661,7 @@ const Product = () => {
                 <th>
                   <Checkbox
                     onChange={handleAllCheckBoxChange}
-                    checked={isAllChecked}
+                    checked={checkAllBoxStatus}
                   />
                 </th>
                 <th>상품 번호</th>
