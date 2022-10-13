@@ -8,7 +8,6 @@ import GET_ALL_PRODUCTS_BY_SELLER, {
 import {
   selectedProductListVar,
   filterOptionStatusVar,
-  selectedProductListIdsVar,
   checkAllBoxStatusVar,
   filterOptionSkipQuantityVar,
 } from "@cache/ProductManagement";
@@ -36,6 +35,11 @@ import {
   DeleteProductsBySellerInputType,
   DELETE_PRODUCTS_BY_SELLER,
 } from "@graphql/mutations/deleteProductsBySeller";
+import {
+  DuplicateProductsBySellerInputType,
+  DuplicateProductsBySellerType,
+  DUPLICATE_PRODUCTS_BY_SELLER,
+} from "@graphql/mutations/duplicateProductsBySeller";
 
 const saleStatusList = [
   { id: 0, label: "ON_SALE", name: "판매중" },
@@ -47,10 +51,7 @@ const Product = () => {
   const productsList: Array<ProductsListVarType> = useReactiveVar(
     getProductBySellerVar
   );
-
-  const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
-    selectedProductListVar
-  );
+  console.log("productsList", productsList);
 
   const filterOptionStatus: string | null = useReactiveVar(
     filterOptionStatusVar
@@ -60,8 +61,12 @@ const Product = () => {
     filterOptionSkipQuantityVar
   );
 
-  const selectedProductListIds: Array<number> = selectedProductListIdsVar(
-    selectedProductList.map((list) => list.id)
+  const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
+    selectedProductListVar
+  );
+
+  const selectedProductListIds: Array<number> = selectedProductList.map(
+    (list) => list.id
   );
 
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
@@ -88,7 +93,12 @@ const Product = () => {
   const [deleteProducts] = useMutation<
     DeleteProductsBySeller,
     DeleteProductsBySellerInputType
-  >(DELETE_PRODUCTS_BY_SELLER);
+  >(DELETE_PRODUCTS_BY_SELLER, { fetchPolicy: "no-cache" });
+
+  const [duplicateProducts] = useMutation<
+    DuplicateProductsBySellerType,
+    DuplicateProductsBySellerInputType
+  >(DUPLICATE_PRODUCTS_BY_SELLER, { fetchPolicy: "no-cache" });
 
   const showHasCheckedAnyProductModal = () => {
     return systemModalVar({
@@ -361,6 +371,111 @@ const Product = () => {
     if (!selectedProductList.length) {
       return showHasCheckedAnyProductModal();
     }
+
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: <>상품을 복제하시겠습니까?</>,
+      confirmButtonVisibility: true,
+      cancelButtonVisibility: true,
+
+      confirmButtonClickHandler: () => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          (async () => {
+            const {
+              data: {
+                duplicateProductsBySeller: { ok, error },
+              },
+            } = await duplicateProducts({
+              variables: {
+                input: {
+                  productIds: selectedProductListIds,
+                },
+              },
+            });
+
+            if (ok) {
+              const {
+                data: {
+                  getAllProductsBySeller: { products },
+                },
+              } = await refetch();
+
+              console.log("get Server products", products);
+
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: <>상품이 복제되었습니다.</>,
+                confirmButtonVisibility: true,
+                cancelButtonVisibility: false,
+
+                confirmButtonClickHandler: () => {
+                  getProductBySellerVar(
+                    products.map((list) => ({
+                      ...list,
+                      isChecked: false,
+                    }))
+                  );
+
+                  checkAllBoxStatusVar(false);
+                  selectedProductListVar([]);
+
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+                },
+              });
+            }
+
+            if (error) {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: (
+                  <>
+                    에러메시지
+                    <br />
+                    {error}
+                  </>
+                ),
+                confirmButtonVisibility: true,
+                cancelButtonVisibility: false,
+
+                confirmButtonClickHandler: () => {
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+                },
+              });
+            }
+          })();
+        } catch (error) {
+          console.log("error", error);
+
+          if (error) {
+            return systemModalVar({
+              ...systemModalVar(),
+              isVisible: true,
+              description: (
+                <>
+                  인터넷 서버 장애로 인해
+                  <br />
+                  할인율 변경을 완료하지 못했습니다.
+                  <br />
+                  다시 시도해 주시길 바랍니다.
+                </>
+              ),
+              confirmButtonVisibility: true,
+              cancelButtonVisibility: false,
+            });
+          }
+        }
+      },
+    });
   };
 
   const handleDeleteButtonClick = () => {
@@ -386,7 +501,7 @@ const Product = () => {
             } = await deleteProducts({
               variables: {
                 input: {
-                  productsIds: selectedProductListIds,
+                  productIds: selectedProductListIds,
                 },
               },
             });
@@ -397,6 +512,8 @@ const Product = () => {
                   getAllProductsBySeller: { products },
                 },
               } = await refetch();
+
+              console.log("get Server products", products);
 
               systemModalVar({
                 ...systemModalVar(),
@@ -448,7 +565,6 @@ const Product = () => {
             }
           })();
         } catch (error) {
-          // TODO: 요청 조차 못한 상태 처리하기
           console.log("error", error);
 
           if (error) {
