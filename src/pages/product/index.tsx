@@ -51,8 +51,6 @@ const Product = () => {
   const productsList: Array<ProductsListVarType> = useReactiveVar(
     getProductBySellerVar
   );
-  console.log("productsList", productsList);
-
   const filterOptionStatus: string | null = useReactiveVar(
     filterOptionStatusVar
   );
@@ -65,9 +63,11 @@ const Product = () => {
     selectedProductListVar
   );
 
-  const selectedProductListIds: Array<number> = selectedProductList.map(
-    (list) => list.id
-  );
+  // const selectedProductListIds: Array<number> = selectedProductList.map(
+  //   (list) => list.id
+  // );
+
+  const selectedProductListIds: Array<number> = [2000];
 
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
 
@@ -164,28 +164,6 @@ const Product = () => {
               },
             });
 
-            if (error) {
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: (
-                  <>
-                    에러메세지
-                    <br />
-                    {error}
-                  </>
-                ),
-                cancelButtonVisibility: false,
-
-                confirmButtonClickHandler: () => {
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-                },
-              });
-            }
-
             if (ok) {
               const {
                 data: {
@@ -196,7 +174,14 @@ const Product = () => {
               systemModalVar({
                 ...systemModalVar(),
                 isVisible: true,
-                description: <>{saleStatus[value]}(으)로 변경되었습니다</>,
+                description: (
+                  <>
+                    {saleStatus[value] === "판매중" &&
+                      "판매중으로 변경되었습니다."}
+                    {saleStatus[value] === "숨김" && "숨김으로 변경되었습니다."}
+                    {saleStatus[value] === "품절" && "품절로 변경되었습니다."}
+                  </>
+                ),
                 cancelButtonVisibility: false,
 
                 confirmButtonClickHandler: () => {
@@ -215,9 +200,63 @@ const Product = () => {
                 },
               });
             }
+
+            if (error) {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: (
+                  <>
+                    인터넷 서버 장애로 인해
+                    <br />
+                    {saleStatus[value] === "판매중" && "판매중으로 "}
+                    {saleStatus[value] === "숨김" && "숨김으로 "}
+                    {saleStatus[value] === "품절" && "품절로 "}변경을 완료하지
+                    못했습니다.
+                    <br />
+                    다시 시도해 주시길 바랍니다.
+                    <br />
+                    에러메시지: {error}
+                  </>
+                ),
+                cancelButtonVisibility: false,
+
+                confirmButtonClickHandler: () => {
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+                },
+              });
+            }
           })();
         } catch (error) {
-          console.log(error);
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: (
+              <>
+                인터넷 서버 장애로 인해
+                <br />
+                {saleStatus[value] === "판매중" && "판매중으로 "}
+                {saleStatus[value] === "숨김" && "숨김으로 "}
+                {saleStatus[value] === "품절" && "품절로 "}변경을 완료하지
+                못했습니다.
+                <br />
+                다시 시도해 주시길 바랍니다.
+                <br />
+                에러메시지: {error}
+              </>
+            ),
+            cancelButtonVisibility: false,
+
+            confirmButtonClickHandler: () => {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+            },
+          });
         }
       },
       cancelButtonVisibility: true,
@@ -311,9 +350,14 @@ const Product = () => {
                   cancelButtonVisibility: false,
                   description: (
                     <>
-                      에러메세지
+                      인터넷 서버 장애로 인해
                       <br />
-                      {error}
+                      {saleStatus[value] === "판매중" && "판매중으로 "}
+                      {saleStatus[value] === "숨김" && "숨김으로 "}
+                      {saleStatus[value] === "품절" && "품절로 "}변경을 완료하지
+                      못했습니다.
+                      <br />
+                      다시 시도해 주시길 바랍니다.
                     </>
                   ),
 
@@ -327,7 +371,30 @@ const Product = () => {
               }
             })();
           } catch (error) {
-            console.log(error);
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: true,
+              description: (
+                <>
+                  인터넷 서버 장애로 인해
+                  <br />
+                  {saleStatus[value] === "판매중" && "판매중으로 "}
+                  {saleStatus[value] === "숨김" && "숨김으로 "}
+                  {saleStatus[value] === "품절" && "품절로 "}변경을 완료하지
+                  못했습니다.
+                  <br />
+                  다시 시도해 주시길 바랍니다.
+                </>
+              ),
+              cancelButtonVisibility: false,
+
+              confirmButtonClickHandler: () => {
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: false,
+                });
+              },
+            });
           }
         },
         cancelButtonClickHandler: () => {
@@ -402,8 +469,6 @@ const Product = () => {
                 },
               } = await refetch();
 
-              console.log("get Server products", products);
-
               systemModalVar({
                 ...systemModalVar(),
                 isVisible: true,
@@ -436,9 +501,13 @@ const Product = () => {
                 isVisible: true,
                 description: (
                   <>
-                    에러메시지
+                    인터넷 서버 장애로 인해
                     <br />
-                    {error}
+                    상품 복제를 완료하지 못했습니다.
+                    <br />
+                    다시 시도해 주시길 바랍니다.
+                    <br />
+                    에러 메세지: {error}
                   </>
                 ),
                 confirmButtonVisibility: true,
@@ -454,25 +523,29 @@ const Product = () => {
             }
           })();
         } catch (error) {
-          console.log("error", error);
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: (
+              <>
+                인터넷 서버 장애로 인해
+                <br />
+                상품 복제를 완료하지 못했습니다.
+                <br />
+                다시 시도해 주시길 바랍니다.
+                <br />
+                에러 메세지: {error}
+              </>
+            ),
+            cancelButtonVisibility: false,
 
-          if (error) {
-            return systemModalVar({
-              ...systemModalVar(),
-              isVisible: true,
-              description: (
-                <>
-                  인터넷 서버 장애로 인해
-                  <br />
-                  할인율 변경을 완료하지 못했습니다.
-                  <br />
-                  다시 시도해 주시길 바랍니다.
-                </>
-              ),
-              confirmButtonVisibility: true,
-              cancelButtonVisibility: false,
-            });
-          }
+            confirmButtonClickHandler: () => {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+            },
+          });
         }
       },
     });
@@ -513,8 +586,6 @@ const Product = () => {
                 },
               } = await refetch();
 
-              console.log("get Server products", products);
-
               systemModalVar({
                 ...systemModalVar(),
                 isVisible: true,
@@ -547,9 +618,13 @@ const Product = () => {
                 isVisible: true,
                 description: (
                   <>
-                    에러메시지
+                    인터넷 서버 장애로 인해
                     <br />
-                    {error}
+                    상품 삭제를 완료하지 못했습니다.
+                    <br />
+                    다시 시도해 주시길 바랍니다.
+                    <br />
+                    에러 메세지: {error}
                   </>
                 ),
                 confirmButtonVisibility: true,
@@ -565,25 +640,23 @@ const Product = () => {
             }
           })();
         } catch (error) {
-          console.log("error", error);
-
-          if (error) {
-            return systemModalVar({
-              ...systemModalVar(),
-              isVisible: true,
-              description: (
-                <>
-                  인터넷 서버 장애로 인해
-                  <br />
-                  할인율 변경을 완료하지 못했습니다.
-                  <br />
-                  다시 시도해 주시길 바랍니다.
-                </>
-              ),
-              confirmButtonVisibility: true,
-              cancelButtonVisibility: false,
-            });
-          }
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: (
+              <>
+                인터넷 서버 장애로 인해
+                <br />
+                상품을 삭제하지 못했습니다.
+                <br />
+                다시 시도해 주시길 바랍니다.
+                <br />
+                에러 메세지: {error}
+              </>
+            ),
+            confirmButtonVisibility: true,
+            cancelButtonVisibility: false,
+          });
         }
       },
     });
@@ -684,9 +757,13 @@ const Product = () => {
             isVisible: true,
             description: (
               <>
-                에러메세지
+                인터넷 서버 장애로 인해
                 <br />
-                {error}
+                할인율 변경을 완료하지 못했습니다.
+                <br />
+                다시 시도해 주시길 바랍니다.
+                <br />
+                에러 메세지: {error}
               </>
             ),
             cancelButtonVisibility: false,
@@ -713,7 +790,29 @@ const Product = () => {
         }
       })();
     } catch (error) {
-      console.log(error);
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: (
+          <>
+            인터넷 서버 장애로 인해
+            <br />
+            할인율 변경을 완료하지 못했습니다.
+            <br />
+            다시 시도해 주시길 바랍니다.
+            <br />
+            에러 메세지: {error}
+          </>
+        ),
+        cancelButtonVisibility: false,
+
+        confirmButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
+      });
     }
   }, [filterOptionStatus, filterOptionSkipQuantity]);
 
