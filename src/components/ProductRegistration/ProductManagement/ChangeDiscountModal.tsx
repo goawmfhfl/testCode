@@ -33,6 +33,8 @@ import {
   filterOptionStatusVar,
   filterOptionSkipQuantityVar,
   checkAllBoxStatusVar,
+  filterOptionQueryVar,
+  showHasServerErrorModal,
 } from "@cache/ProductManagement";
 import GET_ALL_PRODUCTS_BY_SELLER, {
   GetAllProductsBySellerInputType,
@@ -52,6 +54,7 @@ const ChangeDiscountModal = () => {
   const filterOptionSkipQuantity: number = useReactiveVar(
     filterOptionSkipQuantityVar
   );
+  const filterQuery = useReactiveVar(filterOptionQueryVar);
 
   const selectedProdcutList = useReactiveVar(selectedProductListVar);
   const selectedProductListIds: Array<number> = selectedProdcutList.map(
@@ -68,7 +71,7 @@ const ChangeDiscountModal = () => {
   const discountStartsAt: string = watch(DISCOUNT_STARTS_AT) as string;
   const discountEndsAt: string = watch(DISCOUNT_ENDS_AT) as string;
 
-  const [getProductList, { refetch }] = useLazyQuery<
+  const [getProductList] = useLazyQuery<
     GetAllProductsBySellerType,
     GetAllProductsBySellerInputType
   >(GET_ALL_PRODUCTS_BY_SELLER, {
@@ -77,6 +80,7 @@ const ChangeDiscountModal = () => {
         page: 1,
         skip: filterOptionSkipQuantity,
         status: filterOptionStatus,
+        query: filterQuery,
       },
     },
   });
@@ -138,32 +142,35 @@ const ChangeDiscountModal = () => {
       confirmButtonVisibility: true,
       cancelButtonVisibility: true,
       confirmButtonClickHandler: () => {
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          (async () => {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        (async () => {
+          const {
+            data: {
+              changeProductsInfo: { ok, error },
+            },
+          } = await updateDiscount({
+            variables: {
+              input: {
+                productIds: selectedProductListIds,
+                discountAmount,
+                discountMethod: discountOption,
+                startDiscountDate: discountStartsAt ? discountStartsAt : null,
+                endDiscountDate: discountEndsAt ? discountStartsAt : null,
+              },
+            },
+          });
+
+          if (ok) {
             const {
               data: {
-                changeProductsInfo: { ok, error },
-              },
-            } = await updateDiscount({
-              variables: {
-                input: {
-                  productIds: selectedProductListIds,
-                  discountAmount,
-                  discountMethod: discountOption,
-                  startDiscountDate: discountStartsAt ? discountStartsAt : null,
-                  endDiscountDate: discountEndsAt ? discountStartsAt : null,
+                getAllProductsBySeller: {
+                  products,
+                  ok: refetchOk,
+                  error: refetchError,
                 },
               },
-            });
-
-            if (ok) {
-              const {
-                data: {
-                  getAllProductsBySeller: { products },
-                },
-              } = await refetch();
-
+            } = await getProductList();
+            if (refetchOk) {
               systemModalVar({
                 ...systemModalVar(),
                 isVisible: true,
@@ -192,33 +199,15 @@ const ChangeDiscountModal = () => {
               });
             }
 
-            if (error) {
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: (
-                  <>
-                    인터넷 서버 장애로 인해
-                    <br />
-                    할인율 변경을 완료하지 못했습니다.
-                    <br />
-                    다시 시도해 주시길 바랍니다.
-                  </>
-                ),
-                confirmButtonVisibility: true,
-                cancelButtonVisibility: false,
-                confirmButtonClickHandler: () => {
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-                },
-              });
+            if (refetchError) {
+              showHasServerErrorModal(refetchError);
             }
-          })();
-        } catch (error) {
-          console.log(error);
-        }
+          }
+
+          if (error) {
+            showHasServerErrorModal(error);
+          }
+        })();
       },
     });
   };

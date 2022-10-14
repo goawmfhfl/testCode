@@ -31,17 +31,44 @@ const authLink = setContext((_, { headers }) => {
 });
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors)
-    graphQLErrors.forEach(({ message, locations, path }) =>
-      console.log(
-        `[GraphQL error]: Message: ${message}, Location: ${JSON.stringify(
-          locations
-        )}, Path: ${JSON.stringify(path)}`
-      )
-    );
+  const {
+    extensions: { code },
+    message,
+  } = graphQLErrors[0];
 
-  if (networkError)
-    console.log(`[Network error]: ${JSON.stringify(networkError)}`);
+  if (graphQLErrors && networkError) {
+    // Console
+    console.log(`
+  [에러코드]: ${code as string}
+  [에러메세지]: ${message}
+  `);
+
+    // Modal
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: (
+        <>
+          인터넷 서버 장애로 인해
+          <br />
+          해당 작업을 완료하지 못했습니다.
+          <br />
+          다시 시도해 주시길 바랍니다.
+          <br />
+          에러 코드: {code}
+        </>
+      ),
+      confirmButtonVisibility: true,
+      cancelButtonVisibility: false,
+
+      confirmButtonClickHandler: () => {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: false,
+        });
+      },
+    });
+  }
 });
 
 const client = new ApolloClient({

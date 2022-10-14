@@ -24,10 +24,12 @@ import {
 } from "@graphql/mutations/changeProductsInfo";
 import {
   checkAllBoxStatusVar,
+  filterOptionQueryVar,
   filterOptionSkipQuantityVar,
   filterOptionStatusVar,
   getProductBySellerVar,
   selectedProductListVar,
+  showHasServerErrorModal,
 } from "@cache/ProductManagement";
 import GET_ALL_PRODUCTS_BY_SELLER, {
   GetAllProductsBySellerInputType,
@@ -43,6 +45,7 @@ const ChangeCategoryModal = () => {
   const filterOptionSkipQuantity: number = useReactiveVar(
     filterOptionSkipQuantityVar
   );
+  const filterQuery = useReactiveVar(filterOptionQueryVar);
 
   const selectedProdcutList = useReactiveVar(selectedProductListVar);
   const selectedProductListIds: Array<number> = selectedProdcutList.map(
@@ -60,12 +63,7 @@ const ChangeCategoryModal = () => {
   const categoryDepthThird: Array<string> =
     (CATEGORIES.CATEGORY_THIRD[selectedSecondCategory] as Array<string>) || [];
 
-  const [updateCategory] =
-    useMutation<ChangeProductsInfoType, ChangeProductsInfoInputType>(
-      CHANGE_PRODUCTS_INFO
-    );
-
-  const [getProductList, { refetch }] = useLazyQuery<
+  const [getProductList] = useLazyQuery<
     GetAllProductsBySellerType,
     GetAllProductsBySellerInputType
   >(GET_ALL_PRODUCTS_BY_SELLER, {
@@ -74,8 +72,30 @@ const ChangeCategoryModal = () => {
         page: 1,
         skip: filterOptionSkipQuantity,
         status: filterOptionStatus,
+        query: filterQuery,
       },
     },
+  });
+
+  const [updateCategory] = useMutation<
+    ChangeProductsInfoType,
+    ChangeProductsInfoInputType
+  >(CHANGE_PRODUCTS_INFO, {
+    refetchQueries: [
+      {
+        query: GET_ALL_PRODUCTS_BY_SELLER,
+        variables: {
+          input: {
+            page: 1,
+            skip: filterOptionSkipQuantity,
+            status: filterOptionStatus,
+            query: filterQuery,
+          },
+        },
+      },
+      "GetAllProductsBySeller",
+    ],
+    fetchPolicy: "no-cache",
   });
 
   const handleCheckBoxChange = ({
@@ -118,30 +138,34 @@ const ChangeCategoryModal = () => {
         cancelButtonVisibility: true,
         confirmButtonVisibility: true,
         confirmButtonClickHandler: () => {
-          try {
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            (async () => {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          (async () => {
+            const {
+              data: {
+                changeProductsInfo: { ok, error },
+              },
+            } = await updateCategory({
+              variables: {
+                input: {
+                  productIds: selectedProductListIds,
+                  categoryName: selectedSecondCategory,
+                  isBmarket: isBmarketChecked,
+                },
+              },
+            });
+
+            if (ok) {
               const {
                 data: {
-                  changeProductsInfo: { ok, error },
-                },
-              } = await updateCategory({
-                variables: {
-                  input: {
-                    productIds: selectedProductListIds,
-                    categoryName: selectedSecondCategory,
-                    isBmarket: isBmarketChecked,
+                  getAllProductsBySeller: {
+                    products,
+                    ok: refetchOk,
+                    error: refetchError,
                   },
                 },
-              });
+              } = await getProductList();
 
-              if (ok) {
-                const {
-                  data: {
-                    getAllProductsBySeller: { products },
-                  },
-                } = await refetch();
-
+              if (refetchOk) {
                 systemModalVar({
                   ...systemModalVar(),
                   isVisible: true,
@@ -173,32 +197,15 @@ const ChangeCategoryModal = () => {
                 });
               }
 
-              if (error) {
-                console.log(error);
-
-                systemModalVar({
-                  ...systemModalVar(),
-                  isVisible: true,
-                  description: (
-                    <>
-                      에러메세지 <br />
-                      {error}
-                    </>
-                  ),
-                  cancelButtonVisibility: false,
-
-                  confirmButtonClickHandler: () => {
-                    systemModalVar({
-                      ...systemModalVar(),
-                      isVisible: false,
-                    });
-                  },
-                });
+              if (refetchError) {
+                showHasServerErrorModal(refetchError);
               }
-            })();
-          } catch (error) {
-            console.log(error);
-          }
+            }
+
+            if (error) {
+              showHasServerErrorModal(error);
+            }
+          })();
         },
       });
     }

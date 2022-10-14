@@ -19,7 +19,6 @@ export interface ChangeProductsInfoInputType {
     isBmarket?: boolean;
   };
 }
-
 export const CHANGE_PRODUCTS_INFO = gql`
   mutation ChangeProductsInfo($input: ChangeProductInfoInput!) {
     changeProductsInfo(input: $input) {
