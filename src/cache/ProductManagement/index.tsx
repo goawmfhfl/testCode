@@ -5,6 +5,7 @@ export const getProductBySellerVar = makeVar<Array<ProductsListVarType>>([]);
 export const filterOptionSkipQuantityVar = makeVar<number>(20);
 export const filterOptionStatusVar = makeVar<string | null>(null);
 export const filterOptionQueryVar = makeVar<string>("");
+export const temporaryQueryVar = makeVar<string>("");
 
 export const selectedProductListVar = makeVar<Array<ProductsListVarType>>([]);
 export const checkAllBoxStatusVar = makeVar<boolean>(false);

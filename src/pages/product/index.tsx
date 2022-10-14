@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useLazyQuery, useMutation, useReactiveVar } from "@apollo/client";
 import GET_ALL_PRODUCTS_BY_SELLER, {
@@ -11,6 +11,7 @@ import {
   filterOptionSkipQuantityVar,
   filterOptionStatusVar,
   filterOptionQueryVar,
+  temporaryQueryVar,
   showHasCheckedAnyProductModal,
   showHasServerErrorModal,
 } from "@cache/ProductManagement";
@@ -58,7 +59,6 @@ const saleStatusList = [
 
 const Product = () => {
   const productList = useReactiveVar(getProductBySellerVar);
-  console.log("Global Status productList", productList);
 
   const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
     selectedProductListVar
@@ -77,7 +77,7 @@ const Product = () => {
   );
 
   const filterQuery = useReactiveVar(filterOptionQueryVar);
-  const [temporaryQuery, setTemporaryQuery] = useState<string>("");
+  const temporaryQuery = useReactiveVar(temporaryQueryVar);
 
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
 
@@ -623,9 +623,10 @@ const Product = () => {
         }
       }
     };
+
   // 필터 임시 쿼리
   const changeFilterQueryHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTemporaryQuery(e.target.value);
+    temporaryQueryVar(e.target.value);
   };
 
   // 필터 쿼리

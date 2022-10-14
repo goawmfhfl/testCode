@@ -85,10 +85,26 @@ const ChangeDiscountModal = () => {
     },
   });
 
-  const [updateDiscount] =
-    useMutation<ChangeProductsInfoType, ChangeProductsInfoInputType>(
-      CHANGE_PRODUCTS_INFO
-    );
+  const [updateDiscount] = useMutation<
+    ChangeProductsInfoType,
+    ChangeProductsInfoInputType
+  >(CHANGE_PRODUCTS_INFO, {
+    refetchQueries: [
+      {
+        query: GET_ALL_PRODUCTS_BY_SELLER,
+        variables: {
+          input: {
+            page: 1,
+            skip: filterOptionSkipQuantity,
+            status: filterOptionStatus,
+            query: filterQuery,
+          },
+        },
+      },
+      "GetAllProductsBySeller",
+    ],
+    fetchPolicy: "no-cache",
+  });
 
   const handleCloseButtonClick = () => {
     modalVar({
@@ -170,6 +186,7 @@ const ChangeDiscountModal = () => {
                 },
               },
             } = await getProductList();
+
             if (refetchOk) {
               systemModalVar({
                 ...systemModalVar(),

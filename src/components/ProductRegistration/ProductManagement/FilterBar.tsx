@@ -1,12 +1,19 @@
-import React from "react";
 import styled from "styled-components";
 
-import { filterOptionStatusVar } from "@cache/ProductManagement";
+import {
+  filterOptionStatusVar,
+  filterOptionQueryVar,
+  temporaryQueryVar,
+} from "@cache/ProductManagement";
+import { useReactiveVar } from "@apollo/client";
 
 const FilterBar = () => {
+  const query = useReactiveVar(filterOptionQueryVar);
+
   const changeFilterOptionNameClick =
     (filterOptionName: string | null) => () => {
       filterOptionStatusVar(filterOptionName);
+      temporaryQueryVar(query);
     };
 
   return (
