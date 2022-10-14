@@ -199,7 +199,6 @@ const ChangeDiscountModal = () => {
                 },
               },
             } = await getProductList();
-
             if (refetchOk) {
               systemModalVar({
                 ...systemModalVar(),

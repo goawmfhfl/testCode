@@ -51,6 +51,11 @@ import {
   Td,
 } from "@components/common/table/Table";
 
+import mediumDoubleLeftSvg from "@icons/medium-double-left.svg";
+import mediumDoubleRightSvg from "@icons/medium-double-right.svg";
+import mediumLeftSvg from "@icons/medium-left.svg";
+import mediumRightSvg from "@icons/medium-right.svg";
+
 const saleStatusList = [
   { id: 0, label: "DEFAULT", name: "판매상태 변경" },
   { id: 1, label: "ON_SALE", name: "판매중" },
