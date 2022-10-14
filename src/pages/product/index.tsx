@@ -50,12 +50,8 @@ import {
   Td,
 } from "@components/common/table/Table";
 
-const saleStatusList = [
-  { id: 0, label: "DEFAULT", name: "판매상태 변경" },
-  { id: 1, label: "ON_SALE", name: "판매중" },
-  { id: 2, label: "STOP_SALE", name: "숨김" },
-  { id: 3, label: "SOLD_OUT", name: "품절" },
-];
+import { modalVar } from "@cache/index";
+import { CheckedProductsListVarType } from "@cache/ProductManagement";
 
 const Product = () => {
   const productList = useReactiveVar(getProductBySellerVar);
@@ -92,7 +88,6 @@ const Product = () => {
         query: filterOptionQuery,
       },
     },
-    fetchPolicy: "no-cache",
   });
 
   const [updateProductsStatus] = useMutation<
