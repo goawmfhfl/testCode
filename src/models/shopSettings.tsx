@@ -78,7 +78,7 @@ export interface TemporarySaveShopSettingsInputType {
   identificationCardIssueDate?: Date;
 
   // 전화번호
-  contactNumber?: string;
+  phoneNumber?: string;
 
   // 정산 계좌
   bankAccountNumber?: string;
@@ -120,7 +120,7 @@ export interface SaveShopSettingsInputType {
   identificationCardIssueDate?: Date;
 
   // 전화번호
-  contactNumber: string;
+  phoneNumber: string;
 
   // 정산 계좌
   bankAccountNumber: string;

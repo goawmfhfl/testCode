@@ -69,7 +69,7 @@ export function restructureShopSettingStates(
     identificationCardIssueDate,
   } = registrationNumberVar();
 
-  const contactNumber = phoneNumberVar();
+  const phoneNumber = phoneNumberVar();
 
   const {
     accountNumber: bankAccountNumber,
@@ -100,7 +100,7 @@ export function restructureShopSettingStates(
     identificationCardOwner,
     identificationCardNumber,
     identificationCardIssueDate,
-    contactNumber,
+    phoneNumber,
     bankAccountNumber,
     bankAccountHolder,
     bankName,

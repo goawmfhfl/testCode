@@ -141,7 +141,7 @@ export const shopSettingsSectionMapper: { [key: string]: string } = {
   identificationCardNumber: SHOP_SETTING_SECTIONS.REGISTRATION_NUMBER,
   identificationCardIssueDate: SHOP_SETTING_SECTIONS.REGISTRATION_NUMBER,
 
-  contactNumber: SHOP_SETTING_SECTIONS.PHONE_NUMBER,
+  phoneNumber: SHOP_SETTING_SECTIONS.PHONE_NUMBER,
 
   bankAccountNumber: SHOP_SETTING_SECTIONS.SETTLEMENT_ACCOUNT,
   bankAccountHolder: SHOP_SETTING_SECTIONS.SETTLEMENT_ACCOUNT,
