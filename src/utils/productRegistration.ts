@@ -201,7 +201,7 @@ function getRequiredOptions(formContext: UseFormReturn) {
   const { optionHeaders, optionRows } = requiredOptionVar().adaptedOption;
 
   const requiredOptions = optionRows.map((row) => {
-    const name = row.option.map((value, index) => ({
+    const components = row.option.map((value, index) => ({
       name: optionHeaders[index].header,
       value,
     }));
@@ -210,7 +210,7 @@ function getRequiredOptions(formContext: UseFormReturn) {
     const optionPrice = watch(`optionPrice-${row.id}`) as string;
 
     return {
-      name,
+      components,
       price: Number(optionPrice),
       quantity: Number(optionStock),
       isRequired: true,
@@ -232,7 +232,7 @@ function getSelectiveOptions(formContext: UseFormReturn) {
     const optionPrice = watch(`optionPrice-${id}`) as string;
 
     return {
-      name: [{ name, value }],
+      components: [{ name, value }],
       price: Number(optionPrice),
       quantity: Number(optionStock),
       isRequired: false,

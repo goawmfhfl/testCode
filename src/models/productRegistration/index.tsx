@@ -111,7 +111,7 @@ export interface TemporarySaveProductInputType {
 
   // 옵션 (필수 + 선택)
   optionCombinations: Array<{
-    name: Array<{ name: string; value: string }>;
+    components: Array<{ name: string; value: string }>;
     price: number;
     quantity: number;
     isRequired: boolean;
