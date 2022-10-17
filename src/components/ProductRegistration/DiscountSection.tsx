@@ -23,9 +23,11 @@ import {
   IS_DISCOUNTED,
 } from "@cache/productRegistration/index";
 import { DiscountMethod } from "@models/productRegistration";
+import { useReactiveVar } from "@apollo/client";
 
 const ProductDiscount = () => {
   const { register, watch, control, getValues } = useFormContext();
+  const discountAppliedPrice = useReactiveVar(discountAppliedPriceVar);
 
   function getDiscountedPrice(): number | string {
     const productPrice = watch(PRODUCT_PRICE) as string;
@@ -52,16 +54,15 @@ const ProductDiscount = () => {
 
   const isDiscounted = watch(IS_DISCOUNTED) as boolean;
   const discountAmount = watch(DISCOUNT_AMOUNT) as string;
-  const discountedPrice = getDiscountedPrice();
   const hasDiscountSpan = watch(HAS_DISCOUNT_SPAN) as boolean;
   const discountStartsAt = watch(DISCOUNT_STARTS_AT) as boolean;
   const discountEndsAt = watch(DISCOUNT_ENDS_AT) as boolean;
 
   useEffect(() => {
-    if (typeof discountedPrice === "number") {
-      discountAppliedPriceVar(discountedPrice);
+    if (discountAmount) {
+      discountAppliedPriceVar(Number(getDiscountedPrice()));
     }
-  }, [discountedPrice]);
+  }, [discountAmount]);
 
   return (
     <Container>
@@ -207,7 +208,7 @@ const ProductDiscount = () => {
         <PriceWrapper>
           {isDiscounted &&
             discountAmount &&
-            `${discountedPrice.toLocaleString()}원`}
+            `${discountAppliedPrice.toLocaleString()}원`}
         </PriceWrapper>
         {hasDiscountSpan && (
           <DiscountTimespanNotification>

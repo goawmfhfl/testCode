@@ -27,7 +27,7 @@ import {
 } from "@models/productRegistration/shipmentTemplate";
 
 const GET_SHIPMENT_TEMPLATES = gql`
-  query GetAllShipmentTemplates {
+  query GetUserShipmentTemplates {
     getUserShipmentTemplates {
       ok
       error
