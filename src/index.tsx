@@ -11,13 +11,14 @@ import {
   from,
 } from "@apollo/client";
 import App from "./App";
+import { AUTH_TOKEN_KEY } from "@constants/auth";
 
 const httpLink = createHttpLink({
   uri: `${process.env.REACT_APP_SERVER_URI}/graphql`,
 });
 
 const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
 
   return {
     // eslint-disable-next-line
