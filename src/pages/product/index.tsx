@@ -8,12 +8,14 @@ import GET_ALL_PRODUCTS_BY_SELLER, {
 import {
   selectedProductListVar,
   checkAllBoxStatusVar,
+  pageNumberListVar,
   filterOptionSkipQuantityVar,
   filterOptionStatusVar,
   filterOptionQueryVar,
   temporaryQueryVar,
   showHasCheckedAnyProductModal,
   showHasServerErrorModal,
+  filterOptionPageNumberVar,
 } from "@cache/ProductManagement";
 import { modalVar, systemModalVar } from "@cache/index";
 import {
@@ -29,6 +31,8 @@ import Checkbox from "@components/common/input/Checkbox";
 import FilterBar from "@components/ProductRegistration/ProductManagement/FilterBar";
 import ChangeCategoryModal from "@components/ProductRegistration/ProductManagement/ChangeCategoryModal";
 import ChangeDiscountModal from "@components/ProductRegistration/ProductManagement/ChangeDiscountModal";
+import Pagination from "@components/ProductRegistration/ProductManagement/Pagination";
+
 import {
   ChangeProductsInfoInputType,
   ChangeProductsInfoType,
@@ -44,11 +48,6 @@ import {
   DuplicateProductsBySellerType,
   DUPLICATE_PRODUCTS_BY_SELLER,
 } from "@graphql/mutations/duplicateProductsBySeller";
-
-import mediumDoubleLeftSvg from "@icons/medium-double-left.svg";
-import mediumDoubleRightSvg from "@icons/medium-double-right.svg";
-import mediumLeftSvg from "@icons/medium-left.svg";
-import mediumRightSvg from "@icons/medium-right.svg";
 
 const saleStatusList = [
   { id: 0, label: "DEFAULT", name: "판매상태 변경" },
@@ -68,6 +67,10 @@ const Product = () => {
     (list) => list.id
   );
 
+  const filterOptionPageNumber: number = useReactiveVar(
+    filterOptionPageNumberVar
+  );
+
   const filterOptionStatus: string | null = useReactiveVar(
     filterOptionStatusVar
   );
@@ -76,7 +79,7 @@ const Product = () => {
     filterOptionSkipQuantityVar
   );
 
-  const filterQuery = useReactiveVar(filterOptionQueryVar);
+  const filterOptionQuery = useReactiveVar(filterOptionQueryVar);
   const temporaryQuery = useReactiveVar(temporaryQueryVar);
 
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
@@ -87,10 +90,10 @@ const Product = () => {
   >(GET_ALL_PRODUCTS_BY_SELLER, {
     variables: {
       input: {
-        page: 1,
+        page: filterOptionPageNumber,
         skip: filterOptionSkipQuantity,
         status: filterOptionStatus,
-        query: filterQuery,
+        query: filterOptionQuery,
       },
     },
     fetchPolicy: "no-cache",
@@ -105,10 +108,10 @@ const Product = () => {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
           input: {
-            page: 1,
+            page: filterOptionPageNumber,
             skip: filterOptionSkipQuantity,
             status: filterOptionStatus,
-            query: filterQuery,
+            query: filterOptionQuery,
           },
         },
       },
@@ -126,10 +129,10 @@ const Product = () => {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
           input: {
-            page: 1,
+            page: filterOptionPageNumber,
             skip: filterOptionSkipQuantity,
             status: filterOptionStatus,
-            query: filterQuery,
+            query: filterOptionQuery,
           },
         },
       },
@@ -147,10 +150,10 @@ const Product = () => {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
           input: {
-            page: 1,
+            page: filterOptionPageNumber,
             skip: filterOptionSkipQuantity,
             status: filterOptionStatus,
-            query: filterQuery,
+            query: filterOptionQuery,
           },
         },
       },
@@ -554,7 +557,7 @@ const Product = () => {
     });
   };
 
-  // 체크박스 All
+  // 복수 체크박스
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     checkAllBoxStatusVar(e.target.checked);
 
@@ -579,7 +582,7 @@ const Product = () => {
     }
   };
 
-  // 체크박스 Single
+  // 단일 체크박스
   const changeSingleCheckBoxHandler =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.checked) {
@@ -649,9 +652,15 @@ const Product = () => {
     (async () => {
       const {
         data: {
-          getAllProductsBySeller: { products, ok, error },
+          getAllProductsBySeller: { products, ok, error, totalPages },
         },
       } = await getProductList();
+
+      pageNumberListVar(
+        Array(totalPages)
+          .fill(null)
+          .map((_, index) => index + 1)
+      );
 
       if (ok) {
         getProductBySellerVar(
@@ -669,7 +678,12 @@ const Product = () => {
         showHasServerErrorModal(error);
       }
     })();
-  }, [filterOptionStatus, filterOptionSkipQuantity, filterQuery]);
+  }, [
+    filterOptionStatus,
+    filterOptionSkipQuantity,
+    filterOptionQuery,
+    filterOptionPageNumber,
+  ]);
 
   return (
     <Layout>
@@ -811,6 +825,7 @@ const Product = () => {
               )}
             </tbody>
           </ProductListTable>
+          <Pagination />
         </ProductManagerContainer>
       </ContentsContainer>
     </Layout>

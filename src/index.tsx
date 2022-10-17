@@ -37,13 +37,11 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   } = graphQLErrors[0];
 
   if (graphQLErrors && networkError) {
-    // Console
     console.log(`
   [에러코드]: ${code as string}
   [에러메세지]: ${message}
   `);
 
-    // Modal
     systemModalVar({
       ...systemModalVar(),
       isVisible: true,

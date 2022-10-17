@@ -2,6 +2,9 @@ import { makeVar } from "@apollo/client";
 import { systemModalVar } from "..";
 
 export const getProductBySellerVar = makeVar<Array<ProductsListVarType>>([]);
+
+export const filterOptionPageNumberVar = makeVar<number>(1);
+export const pageNumberListVar = makeVar<Array<number>>([]);
 export const filterOptionSkipQuantityVar = makeVar<number>(20);
 export const filterOptionStatusVar = makeVar<string | null>(null);
 export const filterOptionQueryVar = makeVar<string>("");
