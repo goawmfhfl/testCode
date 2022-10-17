@@ -132,7 +132,9 @@ export function restructureProductRegistrationStates(
     discountMethod: isDiscounted ? discountMethod : null,
     startDiscountDate: isDiscounted ? new Date(startDiscountDate) : null,
     endDiscountDate: isDiscounted ? new Date(endDiscountDate) : null,
-    discountAppliedPrice: isDiscounted ? discountAppliedPriceVar() : null,
+    discountAppliedPrice: isDiscounted
+      ? Number(discountAppliedPriceVar())
+      : null,
     quantity: Number(quantity),
     optionCombinations:
       !hasRequiredOption && !hasSelectiveOption ? null : productOptions,

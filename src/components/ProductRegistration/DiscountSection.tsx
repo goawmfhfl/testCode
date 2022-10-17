@@ -29,30 +29,29 @@ const ProductDiscount = () => {
   const { register, watch, control, getValues } = useFormContext();
   const discountAppliedPrice = useReactiveVar(discountAppliedPriceVar);
 
-  function getDiscountedPrice(): number | string {
-    const productPrice = watch(PRODUCT_PRICE) as string;
-    const discountAmount = watch(DISCOUNT_AMOUNT) as string;
-    const discountOption = watch(DISCOUNT_OPTION) as string;
-
+  function getDiscountedPrice(
+    originalPrice: number,
+    discountAmount: number,
+    discountOption: string
+  ): string {
     if (!discountAmount) {
       return "-";
     }
 
     if (discountOption === "PERCENT") {
-      return (
-        Number(productPrice) -
-        Number(productPrice) * Number(discountAmount) * 0.01
-      );
+      return String(originalPrice - originalPrice * discountAmount * 0.01);
     }
 
     if (discountOption === "WON") {
-      return Number(productPrice) - Number(discountAmount);
+      return String(originalPrice - discountAmount);
     }
 
-    return productPrice;
+    return String(originalPrice);
   }
 
   const isDiscounted = watch(IS_DISCOUNTED) as boolean;
+  const productPrice = watch(PRODUCT_PRICE) as string;
+  const discountOption = watch(DISCOUNT_OPTION) as string;
   const discountAmount = watch(DISCOUNT_AMOUNT) as string;
   const hasDiscountSpan = watch(HAS_DISCOUNT_SPAN) as boolean;
   const discountStartsAt = watch(DISCOUNT_STARTS_AT) as boolean;
@@ -60,9 +59,15 @@ const ProductDiscount = () => {
 
   useEffect(() => {
     if (discountAmount) {
-      discountAppliedPriceVar(Number(getDiscountedPrice()));
+      discountAppliedPriceVar(
+        getDiscountedPrice(
+          Number(productPrice),
+          Number(discountAmount),
+          discountOption
+        )
+      );
     }
-  }, [discountAmount]);
+  }, [productPrice, discountAmount, discountOption]);
 
   return (
     <Container>

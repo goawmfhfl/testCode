@@ -18,7 +18,7 @@ export const DISCOUNT_OPTION = "DISCOUNT_OPTION";
 export const HAS_DISCOUNT_SPAN = "HAS_DISCOUNT_SPAN"; // client only
 export const DISCOUNT_STARTS_AT = "DISCOUNT_STARTS_AT";
 export const DISCOUNT_ENDS_AT = "DISCOUNT_ENDS_AT";
-export const discountAppliedPriceVar = makeVar(0);
+export const discountAppliedPriceVar = makeVar("0");
 
 export const PRODUCT_STOCK = "PRODUCT_STOCK";
 
