@@ -197,6 +197,10 @@ const SaveBar = () => {
 
       const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
       const isShipmentPriceFree = shipmentType === ShipmentChargeType.Free;
+      const hasIdentificationCardAuthenticated =
+        input.identificationCardIssueDate &&
+        input.identificationCardNumber &&
+        input.identificationCardOwner;
 
       const { isFulfilled, unfulfilledInputNames } = hasEveryInputFulfilled(
         input,
@@ -206,6 +210,11 @@ const SaveBar = () => {
           "identificationCardOwner",
           "identificationCardNumber",
           "identificationCardIssueDate",
+          hasIdentificationCardAuthenticated && "representativeName",
+          hasIdentificationCardAuthenticated && "businessRegistrationNumber",
+          hasIdentificationCardAuthenticated && "isSimpleTaxpayers",
+          hasIdentificationCardAuthenticated && "companyLocation",
+          hasIdentificationCardAuthenticated && "onlineSalesLicense",
         ],
         [
           isShipmentPriceFree && "shipmentPrice",
@@ -284,7 +293,6 @@ const SaveBar = () => {
     }
 
     if (location.pathname === "/product/registration") {
-      console.log("?");
       const input = restructureProductRegistrationStates(formContext);
 
       const isDiscounted = watch(IS_DISCOUNTED) as boolean;
@@ -328,8 +336,6 @@ const SaveBar = () => {
         ]
       );
 
-      console.log(isFulfilled);
-
       if (!isFulfilled) {
         const unfulfilledSectionNames = [
           ...new Set(
@@ -368,9 +374,9 @@ const SaveBar = () => {
           input,
         },
       });
-      console.log(result);
 
       // TODO: 등록 상태에 따른 systemModal 메시지
+      console.log("상품 생성 결과", result);
 
       return;
     }
