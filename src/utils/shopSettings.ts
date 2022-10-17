@@ -38,9 +38,10 @@ export function restructureShopSettingStates(
   const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
   const shipmentPrice = Number(watch(SHIPMENT_PRICE));
   const shipmentDistantPrice = Number(watch(SHIPMENT_DISTANT_PRICE));
-  const shipmentConditionalPrice = Number(watch(SHIPMENT_RETURN_PRICE));
-  const shipmentReturnPrice = Number(watch(SHIPMENT_EXCHANGE_PRICE));
-  const shipmentExchangePrice = Number(watch(SHIPMENT_CONDITIONAL_PRICE));
+
+  const shipmentReturnPrice = Number(watch(SHIPMENT_RETURN_PRICE));
+  const shipmentExchangePrice = Number(watch(SHIPMENT_EXCHANGE_PRICE));
+  const shipmentConditionalPrice = Number(watch(SHIPMENT_CONDITIONAL_PRICE));
 
   const uploadedFileInfos = [
     {
@@ -86,9 +87,9 @@ export function restructureShopSettingStates(
     shipmentType,
     shipmentPrice,
     shipmentDistantPrice,
-    shipmentConditionalPrice,
     shipmentReturnPrice,
     shipmentExchangePrice,
+    shipmentConditionalPrice,
     isBundleShipment,
     representativeName,
     businessRegistrationNumber,
