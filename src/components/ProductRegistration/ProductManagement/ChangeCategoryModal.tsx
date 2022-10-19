@@ -43,20 +43,11 @@ import {
   GetAllProductsBySellerType,
 } from "@graphql/queries/getAllProductsBySeller";
 
-import { CHANGE_PRODUCTS_INFO } from "@graphql/mutations/changeProductsInfo";
-import { CATEGORIES, categoryMapper } from "@constants/index";
-import {
-  checkedProductsListVar,
-  CheckedProductsListVarType,
-} from "@cache/ProductManagement";
-
-import {
-  ChangeProductsInfoType,
-  ChangeProductsInfoInputType,
-} from "@graphql/mutations/changeProductsInfo";
+import closeIconSource from "@icons/delete.svg";
 
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
+
   const [updateCategory] =
     useMutation<ChangeProductsInfoType, ChangeProductsInfoInputType>(
       CHANGE_PRODUCTS_INFO
