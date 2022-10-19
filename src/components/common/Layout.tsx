@@ -65,9 +65,9 @@ const ContentsContainer = styled.div`
 
   display: flex;
   flex-direction: column;
+
   margin-left: 210px;
   margin-top: 56px;
-  margin-bottom: 72px;
 
   overflow: scroll;
 `;

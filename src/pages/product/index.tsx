@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useLazyQuery, useMutation, useReactiveVar } from "@apollo/client";
-import GET_ALL_PRODUCTS_BY_SELLER, {
+import {
+  GET_ALL_PRODUCTS_BY_SELLER,
   GetAllProductsBySellerType,
   GetAllProductsBySellerInputType,
 } from "@graphql/queries/getAllProductsBySeller";
@@ -12,12 +13,10 @@ import {
   filterOptionSkipQuantityVar,
   filterOptionStatusVar,
   filterOptionQueryVar,
-  temporaryQueryVar,
-  showHasCheckedAnyProductModal,
   showHasServerErrorModal,
   filterOptionPageNumberVar,
 } from "@cache/ProductManagement";
-import { modalVar, systemModalVar } from "@cache/index";
+import { systemModalVar } from "@cache/index";
 import {
   ProductsListVarType,
   getProductBySellerVar,
@@ -26,28 +25,30 @@ import {
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
 import ContentsHeader from "@components/common/ContentsHeader";
-import Button from "@components/common/Button";
 import Checkbox from "@components/common/input/Checkbox";
 import FilterBar from "@components/ProductRegistration/ProductManagement/FilterBar";
-import ChangeCategoryModal from "@components/ProductRegistration/ProductManagement/ChangeCategoryModal";
-import ChangeDiscountModal from "@components/ProductRegistration/ProductManagement/ChangeDiscountModal";
 import Pagination from "@components/ProductRegistration/ProductManagement/Pagination";
+import Controller from "@components/ProductRegistration/ProductManagement/Controller";
+import NoDataContainer from "@components/common/table/NoDataContainer";
+import {
+  SelectInput as Dropdown,
+  OptionInput as Option,
+} from "@components/common/input/Dropdown";
+import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 
 import {
   ChangeProductsInfoInputType,
   ChangeProductsInfoType,
   CHANGE_PRODUCTS_INFO,
 } from "@graphql/mutations/changeProductsInfo";
+import { tableData } from "@cache/ProductManagement/table";
 import {
-  DeleteProductsBySeller,
-  DeleteProductsBySellerInputType,
-  DELETE_PRODUCTS_BY_SELLER,
-} from "@graphql/mutations/deleteProductsBySeller";
-import {
-  DuplicateProductsBySellerInputType,
-  DuplicateProductsBySellerType,
-  DUPLICATE_PRODUCTS_BY_SELLER,
-} from "@graphql/mutations/duplicateProductsBySeller";
+  ThContainer,
+  Th,
+  TbContainer,
+  Tr,
+  Td,
+} from "@components/common/table/Table";
 
 const saleStatusList = [
   { id: 0, label: "DEFAULT", name: "판매상태 변경" },
@@ -63,10 +64,6 @@ const Product = () => {
     selectedProductListVar
   );
 
-  const selectedProductListIds: Array<number> = selectedProductList.map(
-    (list) => list.id
-  );
-
   const filterOptionPageNumber: number = useReactiveVar(
     filterOptionPageNumberVar
   );
@@ -80,11 +77,10 @@ const Product = () => {
   );
 
   const filterOptionQuery = useReactiveVar(filterOptionQueryVar);
-  const temporaryQuery = useReactiveVar(temporaryQueryVar);
 
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
 
-  const [getProductList] = useLazyQuery<
+  const [getProductList, { loading }] = useLazyQuery<
     GetAllProductsBySellerType,
     GetAllProductsBySellerInputType
   >(GET_ALL_PRODUCTS_BY_SELLER, {
@@ -119,146 +115,6 @@ const Product = () => {
     ],
     fetchPolicy: "no-cache",
   });
-
-  const [deleteProducts] = useMutation<
-    DeleteProductsBySeller,
-    DeleteProductsBySellerInputType
-  >(DELETE_PRODUCTS_BY_SELLER, {
-    refetchQueries: [
-      {
-        query: GET_ALL_PRODUCTS_BY_SELLER,
-        variables: {
-          input: {
-            page: filterOptionPageNumber,
-            skip: filterOptionSkipQuantity,
-            status: filterOptionStatus,
-            query: filterOptionQuery,
-          },
-        },
-      },
-      "GetAllProductsBySeller",
-    ],
-    fetchPolicy: "no-cache",
-  });
-
-  const [duplicateProducts] = useMutation<
-    DuplicateProductsBySellerType,
-    DuplicateProductsBySellerInputType
-  >(DUPLICATE_PRODUCTS_BY_SELLER, {
-    refetchQueries: [
-      {
-        query: GET_ALL_PRODUCTS_BY_SELLER,
-        variables: {
-          input: {
-            page: filterOptionPageNumber,
-            skip: filterOptionSkipQuantity,
-            status: filterOptionStatus,
-            query: filterOptionQuery,
-          },
-        },
-      },
-      "GetAllProductsBySeller",
-    ],
-    fetchPolicy: "no-cache",
-  });
-
-  // 복수 상태 변경
-  const changeMultiSaleStatusHandler = (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const value = e.target.value;
-    if (value === "판매상태 변경") return;
-
-    const saleStatus = {
-      DEFAULT: "판매상태 변경",
-      ON_SALE: "판매중",
-      STOP_SALE: "숨김",
-      SOLD_OUT: "품절",
-    };
-
-    systemModalVar({
-      ...systemModalVar(),
-      isVisible: true,
-      description: (
-        <>
-          선택하신 상품을
-          <br />
-          {saleStatus[value] === "판매중" && "판매중으로 변경하시겠습니까?"}
-          {saleStatus[value] === "숨김" && "숨김으로 변경하시겠습니까?"}
-          {saleStatus[value] === "품절" && "품절로 변경하시겠습니까?"}
-        </>
-      ),
-      cancelButtonVisibility: true,
-      confirmButtonClickHandler: () => {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        (async () => {
-          const {
-            data: {
-              changeProductsInfo: { ok, error },
-            },
-          } = await updateProductsStatus({
-            variables: {
-              input: {
-                productIds: selectedProductListIds,
-                productStatus: value,
-              },
-            },
-          });
-
-          if (ok) {
-            const {
-              data: {
-                getAllProductsBySeller: {
-                  products,
-                  ok: refetchOk,
-                  error: refetchError,
-                },
-              },
-            } = await getProductList();
-
-            if (refetchOk) {
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: (
-                  <>
-                    {saleStatus[value] === "판매중" &&
-                      "판매중으로 변경되었습니다."}
-                    {saleStatus[value] === "숨김" && "숨김으로 변경되었습니다."}
-                    {saleStatus[value] === "품절" && "품절로 변경되었습니다."}
-                  </>
-                ),
-                cancelButtonVisibility: false,
-
-                confirmButtonClickHandler: () => {
-                  getProductBySellerVar(
-                    products.map((list) => ({ ...list, isChecked: false }))
-                  );
-
-                  e.target.value = saleStatus["DEFAULT"];
-                  checkAllBoxStatusVar(false);
-                  selectedProductListVar([]);
-
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-                },
-              });
-            }
-
-            if (refetchError) {
-              showHasServerErrorModal(refetchError);
-            }
-          }
-
-          if (error) {
-            showHasServerErrorModal(error);
-          }
-        })();
-      },
-    });
-  };
 
   // 단일 상태 변경
   const changeSingleSaleStatusHandler =
@@ -363,200 +219,6 @@ const Product = () => {
       });
     };
 
-  // 단일 상태 방지
-  const handleSaleStatusClick = () => {
-    if (!selectedProductList.length) {
-      showHasCheckedAnyProductModal();
-      return;
-    }
-  };
-
-  // 카테고리 변경 모달
-  const handleChangeCategoryModalButtonClick = () => {
-    if (!selectedProductList.length) {
-      showHasCheckedAnyProductModal();
-      return;
-    }
-
-    modalVar({
-      isVisible: true,
-      component: <ChangeCategoryModal />,
-    });
-  };
-
-  // 할인율 변경 모달
-  const handleChangeDiscountModalButtonClick = () => {
-    if (!selectedProductList.length) {
-      showHasCheckedAnyProductModal();
-      return;
-    }
-
-    modalVar({
-      isVisible: true,
-      component: <ChangeDiscountModal />,
-    });
-  };
-
-  // 복제
-  const handleDuplicateButtonClick = () => {
-    if (!selectedProductList.length) {
-      showHasCheckedAnyProductModal();
-      return;
-    }
-
-    systemModalVar({
-      ...systemModalVar(),
-      isVisible: true,
-      description: <>상품을 복제하시겠습니까?</>,
-      confirmButtonVisibility: true,
-      cancelButtonVisibility: true,
-
-      confirmButtonClickHandler: () => {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        (async () => {
-          const {
-            data: {
-              duplicateProductsBySeller: { ok, error },
-            },
-          } = await duplicateProducts({
-            variables: {
-              input: {
-                productIds: selectedProductListIds,
-              },
-            },
-          });
-
-          if (ok) {
-            const {
-              data: {
-                getAllProductsBySeller: {
-                  products,
-                  ok: refetchOk,
-                  error: refetchError,
-                },
-              },
-            } = await getProductList();
-
-            if (refetchOk) {
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: <>상품이 복제되었습니다.</>,
-                confirmButtonVisibility: true,
-                cancelButtonVisibility: false,
-
-                confirmButtonClickHandler: () => {
-                  getProductBySellerVar(
-                    products.map((list) => ({
-                      ...list,
-                      isChecked: false,
-                    }))
-                  );
-
-                  checkAllBoxStatusVar(false);
-                  selectedProductListVar([]);
-
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-                },
-              });
-            }
-
-            if (refetchError) {
-              showHasServerErrorModal(refetchError);
-            }
-          }
-
-          if (error) {
-            showHasServerErrorModal(error);
-          }
-        })();
-      },
-    });
-  };
-
-  // 삭제
-  const handleDeleteButtonClick = () => {
-    if (!selectedProductList.length) {
-      showHasCheckedAnyProductModal();
-      return;
-    }
-
-    systemModalVar({
-      ...systemModalVar(),
-      isVisible: true,
-      description: <>상품을 삭제하시겠습니까?</>,
-      confirmButtonVisibility: true,
-      cancelButtonVisibility: true,
-
-      confirmButtonClickHandler: () => {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        (async () => {
-          const {
-            data: {
-              deleteProductsBySeller: { ok, error },
-            },
-          } = await deleteProducts({
-            variables: {
-              input: {
-                productIds: selectedProductListIds,
-              },
-            },
-          });
-
-          if (ok) {
-            const {
-              data: {
-                getAllProductsBySeller: {
-                  products,
-                  ok: refetchOk,
-                  error: refetchError,
-                },
-              },
-            } = await getProductList();
-
-            if (refetchOk) {
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: <>상품이 삭제되었습니다.</>,
-                confirmButtonVisibility: true,
-                cancelButtonVisibility: false,
-
-                confirmButtonClickHandler: () => {
-                  getProductBySellerVar(
-                    products.map((list) => ({
-                      ...list,
-                      isChecked: false,
-                    }))
-                  );
-
-                  checkAllBoxStatusVar(false);
-                  selectedProductListVar([]);
-
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-                },
-              });
-            }
-
-            if (refetchError) {
-              showHasServerErrorModal(error);
-            }
-          }
-
-          if (error) {
-            showHasServerErrorModal(error);
-          }
-        })();
-      },
-    });
-  };
-
   // 복수 체크박스
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     checkAllBoxStatusVar(e.target.checked);
@@ -627,25 +289,6 @@ const Product = () => {
       }
     };
 
-  // 필터 임시 쿼리
-  const changeFilterQueryHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    temporaryQueryVar(e.target.value);
-  };
-
-  // 필터 쿼리
-  const changeSkipQuantityHandler = ({ target: { value } }) => {
-    filterOptionSkipQuantityVar(Number(value));
-  };
-
-  // 디바운스
-  useEffect(() => {
-    const debounce = setTimeout(() => {
-      return filterOptionQueryVar(temporaryQuery);
-    }, 500);
-
-    return () => clearTimeout(debounce);
-  }, [temporaryQuery]);
-
   // 필터 업데이트
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -691,141 +334,170 @@ const Product = () => {
         <ContentsHeader headerName="상품관리" />
         <FilterBar />
         <ProductManagerContainer>
-          <ControllerContainer>
-            <Select
-              onChange={changeMultiSaleStatusHandler}
-              onClick={handleSaleStatusClick}
-              value={"DEFAULT"}
-            >
-              <Option value={"DEFAULT"} disabled hidden>
-                판매상태 변경
-              </Option>
-              <Option value={"ON_SALE"}>판매중</Option>
-              <Option value={"STOP_SALE"}>숨김</Option>
-              <Option value={"SOLD_OUT"}>품절</Option>
-            </Select>
-            <Button
-              size="small"
-              backgroundColor="white"
-              onClick={handleChangeCategoryModalButtonClick}
-            >
-              카테고리 변경
-            </Button>
-            <Button
-              size="small"
-              backgroundColor="white"
-              onClick={handleChangeDiscountModalButtonClick}
-            >
-              할인율 변경
-            </Button>
-            <Button
-              size="small"
-              backgroundColor="white"
-              onClick={handleDuplicateButtonClick}
-            >
-              복제
-            </Button>
-            <Button
-              size="small"
-              backgroundColor="white"
-              onClick={handleDeleteButtonClick}
-            >
-              삭제
-            </Button>
-            <Input
-              type="text"
-              onChange={changeFilterQueryHandler}
-              value={temporaryQuery}
-            />
-
-            <Select onChange={changeSkipQuantityHandler} defaultValue={20}>
-              <Option value={20}>20개씩보기</Option>
-              <Option value={50}>50개씩보기</Option>
-              <Option value={100}>100개씩보기</Option>
-            </Select>
-          </ControllerContainer>
-
+          <Controller />
           <ProductListTable>
-            <thead>
-              <tr>
-                <th>
-                  <Checkbox
-                    onChange={changeAllCheckBoxHandler}
-                    checked={checkAllBoxStatus}
-                  />
-                </th>
-                <th>상품 번호</th>
-                <th>상품명</th>
-                <th>상품 가격</th>
-                <th>할인율</th>
-                <th>할인가</th>
-                <th>재고</th>
-                <th>상태</th>
-              </tr>
-            </thead>
-            <tbody>
-              {productList?.map(
-                (
-                  {
-                    id,
-                    name,
-                    originalPrice,
-                    discountMethod,
-                    discountAmount,
-                    discountAppliedPrice,
-                    quantity,
-                    status,
-                    isChecked,
-                  },
-                  index
-                ) => {
-                  return (
-                    <tr key={id}>
-                      <td>
-                        <Checkbox
-                          onChange={changeSingleCheckBoxHandler(index)}
-                          checked={isChecked}
-                        />
-                      </td>
-                      <td>{id}</td>
-                      <td>{name}</td>
-                      <td>{originalPrice}</td>
-                      <td>
-                        {discountMethod &&
-                          discountAmount &&
-                          `${discountAmount} ${discountMethod}`}
-                      </td>
-                      <td>
-                        {getDiscountedPrice(
-                          Number(originalPrice),
-                          Number(discountAmount),
-                          discountMethod
-                        )}
-                      </td>
-                      <td>{quantity}</td>
-                      <td>
-                        <Select
-                          onChange={changeSingleSaleStatusHandler(id)}
-                          value={status}
+            <ThContainer>
+              {tableData.map(({ id, label, width, className }) => (
+                <Th key={id} width={width} className={className}>
+                  {label === "checkBox" ? (
+                    <Checkbox
+                      onChange={changeAllCheckBoxHandler}
+                      checked={checkAllBoxStatus}
+                    />
+                  ) : (
+                    label
+                  )}
+                </Th>
+              ))}
+            </ThContainer>
+            {productList.length ? (
+              <TbContainer>
+                {productList?.map(
+                  (
+                    {
+                      id,
+                      name,
+                      category,
+                      originalPrice,
+                      discountMethod,
+                      discountAmount,
+                      discountAppliedPrice,
+                      quantity,
+                      status,
+                      thumbnail,
+                      isChecked,
+                    },
+                    index
+                  ) => {
+                    const discountAppliedPriceToWonSign = discountAppliedPrice
+                      ? `${discountAppliedPrice.toLocaleString("ko-KR")} ₩`
+                      : "-";
+
+                    const firstCategory = category?.parent?.name
+                      ? category.parent.name
+                      : "-";
+                    const secondCategory = category?.name ? category.name : "-";
+                    const thirdCategory = category?.children?.name
+                      ? category.children.name
+                      : "-";
+
+                    const rateOfDiscount =
+                      discountMethod &&
+                      discountAmount &&
+                      `${discountAmount.toLocaleString("ko-KR")} ${
+                        discountMethod === "PERCENT" ? "%" : "₩"
+                      }`;
+                    const originalPriceToWonSign = `${originalPrice.toLocaleString(
+                      "ko-KR"
+                    )} ₩`;
+
+                    return (
+                      <Tr key={id}>
+                        <ProductManageMentTd
+                          width={tableData[0].width}
+                          className={tableData[0].className}
                         >
-                          {saleStatusList.map(({ id, label, name }) => (
-                            <Option
-                              key={id}
-                              value={label}
-                              hidden={label === "DEFAULT"}
-                            >
-                              {name}
-                            </Option>
-                          ))}
-                        </Select>
-                      </td>
-                    </tr>
-                  );
-                }
-              )}
-            </tbody>
+                          <Checkbox
+                            onChange={changeSingleCheckBoxHandler(index)}
+                            checked={isChecked}
+                          />
+                        </ProductManageMentTd>
+                        <ProductManageMentTd
+                          width={tableData[1].width}
+                          className={tableData[1].className}
+                        >
+                          {id}
+                        </ProductManageMentTd>
+                        <ProductManageMentTd
+                          width={tableData[2].width}
+                          className={tableData[2].className}
+                        >
+                          <ProductThumbNailWrapper>
+                            <ProductThumbNail src={thumbnail} />
+                          </ProductThumbNailWrapper>
+                          <ProductName>{name}</ProductName>
+                        </ProductManageMentTd>
+                        <ProductManageMentTd
+                          width={tableData[3].width}
+                          className={tableData[3].className}
+                        >
+                          {firstCategory}
+                        </ProductManageMentTd>
+                        <ProductManageMentTd
+                          width={tableData[4].width}
+                          className={tableData[4].className}
+                        >
+                          {secondCategory}
+                        </ProductManageMentTd>
+                        <ProductManageMentTd
+                          width={tableData[5].width}
+                          className={tableData[5].className}
+                        >
+                          {thirdCategory}
+                        </ProductManageMentTd>
+                        <ProductManageMentTd
+                          width={tableData[6].width}
+                          className={tableData[6].className}
+                        >
+                          {originalPriceToWonSign}
+                        </ProductManageMentTd>
+                        <ProductManageMentTd
+                          width={tableData[7].width}
+                          className={tableData[7].className}
+                        >
+                          {rateOfDiscount}
+                        </ProductManageMentTd>
+                        <ProductManageMentTd
+                          width={tableData[8].width}
+                          className={tableData[8].className}
+                        >
+                          {discountAppliedPriceToWonSign}
+                        </ProductManageMentTd>
+                        <ProductManageMentTd
+                          width={tableData[9].width}
+                          className={tableData[9].className}
+                        >
+                          {quantity}
+                        </ProductManageMentTd>
+                        <ProductManageMentTd
+                          width={tableData[10].width}
+                          className={tableData[10].className}
+                        >
+                          <Dropdown
+                            onChange={changeSingleSaleStatusHandler(id)}
+                            arrowSrc={triangleArrowSvg}
+                            value={status}
+                            sizing={"medium"}
+                            width={"146px"}
+                          >
+                            {saleStatusList.map(({ id, label, name }) => (
+                              <Option
+                                key={id}
+                                value={label}
+                                hidden={label === "DEFAULT"}
+                              >
+                                {name}
+                              </Option>
+                            ))}
+                          </Dropdown>
+                        </ProductManageMentTd>
+                      </Tr>
+                    );
+                  }
+                )}
+              </TbContainer>
+            ) : (
+              !loading && (
+                <NoDataContainer>
+                  검색어와 일치하는
+                  <br />
+                  상품이 없습니다.
+                </NoDataContainer>
+              )
+            )}
           </ProductListTable>
-          <Pagination />
+
+          {productList.length ? <Pagination /> : <></>}
         </ProductManagerContainer>
       </ContentsContainer>
     </Layout>
@@ -833,37 +505,42 @@ const Product = () => {
 };
 
 const ProductManagerContainer = styled.div`
-  background-color: greenyellow;
+  flex: 1 1 0;
 `;
 
-const ControllerContainer = styled.div`
-  background-color: red;
-  padding: 1em;
+const ProductListTable = styled.div`
+  width: 100%;
+`;
 
+const ProductManageMentTd = styled(Td)`
+  &.name {
+    justify-content: flex-start;
+  }
+`;
+
+const ProductThumbNailWrapper = styled.div`
   display: flex;
+  justify-content: center;
+  align-items: center;
 
-  & > button {
-    margin-right: 1em;
-  }
+  min-width: 56px;
+  height: 40px;
+
+  border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 
-const ProductListTable = styled.table`
-  background-color: skyblue;
-
-  & td,
-  th {
-    padding: 1em;
-  }
+const ProductThumbNail = styled.img`
+  width: 24px;
+  height: 24px;
 `;
 
-const Input = styled.input`
-  width: 100px;
-  background-color: #fff;
-`;
+const ProductName = styled.span`
+  display: block;
 
-const Select = styled.select`
-  background-color: skyblue;
+  padding: 0 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
-const Option = styled.option``;
 
 export default Product;

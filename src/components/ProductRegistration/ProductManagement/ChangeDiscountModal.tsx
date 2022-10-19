@@ -35,8 +35,10 @@ import {
   checkAllBoxStatusVar,
   filterOptionQueryVar,
   showHasServerErrorModal,
+  filterOptionPageNumberVar,
 } from "@cache/ProductManagement";
-import GET_ALL_PRODUCTS_BY_SELLER, {
+import {
+  GET_ALL_PRODUCTS_BY_SELLER,
   GetAllProductsBySellerInputType,
   GetAllProductsBySellerType,
 } from "@graphql/queries/getAllProductsBySeller";
@@ -48,6 +50,9 @@ const ChangeDiscountModal = () => {
   });
   const { register, watch, control, getValues } = method;
 
+  const filterOptionPageNumber: number = useReactiveVar(
+    filterOptionPageNumberVar
+  );
   const filterOptionStatus: string | null = useReactiveVar(
     filterOptionStatusVar
   );
@@ -77,12 +82,13 @@ const ChangeDiscountModal = () => {
   >(GET_ALL_PRODUCTS_BY_SELLER, {
     variables: {
       input: {
-        page: 1,
+        page: filterOptionPageNumber,
         skip: filterOptionSkipQuantity,
         status: filterOptionStatus,
         query: filterQuery,
       },
     },
+    fetchPolicy: "no-cache",
   });
 
   const [updateDiscount] = useMutation<
@@ -94,7 +100,7 @@ const ChangeDiscountModal = () => {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
           input: {
-            page: 1,
+            page: filterOptionPageNumber,
             skip: filterOptionSkipQuantity,
             status: filterOptionStatus,
             query: filterQuery,
@@ -155,6 +161,7 @@ const ChangeDiscountModal = () => {
           이대로 변경하시겠습니까?
         </>
       ),
+
       confirmButtonVisibility: true,
       cancelButtonVisibility: true,
       confirmButtonClickHandler: () => {

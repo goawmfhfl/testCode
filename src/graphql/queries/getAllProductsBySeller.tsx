@@ -7,15 +7,20 @@ export interface GetAllProductsBySellerType {
     totalPages: number;
     totalResults: number;
     products: Array<{
-      // need reconfigure category Type
-      category: string;
       id: number;
       name: string;
+      category: {
+        id: number;
+        name: string;
+        parent: { id: number; name: string } | null;
+        children: { id: number; name: string } | null;
+      };
       originalPrice: number;
       discountAmount: number | null;
       discountAppliedPrice: number | null;
       discountMethod: string | null;
       status: string;
+      thumbnail: string;
       quantity: number;
     }>;
   };
@@ -23,14 +28,14 @@ export interface GetAllProductsBySellerType {
 
 export interface GetAllProductsBySellerInputType {
   input: {
-    page: number;
-    skip: number;
+    page?: number;
+    skip?: number;
     status: string | null;
     query?: string;
   };
 }
 
-const GET_ALL_PRODUCTS_BY_SELLER = gql`
+export const GET_ALL_PRODUCTS_BY_SELLER = gql`
   query GetAllProductsBySeller($input: GetAllProductsBySellerInput!) {
     getAllProductsBySeller(input: $input) {
       ok
@@ -57,10 +62,33 @@ const GET_ALL_PRODUCTS_BY_SELLER = gql`
         discountAmount
         discountMethod
         quantity
+        thumbnail
         status
       }
     }
   }
 `;
 
-export default GET_ALL_PRODUCTS_BY_SELLER;
+export interface GetAllProductsStatusBySellerType {
+  getAllProductsBySeller: {
+    ok: boolean;
+    error: string;
+    totalResults: number;
+  };
+}
+
+export interface GetAllProductsStatusBySellerInPutType {
+  input: {
+    status: string | null;
+  };
+}
+
+export const GET_ALL_PRODCUCTS_STATUS_BY_SELLER = gql`
+  query GetAllProductsBySeller($input: GetAllProductsBySellerInput!) {
+    getAllProductsBySeller(input: $input) {
+      ok
+      error
+      totalResults
+    }
+  }
+`;

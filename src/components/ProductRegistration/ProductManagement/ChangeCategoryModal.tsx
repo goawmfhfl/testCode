@@ -24,6 +24,7 @@ import {
 } from "@graphql/mutations/changeProductsInfo";
 import {
   checkAllBoxStatusVar,
+  filterOptionPageNumberVar,
   filterOptionQueryVar,
   filterOptionSkipQuantityVar,
   filterOptionStatusVar,
@@ -31,7 +32,8 @@ import {
   selectedProductListVar,
   showHasServerErrorModal,
 } from "@cache/ProductManagement";
-import GET_ALL_PRODUCTS_BY_SELLER, {
+import {
+  GET_ALL_PRODUCTS_BY_SELLER,
   GetAllProductsBySellerInputType,
   GetAllProductsBySellerType,
 } from "@graphql/queries/getAllProductsBySeller";
@@ -39,9 +41,14 @@ import GET_ALL_PRODUCTS_BY_SELLER, {
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
 
+  const filterOptionPageNumber: number = useReactiveVar(
+    filterOptionPageNumberVar
+  );
+
   const filterOptionStatus: string | null = useReactiveVar(
     filterOptionStatusVar
   );
+
   const filterOptionSkipQuantity: number = useReactiveVar(
     filterOptionSkipQuantityVar
   );
@@ -69,7 +76,7 @@ const ChangeCategoryModal = () => {
   >(GET_ALL_PRODUCTS_BY_SELLER, {
     variables: {
       input: {
-        page: 1,
+        page: filterOptionPageNumber,
         skip: filterOptionSkipQuantity,
         status: filterOptionStatus,
         query: filterQuery,
@@ -86,7 +93,7 @@ const ChangeCategoryModal = () => {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
           input: {
-            page: 1,
+            page: filterOptionPageNumber,
             skip: filterOptionSkipQuantity,
             status: filterOptionStatus,
             query: filterQuery,

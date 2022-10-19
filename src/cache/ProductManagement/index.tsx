@@ -14,14 +14,20 @@ export const selectedProductListVar = makeVar<Array<ProductsListVarType>>([]);
 export const checkAllBoxStatusVar = makeVar<boolean>(false);
 
 export interface ProductsListVarType {
-  category: string;
   id: number;
   name: string;
+  category: {
+    id: number;
+    name: string;
+    parent: { id: number; name: string } | null;
+    children: { id: number; name: string } | null;
+  };
   originalPrice: number;
   discountAmount: number | null;
   discountAppliedPrice: number | null;
   discountMethod: string | null;
   status: string;
+  thumbnail: string;
   quantity: number;
   isChecked: boolean;
 }
