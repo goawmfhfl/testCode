@@ -12,7 +12,7 @@ import addImageSrc from "@icons/addImage.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import infoIconSrc from "@icons/info.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
-import closeIconSource from "@icons/close.svg";
+import closeIconSource from "@icons/delete.svg";
 import photochangeSrc from "@icons/photochange.svg";
 import { shopImagesVar, SHOP_INTRODUCTION } from "@cache/shopSettings";
 import { systemModalVar } from "@cache/index";

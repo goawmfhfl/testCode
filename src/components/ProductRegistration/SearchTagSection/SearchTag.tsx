@@ -3,7 +3,7 @@ import styled from "styled-components/macro";
 import { useState, useRef } from "react";
 import { useReactiveVar } from "@apollo/client";
 
-import closeIconSource from "@icons/close.svg";
+import closeIconSource from "@icons/delete.svg";
 import whiteCloseIconSource from "@icons/close-white.svg";
 import {
   TagTypes,

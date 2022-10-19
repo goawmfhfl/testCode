@@ -4,7 +4,7 @@ import axios from "axios";
 import X2JS from "x2js";
 import styled from "styled-components/macro";
 
-import closeIconSource from "@icons/close.svg";
+import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import ValidText from "@components/common/ValidText";
 import Button from "@components/common/Button";

@@ -3,7 +3,7 @@ import styled from "styled-components/macro";
 import axios from "axios";
 import { last } from "lodash";
 
-import closeIconSource from "@icons/close.svg";
+import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Input from "@components/common/Input";

@@ -5,7 +5,7 @@ import styled from "styled-components/macro";
 
 import { encryptedData } from "@utils/cipher";
 
-import closeIconSource from "@icons/close.svg";
+import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";

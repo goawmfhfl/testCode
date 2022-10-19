@@ -16,8 +16,8 @@ import {
   TextInputWrapper,
   ReturnExchangeFeeInputContainer,
   ShipmentChargeInputContainer,
-} from "@components/productRegistration/ShipmentChargeSection";
-import closeIconSource from "@icons/close.svg";
+} from "@components/ProductRegistration/ShipmentChargeSection";
+import closeIconSource from "@icons/delete.svg";
 import downwordArrowMedium from "@icons/arrow-downward-medium.svg";
 import { hasEveryInputFulfilled } from "@utils/index";
 import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
