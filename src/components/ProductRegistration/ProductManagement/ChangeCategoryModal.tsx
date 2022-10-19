@@ -66,6 +66,10 @@ const ChangeCategoryModal = () => {
     filterOptionPageNumberVar
   );
 
+  const filterOptionPageNumber: number = useReactiveVar(
+    filterOptionPageNumberVar
+  );
+
   const filterOptionStatus: string | null = useReactiveVar(
     filterOptionStatusVar
   );
@@ -138,7 +142,7 @@ const ChangeCategoryModal = () => {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
           input: {
-            page: 1,
+            page: filterOptionPageNumber,
             skip: filterOptionSkipQuantity,
             status: filterOptionStatus,
             query: filterQuery,

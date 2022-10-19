@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { useLazyQuery, useMutation, useReactiveVar } from "@apollo/client";
-
 import {
   GET_ALL_PRODUCTS_BY_SELLER,
   GetAllProductsBySellerType,
