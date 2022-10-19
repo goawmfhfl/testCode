@@ -50,22 +50,6 @@ import {
   Td,
 } from "@components/common/table/Table";
 
-import {
-  ChangeProductsInfoInputType,
-  ChangeProductsInfoType,
-  CHANGE_PRODUCTS_INFO,
-} from "@graphql/mutations/changeProductsInfo";
-import {
-  DeleteProductsBySeller,
-  DeleteProductsBySellerInputType,
-  DELETE_PRODUCTS_BY_SELLER,
-} from "@graphql/mutations/deleteProductsBySeller";
-import {
-  DuplicateProductsBySellerInputType,
-  DuplicateProductsBySellerType,
-  DUPLICATE_PRODUCTS_BY_SELLER,
-} from "@graphql/mutations/duplicateProductsBySeller";
-
 const saleStatusList = [
   { id: 0, label: "DEFAULT", name: "판매상태 변경" },
   { id: 1, label: "ON_SALE", name: "판매중" },

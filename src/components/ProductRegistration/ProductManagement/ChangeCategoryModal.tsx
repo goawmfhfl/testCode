@@ -61,6 +61,10 @@ const ChangeCategoryModal = () => {
     filterOptionPageNumberVar
   );
 
+  const filterOptionPageNumber: number = useReactiveVar(
+    filterOptionPageNumberVar
+  );
+
   const filterOptionStatus: string | null = useReactiveVar(
     filterOptionStatusVar
   );
