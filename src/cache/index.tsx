@@ -6,6 +6,8 @@ import {
   PRODUCT_REGISTRATION_SECTIONS,
 } from "@constants/index";
 
+export const paginationSkipVar = makeVar<number>(0);
+
 export const modalVar = makeVar<{
   isVisible: boolean;
   component: React.ReactNode;

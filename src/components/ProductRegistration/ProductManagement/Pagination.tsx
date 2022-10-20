@@ -11,18 +11,20 @@ import mediumLeftInActvieSvg from "@icons/medium-left-inactive.svg";
 import mediumRightInActiveSvg from "@icons/medium-right-inactive.svg";
 
 import { useReactiveVar } from "@apollo/client";
+import { paginationSkipVar } from "@cache/index";
 import {
   filterOptionPageNumberVar,
   pageNumberListVar,
 } from "@cache/ProductManagement";
 
 const Pagination = () => {
-  const filterOptionPageNumber = useReactiveVar(filterOptionPageNumberVar);
   const pageNumberList = useReactiveVar(pageNumberListVar);
+  const filterOptionPageNumber = useReactiveVar(filterOptionPageNumberVar);
+  const paginationSkip = useReactiveVar(paginationSkipVar);
+
   const [pageList, setPageList] = useState<Array<number>>(
     pageNumberList.slice(0 * 10, (0 + 1) * 10)
   );
-  const [skip, setSkipPage] = useState<number>(0);
   const totalSkipPage: number = Math.floor(pageNumberList.length / 10);
 
   const handlePageNumberClick = (pageNumber: number) => () => {
@@ -30,44 +32,49 @@ const Pagination = () => {
   };
 
   const handleNextPageClick = () => {
-    if (skip >= totalSkipPage) return;
+    if (paginationSkip >= totalSkipPage) return;
 
-    setSkipPage((prev) => prev + 1);
-    filterOptionPageNumberVar((skip + 1) * 10 + 1);
+    paginationSkipVar(paginationSkip + 1);
+    filterOptionPageNumberVar((paginationSkip + 1) * 10 + 1);
   };
 
   const handlePrevPageClick = () => {
-    if (skip <= 0) return;
+    if (paginationSkip <= 0) return;
 
-    setSkipPage((prev) => prev - 1);
-    filterOptionPageNumberVar(skip * 10);
+    paginationSkipVar(paginationSkip - 1);
+    filterOptionPageNumberVar(paginationSkip * 10);
   };
 
   const handleStartPageClick = () => {
-    setSkipPage(0);
+    paginationSkipVar(0);
     filterOptionPageNumberVar(1);
   };
 
   const handleEndPageClick = () => {
-    setSkipPage(totalSkipPage);
+    paginationSkipVar(totalSkipPage);
     filterOptionPageNumberVar(pageNumberList.length);
   };
 
   useEffect(() => {
-    const newPageList = pageNumberList.slice(skip * 10, (skip + 1) * 10);
+    const newPageList = pageNumberList.slice(
+      paginationSkip * 10,
+      (paginationSkip + 1) * 10
+    );
     setPageList(newPageList);
-  }, [skip, pageNumberList]);
+  }, [paginationSkip, pageNumberList]);
+
+  console.log("pageList", pageList);
 
   return (
     <Container>
       <DoubleLeftButton
-        isActive={skip > 0}
-        disabled={skip === 0}
+        isActive={paginationSkip > 0}
+        disabled={paginationSkip === 0}
         onClick={handleStartPageClick}
       />
       <SingleLeftButton
-        isActive={skip > 0}
-        disabled={skip === 0}
+        isActive={paginationSkip > 0}
+        disabled={paginationSkip === 0}
         onClick={handlePrevPageClick}
       />
       <PageNumberList>
@@ -82,14 +89,14 @@ const Pagination = () => {
         ))}
       </PageNumberList>
       <SingleRightButton
-        isActive={totalSkipPage !== skip}
-        disabled={totalSkipPage === skip}
+        isActive={totalSkipPage !== paginationSkip}
+        disabled={totalSkipPage === paginationSkip}
         onClick={handleNextPageClick}
       />
 
       <DoubleRightButton
-        isActive={totalSkipPage !== skip}
-        disabled={totalSkipPage === skip}
+        isActive={totalSkipPage !== paginationSkip}
+        disabled={totalSkipPage === paginationSkip}
         onClick={handleEndPageClick}
       />
     </Container>
