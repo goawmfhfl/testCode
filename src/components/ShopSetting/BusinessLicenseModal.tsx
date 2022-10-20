@@ -93,7 +93,23 @@ const BusinessLicenseModal = () => {
         parameter
       );
 
-      const { data } = response as { data: { items: Array<any> } | string };
+      const { data } = response as {
+        data:
+          | {
+              items: Array<{
+                rprsvNm: string;
+                bizrno: string;
+                crno: string;
+                simTxtnTrgtYnDesc: string;
+                rdnAddr: string;
+                prmsnMgtNo: string;
+                mngStateNm: string;
+              }>;
+            }
+          | string;
+      };
+
+      console.log(data);
 
       if (typeof data === "string") {
         systemModalVar({
@@ -135,6 +151,30 @@ const BusinessLicenseModal = () => {
         return;
       }
 
+      if (data.items[0].mngStateNm !== "정상영업") {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          icon: exclamationmarkSrc,
+          description: (
+            <>
+              유효하지 않은 정보입니다.
+              <br />
+              최신 정보를 입력해주세요.
+            </>
+          ),
+          confirmButtonText: "확인",
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+            });
+          },
+        });
+
+        return;
+      }
+
       systemModalVar({
         ...systemModalVar(),
         isVisible: true,
@@ -157,14 +197,7 @@ const BusinessLicenseModal = () => {
             isVisible: false,
           });
 
-          const businessLicense = data.items[0] as {
-            rprsvNm: string;
-            bizrno: string;
-            crno: string;
-            simTxtnTrgtYnDesc: string;
-            rdnAddr: string;
-            prmsnMgtNo: string;
-          };
+          const businessLicense = data.items[0];
 
           const {
             rprsvNm,
