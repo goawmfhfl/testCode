@@ -44,6 +44,14 @@ export const systemModalVar = makeVar<{
   cancelButtonClickHandler: () => closeSystemModal(),
 });
 
+export const DetailNoticeVar = makeVar<{
+  isVisible: boolean;
+  component: React.ReactNode;
+}>({
+  isVisible: false,
+  component: <></>,
+});
+
 export const GNBReferenceVar = makeVar<HTMLElement | null>(null);
 export const contentsContainerReferenceVar = makeVar<HTMLElement | null>(null);
 

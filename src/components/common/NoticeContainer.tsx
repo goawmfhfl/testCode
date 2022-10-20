@@ -23,6 +23,7 @@ const NoticeContainer = ({
 
 const Container = styled.div<{ width: string }>`
   display: flex;
+
   width: ${({ width }) => (width ? width : "100%")};
   padding: 8px 16px 8px 8px;
   border-radius: 7px;

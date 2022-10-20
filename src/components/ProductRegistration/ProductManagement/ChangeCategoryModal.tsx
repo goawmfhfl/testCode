@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { modalVar, systemModalVar } from "@cache/index";
+import { DetailNoticeVar, modalVar, systemModalVar } from "@cache/index";
 import { useForm } from "react-hook-form";
 import {
   CATEGORY_FIRST,
@@ -11,13 +11,18 @@ import { useLazyQuery, useMutation, useReactiveVar } from "@apollo/client";
 
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
 import questionMarkIconSrc from "@icons/questionmark.svg";
+import closeIconSource from "@icons/delete.svg";
+import exclamationmarkSrc from "@icons/exclamationmark.svg";
+
 import {
   SelectInput as Dropdown,
   OptionInput as Option,
 } from "@components/common/input/Dropdown";
-import { CHANGE_PRODUCTS_INFO } from "@graphql/mutations/changeProductsInfo";
-import { CATEGORIES, categoryMapper } from "@constants/index";
+import NoticeContainer from "@components/common/NoticeContainer";
+import Button from "@components/common/Button";
 
+import { CATEGORIES, categoryMapper } from "@constants/index";
+import { CHANGE_PRODUCTS_INFO } from "@graphql/mutations/changeProductsInfo";
 import {
   ChangeProductsInfoType,
   ChangeProductsInfoInputType,
@@ -37,8 +42,6 @@ import {
   GetAllProductsBySellerInputType,
   GetAllProductsBySellerType,
 } from "@graphql/queries/getAllProductsBySeller";
-
-import closeIconSource from "@icons/delete.svg";
 
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
@@ -229,21 +232,55 @@ const ChangeCategoryModal = () => {
     }
   };
 
+  const showNoticeClick = () => {
+    DetailNoticeVar({
+      isVisible: !detailNotice.isVisible,
+      component: (
+        <NoticeContainer icon={questionMarkIconSrc} width={"418px"}>
+          B-MARKET은 작업과정에서 발생하는 작은 흠으로 파기되는B급 상품을
+          <br />
+          할인된 가격에 판매할 수 있는 카테고리 입니다.
+          <br />
+          B급 상품 설정에 체크시 해당 상품은 B-MARKET 카테고리에 등록됩니다.
+          <br />
+          B급 상품은 정상 상품의 가격보다 할인된 가격으로 책정해주세요.
+        </NoticeContainer>
+      ),
+    });
+  };
+
+  useEffect(() => {
+    return () => {
+      DetailNoticeVar({
+        isVisible: false,
+        component: <></>,
+      });
+    };
+  }, []);
+
   return (
     <Container>
-      <CloseButton onClick={handleCloseButtonClick}>X</CloseButton>
+      <CloseButton onClick={handleCloseButtonClick} src={closeIconSource} />
       <Title>카테고리 변경하기</Title>
-      <Notice>상품 다중 선택시 카테고리가 일괄 변경됩니다.</Notice>
+      <NoticeContainer icon={exclamationmarkSrc} width={"291px"}>
+        상품 다중 선택 시 카테고리가 일괄 변경됩니다.
+      </NoticeContainer>
+
       <BmarketContainer>
         <CheckBox onChange={handleCheckBoxChange} checked={isBmarketChecked} />
         <Description>이 상품은 B-MARKET 상품입니다</Description>
-        <NoticeIcon src={questionMarkIconSrc} />
+        <NoticeIcon src={questionMarkIconSrc} onClick={showNoticeClick} />
+
+        {detailNotice.isVisible && (
+          <DetailNoticeLayer>{detailNotice.component}</DetailNoticeLayer>
+        )}
       </BmarketContainer>
-      <CategoryContainer>
+      <DropdownContainer>
         <DropdownWrapper>
           <DropdownLabel>대분류</DropdownLabel>
-          <Dropdown
+          <StyledDropdown
             sizing={"medium"}
+            width={"160px"}
             arrowSrc={downwordArrowBig}
             {...register(CATEGORY_FIRST)}
             value={watch(CATEGORY_FIRST) as string}
@@ -262,12 +299,13 @@ const ChangeCategoryModal = () => {
                 {option.name}
               </Option>
             ))}
-          </Dropdown>
+          </StyledDropdown>
         </DropdownWrapper>
         <DropdownWrapper>
           <DropdownLabel>중분류</DropdownLabel>
-          <Dropdown
+          <StyledDropdown
             sizing={"medium"}
+            width={"160px"}
             arrowSrc={downwordArrowBig}
             {...register(CATEGORY_SECOND)}
             value={watch(CATEGORY_SECOND) as string}
@@ -287,12 +325,13 @@ const ChangeCategoryModal = () => {
                 {option.name}
               </Option>
             ))}
-          </Dropdown>
+          </StyledDropdown>
         </DropdownWrapper>
         <DropdownWrapper>
           <DropdownLabel>소분류</DropdownLabel>
-          <Dropdown
+          <StyledDropdown
             sizing={"medium"}
+            width={"160px"}
             arrowSrc={downwordArrowBig}
             {...register(CATEGORY_THIRD)}
             value={watch(CATEGORY_THIRD) as string}
@@ -312,50 +351,78 @@ const ChangeCategoryModal = () => {
                 {option.name}
               </Option>
             ))}
-          </Dropdown>
+          </StyledDropdown>
         </DropdownWrapper>
-      </CategoryContainer>
+      </DropdownContainer>
       <ButtonContainer>
-        <Button onClick={updateCategoryClick}>확인</Button>
-        <Button onClick={handleCloseButtonClick}>취소</Button>
+        <StyledButton
+          size={"small"}
+          className={"positive"}
+          onClick={updateCategoryClick}
+        >
+          확인
+        </StyledButton>
+        <Button size={"small"} onClick={handleCloseButtonClick}>
+          취소
+        </Button>
       </ButtonContainer>
     </Container>
   );
 };
 
 const Container = styled.div`
+  position: relative;
+
   display: flex;
   flex-direction: column;
-  background-color: #fff;
 
-  padding: 1em;
+  padding: 40px 24px 24px 24px;
+  background-color: ${({ theme: { palette } }) => palette.white};
 `;
 
-const CloseButton = styled.button`
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
+const CloseButton = styled.img`
+  position: absolute;
+  top: 12.79px;
+  right: 12.77px;
+
+  width: 24px;
+  height: 24px;
+
+  cursor: pointer;
 `;
 
 const Title = styled.h2`
-  padding: 1em;
-  background-color: gainsboro;
-`;
+  margin-bottom: 24px;
 
-const Notice = styled.span`
-  padding: 1em;
-  background-color: goldenrod;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: -0.015em;
 `;
 
 const BmarketContainer = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+
   width: 100%;
-  padding: 1em;
-
-  background-color: green;
+  margin: 15px 0px;
 `;
-const CheckBox = styled.input.attrs({ type: "checkbox" })``;
 
-const Description = styled.span``;
+const CheckBox = styled.input.attrs({ type: "checkbox" })`
+  margin-right: 4px;
+`;
+
+const Description = styled.span`
+  margin-right: 7px;
+
+  font-family: "Spoqa Han Sans Neo";
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0.10000000149011612px;
+  text-align: left;
+`;
 
 const NoticeIcon = styled.img`
   width: 24px;
@@ -363,37 +430,56 @@ const NoticeIcon = styled.img`
   margin-right: 15px;
 
   user-select: none;
+  cursor: pointer;
 `;
 
-const CategoryContainer = styled.div`
+const DetailNoticeLayer = styled.div`
+  position: absolute;
+  right: 0;
+  bottom: -92px;
+
+  z-index: 1000;
+`;
+
+const DropdownContainer = styled.div`
   display: flex;
   width: 100%;
-  padding: 1em;
-
-  background-color: yellow;
 `;
 
 const DropdownWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 1em;
+
+  margin-right: 16px;
+  margin-bottom: 32px;
+
+  &:last-child {
+    margin-right: 0px;
+  }
 `;
 
 const DropdownLabel = styled.span`
   margin-bottom: 10px;
+
+  font-family: "Spoqa Han Sans Neo";
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.10000000149011612px;
+  text-align: left;
+`;
+
+const StyledDropdown = styled(Dropdown)`
+  padding-right: 0px;
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
-
-  padding: 1em;
-
-  background-color: grey;
 `;
 
-const Button = styled.button`
-  margin-right: 5px;
+const StyledButton = styled(Button)`
+  margin-right: 16px;
 `;
 
 export default ChangeCategoryModal;
