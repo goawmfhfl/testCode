@@ -43,8 +43,6 @@ import {
   GetAllProductsBySellerType,
 } from "@graphql/queries/getAllProductsBySeller";
 
-import closeIconSource from "@icons/delete.svg";
-
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
 
