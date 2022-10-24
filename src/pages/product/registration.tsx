@@ -1,5 +1,9 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
+import { useLazyQuery } from "@apollo/client";
+import { useLocation } from "react-router-dom";
+
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
 import ContentsHeader from "@components/common/ContentsHeader";
@@ -24,11 +28,12 @@ import DescriptionSection from "@components/productRegistration/DescriptionSecti
 
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import questionMarkSource from "@icons/questionmark.svg";
-import SearchTagSection from "@components/productRegistration/SearchTagSection";
-import { useState } from "react";
+import SearchTagSection from "@components/ProductRegistration/SearchTagSection";
 import { PRODUCT_REGISTRATION_SECTIONS } from "@constants/index";
 
 export interface ProductRegistrationFormValues {
+  TITLE: string;
+
   productName: string;
   productPrice: string;
   productDescription: string;
@@ -49,14 +54,73 @@ export interface ProductRegistrationFormValues {
   CATEGORY_THIRD: string;
 }
 
+import {
+  GET_PRODUCTS_BY_ID,
+  GetProductsByIdType,
+  GetProductsByIdInputType,
+} from "@graphql/queries/getProductsById";
+
+import { CreateProductInputType } from "@models/productRegistration/index";
+
+interface LocationType {
+  state: { productId: number | null };
+}
+
 const ProductRegistration = () => {
+  const [updateData, setUpdateData] = useState<CreateProductInputType>();
+
+  const { state } = useLocation() as LocationType;
+
+  const productId: number | undefined = state?.productId;
+
   const methods = useForm<ProductRegistrationFormValues>();
-  const { register } = methods;
+
+  const [getData] = useLazyQuery<GetProductsByIdType, GetProductsByIdInputType>(
+    GET_PRODUCTS_BY_ID,
+    {
+      variables: {
+        input: {
+          productId: productId,
+        },
+      },
+    }
+  );
 
   const onSubmit: SubmitHandler<ProductRegistrationFormValues> = (data) => {
     console.log("form is submitted!");
     console.log(data);
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    productId &&
+      (async () => {
+        const {
+          data: {
+            getProductById: { product, ok, error },
+          },
+          loading,
+        } = await getData();
+
+        if (ok) {
+          setUpdateData(product);
+        }
+
+        if (error) {
+          // TODO: 에러 핸들링 로직 추가 예정
+          console.log(error);
+        }
+      })();
+  }, [productId]);
+
+  const watchAllField = methods.watch();
+
+  useEffect(() => {
+    methods.reset({
+      ...watchAllField,
+      TITLE: updateData?.name,
+    });
+  }, [updateData]);
 
   return (
     <FormProvider {...methods}>
