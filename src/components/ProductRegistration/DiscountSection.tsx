@@ -53,7 +53,7 @@ const ProductDiscount = () => {
             size={"medium"}
             // eslint-disable-next-line
             options={[
-              { name: "%", value: DiscountMethod.PERCENT },
+              { name: "%", value: DiscountMethod.PERCENT, selected: true },
               { name: "₩", value: DiscountMethod.WON },
             ]}
             register={register(DISCOUNT_OPTION)}

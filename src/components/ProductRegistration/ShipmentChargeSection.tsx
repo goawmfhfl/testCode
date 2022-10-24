@@ -162,7 +162,7 @@ const ProductShipmentCharge = () => {
             register={register(SHIPMENT_TEMPLATE)}
             size="medium"
             options={[
-              { name: "템플릿 선택 안함", value: null },
+              { name: "템플릿 선택 안함", value: null, selected: true },
               ...shipmentTemplates.map(({ name }) => ({
                 name,
                 value: name,
@@ -220,6 +220,7 @@ const ProductShipmentCharge = () => {
               {
                 name: "유료",
                 value: ShipmentChargeType.Charged,
+                selected: true,
               },
               { name: "무료", value: ShipmentChargeType.Free },
             ]}
