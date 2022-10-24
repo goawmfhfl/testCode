@@ -311,7 +311,6 @@ const SaveBar = () => {
         [
           !isDiscounted && "discountAmount",
           !isDiscounted && "discountMethod",
-          !isDiscounted && "discountAppliedPrice",
           !isDiscounted && "startDiscountDate",
           !isDiscounted && "endDiscountDate",
           !hasRequiredOption && !hasSelectiveOption && "optionCombinations",
@@ -330,7 +329,6 @@ const SaveBar = () => {
         ],
         [
           !isDiscounted && "discountAmount",
-          !isDiscounted && "discountAppliedPrice",
           hasRequiredOption && "quantity",
           isShipmentPriceFree && "shipmentPrice",
         ]

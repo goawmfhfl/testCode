@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components/macro";
 import {
   useFormContext,
   Controller,
-  ControllerFieldState,
   ControllerRenderProps,
 } from "react-hook-form";
 
@@ -18,36 +17,14 @@ import {
   DISCOUNT_OPTION,
   DISCOUNT_STARTS_AT,
   DISCOUNT_ENDS_AT,
-  discountAppliedPriceVar,
   HAS_DISCOUNT_SPAN,
   IS_DISCOUNTED,
 } from "@cache/productRegistration/index";
 import { DiscountMethod } from "@models/productRegistration";
-import { useReactiveVar } from "@apollo/client";
+import { getDiscountedPrice } from "@utils/productRegistration";
 
 const ProductDiscount = () => {
   const { register, watch, control, getValues } = useFormContext();
-  const discountAppliedPrice = useReactiveVar(discountAppliedPriceVar);
-
-  function getDiscountedPrice(
-    originalPrice: number,
-    discountAmount: number,
-    discountOption: string
-  ): string {
-    if (!discountAmount) {
-      return "-";
-    }
-
-    if (discountOption === "PERCENT") {
-      return String(originalPrice - originalPrice * discountAmount * 0.01);
-    }
-
-    if (discountOption === "WON") {
-      return String(originalPrice - discountAmount);
-    }
-
-    return String(originalPrice);
-  }
 
   const isDiscounted = watch(IS_DISCOUNTED) as boolean;
   const productPrice = watch(PRODUCT_PRICE) as string;
@@ -56,18 +33,6 @@ const ProductDiscount = () => {
   const hasDiscountSpan = watch(HAS_DISCOUNT_SPAN) as boolean;
   const discountStartsAt = watch(DISCOUNT_STARTS_AT) as boolean;
   const discountEndsAt = watch(DISCOUNT_ENDS_AT) as boolean;
-
-  useEffect(() => {
-    if (discountAmount) {
-      discountAppliedPriceVar(
-        getDiscountedPrice(
-          Number(productPrice),
-          Number(discountAmount),
-          discountOption
-        )
-      );
-    }
-  }, [productPrice, discountAmount, discountOption]);
 
   return (
     <Container>
@@ -213,7 +178,11 @@ const ProductDiscount = () => {
         <PriceWrapper>
           {isDiscounted &&
             discountAmount &&
-            `${discountAppliedPrice.toLocaleString()}원`}
+            `${getDiscountedPrice(
+              Number(productPrice),
+              Number(discountAmount),
+              discountOption
+            ).toLocaleString()}원`}
         </PriceWrapper>
         {hasDiscountSpan && (
           <DiscountTimespanNotification>

@@ -5,6 +5,7 @@ import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
 import ContentsHeader from "@components/common/ContentsHeader";
 import Button from "@components/common/Button";
+import { getDiscountedPrice } from "@utils/productRegistration";
 
 const GET_ALL_PRODUCTS_BY_SELLER = gql`
   query GetAllProductsBySeller($input: GetAllProductsBySellerInput!) {
@@ -23,7 +24,6 @@ const GET_ALL_PRODUCTS_BY_SELLER = gql`
         originalPrice
         discountAmount
         discountMethod
-        discountAppliedPrice
         quantity
         status
       }
@@ -45,7 +45,6 @@ const Product = () => {
           originalPrice: number;
           discountMethod: string;
           discountAmount: number;
-          discountAppliedPrice: number;
           quantity: number;
           status: string;
         }>;
@@ -112,7 +111,6 @@ const Product = () => {
                   originalPrice,
                   discountMethod,
                   discountAmount,
-                  discountAppliedPrice,
                   quantity,
                   status,
                 }) => {
@@ -126,7 +124,13 @@ const Product = () => {
                           discountAmount &&
                           `${discountAmount} ${discountMethod}`}
                       </td>
-                      <td>{discountAppliedPrice}</td>
+                      <td>
+                        {getDiscountedPrice(
+                          Number(originalPrice),
+                          Number(discountAmount),
+                          discountMethod
+                        )}
+                      </td>
                       <td>{quantity}</td>
                       <td>{status}</td>
                     </tr>

@@ -79,37 +79,21 @@ export enum DiscountMethod {
 }
 
 export interface TemporarySaveProductInputType {
-  // 상품명
   name: string;
-
-  // 카테고리
   categoryName: CategoryName;
-
-  // 대표사진
   uploadedFileInfos: Array<UploadedFileInfos>;
-
-  // 상품설명
   description: string;
-
-  // 상품컬러
   colors: Array<{
     name: ColorType;
   }>;
-
-  // 판매가
   originalPrice: number;
-
-  // 할인
   discountAmount: number;
   discountMethod: string;
   startDiscountDate: Date;
   endDiscountDate: Date;
-  discountAppliedPrice: number;
 
-  // 재고
   quantity: number;
 
-  // 옵션 (필수 + 선택)
   optionCombinations: Array<{
     components: Array<{ name: string; value: string }>;
     price: number;
@@ -117,13 +101,11 @@ export interface TemporarySaveProductInputType {
     isRequired: boolean;
   }>;
 
-  // 주문 후 제작 여부
   manufacturingLeadTime: {
     min: number;
     max: number;
   };
 
-  // 배송 설정
   shipmentId?: number;
   isBundleShipment?: boolean;
   shipmentType?: ShipmentChargeType;
@@ -132,7 +114,6 @@ export interface TemporarySaveProductInputType {
   shipmentReturnPrice?: number;
   shipmentExchangePrice?: number;
 
-  // 작품정보제공고시
   specName: string;
   material: string;
   size: string;
@@ -141,7 +122,6 @@ export interface TemporarySaveProductInputType {
   authorization: string;
   personInCharge: string;
 
-  // 검색용 태그 설정
   tagInfos: Array<{
     name: string;
     isExposed: boolean;
@@ -149,51 +129,33 @@ export interface TemporarySaveProductInputType {
 }
 
 export interface CreateProductInputType {
-  // 상품명
   name: string;
-
-  // 카테고리
   categoryName: CategoryName;
-
-  // 대표사진
   uploadedFileInfos: Array<UploadedFileInfos>;
-
-  // 상품설명
   description: string;
-
-  // 상품컬러
   colors: Array<{
     name: ColorType;
   }>;
-
-  // 판매가
   originalPrice: number;
-
-  // 할인
   discountAmount: number;
   discountMethod: string;
   startDiscountDate: Date;
   endDiscountDate: Date;
-  discountAppliedPrice: number;
 
-  // 재고
   quantity: number;
 
-  // 옵션 (필수 + 선택)
   optionCombinations: Array<{
-    name: Array<{ name: string; value: string }>;
+    components: Array<{ name: string; value: string }>;
     price: number;
     quantity: number;
     isRequired: boolean;
   }>;
 
-  // 주문 후 제작 여부
   manufacturingLeadTime: {
     min: number;
     max: number;
   };
 
-  // 배송 설정
   shipmentId?: number;
   isBundleShipment?: boolean;
   shipmentType?: ShipmentChargeType;
@@ -202,7 +164,6 @@ export interface CreateProductInputType {
   shipmentReturnPrice?: number;
   shipmentExchangePrice?: number;
 
-  // 작품정보제공고시
   specName: string;
   material: string;
   size: string;
@@ -211,7 +172,6 @@ export interface CreateProductInputType {
   authorization: string;
   personInCharge: string;
 
-  // 검색용 태그 설정
   tagInfos: Array<{
     name: string;
     isExposed: boolean;

@@ -35,7 +35,6 @@ import {
   PRECAUTION,
   AUTHORIZATION,
   PERSON_IN_CHARGE,
-  discountAppliedPriceVar,
   HAS_TAG_INFOS,
 } from "@cache/productRegistration";
 
@@ -132,9 +131,6 @@ export function restructureProductRegistrationStates(
     discountMethod: isDiscounted ? discountMethod : null,
     startDiscountDate: isDiscounted ? new Date(startDiscountDate) : null,
     endDiscountDate: isDiscounted ? new Date(endDiscountDate) : null,
-    discountAppliedPrice: isDiscounted
-      ? Number(discountAppliedPriceVar())
-      : null,
     quantity: Number(quantity),
     optionCombinations:
       !hasRequiredOption && !hasSelectiveOption ? null : productOptions,
@@ -255,4 +251,24 @@ function getTagInfos(): Array<{ name: string; isExposed: boolean }> {
   });
 
   return tagInfos;
+}
+
+export function getDiscountedPrice(
+  originalPrice: number,
+  discountAmount: number,
+  discountOption: string
+): string {
+  if (!discountAmount) {
+    return "-";
+  }
+
+  if (discountOption === "PERCENT") {
+    return String(originalPrice - originalPrice * discountAmount * 0.01);
+  }
+
+  if (discountOption === "WON") {
+    return String(originalPrice - discountAmount);
+  }
+
+  return String(originalPrice);
 }
