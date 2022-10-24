@@ -14,7 +14,7 @@ jobs:
       - name: Use Node.js 16
         uses: actions/setup-node@v2
         with:
-          node-version: 16.x
+          node-version: 16.15.0
 
       # 실행 속도를 빠르게 하기 위해 설치된 Node 모듈을 캐시하도록 설정
       - name: Cache node modules
