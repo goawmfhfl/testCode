@@ -70,7 +70,6 @@ const ShipmentSettings = () => {
                   {
                     name: "유료",
                     value: ShipmentChargeType.Charged,
-                    selected: true,
                   },
                   {
                     name: "무료",

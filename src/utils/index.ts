@@ -339,10 +339,6 @@ function isElementOverflown(element: HTMLDivElement | null): void | boolean {
   return element?.scrollHeight > element?.clientHeight;
 }
 
-function getDiscountRate(originalPrice: number, discountAmount: number) {
-  return Math.floor((discountAmount / originalPrice) * 100);
-}
-
 export {
   addImageOnServer,
   removeImageFromServer,
@@ -354,5 +350,4 @@ export {
   validatePhoneNumber,
   hasEveryInputFulfilled,
   isElementOverflown,
-  getDiscountRate,
 };

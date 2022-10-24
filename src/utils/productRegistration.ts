@@ -55,12 +55,10 @@ import { tagListVar } from "@cache/productRegistration/searchTag";
 import {
   CategoryName,
   ColorType,
-  DiscountMethod,
   UploadedFileInfos,
 } from "@models/productRegistration/index";
 
 import { TagTypes } from "@models/productRegistration/searchTag";
-
 import {
   ShipmentChargeType,
   CreateShipmentInputType,
@@ -74,11 +72,11 @@ export function restructureProductRegistrationStates(
   const name = watch(TITLE) as string;
   const description = watch(PRODUCT_DESCRIPTION) as string;
   const colors = (watch(PRODUCT_COLOR) as Array<ColorType>) || [];
-  const originalPrice = watch(PRODUCT_PRICE) as number;
+  const originalPrice = watch(PRODUCT_PRICE) as string;
 
   const isDiscounted = watch(IS_DISCOUNTED) as boolean;
-  const discountAmount = watch(DISCOUNT_AMOUNT) as number;
-  const discountOption = watch(DISCOUNT_OPTION) as DiscountMethod;
+  const discountAmount = watch(DISCOUNT_AMOUNT) as string;
+  const discountMethod = watch(DISCOUNT_OPTION) as string;
   const startDiscountDate = watch(DISCOUNT_STARTS_AT) as string;
   const endDiscountDate = watch(DISCOUNT_ENDS_AT) as string;
 
@@ -129,9 +127,8 @@ export function restructureProductRegistrationStates(
     description,
     colors: colors.map((color) => ({ name: color })),
     originalPrice: Number(originalPrice),
-    discountAmount: isDiscounted
-      ? convertDiscountedAmount(originalPrice, discountAmount, discountOption)
-      : null,
+    discountAmount: isDiscounted ? Number(discountAmount) : null,
+    discountMethod: isDiscounted ? discountMethod : null,
     startDiscountDate: isDiscounted ? new Date(startDiscountDate) : null,
     endDiscountDate: isDiscounted ? new Date(endDiscountDate) : null,
     quantity: Number(quantity),
@@ -256,16 +253,22 @@ function getTagInfos(): Array<{ name: string; isExposed: boolean }> {
   return tagInfos;
 }
 
-export function convertDiscountedAmount(
+export function getDiscountedPrice(
   originalPrice: number,
   discountAmount: number,
-  discountMethod: DiscountMethod
-): number {
-  if (discountMethod === DiscountMethod.WON) {
-    return discountAmount;
+  discountOption: string
+): string {
+  if (!discountAmount) {
+    return "-";
   }
 
-  if (discountMethod === DiscountMethod.PERCENT) {
-    return originalPrice * discountAmount * 0.01;
+  if (discountOption === "PERCENT") {
+    return String(originalPrice - originalPrice * discountAmount * 0.01);
   }
+
+  if (discountOption === "WON") {
+    return String(originalPrice - discountAmount);
+  }
+
+  return String(originalPrice);
 }

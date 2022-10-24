@@ -310,6 +310,7 @@ const SaveBar = () => {
         input,
         [
           !isDiscounted && "discountAmount",
+          !isDiscounted && "discountMethod",
           !isDiscounted && "startDiscountDate",
           !isDiscounted && "endDiscountDate",
           !hasRequiredOption && !hasSelectiveOption && "optionCombinations",
