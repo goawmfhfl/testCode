@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import styled from "styled-components/macro";
 import { useFormContext, UseFormRegisterReturn } from "react-hook-form";
 
@@ -36,7 +37,13 @@ const Dropdown = ({
   disabled?: boolean;
 }) => {
   return (
-    <Select register={register} size={size} width={width} disabled={disabled}>
+    <Select
+      register={register}
+      size={size}
+      width={width}
+      disabled={disabled}
+      defaultValue={options.find((el) => el.selected).value}
+    >
       {options.map(({ name, value }) => {
         return (
           <Option key={`${name}`} value={value}>
@@ -54,18 +61,24 @@ const Select = ({
   children,
   register,
   disabled,
+  defaultValue,
 }: {
   size: string;
   width?: string;
   children: React.ReactNode;
   register: UseFormRegisterReturn;
   disabled?: boolean;
+  defaultValue: string | number | Array<string>;
 }) => {
   const downwardArrowSrc: string = arrowSet[size as keyof arrowSetType];
 
-  const { watch } = useFormContext();
+  const { watch, setValue } = useFormContext();
 
   const inputName = register.name;
+
+  useEffect(() => {
+    setValue(inputName, defaultValue);
+  }, []);
 
   return (
     <SelectInput
