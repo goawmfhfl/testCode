@@ -21,15 +21,15 @@ import {
   IS_DISCOUNTED,
 } from "@cache/productRegistration/index";
 import { DiscountMethod } from "@models/productRegistration";
-import { getDiscountedPrice } from "@utils/productRegistration";
+import { convertDiscountedAmount } from "@utils/productRegistration";
 
 const ProductDiscount = () => {
   const { register, watch, control, getValues } = useFormContext();
 
   const isDiscounted = watch(IS_DISCOUNTED) as boolean;
-  const productPrice = watch(PRODUCT_PRICE) as string;
-  const discountOption = watch(DISCOUNT_OPTION) as string;
-  const discountAmount = watch(DISCOUNT_AMOUNT) as string;
+  const productPrice = watch(PRODUCT_PRICE) as number;
+  const discountAmount = watch(DISCOUNT_AMOUNT) as number;
+  const discountMethod = watch(DISCOUNT_OPTION) as DiscountMethod;
   const hasDiscountSpan = watch(HAS_DISCOUNT_SPAN) as boolean;
   const discountStartsAt = watch(DISCOUNT_STARTS_AT) as boolean;
   const discountEndsAt = watch(DISCOUNT_ENDS_AT) as boolean;
@@ -53,7 +53,7 @@ const ProductDiscount = () => {
             size={"medium"}
             // eslint-disable-next-line
             options={[
-              { name: "%", value: DiscountMethod.PERCENT },
+              { name: "%", value: DiscountMethod.PERCENT, selected: true },
               { name: "₩", value: DiscountMethod.WON },
             ]}
             register={register(DISCOUNT_OPTION)}
@@ -178,10 +178,13 @@ const ProductDiscount = () => {
         <PriceWrapper>
           {isDiscounted &&
             discountAmount &&
-            `${getDiscountedPrice(
-              Number(productPrice),
-              Number(discountAmount),
-              discountOption
+            `${(
+              productPrice -
+              convertDiscountedAmount(
+                productPrice,
+                discountAmount,
+                discountMethod
+              )
             ).toLocaleString()}원`}
         </PriceWrapper>
         {hasDiscountSpan && (
