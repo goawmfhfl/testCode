@@ -90,6 +90,18 @@ interface LocationType {
   state: { productId: number | null };
 }
 
+import {
+  GET_PRODUCTS_BY_ID,
+  GetProductsByIdType,
+  GetProductsByIdInputType,
+} from "@graphql/queries/getProductsById";
+
+import { CreateProductInputType } from "@models/productRegistration/index";
+
+interface LocationType {
+  state: { productId: number | null };
+}
+
 const ProductRegistration = () => {
   const updatedProductRegistrationStates = useReactiveVar(
     updatedProductRegistrationStatesVar

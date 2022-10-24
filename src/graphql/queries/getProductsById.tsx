@@ -39,7 +39,6 @@ export const GET_PRODUCTS_BY_ID = gql`
           min
           max
         }
-
         specName
         material
         weight
@@ -48,7 +47,6 @@ export const GET_PRODUCTS_BY_ID = gql`
         precaution
         authorization
         personInCharge
-
         thumbnail
         isExclusive
         isBmarket
