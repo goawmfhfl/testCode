@@ -361,7 +361,6 @@ const Product = () => {
                       originalPrice,
                       discountMethod,
                       discountAmount,
-                      discountAppliedPrice,
                       quantity,
                       status,
                       thumbnail,
@@ -369,9 +368,9 @@ const Product = () => {
                     },
                     index
                   ) => {
-                    const discountAppliedPriceToWonSign = discountAppliedPrice
-                      ? `${discountAppliedPrice.toLocaleString("ko-KR")} ₩`
-                      : "-";
+                    // const discountAppliedPriceToWonSign = discountAppliedPrice
+                    //   ? `${discountAppliedPrice.toLocaleString("ko-KR")} ₩`
+                    //   : "-";
 
                     const firstCategory = category?.parent?.name
                       ? category.parent.name
@@ -451,7 +450,7 @@ const Product = () => {
                           width={tableData[8].width}
                           className={tableData[8].className}
                         >
-                          {discountAppliedPriceToWonSign}
+                          {/* {discountAppliedPriceToWonSign} */}
                         </ProductManageMentTd>
                         <ProductManageMentTd
                           width={tableData[9].width}
