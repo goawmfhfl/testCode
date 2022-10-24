@@ -89,7 +89,6 @@ export interface TemporarySaveProductInputType {
   }>;
   originalPrice: number;
   discountAmount: number;
-  discountMethod: string;
   startDiscountDate: Date;
   endDiscountDate: Date;
 
@@ -140,7 +139,6 @@ export interface CreateProductInputType {
   }>;
   originalPrice: number;
   discountAmount: number;
-  discountMethod: string;
   startDiscountDate: Date;
   endDiscountDate: Date;
   quantity: number;

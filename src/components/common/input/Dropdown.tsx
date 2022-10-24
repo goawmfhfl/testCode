@@ -4,6 +4,7 @@ import { useFormContext, UseFormRegisterReturn } from "react-hook-form";
 
 import downwordArrowMedium from "@icons/arrow-downward-medium.svg";
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
+import { useEffect } from "react";
 
 interface arrowSetType {
   small: string;
