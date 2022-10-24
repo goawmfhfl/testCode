@@ -5,7 +5,7 @@ import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
 import ContentsHeader from "@components/common/ContentsHeader";
 import Button from "@components/common/Button";
-import { getDiscountRate } from "@utils/index";
+import { getDiscountedPrice } from "@utils/productRegistration";
 
 const GET_ALL_PRODUCTS_BY_SELLER = gql`
   query GetAllProductsBySeller($input: GetAllProductsBySellerInput!) {
@@ -23,6 +23,7 @@ const GET_ALL_PRODUCTS_BY_SELLER = gql`
         }
         originalPrice
         discountAmount
+        discountMethod
         quantity
         status
       }
@@ -42,6 +43,7 @@ const Product = () => {
           id: number;
           name: string;
           originalPrice: number;
+          discountMethod: string;
           discountAmount: number;
           quantity: number;
           status: string;
@@ -107,6 +109,7 @@ const Product = () => {
                   id,
                   name,
                   originalPrice,
+                  discountMethod,
                   discountAmount,
                   quantity,
                   status,
@@ -117,11 +120,16 @@ const Product = () => {
                       <td>{name}</td>
                       <td>{originalPrice}</td>
                       <td>
-                        {discountAmount &&
-                          `${getDiscountRate(originalPrice, discountAmount)} %`}
+                        {discountMethod &&
+                          discountAmount &&
+                          `${discountAmount} ${discountMethod}`}
                       </td>
                       <td>
-                        {(originalPrice - discountAmount).toLocaleString()}
+                        {getDiscountedPrice(
+                          Number(originalPrice),
+                          Number(discountAmount),
+                          discountMethod
+                        )}
                       </td>
                       <td>{quantity}</td>
                       <td>{status}</td>
