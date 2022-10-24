@@ -63,8 +63,6 @@ const Pagination = () => {
     setPageList(newPageList);
   }, [paginationSkip, pageNumberList]);
 
-  console.log("pageList", pageList);
-
   return (
     <Container>
       <DoubleLeftButton

@@ -22,6 +22,8 @@ import {
   getProductBySellerVar,
 } from "@cache/ProductManagement";
 
+import { Link } from "react-router-dom";
+
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
 import ContentsHeader from "@components/common/ContentsHeader";
@@ -187,7 +189,6 @@ const Product = () => {
                     getProductBySellerVar(
                       products.map((list) => ({ ...list, isChecked: false }))
                     );
-
                     checkAllBoxStatusVar(false);
                     selectedProductListVar([]);
 
@@ -378,7 +379,6 @@ const Product = () => {
                     const thirdCategory = category?.children?.name
                       ? category.children.name
                       : "-";
-
                     const rateOfDiscount =
                       discountMethod &&
                       discountAmount &&
@@ -413,7 +413,14 @@ const Product = () => {
                           <ProductThumbNailWrapper>
                             <ProductThumbNail src={thumbnail} />
                           </ProductThumbNailWrapper>
-                          <ProductName>{name}</ProductName>
+                          <ProductName>
+                            <Link
+                              to={`/product/${id}`}
+                              state={{ productId: id }}
+                            >
+                              {name}
+                            </Link>
+                          </ProductName>
                         </ProductManageMentTd>
                         <ProductManageMentTd
                           width={tableData[3].width}

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 import { useReactiveVar } from "@apollo/client";
 
@@ -31,12 +31,13 @@ function App() {
           <Route path="oauth" element={<OAuth />}>
             <Route path=":oauthProvider" element={<OAuth />} />
           </Route>
-          <Route path="/shop/settings" element={<ShopSetting />} />
+          <Route path="/shop/settings/" element={<ShopSetting />} />
           <Route path="/product" element={<ProductManagement />} />
           <Route
             path="/product/registration"
             element={<ProductRegistration />}
           />
+          <Route path="/product/:id" element={<ProductRegistration />} />
         </Routes>
       </ThemeProvider>
     </BrowserRouter>
