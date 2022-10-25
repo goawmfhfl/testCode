@@ -24,7 +24,6 @@ export interface ProductsListVarType {
   };
   originalPrice: number;
   discountAmount: number | null;
-  discountAppliedPrice: number | null;
   discountMethod: string | null;
   status: string;
   thumbnail: string;

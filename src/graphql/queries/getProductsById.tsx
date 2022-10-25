@@ -30,6 +30,7 @@ export const GET_PRODUCTS_BY_ID = gql`
         }
         originalPrice
         discountAmount
+        discountMethod
         startDiscountDate
         endDiscountDate
         quantity

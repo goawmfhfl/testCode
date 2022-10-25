@@ -61,7 +61,6 @@ export const CATEGORIES: CategoryType = {
       CategoryName.JEWELLERY,
       CategoryName.BAG_POUCH,
       CategoryName.WEAR_ACC_ETC,
-      CategoryName.NATURE,
     ],
   },
   CATEGORY_THIRD: {
@@ -107,7 +106,6 @@ export const categoryMapper: { [key: string]: string } = {
   JEWELLERY: "쥬얼리",
   BAG_POUCH: "가방/파우치",
   WEAR_ACC_ETC: "WEAR_ACC/기타",
-  NATURE: "자연",
 };
 
 export enum SHOP_SETTING_SECTIONS {

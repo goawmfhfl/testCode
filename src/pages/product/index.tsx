@@ -1,6 +1,8 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { useLazyQuery, useMutation, useReactiveVar } from "@apollo/client";
+
 import {
   GET_ALL_PRODUCTS_BY_SELLER,
   GetAllProductsBySellerType,
@@ -16,13 +18,9 @@ import {
   showHasServerErrorModal,
   filterOptionPageNumberVar,
 } from "@cache/ProductManagement";
-import { systemModalVar } from "@cache/index";
-import {
-  ProductsListVarType,
-  getProductBySellerVar,
-} from "@cache/ProductManagement";
 
-import { Link } from "react-router-dom";
+import { systemModalVar } from "@cache/index";
+import { getProductBySellerVar } from "@cache/ProductManagement";
 
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
@@ -94,6 +92,7 @@ const Product = () => {
         query: filterOptionQuery,
       },
     },
+    fetchPolicy: "no-cache",
   });
 
   const [updateProductsStatus] = useMutation<
@@ -189,6 +188,7 @@ const Product = () => {
                     getProductBySellerVar(
                       products.map((list) => ({ ...list, isChecked: false }))
                     );
+
                     checkAllBoxStatusVar(false);
                     selectedProductListVar([]);
 
@@ -359,7 +359,6 @@ const Product = () => {
                       name,
                       category,
                       originalPrice,
-                      discountMethod,
                       discountAmount,
                       quantity,
                       status,
@@ -379,12 +378,14 @@ const Product = () => {
                     const thirdCategory = category?.children?.name
                       ? category.children.name
                       : "-";
+
                     const rateOfDiscount =
-                      discountMethod &&
-                      discountAmount &&
-                      `${discountAmount.toLocaleString("ko-KR")} ${
-                        discountMethod === "PERCENT" ? "%" : "₩"
-                      }`;
+                      discountMethod && discountAmount
+                        ? `${discountAmount.toLocaleString("ko-KR")} ${
+                            discountMethod === "PERCENT" ? "%" : "₩"
+                          }`
+                        : "-";
+
                     const originalPriceToWonSign = `${originalPrice.toLocaleString(
                       "ko-KR"
                     )} ₩`;

@@ -59,6 +59,8 @@ export const GET_ALL_PRODUCTS_BY_SELLER = gql`
         originalPrice
         discountAmount
         discountMethod
+        discountAmount
+        originalPrice
         quantity
         thumbnail
         status

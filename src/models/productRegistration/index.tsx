@@ -117,6 +117,7 @@ export interface TemporarySaveProductInputType {
 
   specName: string;
   material: string;
+  weight: string;
   size: string;
   manufacturer: string;
   precaution: string;
@@ -167,6 +168,7 @@ export interface CreateProductInputType {
 
   specName: string;
   material: string;
+  weight: string;
   size: string;
   manufacturer: string;
   precaution: string;
