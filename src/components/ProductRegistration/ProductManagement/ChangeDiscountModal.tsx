@@ -6,10 +6,9 @@ import {
   Controller,
   ControllerRenderProps,
 } from "react-hook-form";
+import { useMutation, useReactiveVar, useLazyQuery } from "@apollo/client";
 import { modalVar, systemModalVar } from "@cache/index";
 
-import TextInput from "@components/common/input/TextInput";
-import Dropdown from "@components/common/input/Dropdown";
 import {
   DISCOUNT_AMOUNT,
   DISCOUNT_ENDS_AT,
@@ -18,9 +17,13 @@ import {
   HAS_DISCOUNT_SPAN,
 } from "@cache/productRegistration";
 import { DiscountMethod } from "@models/productRegistration";
+import TextInput from "@components/common/input/TextInput";
+import Dropdown from "@components/common/input/Dropdown";
 import Checkbox from "@components/common/input/Checkbox";
+import Button from "@components/common/Button";
 import DateInput from "@components/common/input/DateInput";
-import { useMutation, useReactiveVar, useLazyQuery } from "@apollo/client";
+import NoticeContainer from "@components/common/NoticeContainer";
+
 import {
   ChangeProductsInfoInputType,
   ChangeProductsInfoType,
@@ -42,6 +45,9 @@ import {
   GetAllProductsBySellerInputType,
   GetAllProductsBySellerType,
 } from "@graphql/queries/getAllProductsBySeller";
+
+import closeIconSource from "@icons/delete.svg";
+import exclamationmarkSrc from "@icons/exclamationmark.svg";
 
 const ChangeDiscountModal = () => {
   const method = useForm({
@@ -239,15 +245,18 @@ const ChangeDiscountModal = () => {
   return (
     <FormProvider {...method}>
       <Container>
-        <CloseButton onClick={handleCloseButtonClick}>X</CloseButton>
+        <CloseButton onClick={handleCloseButtonClick} src={closeIconSource} />
         <Title>할인율 변경하기</Title>
-        <Notice>상품 다중 선택 후 할인율 변경시 일괄 변경됩니다.</Notice>
+        <NoticeContainer icon={exclamationmarkSrc} width={"305px"}>
+          상품 다중 선택 후 할인율 변경시 일괄 변경됩니다.
+        </NoticeContainer>
         <InputContainer>
           <Label>할인율</Label>
           <TextInput
             register={register(DISCOUNT_AMOUNT)}
             numbersOnly={true}
             placeholder={"숫자만 입력"}
+            width={"112px"}
           />
           <DropdownWrapper>
             <Dropdown
@@ -370,8 +379,16 @@ const ChangeDiscountModal = () => {
         </CalendarContainer>
 
         <ButtonContainer>
-          <Button onClick={updateDiscountClick}>확인</Button>
-          <Button onClick={handleCloseButtonClick}>취소</Button>
+          <StyledButton
+            size={"small"}
+            className={"positive"}
+            onClick={updateDiscountClick}
+          >
+            확인
+          </StyledButton>
+          <Button size={"small"} onClick={handleCloseButtonClick}>
+            취소
+          </Button>
         </ButtonContainer>
       </Container>
     </FormProvider>
@@ -379,54 +396,68 @@ const ChangeDiscountModal = () => {
 };
 
 const Container = styled.div`
-  padding: 1rem;
-  background-color: #f8ede3;
-`;
+  position: relative;
 
-const CloseButton = styled.div`
-  padding: 1rem;
-  background-color: #dfd3c3;
-`;
-
-const Title = styled.div`
-  padding: 1rem;
-  background-color: #d0b8a8;
-`;
-
-const Notice = styled.div`
-  padding: 1rem;
-  background-color: #7d6e83;
-`;
-
-const ButtonContainer = styled.div`
-  padding: 1rem;
-  background-color: #f8ede3;
   display: flex;
+  flex-direction: column;
+
+  padding: 40px 24px 24px 24px;
+  background-color: ${({ theme: { palette } }) => palette.white};
 `;
 
-const Button = styled.div`
-  padding: 1rem;
-  background-color: #dfd3c3;
+const CloseButton = styled.img`
+  position: absolute;
+  top: 12.79px;
+  right: 12.77px;
+
+  width: 24px;
+  height: 24px;
+
+  cursor: pointer;
+`;
+
+const Title = styled.h2`
+  margin-bottom: 24px;
+
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: -0.015em;
 `;
 
 const InputContainer = styled.div`
   display: flex;
   align-items: center;
 
+  margin-top: 34px;
+
   font-family: "Spoqa Han Sans Neo";
-  font-style: normal;
-  font-weight: 400;
   font-size: 13px;
+  font-weight: 400;
   line-height: 18px;
+  letter-spacing: 0.10000000149011612px;
+  text-align: left;
 `;
-const Label = styled.div``;
+const Label = styled.span`
+  width: 80px;
+
+  font-family: "Spoqa Han Sans Neo";
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.10000000149011612px;
+  text-align: left;
+`;
 
 const DropdownWrapper = styled.div`
   margin-left: 16px;
   margin-right: 8px;
 `;
 
-const DiscountSpanCheckbox = styled(Checkbox)``;
+const DiscountSpanCheckbox = styled(Checkbox)`
+  margin-left: 24px;
+  margin-right: 8px;
+`;
 
 const CalendarContainer = styled.div`
   display: flex;
@@ -447,6 +478,19 @@ const StartAt = styled(DateInput)`
 
 const EndAt = styled(DateInput)<{
   inputRef: React.RefCallback<HTMLInputElement>;
-}>``;
+}>`
+  margin-left: 16px;
+  width: 112px;
+`;
+
+const ButtonContainer = styled.div`
+  margin-top: 32px;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const StyledButton = styled(Button)`
+  margin-right: 16px;
+`;
 
 export default ChangeDiscountModal;
