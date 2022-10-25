@@ -5,10 +5,7 @@ import questionMarkSrc from "@icons/questionmark.svg";
 import Button from "@components/common/Button";
 import {
   filterOptionStatusVar,
-  filterOptionQueryVar,
-  temporaryQueryVar,
   getProductBySellerVar,
-  filterOptionPageNumberVar,
 } from "@cache/ProductManagement";
 import { useNavigate } from "react-router-dom";
 import {
@@ -17,15 +14,14 @@ import {
   GetAllProductsStatusBySellerInPutType,
 } from "@graphql/queries/getAllProductsBySeller";
 import { useEffect, useState } from "react";
-import { paginationSkipVar, systemModalVar } from "@cache/index";
+import { systemModalVar } from "@cache/index";
 
 const FilterBar = () => {
   const navigate = useNavigate();
 
-  const query = useReactiveVar(filterOptionQueryVar);
-  const filterOptionStatus = useReactiveVar(filterOptionStatusVar);
-
   const productList = useReactiveVar(getProductBySellerVar);
+
+  const filterOptionStatus = useReactiveVar(filterOptionStatusVar);
 
   const [totalPageLength, setTotalPageLength] = useState<{
     onSaleProducutsLength: number;
@@ -46,9 +42,6 @@ const FilterBar = () => {
   const changeFilterOptionNameClick =
     (filterOptionName: string | null) => () => {
       filterOptionStatusVar(filterOptionName);
-      temporaryQueryVar(query);
-      filterOptionPageNumberVar(1);
-      paginationSkipVar(0);
     };
 
   const handleButtonClick = () => {
