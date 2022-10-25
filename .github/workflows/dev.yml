@@ -25,7 +25,29 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-build-
             ${{ runner.OS }}-
-
+      - name: Generate env file
+        run: |
+          echo "REACT_APP_SERVER_URI" >> .env
+          echo "REACT_APP_OAUTH_GOOGLE_CLIENT_ID" >> .env
+          echo "REACT_APP_OAUTH_GOOGLE_CLIENT_PASSWORD" >> .env
+          echo "REACT_APP_KAKAO_JAVASCRIPT_KEY" >> .env
+          echo "REACT_APP_DATAHUB_API_URL_DEV" >> .env
+          echo "REACT_APP_BUSINESS_AUTHENTICATION_API_KEY" >> .env
+          echo "REACT_APP_DATA_API_KEY" >> .env
+          echo "REACT_APP_BIZM_PROFILE" >> .env
+          echo "REACT_APP_BIZM_PRODUCT_URL" >> .env
+          echo "REACT_APP_ECOLIFE_API_KEY" >> .env
+        env:
+          REACT_APP_SERVER_URI: ${{ secrets.REACT_APP_SERVER_URI }}
+          REACT_APP_OAUTH_GOOGLE_CLIENT_ID: ${{ secrets.REACT_APP_OAUTH_GOOGLE_CLIENT_ID }}
+          REACT_APP_OAUTH_GOOGLE_CLIENT_PASSWORD: ${{ secrets.REACT_APP_OAUTH_GOOGLE_CLIENT_PASSWORD }}
+          REACT_APP_KAKAO_JAVASCRIPT_KEY: ${{ secrets.REACT_APP_KAKAO_JAVASCRIPT_KEY }}
+          REACT_APP_DATAHUB_API_URL_DEV: ${{ secrets.REACT_APP_DATAHUB_API_URL_DEV }}
+          REACT_APP_BUSINESS_AUTHENTICATION_API_KEY: ${{ secrets.REACT_APP_BUSINESS_AUTHENTICATION_API_KEY }}
+          REACT_APP_DATA_API_KEY: ${{ secrets.REACT_APP_DATA_API_KEY }}
+          REACT_APP_BIZM_PROFILE: ${{ secrets.REACT_APP_BIZM_PROFILE }}
+          REACT_APP_BIZM_PRODUCT_URL: ${{ secrets.REACT_APP_BIZM_PRODUCT_URL }}
+          REACT_APP_ECOLIFE_API_KEY: ${{ secrets.REACT_APP_ECOLIFE_API_KEY }}
       - name: Install Dependencies
         run: npm install
 
