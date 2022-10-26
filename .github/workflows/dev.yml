@@ -25,12 +25,23 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-build-
             ${{ runner.OS }}-
-
       - name: Install Dependencies
         run: npm install
 
       - name: Build
-        run: CI='' npm run build
+        run: npm run build
+        env:
+          CI: ""
+          REACT_APP_SERVER_URI: ${{secrets.REACT_APP_SERVER_URI}}
+          REACT_APP_OAUTH_GOOGLE_CLIENT_ID: ${{secrets.REACT_APP_OAUTH_GOOGLE_CLIENT_ID}}
+          REACT_APP_OAUTH_GOOGLE_CLIENT_PASSWORD: ${{secrets.REACT_APP_OAUTH_GOOGLE_CLIENT_PASSWORD}}
+          REACT_APP_KAKAO_JAVASCRIPT_KEY: ${{secrets.REACT_APP_KAKAO_JAVASCRIPT_KEY}}
+          REACT_APP_DATAHUB_API_URL_DEV: ${{secrets.REACT_APP_DATAHUB_API_URL_DEV}}
+          REACT_APP_BUSINESS_AUTHENTICATION_API_KEY: ${{secrets.REACT_APP_BUSINESS_AUTHENTICATION_API_KEY}}
+          REACT_APP_DATA_API_KEY: ${{secrets.REACT_APP_DATA_API_KEY}}
+          REACT_APP_BIZM_PROFILE: ${{secrets.REACT_APP_BIZM_PROFILE}}
+          REACT_APP_BIZM_PRODUCT_URL: ${{secrets.REACT_APP_BIZM_PRODUCT_URL}}
+          REACT_APP_ECOLIFE_API_KEY: ${{secrets.REACT_APP_ECOLIFE_API_KEY}}
 
       - name: Deploy
         env:
