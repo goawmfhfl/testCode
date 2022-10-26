@@ -46,15 +46,6 @@ import {
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
 
-  const [updateCategory] =
-    useMutation<ChangeProductsInfoType, ChangeProductsInfoInputType>(
-      CHANGE_PRODUCTS_INFO
-    );
-
-  const filterOptionPageNumber: number = useReactiveVar(
-    filterOptionPageNumberVar
-  );
-
   const filterOptionPageNumber: number = useReactiveVar(
     filterOptionPageNumberVar
   );
@@ -84,6 +75,8 @@ const ChangeCategoryModal = () => {
   const categoryDepthThird: Array<string> =
     (CATEGORIES.CATEGORY_THIRD[selectedSecondCategory] as Array<string>) || [];
 
+  const detailNotice = useReactiveVar(DetailNoticeVar);
+
   const [getProductList] = useLazyQuery<
     GetAllProductsBySellerType,
     GetAllProductsBySellerInputType
@@ -96,6 +89,7 @@ const ChangeCategoryModal = () => {
         query: filterQuery,
       },
     },
+    fetchPolicy: "no-cache",
   });
 
   const [updateCategory] = useMutation<

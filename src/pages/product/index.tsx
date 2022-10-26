@@ -17,6 +17,7 @@ import {
   filterOptionQueryVar,
   showHasServerErrorModal,
   filterOptionPageNumberVar,
+  ProductsListVarType,
 } from "@cache/ProductManagement";
 
 import { systemModalVar } from "@cache/index";
@@ -360,6 +361,7 @@ const Product = () => {
                       category,
                       originalPrice,
                       discountAmount,
+                      discountMethod,
                       quantity,
                       status,
                       thumbnail,
