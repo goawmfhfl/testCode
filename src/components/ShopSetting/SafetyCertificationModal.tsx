@@ -11,7 +11,7 @@ import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import { modalVar, systemModalVar } from "@cache/index";
 import { safetyCertificationVar } from "@cache/shopSettings";
-import AuthenticationLoader from "@components/ShopSetting/AuthenticationLoader";
+import AuthenticationLoader from "@components/shopSetting/AuthenticationLoader";
 import { Input as TextInput } from "@components/common/input/TextInput";
 
 interface parsedDataType {

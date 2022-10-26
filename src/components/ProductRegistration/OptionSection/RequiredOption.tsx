@@ -8,8 +8,8 @@ import { ProductRegistrationFormValues } from "@pages/product/registration";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Checkbox from "@components/common/input/Checkbox";
 import Button from "@components/common/Button";
-import OptionInput from "@components/ProductRegistration/OptionSection/OptionInput";
-import AdaptedOption from "@components/ProductRegistration/OptionSection/AdaptedOption";
+import OptionInput from "@components/productRegistration/OptionSection/OptionInput";
+import AdaptedOption from "@components/productRegistration/OptionSection/AdaptedOption";
 
 import { HAS_REQUIRED_OPTION } from "@cache/productRegistration/index";
 import { requiredOptionVar } from "@cache/productRegistration/productOptions";

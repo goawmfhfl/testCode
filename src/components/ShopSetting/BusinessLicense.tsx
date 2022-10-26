@@ -2,7 +2,7 @@ import styled from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
 import Button from "@components/common/Button";
-import BusinessLicenseModal from "@components/ShopSetting/BusinessLicenseModal";
+import BusinessLicenseModal from "@components/shopSetting/BusinessLicenseModal";
 
 import { modalVar } from "@cache/index";
 import { BusinessLicenseVariables } from "@models/shopSettings";

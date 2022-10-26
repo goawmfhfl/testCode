@@ -2,7 +2,7 @@ import styled from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
 import Button from "@components/common/Button";
-import SettlementAccountModal from "@components/ShopSetting/SettlementAccountModal";
+import SettlementAccountModal from "@components/shopSetting/SettlementAccountModal";
 
 import { modalVar } from "@cache/index";
 import { settlementAccountVar } from "@cache/shopSettings";

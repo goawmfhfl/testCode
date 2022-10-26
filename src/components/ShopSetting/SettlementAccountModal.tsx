@@ -11,7 +11,7 @@ import ValidText from "@components/common/ValidText";
 import { modalVar, systemModalVar } from "@cache/index";
 import { settlementAccountVar } from "@cache/shopSettings";
 import { isNumber } from "@utils/index";
-import AuthenticationLoader from "@components/ShopSetting/AuthenticationLoader";
+import AuthenticationLoader from "@components/shopSetting/AuthenticationLoader";
 
 const SettlementAccountModal = () => {
   const [accountInformation, setAccountInformation] = useState<{

@@ -7,7 +7,7 @@ import TextInput from "@components/common/input/TextInput";
 import Dropdown from "@components/common/input/Dropdown";
 import Radio from "@components/common/input/Radio";
 import Button from "@components/common/Button";
-import ShipmentChargeTemplateModal from "@components/ProductRegistration/ShipmentChargeTemplateModal";
+import ShipmentChargeTemplateModal from "@components/productRegistration/ShipmentChargeTemplateModal";
 
 import { modalVar } from "@cache/index";
 import {

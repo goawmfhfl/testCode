@@ -16,7 +16,7 @@ import {
   TextInputWrapper,
   ReturnExchangeFeeInputContainer,
   ShipmentChargeInputContainer,
-} from "@components/ProductRegistration/ShipmentChargeSection";
+} from "@components/productRegistration/ShipmentChargeSection";
 import closeIconSource from "@icons/close.svg";
 import downwordArrowMedium from "@icons/arrow-downward-medium.svg";
 import { hasEveryInputFulfilled } from "@utils/index";

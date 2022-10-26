@@ -4,7 +4,7 @@ import { useReactiveVar } from "@apollo/client";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
-import SafetyCertificationModal from "@components/ShopSetting/SafetyCertificationModal";
+import SafetyCertificationModal from "@components/shopSetting/SafetyCertificationModal";
 import { modalVar } from "@cache/index";
 import { safetyCertificationVar } from "@cache/shopSettings";
 

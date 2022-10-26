@@ -2,7 +2,7 @@ import styled from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
-import RegistrationNumberModal from "@components/ShopSetting/RegistrationNumberModal";
+import RegistrationNumberModal from "@components/shopSetting/RegistrationNumberModal";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
 

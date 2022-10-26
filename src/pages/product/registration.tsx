@@ -8,23 +8,23 @@ import ContentsSection from "@components/common/ContentsSection";
 import SectionWrapper from "@components/common/SectionWrapper";
 import NoticeContainer from "@components/common/NoticeContainer";
 
-import NameSection from "@components/ProductRegistration/NameSection";
-import CategorySection from "@components/ProductRegistration/CategorySection";
-import ImageSection from "@components/ProductRegistration/ImageSection/index";
-import ColorSection from "@components/ProductRegistration/ColorSection";
-import PriceSection from "@components/ProductRegistration/PriceSection";
-import DiscountSection from "@components/ProductRegistration/DiscountSection";
-import StockSection from "@components/ProductRegistration/StockSection";
-import RequiredOptionSection from "@components/ProductRegistration/OptionSection/RequiredOption";
-import SelectiveOptionSection from "@components/ProductRegistration/OptionSection/SelectiveOption";
-import OrderProductionSection from "@components/ProductRegistration/OrderProductionSection";
-import ShipmentChargeSection from "@components/ProductRegistration/ShipmentChargeSection";
-import SpecificationSection from "@components/ProductRegistration/SpecificationSection";
-import DescriptionSection from "@components/ProductRegistration/DescriptionSection";
+import NameSection from "@components/productRegistration/NameSection";
+import CategorySection from "@components/productRegistration/CategorySection";
+import ImageSection from "@components/productRegistration/ImageSection/index";
+import ColorSection from "@components/productRegistration/ColorSection";
+import PriceSection from "@components/productRegistration/PriceSection";
+import DiscountSection from "@components/productRegistration/DiscountSection";
+import StockSection from "@components/productRegistration/StockSection";
+import RequiredOptionSection from "@components/productRegistration/OptionSection/RequiredOption";
+import SelectiveOptionSection from "@components/productRegistration/OptionSection/SelectiveOption";
+import OrderProductionSection from "@components/productRegistration/OrderProductionSection";
+import ShipmentChargeSection from "@components/productRegistration/ShipmentChargeSection";
+import SpecificationSection from "@components/productRegistration/SpecificationSection";
+import DescriptionSection from "@components/productRegistration/DescriptionSection";
 
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import questionMarkSource from "@icons/questionmark.svg";
-import SearchTagSection from "@components/ProductRegistration/SearchTagSection";
+import SearchTagSection from "@components/productRegistration/SearchTagSection";
 import { useState } from "react";
 import { PRODUCT_REGISTRATION_SECTIONS } from "@constants/index";
 

@@ -5,8 +5,8 @@ import format from "date-fns/format";
 import styled, { useTheme } from "styled-components/macro";
 import { gql, useQuery, useMutation, useReactiveVar } from "@apollo/client";
 
-import CreateShipmentTemplateModal from "@components/ProductRegistration/CreateShipmentTemplateModal";
-import EditShipmentTemplateModal from "@components/ProductRegistration/EditShipmentTemplateModal";
+import CreateShipmentTemplateModal from "@components/productRegistration/CreateShipmentTemplateModal";
+import EditShipmentTemplateModal from "@components/productRegistration/EditShipmentTemplateModal";
 import Button from "@components/common/Button";
 import { modalVar, overModalVar, systemModalVar } from "@cache/index";
 import closeIconSource from "@icons/close.svg";
