@@ -1,3 +1,8 @@
+import { makeVar } from "@apollo/client";
+import { ProductType } from "@models/productRegistration/index";
+
+export const updatedProductRegistrationStatesVar = makeVar<ProductType>(null);
+
 export const TITLE = "TITLE";
 
 export const CATEGORY_FIRST = "CATEGORY_FIRST";

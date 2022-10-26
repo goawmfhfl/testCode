@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
 import { useLazyQuery } from "@apollo/client";
 import { useLocation } from "react-router-dom";
+import { useReactiveVar } from "@apollo/client";
 
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
@@ -33,6 +34,32 @@ import { PRODUCT_REGISTRATION_SECTIONS } from "@constants/index";
 
 export interface ProductRegistrationFormValues {
   TITLE: string;
+  PRODUCT_DESCRIPTION: string;
+  PRODUCT_COLOR: Array<string>;
+  PRODUCT_PRICE: number;
+  IS_DISCOUNTED: boolean;
+  DISCOUNT_AMOUNT: number;
+  DISCOUNT_OPTION: string;
+  DISCOUNT_STARTS_AT: string;
+  DISCOUNT_ENDS_AT: string;
+  HAS_DISCOUNT_SPAN: boolean;
+  PRODUCT_STOCK: number;
+  HAS_REQUIRED_OPTION: boolean;
+  HAS_MANUFACTURING_LEAD_TIME: boolean;
+  LEAD_TIME_MAX: number;
+  LEAD_TIME_MIN: number;
+  SPEC_NAME: string;
+  MATERIAL: string;
+  SIZE: string;
+  WEIGHT: string;
+  MANUFACTURER: string;
+  PRECAUTION: string;
+  AUTHORIZATION: string;
+  PERSON_IN_CHARGE: string;
+  HAS_TAG_INFOS: boolean;
+  CATEGORY_FIRST: string;
+  CATEGORY_SECOND: string;
+  CATEGORY_THIRD: string;
 
   productName: string;
   productPrice: string;
@@ -49,9 +76,6 @@ export interface ProductRegistrationFormValues {
   countrysideAdditionalShipmentCharge: string;
   contactInformationSpec: string;
   deliveryFee: string;
-  CATEGORY_FIRST: string;
-  CATEGORY_SECOND: string;
-  CATEGORY_THIRD: string;
 }
 
 import {
@@ -60,20 +84,24 @@ import {
   GetProductsByIdInputType,
 } from "@graphql/queries/getProductsById";
 
-import { CreateProductInputType } from "@models/productRegistration/index";
+import { updatedProductRegistrationStatesVar } from "@cache/productRegistration";
 
 interface LocationType {
   state: { productId: number | null };
 }
 
 const ProductRegistration = () => {
-  const [updateData, setUpdateData] = useState<CreateProductInputType>();
+  const updatedProductRegistrationStates = useReactiveVar(
+    updatedProductRegistrationStatesVar
+  );
 
   const { state } = useLocation() as LocationType;
 
   const productId: number | undefined = state?.productId;
 
   const methods = useForm<ProductRegistrationFormValues>();
+
+  const watchAllField = methods.watch();
 
   const [getData] = useLazyQuery<GetProductsByIdType, GetProductsByIdInputType>(
     GET_PRODUCTS_BY_ID,
@@ -103,24 +131,113 @@ const ProductRegistration = () => {
         } = await getData();
 
         if (ok) {
-          setUpdateData(product);
+          updatedProductRegistrationStatesVar(product);
         }
 
         if (error) {
-          // TODO: 에러 핸들링 로직 추가 예정
+          // TODO: 에러 핸들링 로직 추가
           console.log(error);
         }
       })();
   }, [productId]);
 
-  const watchAllField = methods.watch();
-
   useEffect(() => {
     methods.reset({
       ...watchAllField,
-      TITLE: updateData?.name,
+
+      // 상품명
+      TITLE: updatedProductRegistrationStates?.name
+        ? updatedProductRegistrationStates?.name
+        : "",
+      // 카테고리
+      CATEGORY_FIRST: updatedProductRegistrationStates?.category?.parent.name
+        ? updatedProductRegistrationStates?.category?.parent.name
+        : "",
+
+      CATEGORY_SECOND: updatedProductRegistrationStates?.category?.name
+        ? updatedProductRegistrationStates?.category?.name
+        : "",
+
+      CATEGORY_THIRD: updatedProductRegistrationStates?.category?.children.name
+        ? updatedProductRegistrationStates?.category?.children.name
+        : "",
+
+      // 상품설명
+      PRODUCT_DESCRIPTION: updatedProductRegistrationStates?.description,
+
+      // 상품 컬러
+      PRODUCT_COLOR: updatedProductRegistrationStates?.colors?.map(
+        (color) => color?.name
+      ),
+
+      // 판매가
+      PRODUCT_PRICE: updatedProductRegistrationStates?.originalPrice,
+
+      // 할인
+      IS_DISCOUNTED: updatedProductRegistrationStates?.discountAmount
+        ? true
+        : false,
+
+      // 할인 금액
+      DISCOUNT_AMOUNT: updatedProductRegistrationStates?.discountAmount,
+
+      // 할인 옵션
+      DISCOUNT_OPTION:
+        updatedProductRegistrationStates?.discountMethod === "PERCENT"
+          ? "PERCENT"
+          : "WON",
+
+      //  기간할인 설정
+      HAS_DISCOUNT_SPAN:
+        updatedProductRegistrationStates?.startDiscountDate &&
+        updatedProductRegistrationStates?.endDiscountDate
+          ? true
+          : false,
+
+      //  재고
+      PRODUCT_STOCK: updatedProductRegistrationStates?.quantity
+        ? updatedProductRegistrationStates?.quantity
+        : 0,
+
+      // 주문 후 제작 여부
+      HAS_MANUFACTURING_LEAD_TIME:
+        updatedProductRegistrationStates?.manufacturingLeadTime?.max &&
+        updatedProductRegistrationStates?.manufacturingLeadTime?.min
+          ? true
+          : false,
+      LEAD_TIME_MAX: updatedProductRegistrationStates?.manufacturingLeadTime
+        ?.max
+        ? updatedProductRegistrationStates?.manufacturingLeadTime?.max
+        : 0,
+      LEAD_TIME_MIN: updatedProductRegistrationStates?.manufacturingLeadTime
+        ?.min
+        ? updatedProductRegistrationStates?.manufacturingLeadTime?.min
+        : 0,
+
+      // 작품정보제공고시
+      SPEC_NAME: updatedProductRegistrationStates?.specName
+        ? updatedProductRegistrationStates?.specName
+        : "",
+      MATERIAL: updatedProductRegistrationStates?.material
+        ? updatedProductRegistrationStates?.material
+        : "",
+      SIZE: updatedProductRegistrationStates?.size
+        ? updatedProductRegistrationStates?.size
+        : "",
+      WEIGHT: updatedProductRegistrationStates?.weight
+        ? updatedProductRegistrationStates?.weight
+        : "",
+      PRECAUTION: updatedProductRegistrationStates?.precaution
+        ? updatedProductRegistrationStates?.precaution
+        : "",
+      AUTHORIZATION: updatedProductRegistrationStates?.authorization
+        ? updatedProductRegistrationStates?.authorization
+        : "",
+      PERSON_IN_CHARGE: updatedProductRegistrationStates?.personInCharge
+        ? updatedProductRegistrationStates?.personInCharge
+        : "",
     });
-  }, [updateData]);
+  }, [updatedProductRegistrationStates]);
 
   return (
     <FormProvider {...methods}>

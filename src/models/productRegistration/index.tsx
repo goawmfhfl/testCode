@@ -143,9 +143,7 @@ export interface CreateProductInputType {
   discountMethod: string;
   startDiscountDate: Date;
   endDiscountDate: Date;
-
   quantity: number;
-
   optionCombinations: Array<{
     components: Array<{ name: string; value: string }>;
     price: number;
@@ -157,7 +155,6 @@ export interface CreateProductInputType {
     min: number;
     max: number;
   };
-
   shipmentId?: number;
   isBundleShipment?: boolean;
   shipmentType?: ShipmentChargeType;
@@ -178,5 +175,65 @@ export interface CreateProductInputType {
   tagInfos: Array<{
     name: string;
     isExposed: boolean;
+  }>;
+}
+
+export interface ProductType {
+  name: string;
+  description: string;
+  colors: Array<{
+    name: ColorType;
+  }>;
+
+  originalPrice: number;
+  discountAmount: number;
+  discountMethod: string;
+  startDiscountDate: Date;
+  endDiscountDate: Date;
+  quantity: number;
+  manufacturingLeadTime: {
+    min: number;
+    max: number;
+  };
+
+  uploadedFileInfos: Array<UploadedFileInfos>;
+
+  optionCombinations: Array<{
+    components: Array<{ name: string; value: string }>;
+    price: number;
+    quantity: number;
+    isRequired: boolean;
+  }>;
+
+  shipmentId?: number;
+  isBundleShipment?: boolean;
+  shipmentType?: ShipmentChargeType;
+  shipmentPrice?: number;
+  shipmentDistantPrice?: number;
+  shipmentReturnPrice?: number;
+  shipmentExchangePrice?: number;
+
+  specName: string;
+  material: string;
+  weight: string;
+  size: string;
+  manufacturer: string;
+  precaution: string;
+  authorization: string;
+  personInCharge: string;
+
+  category: {
+    name: string;
+    parent: { name: string };
+    children: { name: string };
+  };
+
+  productToTags?: Array<{
+    id: number;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
+    isExposed: boolean;
+    tag: Array<{ id: number; name: string }>;
   }>;
 }

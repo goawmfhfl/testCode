@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
 
-import { CreateProductInputType } from "@models/productRegistration/index";
+import { ProductType } from "@models/productRegistration/index";
 
 export interface GetProductsByIdType {
   getProductById: {
     ok: boolean;
     error: string;
-    product: CreateProductInputType;
+    product: ProductType;
   };
 }
 
@@ -34,10 +34,12 @@ export const GET_PRODUCTS_BY_ID = gql`
         startDiscountDate
         endDiscountDate
         quantity
+
         manufacturingLeadTime {
           min
           max
         }
+
         specName
         material
         weight
@@ -46,6 +48,7 @@ export const GET_PRODUCTS_BY_ID = gql`
         precaution
         authorization
         personInCharge
+
         thumbnail
         isExclusive
         isBmarket
