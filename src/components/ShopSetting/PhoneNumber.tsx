@@ -1,7 +1,7 @@
 import styled from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
-import PhoneNumberModal from "./PhoneNumberModal";
+import PhoneNumberModal from "@components/shopSetting/PhoneNumberModal";
 import Button from "@components/common/Button";
 
 import { modalVar } from "@cache/index";

@@ -16,7 +16,7 @@ import {
   SELLER_LOGIN,
   SellerLoginType,
   SellerLoginInputType,
-} from "@graphql/mutations/sellerLogin";
+} from "graphql/mutations/sellerLogin";
 import { useNavigate } from "react-router-dom";
 
 interface LoginFormType {
