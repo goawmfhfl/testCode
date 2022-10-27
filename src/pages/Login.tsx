@@ -10,7 +10,14 @@ import appleSrc from "@icons/apple.svg";
 import kakaoSrc from "@icons/kakao.svg";
 import googleSrc from "@icons/google.svg";
 import Button from "@components/common/Button";
+
 import { AUTH_TOKEN_KEY } from "@constants/auth";
+import {
+  SELLER_LOGIN,
+  SellerLoginType,
+  SellerLoginInputType,
+} from "@graphql/mutations/sellerLogin";
+import { useNavigate } from "react-router-dom";
 
 import {
   SELLER_LOGIN,
