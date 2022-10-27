@@ -46,15 +46,6 @@ import {
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
 
-  const [updateCategory] =
-    useMutation<ChangeProductsInfoType, ChangeProductsInfoInputType>(
-      CHANGE_PRODUCTS_INFO
-    );
-
-  const filterOptionPageNumber: number = useReactiveVar(
-    filterOptionPageNumberVar
-  );
-
   const filterOptionPageNumber: number = useReactiveVar(
     filterOptionPageNumberVar
   );
@@ -98,27 +89,6 @@ const ChangeCategoryModal = () => {
         query: filterQuery,
       },
     },
-    fetchPolicy: "no-cache",
-  });
-
-  const [updateCategory] = useMutation<
-    ChangeProductsInfoType,
-    ChangeProductsInfoInputType
-  >(CHANGE_PRODUCTS_INFO, {
-    refetchQueries: [
-      {
-        query: GET_ALL_PRODUCTS_BY_SELLER,
-        variables: {
-          input: {
-            page: filterOptionPageNumber,
-            skip: filterOptionSkipQuantity,
-            status: filterOptionStatus,
-            query: filterQuery,
-          },
-        },
-      },
-      "GetAllProductsBySeller",
-    ],
     fetchPolicy: "no-cache",
   });
 

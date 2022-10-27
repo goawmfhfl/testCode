@@ -19,16 +19,16 @@ export interface ProductsListVarType {
   category: {
     id: number;
     name: string;
-    parent: { id: number; name: string } | null;
-    children: { id: number; name: string } | null;
+    parent?: { id: number; name: string };
+    children?: { id: number; name: string };
   };
   originalPrice: number;
-  discountAmount: number | null;
-  discountMethod: string | null;
+  discountAmount?: number;
+  discountMethod?: string;
   status: string;
   thumbnail: string;
   quantity: number;
-  isChecked: boolean;
+  isChecked?: boolean;
 }
 
 export const showHasCheckedAnyProductModal = () => {

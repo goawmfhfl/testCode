@@ -59,13 +59,10 @@ const saleStatusList = [
 
 const Product = () => {
   const productList = useReactiveVar(getProductBySellerVar);
+  console.log("productList", productList);
 
   const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
     selectedProductListVar
-  );
-
-  const filterOptionPageNumber: number = useReactiveVar(
-    filterOptionPageNumberVar
   );
 
   const filterOptionPageNumber: number = useReactiveVar(
@@ -302,6 +299,8 @@ const Product = () => {
           getAllProductsBySeller: { products, ok, error, totalPages },
         },
       } = await getProductList();
+
+      console.log("products", products);
 
       pageNumberListVar(
         Array(totalPages)

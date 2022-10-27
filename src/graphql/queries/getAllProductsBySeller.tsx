@@ -16,11 +16,12 @@ export interface GetAllProductsBySellerType {
         children: { id: number; name: string } | null;
       };
       originalPrice: number;
-      discountAmount: number | null;
-      discountMethod: string | null;
+      discountAmount?: number;
+      discountMethod?: string;
       status: string;
       thumbnail: string;
       quantity: number;
+      isChecked?: boolean;
     }>;
   };
 }
@@ -29,7 +30,7 @@ export interface GetAllProductsBySellerInputType {
   input: {
     page?: number;
     skip?: number;
-    status: string | null;
+    status?: string;
     query?: string;
   };
 }

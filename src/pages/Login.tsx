@@ -19,21 +19,6 @@ import {
 } from "@graphql/mutations/sellerLogin";
 import { useNavigate } from "react-router-dom";
 
-import {
-  SELLER_LOGIN,
-  SellerLoginType,
-  SellerLoginInputType,
-} from "@graphql/mutations/sellerLogin";
-import { useNavigate } from "react-router-dom";
-
-import { AUTH_TOKEN_KEY } from "@constants/auth";
-import {
-  SELLER_LOGIN,
-  SellerLoginType,
-  SellerLoginInputType,
-} from "graphql/mutations/sellerLogin";
-import { useNavigate } from "react-router-dom";
-
 interface LoginFormType {
   id: string;
   password: string;
