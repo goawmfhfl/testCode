@@ -6,7 +6,7 @@ import Button from "@components/common/Button";
 import {
   filterOptionStatusVar,
   getProductBySellerVar,
-} from "@cache/ProductManagement";
+} from "@cache/productManagement";
 import { useNavigate } from "react-router-dom";
 import {
   GET_ALL_PRODCUCTS_STATUS_BY_SELLER,

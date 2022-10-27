@@ -15,7 +15,7 @@ import { paginationSkipVar } from "@cache/index";
 import {
   filterOptionPageNumberVar,
   pageNumberListVar,
-} from "@cache/ProductManagement";
+} from "@cache/productManagement";
 
 const Pagination = () => {
   const pageNumberList = useReactiveVar(pageNumberListVar);

@@ -31,7 +31,7 @@ import {
   showHasCheckedAnyProductModal,
   showHasServerErrorModal,
   temporaryQueryVar,
-} from "@cache/ProductManagement";
+} from "@cache/productManagement";
 import {
   GetAllProductsBySellerInputType,
   GetAllProductsBySellerType,

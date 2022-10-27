@@ -36,7 +36,7 @@ import {
   getProductBySellerVar,
   selectedProductListVar,
   showHasServerErrorModal,
-} from "@cache/ProductManagement";
+} from "@cache/productManagement";
 import {
   GET_ALL_PRODUCTS_BY_SELLER,
   GetAllProductsBySellerInputType,

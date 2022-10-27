@@ -17,18 +17,18 @@ import {
   showHasServerErrorModal,
   filterOptionPageNumberVar,
   ProductsListVarType,
-} from "@cache/ProductManagement";
+} from "@cache/productManagement";
 
 import { systemModalVar } from "@cache/index";
-import { getProductBySellerVar } from "@cache/ProductManagement";
+import { getProductBySellerVar } from "@cache/productManagement";
 
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
 import ContentsHeader from "@components/common/ContentsHeader";
 import Checkbox from "@components/common/input/Checkbox";
-import FilterBar from "@components/ProductRegistration/ProductManagement/FilterBar";
-import Pagination from "@components/ProductRegistration/ProductManagement/Pagination";
-import Controller from "@components/ProductRegistration/ProductManagement/Controller";
+import FilterBar from "@components/productRegistration/productManagement/FilterBar";
+import Pagination from "@components/productRegistration/productManagement/Pagination";
+import Controller from "@components/productRegistration/productManagement/Controller";
 import NoDataContainer from "@components/common/table/NoDataContainer";
 import {
   SelectInput as Dropdown,
@@ -41,7 +41,7 @@ import {
   ChangeProductsInfoType,
   CHANGE_PRODUCTS_INFO,
 } from "@graphql/mutations/changeProductsInfo";
-import { tableData } from "@cache/ProductManagement/table";
+import { tableData } from "@cache/productManagement/table";
 import {
   ThContainer,
   Th,

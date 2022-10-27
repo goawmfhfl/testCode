@@ -7,7 +7,8 @@ import { useReactiveVar } from "@apollo/client";
 import Checkbox from "@components/common/input/Checkbox";
 import { Input as TextInput } from "@components/common/input/TextInput";
 import NoticeContainer from "@components/common/NoticeContainer";
-import SearchTag from "@components/productRegistration/SearchTagSection/SearchTag";
+import SearchTag from "@components/productRegistration/searchTagSection/SearchTag";
+
 import questionMarkIconSource from "@icons/questionmark.svg";
 import rightArrowIconSource from "@icons/arrow-rightward-small.svg";
 import { tagListVar } from "@cache/productRegistration/searchTag";

@@ -15,13 +15,13 @@ import NoticeContainer from "@components/common/NoticeContainer";
 
 import NameSection from "@components/productRegistration/NameSection";
 import CategorySection from "@components/productRegistration/CategorySection";
-import ImageSection from "@components/productRegistration/ImageSection/index";
+import ImageSection from "@components/productRegistration/imageSection/index";
 import ColorSection from "@components/productRegistration/ColorSection";
 import PriceSection from "@components/productRegistration/PriceSection";
 import DiscountSection from "@components/productRegistration/DiscountSection";
 import StockSection from "@components/productRegistration/StockSection";
-import RequiredOptionSection from "@components/productRegistration/OptionSection/RequiredOption";
-import SelectiveOptionSection from "@components/productRegistration/OptionSection/SelectiveOption";
+import RequiredOptionSection from "@components/productRegistration/optionSection/RequiredOption";
+import SelectiveOptionSection from "@components/productRegistration/optionSection/SelectiveOption";
 import OrderProductionSection from "@components/productRegistration/OrderProductionSection";
 import ShipmentChargeSection from "@components/productRegistration/ShipmentChargeSection";
 import SpecificationSection from "@components/productRegistration/SpecificationSection";
@@ -29,7 +29,7 @@ import DescriptionSection from "@components/productRegistration/DescriptionSecti
 
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import questionMarkSource from "@icons/questionmark.svg";
-import SearchTagSection from "@components/ProductRegistration/SearchTagSection";
+import SearchTagSection from "@components/productRegistration/searchTagSection";
 import { PRODUCT_REGISTRATION_SECTIONS } from "@constants/index";
 
 export interface ProductRegistrationFormValues {
