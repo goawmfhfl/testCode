@@ -11,6 +11,7 @@ import {
   from,
 } from "@apollo/client";
 import App from "./App";
+import { systemModalVar } from "./cache";
 import { AUTH_TOKEN_KEY } from "@constants/auth";
 
 const httpLink = createHttpLink({
@@ -18,7 +19,7 @@ const httpLink = createHttpLink({
 });
 
 const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  const token = sessionStorage.getItem(AUTH_TOKEN_KEY);
 
   return {
     // eslint-disable-next-line
