@@ -12,14 +12,14 @@ import ContentsNavigation from "@components/common/ContentsNavigation";
 import ContentsNavItem from "@components/common/ContentsNavItem";
 import SectionWrapper from "@components/common/SectionWrapper";
 
-import ShopInfo from "@components/shopSetting/ShopInfo";
-import ShopPolicy from "@components/shopSetting/ShopPolicy";
-import SafetyCertification from "@components/shopSetting/SafetyCertification";
-import ShipmentSettings from "@components/shopSetting/ShipmentSettings";
-import BusinessLicense from "@components/shopSetting/BusinessLicense";
-import PhoneNumber from "@components/shopSetting/PhoneNumber";
-import SettlementAccount from "@components/shopSetting/SettlementAccount";
-import RegistrationNumber from "@components/shopSetting/RegistrationNumber";
+import ShopInfo from "@components/ShopSetting/ShopInfo";
+import ShopPolicy from "@components/ShopSetting/ShopPolicy";
+import SafetyCertification from "@components/ShopSetting/SafetyCertification";
+import ShipmentSettings from "@components/ShopSetting/ShipmentSettings";
+import BusinessLicense from "@components/ShopSetting/BusinessLicense";
+import PhoneNumber from "@components/ShopSetting/PhoneNumber";
+import SettlementAccount from "@components/ShopSetting/SettlementAccount";
+import RegistrationNumber from "@components/ShopSetting/RegistrationNumber";
 import { systemModalVar } from "@cache/index";
 import { SHOP_SETTING_SECTIONS } from "@constants/index";
 
@@ -34,7 +34,7 @@ export interface ShopSettingFormInputType {
   addtionalOrderFee: number;
 }
 
-import { GetUserInfoType, GET_USER_IFNO } from "graphql/queries/getUserinfo";
+import { GetUserInfoType, GET_USER_IFNO } from "@graphql/queries/getUserinfo";
 import { AUTH_TOKEN_KEY } from "@constants/auth";
 
 const ShopSetting = () => {

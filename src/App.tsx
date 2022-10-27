@@ -31,7 +31,7 @@ function App() {
           <Route path="oauth" element={<OAuth />}>
             <Route path=":oauthProvider" element={<OAuth />} />
           </Route>
-          <Route path="/shop/settings/" element={<ShopSetting />} />
+          <Route path="/shop/settings" element={<ShopSetting />} />
           <Route path="/product" element={<ProductManagement />} />
           <Route
             path="/product/registration"
