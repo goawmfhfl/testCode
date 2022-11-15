@@ -1,3 +1,4 @@
+import { HeaderNames } from "@constants/index";
 import React from "react";
 import styled from "styled-components/macro";
 
@@ -5,7 +6,7 @@ const ContentsHeader = ({
   headerName,
   children,
 }: {
-  headerName: string;
+  headerName: HeaderNames;
   children?: React.ReactNode;
 }) => {
   return (

@@ -1,3 +1,4 @@
+import { Pathnames } from "@constants/index";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -10,7 +11,7 @@ const Home = () => {
     };
 
     if (!user.email) {
-      navigate("/login");
+      navigate(Pathnames.Login);
     }
   }, []);
 

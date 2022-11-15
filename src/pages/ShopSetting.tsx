@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 
 import Layout from "@components/common/Layout";
@@ -21,7 +21,12 @@ import PhoneNumber from "@components/shopSetting/PhoneNumber";
 import SettlementAccount from "@components/shopSetting/SettlementAccount";
 import RegistrationNumber from "@components/shopSetting/RegistrationNumber";
 import { systemModalVar } from "@cache/index";
-import { SHOP_SETTING_SECTIONS } from "@constants/index";
+import {
+  HeaderNames,
+  Pathnames,
+  SHOP_SETTING_SECTIONS,
+} from "@constants/index";
+import { SectionLabels } from "@constants/shop";
 
 export interface ShopSettingFormInputType {
   pcImage: string;
@@ -34,8 +39,9 @@ export interface ShopSettingFormInputType {
   addtionalOrderFee: number;
 }
 
-import { GetUserInfoType, GET_USER_IFNO } from "@graphql/queries/getUserinfo";
+import { GetUserInfoType, GET_USER_INFO } from "@graphql/queries/getUserInfo";
 import { AUTH_TOKEN_KEY } from "@constants/auth";
+import { UserRole } from "@models/login";
 
 const ShopSetting = () => {
   const navagate = useNavigate();
@@ -45,7 +51,8 @@ const ShopSetting = () => {
     reValidateMode: "onSubmit",
   });
 
-  const { data } = useQuery<GetUserInfoType>(GET_USER_IFNO);
+  const [getUserInfo, { data, loading }] =
+    useLazyQuery<GetUserInfoType>(GET_USER_INFO);
 
   const onSubmit: SubmitHandler<ShopSettingFormInputType> = (data) => {
     console.log("form is submitted!");
@@ -55,33 +62,39 @@ const ShopSetting = () => {
   const hasUserLoggedIn = false; // TODO: session storage에서 가져온 토큰정보로 판단
 
   useEffect(() => {
-    const authToken = sessionStorage.getItem(AUTH_TOKEN_KEY);
+    // eslint-disable-next-line
+    (async () => {
+      const authToken = sessionStorage.getItem(AUTH_TOKEN_KEY);
 
-    if (!authToken) {
-      navagate("/login");
-    }
+      if (!authToken) {
+        navagate(Pathnames.Login);
+      }
 
-    if (data?.getUserInfo?.role === "PRE_SELLER") {
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        description: (
-          <>
-            샵/판매자 정보 설정을 완료하시면
-            <br />
-            판매 활동을 시작할 수 있습니다.
-          </>
-        ),
-        confirmButtonVisibility: true,
-        cancelButtonVisibility: false,
-        confirmButtonClickHandler: () => {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: false,
-          });
-        },
-      });
-    }
+      const result = await getUserInfo();
+      const userRole = result.data.getUserInfo.role;
+
+      if (userRole === UserRole.PRE_SELLER) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: (
+            <>
+              샵/판매자 정보 설정을 완료하시면
+              <br />
+              판매 활동을 시작할 수 있습니다.
+            </>
+          ),
+          confirmButtonVisibility: true,
+          cancelButtonVisibility: false,
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+            });
+          },
+        });
+      }
+    })();
   }, [data]);
 
   return (
@@ -91,7 +104,7 @@ const ShopSetting = () => {
           isForm={true}
           onSubmit={methods.handleSubmit(onSubmit)}
         >
-          <ContentsHeader headerName="샵 정보" />
+          <ContentsHeader headerName={HeaderNames.Shop} />
 
           <ContentsNavigation>
             <ContentsNavItem selected={true}>샵 / 판매자 정보</ContentsNavItem>
@@ -101,14 +114,14 @@ const ShopSetting = () => {
           <ContentsMain>
             <ContentsSection>
               <SectionWrapper
-                label="샵 정보"
+                label={SectionLabels.ShopInfo}
                 labelMarginTop={false}
                 referenceKey={SHOP_SETTING_SECTIONS.SHOP_INFO}
               >
                 <ShopInfo />
               </SectionWrapper>
               <SectionWrapper
-                label="정책 설정"
+                label={SectionLabels.ShopPolicy}
                 referenceKey={SHOP_SETTING_SECTIONS.SHOP_POLICY}
               >
                 <ShopPolicy />
@@ -131,7 +144,7 @@ const ShopSetting = () => {
 
             <ContentsSection>
               <SectionWrapper
-                label="샵 배송 정보"
+                label={SectionLabels.ShipmentSettings}
                 referenceKey={SHOP_SETTING_SECTIONS.SHIPMENT_SETTINGS}
               >
                 <ShipmentSettings />
@@ -140,7 +153,7 @@ const ShopSetting = () => {
 
             <ContentsSection>
               <SectionWrapper
-                label="사업자 정보(간이, 법인)"
+                label={SectionLabels.BusinessLicense}
                 labelMarginTop={false}
                 referenceKey={SHOP_SETTING_SECTIONS.BUSINESS_LICENSE}
               >
@@ -150,7 +163,8 @@ const ShopSetting = () => {
               <SectionWrapper
                 label={
                   <>
-                    개인판매자 <br /> 주민등록증 인증
+                    개인판매자 <br />
+                    주인등록증 인증
                   </>
                 }
                 referenceKey={SHOP_SETTING_SECTIONS.REGISTRATION_NUMBER}
@@ -159,14 +173,14 @@ const ShopSetting = () => {
               </SectionWrapper>
 
               <SectionWrapper
-                label="전화번호 변경"
+                label={SectionLabels.PhoneNumber}
                 referenceKey={SHOP_SETTING_SECTIONS.PHONE_NUMBER}
               >
                 <PhoneNumber />
               </SectionWrapper>
 
               <SectionWrapper
-                label="정산 계좌 정보"
+                label={SectionLabels.SettlementAccount}
                 labelMarginTop={false}
                 referenceKey={SHOP_SETTING_SECTIONS.SETTLEMENT_ACCOUNT}
               >

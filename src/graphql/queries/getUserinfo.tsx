@@ -7,7 +7,7 @@ export interface GetUserInfoType {
   };
 }
 
-export const GET_USER_IFNO = gql`
+export const GET_USER_INFO = gql`
   query GetUserInfo {
     getUserInfo {
       role

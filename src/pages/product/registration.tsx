@@ -30,7 +30,7 @@ import DescriptionSection from "@components/productRegistration/DescriptionSecti
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import questionMarkSource from "@icons/questionmark.svg";
 import SearchTagSection from "@components/productRegistration/searchTagSection";
-import { PRODUCT_REGISTRATION_SECTIONS } from "@constants/index";
+import { HeaderNames, PRODUCT_REGISTRATION_SECTIONS } from "@constants/index";
 
 export interface ProductRegistrationFormValues {
   TITLE: string;
@@ -247,7 +247,9 @@ const ProductRegistration = () => {
           isForm={true}
           onSubmit={methods.handleSubmit(onSubmit)}
         >
-          <ContentsHeader headerName={"상품 등록"}>
+          <ContentsHeader
+            headerName={HeaderNames.ProductRegistration as HeaderNames}
+          >
             <NoticeContainer
               width={"175px"}
               icon={exclamationMarkSrc}

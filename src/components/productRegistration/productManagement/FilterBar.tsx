@@ -15,6 +15,7 @@ import {
 } from "@graphql/queries/getAllProductsBySeller";
 import { useEffect, useState } from "react";
 import { systemModalVar } from "@cache/index";
+import { Pathnames } from "@constants/index";
 
 const FilterBar = () => {
   const navigate = useNavigate();
@@ -45,7 +46,7 @@ const FilterBar = () => {
     };
 
   const handleButtonClick = () => {
-    navigate("./registration");
+    navigate(Pathnames.ProductRegistration);
   };
 
   const [getOnSaleProductList] = useLazyQuery<

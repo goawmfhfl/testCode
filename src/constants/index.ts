@@ -217,3 +217,9 @@ export enum Pathnames {
   Shop = "/shop",
   Notice = "/notice",
 }
+
+export enum HeaderNames {
+  Shop = "샵 설정",
+  Product = "상품 관리",
+  ProductRegistration = "상품 등록",
+}

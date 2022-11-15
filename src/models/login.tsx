@@ -8,5 +8,5 @@ export enum OathCompany {
 export enum UserRole {
   CLIENT = "CLIENT",
   PRE_SELLER = "PRE_SELLER",
-  SELLEr = "SELLER",
+  SELLER = "SELLER",
 }

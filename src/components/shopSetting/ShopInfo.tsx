@@ -75,36 +75,24 @@ const ShopInfo = () => {
       // 이미지 사이즈 확인
       const imageSizeAsMegabyte = size / 1000 / 1000;
 
-      if (version === "mobileImage" && imageSizeAsMegabyte > 2) {
+      if (version === "mobileImage" && imageSizeAsMegabyte > 3) {
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
           icon: exclamationmarkSrc,
-          description: (
-            <>
-              모바일 이미지 사이즈는
-              <br />
-              2MB 이하로 부탁드려요!
-            </>
-          ),
+          description: <>등록 가능한 파일크기는 3mb입니다.</>,
           cancelButtonVisibility: false,
         });
 
         return;
       }
 
-      if (version === "pcImage" && imageSizeAsMegabyte > 3) {
+      if (version === "pcImage" && imageSizeAsMegabyte > 5) {
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
           icon: exclamationmarkSrc,
-          description: (
-            <>
-              PC 이미지 사이즈는
-              <br />
-              3MB 이하로 부탁드려요!
-            </>
-          ),
+          description: <>등록 가능한 파일 크기는 5mb입니다.</>,
           cancelButtonVisibility: false,
         });
 
@@ -116,10 +104,6 @@ const ShopInfo = () => {
         "https://dev.chopsticks-store.com/upload",
         formData
       );
-
-      console.log(data);
-
-      console.log(version);
 
       if (version === "mobileImage") {
         if (mobileImage) {
@@ -185,6 +169,8 @@ const ShopInfo = () => {
       e.preventDefault();
       e.stopPropagation();
 
+      console.log(imageUrl);
+
       await deleteImageUrl(imageUrl);
     };
 
@@ -212,7 +198,7 @@ const ShopInfo = () => {
               </ImageInputDescription>
 
               {mobileImage ? (
-                <AddedMobileImageContainer htmlFor="mobileImage">
+                <AddedMobileImageContainer>
                   <AddedMobileImage src={mobileImage} />
                   <DeleteButton
                     src={closeIconSource}
@@ -257,7 +243,7 @@ const ShopInfo = () => {
               </ImageInputDescription>
 
               {pcImage ? (
-                <AddedPcImageContainer htmlFor="pcImage">
+                <AddedPcImageContainer>
                   <AddedPcImage src={pcImage} />
                   <DeleteButton
                     src={closeIconSource}
@@ -435,7 +421,7 @@ const MobileImageContainer = styled(ImageInputContainer)`
   height: 140px;
 `;
 
-const AddedImageContainer = styled.label`
+const AddedImageContainer = styled.div`
   position: relative;
   margin: 0 auto;
 `;

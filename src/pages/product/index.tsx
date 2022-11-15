@@ -49,6 +49,7 @@ import {
   Tr,
   Td,
 } from "@components/common/table/Table";
+import { HeaderNames } from "@constants/index";
 
 const saleStatusList = [
   { id: 0, label: "DEFAULT", name: "판매상태 변경" },
@@ -334,7 +335,7 @@ const Product = () => {
   return (
     <Layout>
       <ContentsContainer>
-        <ContentsHeader headerName="상품관리" />
+        <ContentsHeader headerName={HeaderNames.Product as HeaderNames} />
         <FilterBar />
         <ProductManagerContainer>
           <Controller />

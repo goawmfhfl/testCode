@@ -18,6 +18,7 @@ import {
   SellerLoginInputType,
 } from "@graphql/mutations/sellerLogin";
 import { useNavigate } from "react-router-dom";
+import { Pathnames } from "@constants/index";
 
 interface LoginFormType {
   id: string;
@@ -124,7 +125,7 @@ const Login = () => {
         loginData?.sellerLogin.token
       );
 
-      navigate("/shop/settings");
+      navigate(Pathnames.Shop);
     }
 
     if (!isLoginSucceed) {
