@@ -1,5 +1,5 @@
-const index = () => {
-  return console.log("index");
-};
-
-export default index;
+export interface SkipQuantityCacheType {
+  id: number;
+  label: string;
+  value: number;
+}

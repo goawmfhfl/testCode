@@ -1,5 +1,5 @@
-const orderManagement = () => {
-  return console.log("orderManagement");
-};
-
-export default orderManagement;
+export interface SearchQueryCacheType {
+  id: number;
+  label: string;
+  value: string;
+}

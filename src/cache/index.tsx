@@ -1,5 +1,6 @@
 import React from "react";
 import { makeVar } from "@apollo/client";
+import { SkipQuantityCacheType } from "@models/order/index";
 
 import {
   SHOP_SETTING_SECTIONS,
@@ -115,3 +116,12 @@ export const sectionFulfillmentVar = makeVar<{ [key: string]: boolean }>({
   SPECIFICATION: true,
   SEARCH_TAG: true,
 });
+
+export const SkipQuantityCache: Array<SkipQuantityCacheType> = [
+  { id: 0, label: "20개씩 보기", value: 20 },
+  { id: 1, label: "50개씩 보기", value: 50 },
+  { id: 2, label: "100개씩 보기", value: 100 },
+];
+
+export const SkipQuantityCacheVar =
+  makeVar<Array<SkipQuantityCacheType>>(SkipQuantityCache);
