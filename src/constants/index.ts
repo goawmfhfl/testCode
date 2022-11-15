@@ -202,3 +202,18 @@ export const productRegistrationSectionMapper: { [key: string]: string } = {
   personInCharge: PRODUCT_REGISTRATION_SECTIONS.SPECIFICATION,
   tagInfos: PRODUCT_REGISTRATION_SECTIONS.SEARCH_TAG,
 };
+
+export enum Pathnames {
+  Home = "/",
+  Login = "/login",
+  Product = "/product",
+  ProductRegistration = "/product/registration",
+  Order = "/order",
+  OrderCancel = "/order?claim=cancel",
+  OrderReturn = "/order?claim=return",
+  OrderExchange = "/order?claim=exchange",
+  Inquiry = "/inquiry",
+  Settlement = "/settlement",
+  Shop = "/shop",
+  Notice = "/notice",
+}
