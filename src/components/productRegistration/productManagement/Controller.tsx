@@ -45,8 +45,8 @@ import {
   OptionInput as Option,
 } from "@components/common/input/Dropdown";
 
-import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
+import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 
 const Controller = () => {
   const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
