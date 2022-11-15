@@ -17,8 +17,8 @@ export const fixTableType = {
 };
 
 export const scrollTableType = {
-  claimStatus: "클레임 상태",
-  OrderStatus: "주문 상태",
+  CLAIM_STATUS: "클레임 상태",
+  ORDER_STATUS: "주문 상태",
   COURIER: "택배사",
   INVOICE_NUMBER: "운송장번호",
   PAYMENT_DAY: "결제일",
