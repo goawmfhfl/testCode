@@ -293,6 +293,7 @@ const ShopInfo = () => {
               width={"377px"}
               height={"156px"}
               register={register(SHOP_INTRODUCTION)}
+              maxLength={200}
             />
             <TextCounter>{shopIntroduction?.length}/200</TextCounter>
           </TextareaContainer>

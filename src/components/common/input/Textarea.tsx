@@ -8,6 +8,7 @@ const Textarea = ({
   register,
   onFocus,
   placeholder,
+  maxLength,
 }: {
   width?: string;
   height?: string;
@@ -15,6 +16,7 @@ const Textarea = ({
   register: UseFormRegisterReturn;
   onFocus?: () => void;
   placeholder?: string;
+  maxLength?: number;
 }) => {
   return (
     <Container
@@ -24,6 +26,7 @@ const Textarea = ({
       {...register}
       onFocus={onFocus}
       placeholder={placeholder}
+      maxLength={maxLength}
     />
   );
 };
