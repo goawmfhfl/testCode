@@ -34,7 +34,6 @@ const OrderManagement = () => {
       <FilterBar />
       <Controller />
       <Table width={tableWidth.index}>
-        {/* Fiexd */}
         <FixedTable width={tableWidth.left}>
           <ThContainer>
             <Th width={fixedTableData[0].width}>
@@ -65,7 +64,6 @@ const OrderManagement = () => {
             </Tr>
           </TbContainer>
         </FixedTable>
-        {/* Scroll */}
         <ScrollTable width={tableWidth.right}>
           <ThContainer>
             <Th width={scrollTableData[0].width}>{orderStatusType.CLAIM}</Th>
