@@ -9,13 +9,14 @@ import {
   OptionInput as Option,
 } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
+import ControllerContainer from "@components/order/ControllerContainer";
 
 import { SkipQuantityCache } from "@cache/index";
 import { searchQueryCache } from "@cache/order/orderManagement";
 
 const Controller = () => {
   return (
-    <Container>
+    <ControllerContainer>
       <ActiveButtonContainer>
         <ControllerButton size="small">주문확인</ControllerButton>
         <ControllerButton size="small">발송 처리</ControllerButton>
@@ -50,20 +51,9 @@ const Controller = () => {
           ))}
         </StatusDropDown>
       </SkipQuantityContainer>
-    </Container>
+    </ControllerContainer>
   );
 };
-
-const Container = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  padding: 16px;
-  background-color: ${({ theme: { palette } }) => palette.white};
-
-  white-space: nowrap;
-`;
 
 const ActiveButtonContainer = styled.div`
   display: flex;
