@@ -5,8 +5,16 @@ export const Table = styled.div<{ width: number }>`
   width: 100%;
   min-width: ${({ width }) => `${width}px`};
 `;
+interface FixedTableProps {
+  width: number;
+  children: React.ReactNode;
+}
 
-export const FixedTable = styled.div<{ width: number }>`
+export const FixedTable = ({ width, children }: FixedTableProps) => {
+  return <FixedTableContainer width={width}>{children}</FixedTableContainer>;
+};
+
+export const FixedTableContainer = styled.div<{ width: number }>`
   min-width: ${({ width }) => `${width}px`};
 `;
 
@@ -17,18 +25,19 @@ interface ScrollTableProps {
 
 export const ScrollTable = ({ width, children }: ScrollTableProps) => {
   return (
-    <Container>
-      <Wrapper width={width}>{children}</Wrapper>
-    </Container>
+    <ScrollTableContainer>
+      <WrapperContainer width={width}>{children}</WrapperContainer>
+    </ScrollTableContainer>
   );
 };
 
-const Container = styled.div`
+const ScrollTableContainer = styled.div`
   overflow: scroll;
 `;
 
-const Wrapper = styled.div<{ width: number }>`
+const WrapperContainer = styled.div<{ width: number }>`
   width: 1920px;
+  border-left: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 
 export const TableContainer = styled.div<{ width: number }>`
@@ -47,7 +56,10 @@ export const ThContainer = styled.div`
   background-color: ${({ theme: { palette } }) => palette.grey400};
 `;
 
-export const Th = styled.div<{ width: number; isOneLiner?: boolean }>`
+export const Th = styled.div<{
+  width: number;
+  isOneLiner?: boolean;
+}>`
   display: flex;
   justify-content: center;
   align-items: center;
