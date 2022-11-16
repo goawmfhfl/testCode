@@ -25,7 +25,7 @@ export const tableWidth = {
     COURIER: 120,
     INVOICE_NUMBER: 216,
     SHIPMENT_PRICE: 64,
-    ADDITIONAL_SHIPMENT_PRICE: 136,
+    ADDITIONAL_SHIPMENT_PRICE: 200,
   },
 
   orderStatusType: {

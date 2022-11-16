@@ -1,4 +1,43 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+
+export const Table = styled.div<{ width: number }>`
+  display: flex;
+  width: 100%;
+  min-width: ${({ width }) => `${width}px`};
+`;
+
+export const FixedTable = styled.div<{ width: number }>`
+  min-width: ${({ width }) => `${width}px`};
+`;
+
+interface ScrollTableProps {
+  width: number;
+  children: React.ReactNode;
+}
+
+export const ScrollTable = ({ width, children }: ScrollTableProps) => {
+  return (
+    <Container>
+      <Wrapper width={width}>{children}</Wrapper>
+    </Container>
+  );
+};
+
+const Container = styled.div`
+  overflow: scroll;
+`;
+
+const Wrapper = styled.div<{ width: number }>`
+  width: 1920px;
+`;
+
+export const TableContainer = styled.div<{ width: number }>`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  min-width: ${({ width }) => `${width}px`};
+`;
 
 export const ThContainer = styled.div`
   display: flex;
@@ -8,10 +47,17 @@ export const ThContainer = styled.div`
   background-color: ${({ theme: { palette } }) => palette.grey400};
 `;
 
-export const Th = styled.div<{ width: number }>`
+export const Th = styled.div<{ width: number; isOneLiner?: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  ${({ isOneLiner }) =>
+    !isOneLiner &&
+    css`
+      display: flex;
+      flex-direction: column;
+    `}
 
   width: ${({ width }) => `${width}%`};
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
@@ -40,10 +86,6 @@ export const Tr = styled.div`
   display: flex;
   width: 100%;
   border-bottom: 1px solid ${({ theme: { palette } }) => palette.grey500};
-
-  &:last-child {
-    border-bottom: none;
-  }
 `;
 
 export const Td = styled.div<{ width: number }>`
@@ -53,7 +95,6 @@ export const Td = styled.div<{ width: number }>`
 
   width: ${({ width }) => `${width}%`};
   height: 40px;
-
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 
   &:last-child {

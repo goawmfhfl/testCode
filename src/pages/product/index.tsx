@@ -48,6 +48,7 @@ import {
   TbContainer,
   Tr,
   Td,
+  TableContainer,
 } from "@components/common/table/Table";
 import { HeaderNames } from "@constants/index";
 
@@ -333,191 +334,179 @@ const Product = () => {
       <ContentsContainer>
         <ContentsHeader headerName={HeaderNames.Product as HeaderNames} />
         <FilterBar />
-        <ProductManagerContainer>
-          <Controller />
-          <ProductListTable>
-            <ThContainer>
-              {tableData.map(({ id, label, width, className }) => (
-                <Th key={id} width={width} className={className}>
-                  {label === "checkBox" ? (
-                    <Checkbox
-                      onChange={changeAllCheckBoxHandler}
-                      checked={checkAllBoxStatus}
-                    />
-                  ) : (
-                    label
-                  )}
-                </Th>
-              ))}
-            </ThContainer>
-            {productList.length ? (
-              <TbContainer>
-                {productList?.map(
-                  (
-                    {
-                      id,
-                      name,
-                      category,
-                      originalPrice,
-                      discountAmount,
-                      discountMethod,
-                      quantity,
-                      status,
-                      thumbnail,
-                      isChecked,
-                    },
-                    index
-                  ) => {
-                    // const discountAppliedPriceToWonSign = discountAppliedPrice
-                    //   ? `${discountAppliedPrice.toLocaleString("ko-KR")} ₩`
-                    //   : "-";
+        <Controller />
+        <TableContainer width={1182}>
+          <ThContainer>
+            {tableData.map(({ id, label, width, className }) => (
+              <Th key={id} width={width} className={className}>
+                {label === "checkBox" ? (
+                  <Checkbox
+                    onChange={changeAllCheckBoxHandler}
+                    checked={checkAllBoxStatus}
+                  />
+                ) : (
+                  label
+                )}
+              </Th>
+            ))}
+          </ThContainer>
 
-                    const firstCategory = category?.parent?.name
-                      ? category.parent.name
+          {productList.length !== 0 ? (
+            <TbContainer>
+              {productList?.map(
+                (
+                  {
+                    id,
+                    name,
+                    category,
+                    originalPrice,
+                    discountAmount,
+                    discountMethod,
+                    quantity,
+                    status,
+                    thumbnail,
+                    isChecked,
+                  },
+                  index
+                ) => {
+                  // const discountAppliedPriceToWonSign = discountAppliedPrice
+                  //   ? `${discountAppliedPrice.toLocaleString("ko-KR")} ₩`
+                  //   : "-";
+
+                  const firstCategory = category?.parent?.name
+                    ? category.parent.name
+                    : "-";
+                  const secondCategory = category?.name ? category.name : "-";
+                  const thirdCategory = category?.children?.name
+                    ? category.children.name
+                    : "-";
+
+                  const rateOfDiscount =
+                    discountMethod && discountAmount
+                      ? `${discountAmount.toLocaleString("ko-KR")} ${
+                          discountMethod === "PERCENT" ? "%" : "₩"
+                        }`
                       : "-";
-                    const secondCategory = category?.name ? category.name : "-";
-                    const thirdCategory = category?.children?.name
-                      ? category.children.name
-                      : "-";
 
-                    const rateOfDiscount =
-                      discountMethod && discountAmount
-                        ? `${discountAmount.toLocaleString("ko-KR")} ${
-                            discountMethod === "PERCENT" ? "%" : "₩"
-                          }`
-                        : "-";
+                  const originalPriceToWonSign = `${originalPrice.toLocaleString(
+                    "ko-KR"
+                  )} ₩`;
 
-                    const originalPriceToWonSign = `${originalPrice.toLocaleString(
-                      "ko-KR"
-                    )} ₩`;
-
-                    return (
-                      <Tr key={id}>
-                        <ProductManageMentTd
-                          width={tableData[0].width}
-                          className={tableData[0].className}
+                  return (
+                    <Tr key={id}>
+                      <ProductManageMentTd
+                        width={tableData[0].width}
+                        className={tableData[0].className}
+                      >
+                        <Checkbox
+                          onChange={changeSingleCheckBoxHandler(index)}
+                          checked={isChecked}
+                        />
+                      </ProductManageMentTd>
+                      <ProductManageMentTd
+                        width={tableData[1].width}
+                        className={tableData[1].className}
+                      >
+                        {id}
+                      </ProductManageMentTd>
+                      <ProductManageMentTd
+                        width={tableData[2].width}
+                        className={tableData[2].className}
+                      >
+                        <ProductThumbNailWrapper>
+                          <ProductThumbNail src={thumbnail} />
+                        </ProductThumbNailWrapper>
+                        <ProductName>
+                          <Link to={`/product/${id}`} state={{ productId: id }}>
+                            {name}
+                          </Link>
+                        </ProductName>
+                      </ProductManageMentTd>
+                      <ProductManageMentTd
+                        width={tableData[3].width}
+                        className={tableData[3].className}
+                      >
+                        {firstCategory}
+                      </ProductManageMentTd>
+                      <ProductManageMentTd
+                        width={tableData[4].width}
+                        className={tableData[4].className}
+                      >
+                        {secondCategory}
+                      </ProductManageMentTd>
+                      <ProductManageMentTd
+                        width={tableData[5].width}
+                        className={tableData[5].className}
+                      >
+                        {thirdCategory}
+                      </ProductManageMentTd>
+                      <ProductManageMentTd
+                        width={tableData[6].width}
+                        className={tableData[6].className}
+                      >
+                        {originalPriceToWonSign}
+                      </ProductManageMentTd>
+                      <ProductManageMentTd
+                        width={tableData[7].width}
+                        className={tableData[7].className}
+                      >
+                        {rateOfDiscount}
+                      </ProductManageMentTd>
+                      <ProductManageMentTd
+                        width={tableData[8].width}
+                        className={tableData[8].className}
+                      >
+                        {/* {discountAppliedPriceToWonSign} */}
+                      </ProductManageMentTd>
+                      <ProductManageMentTd
+                        width={tableData[9].width}
+                        className={tableData[9].className}
+                      >
+                        {quantity}
+                      </ProductManageMentTd>
+                      <ProductManageMentTd
+                        width={tableData[10].width}
+                        className={tableData[10].className}
+                      >
+                        <Dropdown
+                          onChange={changeSingleSaleStatusHandler(id)}
+                          arrowSrc={triangleArrowSvg}
+                          value={status}
+                          sizing={"medium"}
+                          width={"146px"}
                         >
-                          <Checkbox
-                            onChange={changeSingleCheckBoxHandler(index)}
-                            checked={isChecked}
-                          />
-                        </ProductManageMentTd>
-                        <ProductManageMentTd
-                          width={tableData[1].width}
-                          className={tableData[1].className}
-                        >
-                          {id}
-                        </ProductManageMentTd>
-                        <ProductManageMentTd
-                          width={tableData[2].width}
-                          className={tableData[2].className}
-                        >
-                          <ProductThumbNailWrapper>
-                            <ProductThumbNail src={thumbnail} />
-                          </ProductThumbNailWrapper>
-                          <ProductName>
-                            <Link
-                              to={`/product/${id}`}
-                              state={{ productId: id }}
+                          {saleStatusList.map(({ id, label, name }) => (
+                            <Option
+                              key={id}
+                              value={label}
+                              hidden={label === "DEFAULT"}
                             >
                               {name}
-                            </Link>
-                          </ProductName>
-                        </ProductManageMentTd>
-                        <ProductManageMentTd
-                          width={tableData[3].width}
-                          className={tableData[3].className}
-                        >
-                          {firstCategory}
-                        </ProductManageMentTd>
-                        <ProductManageMentTd
-                          width={tableData[4].width}
-                          className={tableData[4].className}
-                        >
-                          {secondCategory}
-                        </ProductManageMentTd>
-                        <ProductManageMentTd
-                          width={tableData[5].width}
-                          className={tableData[5].className}
-                        >
-                          {thirdCategory}
-                        </ProductManageMentTd>
-                        <ProductManageMentTd
-                          width={tableData[6].width}
-                          className={tableData[6].className}
-                        >
-                          {originalPriceToWonSign}
-                        </ProductManageMentTd>
-                        <ProductManageMentTd
-                          width={tableData[7].width}
-                          className={tableData[7].className}
-                        >
-                          {rateOfDiscount}
-                        </ProductManageMentTd>
-                        <ProductManageMentTd
-                          width={tableData[8].width}
-                          className={tableData[8].className}
-                        >
-                          {/* {discountAppliedPriceToWonSign} */}
-                        </ProductManageMentTd>
-                        <ProductManageMentTd
-                          width={tableData[9].width}
-                          className={tableData[9].className}
-                        >
-                          {quantity}
-                        </ProductManageMentTd>
-                        <ProductManageMentTd
-                          width={tableData[10].width}
-                          className={tableData[10].className}
-                        >
-                          <Dropdown
-                            onChange={changeSingleSaleStatusHandler(id)}
-                            arrowSrc={triangleArrowSvg}
-                            value={status}
-                            sizing={"medium"}
-                            width={"146px"}
-                          >
-                            {saleStatusList.map(({ id, label, name }) => (
-                              <Option
-                                key={id}
-                                value={label}
-                                hidden={label === "DEFAULT"}
-                              >
-                                {name}
-                              </Option>
-                            ))}
-                          </Dropdown>
-                        </ProductManageMentTd>
-                      </Tr>
-                    );
-                  }
-                )}
-              </TbContainer>
-            ) : (
-              !loading && (
-                <NoDataContainer>
-                  검색어와 일치하는
-                  <br />
-                  상품이 없습니다.
-                </NoDataContainer>
-              )
-            )}
-          </ProductListTable>
+                            </Option>
+                          ))}
+                        </Dropdown>
+                      </ProductManageMentTd>
+                    </Tr>
+                  );
+                }
+              )}
+            </TbContainer>
+          ) : (
+            !loading && (
+              <NoDataContainer>
+                검색어와 일치하는
+                <br />
+                상품이 없습니다.
+              </NoDataContainer>
+            )
+          )}
+        </TableContainer>
 
-          {productList.length ? <Pagination /> : <></>}
-        </ProductManagerContainer>
+        {productList.length ? <Pagination /> : <></>}
       </ContentsContainer>
     </Layout>
   );
 };
-
-const ProductManagerContainer = styled.div`
-  flex: 1 1 0;
-`;
-
-const ProductListTable = styled.div`
-  width: 100%;
-`;
 
 const ProductManageMentTd = styled(Td)`
   &.name {

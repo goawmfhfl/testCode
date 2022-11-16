@@ -14,6 +14,7 @@ const Container = styled.div`
   justify-content: space-between;
   align-items: center;
 
+  min-width: 1182px;
   padding: 16px;
   background-color: ${({ theme: { palette } }) => palette.white};
 
