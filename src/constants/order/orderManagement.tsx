@@ -25,7 +25,7 @@ export const tableWidth = {
     COURIER: 120,
     INVOICE_NUMBER: 216,
     SHIPMENT_PRICE: 64,
-    ADDITIONAL_SHIPMENT_PRICE: 200,
+    SHIPMENT_DISTANT_PRICE: 200,
   },
 
   orderStatusType: {
@@ -77,7 +77,7 @@ export const shipmentType = {
   COURIER: "택배사",
   INVOICE_NUMBER: "운송장번호",
   SHIPMENT_PRICE: "배송비",
-  ADDITIONAL_SHIPMENT_PRICE: "제주/도서 추가배송비",
+  SHIPMENT_DISTANT_PRICE: "제주/도서 추가배송비",
 };
 
 export const orderStatusType = {

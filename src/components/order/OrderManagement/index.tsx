@@ -104,7 +104,7 @@ const OrderManagement = () => {
               {shipmentType.SHIPMENT_PRICE}
             </Th>
             <Th width={scrollTableData[17].width}>
-              {shipmentType.ADDITIONAL_SHIPMENT_PRICE}
+              {shipmentType.SHIPMENT_DISTANT_PRICE}
             </Th>
           </ThContainer>
           <TbContainer>

@@ -187,10 +187,9 @@ export const scrollTableData = [
   },
   {
     id: 17,
-    label: shipmentType.ADDITIONAL_SHIPMENT_PRICE,
+    label: shipmentType.SHIPMENT_DISTANT_PRICE,
     width: Math.round(
-      (tableWidth.shipmentType.ADDITIONAL_SHIPMENT_PRICE / tableWidth.right) *
-        100
+      (tableWidth.shipmentType.SHIPMENT_DISTANT_PRICE / tableWidth.right) * 100
     ),
     className: "order_shipment_addtional_price",
   },
