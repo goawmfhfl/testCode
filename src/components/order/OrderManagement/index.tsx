@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   orderCodeType,
   orderProductType,
@@ -26,8 +27,12 @@ import {
   Tr,
 } from "@components/common/table/Table";
 import { fixedTableData, scrollTableData } from "@cache/order/table";
+import { useOrder } from "hooks/useOrder";
+import { OrderStatus } from "@models/order";
 
 const OrderManagement = () => {
+  const { ok, error, loading, caculatedOrderItem } = useOrder(OrderStatus.NEW);
+
   return (
     <ContentsContainer>
       <ContentsHeader headerName={ORDER_MANAGEMENT} />
@@ -52,16 +57,26 @@ const OrderManagement = () => {
             <Th width={fixedTableData[5].width}>{orderStatusType.ORDER}</Th>
           </ThContainer>
           <TbContainer>
-            <Tr>
-              <Td width={fixedTableData[0].width}>
-                <Checkbox />
-              </Td>
-              <Td width={fixedTableData[1].width} />
-              <Td width={fixedTableData[2].width} />
-              <Td width={fixedTableData[3].width} />
-              <Td width={fixedTableData[4].width} />
-              <Td width={fixedTableData[5].width} />
-            </Tr>
+            {caculatedOrderItem.map(
+              ({
+                merchantitemUid,
+                productCode,
+                orderProduct,
+                sellerName,
+                orderState,
+              }) => (
+                <Tr>
+                  <Td width={fixedTableData[0].width}>
+                    <Checkbox />
+                  </Td>
+                  <Td width={fixedTableData[1].width}>{merchantitemUid}</Td>
+                  <Td width={fixedTableData[2].width}>{productCode}</Td>
+                  <Td width={fixedTableData[3].width}>{orderProduct}</Td>
+                  <Td width={fixedTableData[4].width}>{sellerName}</Td>
+                  <Td width={fixedTableData[5].width}>{orderState}</Td>
+                </Tr>
+              )
+            )}
           </TbContainer>
         </FixedTable>
         <ScrollTable width={tableWidth.right}>
@@ -86,7 +101,6 @@ const OrderManagement = () => {
             </Th>
             <Th width={scrollTableData[9].width}>{sellerType.ID}</Th>
             <Th width={scrollTableData[10].width}>{sellerType.PHONE_NUMBER}</Th>
-            {/*  */}
             <Th width={scrollTableData[11].width}>{orderProductType.OPTION}</Th>
             <Th width={scrollTableData[12].width}>
               {orderProductType.QUANTITY}
@@ -106,26 +120,53 @@ const OrderManagement = () => {
             </Th>
           </ThContainer>
           <TbContainer>
-            <Tr>
-              <Td width={scrollTableData[0].width} />
-              <Td width={scrollTableData[1].width} />
-              <Td width={scrollTableData[2].width} />
-              <Td width={scrollTableData[3].width} />
-              <Td width={scrollTableData[4].width} />
-              <Td width={scrollTableData[5].width} />
-              <Td width={scrollTableData[6].width} />
-              <Td width={scrollTableData[7].width} />
-              <Td width={scrollTableData[8].width} />
-              <Td width={scrollTableData[9].width} />
-              <Td width={scrollTableData[10].width} />
-              <Td width={scrollTableData[11].width} />
-              <Td width={scrollTableData[12].width} />
-              <Td width={scrollTableData[13].width} />
-              <Td width={scrollTableData[14].width} />
-              <Td width={scrollTableData[15].width} />
-              <Td width={scrollTableData[16].width} />
-              <Td width={scrollTableData[17].width} />
-            </Tr>
+            {caculatedOrderItem.map(
+              ({
+                claimState,
+                courier,
+                invoiceNumber,
+                paymentDay,
+                recipientName,
+                recipientPhoneNumber,
+                address,
+                postCode,
+                shipmentMemo,
+                sellerId,
+                sellerPhoneNumber,
+                option,
+                quantity,
+                price,
+                optionPrice,
+                totalPrice,
+                shipmentPrice,
+                shipmentDistantPrice,
+              }) => (
+                <Tr>
+                  <Td width={scrollTableData[0].width}>{claimState}</Td>
+                  <Td width={scrollTableData[1].width}>{courier}</Td>
+                  <Td width={scrollTableData[2].width}>{invoiceNumber}</Td>
+                  <Td width={scrollTableData[3].width}>{paymentDay}</Td>
+                  <Td width={scrollTableData[4].width}>{recipientName}</Td>
+                  <Td width={scrollTableData[5].width}>
+                    {recipientPhoneNumber}
+                  </Td>
+                  <Td width={scrollTableData[6].width}>{address}</Td>
+                  <Td width={scrollTableData[7].width}>{postCode}</Td>
+                  <Td width={scrollTableData[8].width}>{shipmentMemo}</Td>
+                  <Td width={scrollTableData[9].width}>{sellerId}</Td>
+                  <Td width={scrollTableData[10].width}>{sellerPhoneNumber}</Td>
+                  <Td width={scrollTableData[11].width}>{option}</Td>
+                  <Td width={scrollTableData[12].width}>{quantity}</Td>
+                  <Td width={scrollTableData[13].width}>{price}</Td>
+                  <Td width={scrollTableData[14].width}>{optionPrice}</Td>
+                  <Td width={scrollTableData[15].width}>{totalPrice}</Td>
+                  <Td width={scrollTableData[16].width}>{shipmentPrice}</Td>
+                  <Td width={scrollTableData[17].width}>
+                    {shipmentDistantPrice}
+                  </Td>
+                </Tr>
+              )
+            )}
           </TbContainer>
         </ScrollTable>
       </Table>

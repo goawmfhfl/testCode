@@ -8,6 +8,7 @@ export interface GetOrdersBySellerInputType {
 }
 
 export interface OrderItemsType {
+  id: number;
   // 주문 번호
   merchantItemUid: string;
 
@@ -50,11 +51,13 @@ export interface OrderItemsType {
       name: string;
       value: string;
     }>;
-    // 옵션 갯수
-    quantity: number;
+
     // 옵션 가격
     price: number;
   }>;
+
+  // 상품 갯수
+  quantity: number;
 
   // 상품가
   discountAppliedPrice: number;
@@ -78,6 +81,7 @@ export const GET_ORDERS_BY_SELLER = gql`
       ok
       error
       orderItems {
+        id
         #주문번호
         merchantItemUid
 
@@ -124,11 +128,11 @@ export const GET_ORDERS_BY_SELLER = gql`
             name
             value
           }
-          # 상품개수
-          quantity
           # 옵션가
           price
         }
+        # 상품개수
+        quantity
 
         # 상품가
         discountAppliedPrice
