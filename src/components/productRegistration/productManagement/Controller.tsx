@@ -20,18 +20,19 @@ import {
 import { modalVar, systemModalVar } from "@cache/index";
 
 import {
-  checkAllBoxStatusVar,
-  filterOptionPageNumberVar,
-  filterOptionQueryVar,
-  filterOptionSkipQuantityVar,
-  filterOptionStatusVar,
   getProductBySellerVar,
   ProductsListVarType,
   selectedProductListVar,
   showHasCheckedAnyProductModal,
   showHasServerErrorModal,
-  temporaryQueryVar,
 } from "@cache/productManagement";
+
+import {
+  temporaryQueryVar,
+  checkAllBoxStatusVar,
+  filterOptionVar,
+} from "@cache/index";
+
 import {
   GetAllProductsBySellerInputType,
   GetAllProductsBySellerType,
@@ -49,6 +50,8 @@ import { Input as SearchInput } from "@components/common/input/SearchInput";
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 
 const Controller = () => {
+  const filterOption = useReactiveVar(filterOptionVar);
+
   const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
     selectedProductListVar
   );
@@ -57,19 +60,6 @@ const Controller = () => {
     (list) => list.id
   );
 
-  const filterOptionPageNumber: number = useReactiveVar(
-    filterOptionPageNumberVar
-  );
-
-  const filterOptionStatus: string | null = useReactiveVar(
-    filterOptionStatusVar
-  );
-
-  const filterOptionSkipQuantity: number = useReactiveVar(
-    filterOptionSkipQuantityVar
-  );
-
-  const filterOptionQuery = useReactiveVar(filterOptionQueryVar);
   const temporaryQuery = useReactiveVar(temporaryQueryVar);
 
   const [getProductList] = useLazyQuery<
@@ -77,12 +67,7 @@ const Controller = () => {
     GetAllProductsBySellerInputType
   >(GET_ALL_PRODUCTS_BY_SELLER, {
     variables: {
-      input: {
-        page: filterOptionPageNumber,
-        skip: filterOptionSkipQuantity,
-        status: filterOptionStatus,
-        query: filterOptionQuery,
-      },
+      input: filterOption,
     },
     fetchPolicy: "no-cache",
   });
@@ -95,12 +80,7 @@ const Controller = () => {
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
-          input: {
-            page: filterOptionPageNumber,
-            skip: filterOptionSkipQuantity,
-            status: filterOptionStatus,
-            query: filterOptionQuery,
-          },
+          input: filterOption,
         },
       },
       "GetAllProductsBySeller",
@@ -116,12 +96,7 @@ const Controller = () => {
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
-          input: {
-            page: filterOptionPageNumber,
-            skip: filterOptionSkipQuantity,
-            status: filterOptionStatus,
-            query: filterOptionQuery,
-          },
+          input: filterOption,
         },
       },
       "GetAllProductsBySeller",
@@ -137,12 +112,7 @@ const Controller = () => {
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
-          input: {
-            page: filterOptionPageNumber,
-            skip: filterOptionSkipQuantity,
-            status: filterOptionStatus,
-            query: filterOptionQuery,
-          },
+          input: filterOption,
         },
       },
       "GetAllProductsBySeller",
@@ -447,13 +417,16 @@ const Controller = () => {
 
   // 필터 쿼리
   const changeSkipQuantityHandler = ({ target: { value } }) => {
-    filterOptionSkipQuantityVar(Number(value));
+    filterOptionVar({
+      ...filterOption,
+      skip: Number(value),
+    });
   };
 
   // 디바운스
   useEffect(() => {
     const debounce = setTimeout(() => {
-      return filterOptionQueryVar(temporaryQuery);
+      return filterOptionVar({ ...filterOption, query: temporaryQuery });
     }, 500);
 
     return () => clearTimeout(debounce);

@@ -27,16 +27,14 @@ import {
   ChangeProductsInfoType,
   ChangeProductsInfoInputType,
 } from "@graphql/mutations/changeProductsInfo";
+
 import {
-  checkAllBoxStatusVar,
-  filterOptionPageNumberVar,
-  filterOptionQueryVar,
-  filterOptionSkipQuantityVar,
-  filterOptionStatusVar,
   getProductBySellerVar,
   selectedProductListVar,
   showHasServerErrorModal,
 } from "@cache/productManagement";
+import { checkAllBoxStatusVar, filterOptionVar } from "@cache/index";
+
 import {
   GET_ALL_PRODUCTS_BY_SELLER,
   GetAllProductsBySellerInputType,
@@ -46,18 +44,7 @@ import {
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
 
-  const filterOptionPageNumber: number = useReactiveVar(
-    filterOptionPageNumberVar
-  );
-
-  const filterOptionStatus: string | null = useReactiveVar(
-    filterOptionStatusVar
-  );
-
-  const filterOptionSkipQuantity: number = useReactiveVar(
-    filterOptionSkipQuantityVar
-  );
-  const filterQuery = useReactiveVar(filterOptionQueryVar);
+  const filterOption = useReactiveVar(filterOptionVar);
 
   const selectedProdcutList = useReactiveVar(selectedProductListVar);
   const selectedProductListIds: Array<number> = selectedProdcutList.map(
@@ -82,12 +69,7 @@ const ChangeCategoryModal = () => {
     GetAllProductsBySellerInputType
   >(GET_ALL_PRODUCTS_BY_SELLER, {
     variables: {
-      input: {
-        page: filterOptionPageNumber,
-        skip: filterOptionSkipQuantity,
-        status: filterOptionStatus,
-        query: filterQuery,
-      },
+      input: filterOption,
     },
     fetchPolicy: "no-cache",
   });
@@ -100,12 +82,7 @@ const ChangeCategoryModal = () => {
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
-          input: {
-            page: filterOptionPageNumber,
-            skip: filterOptionSkipQuantity,
-            status: filterOptionStatus,
-            query: filterQuery,
-          },
+          input: filterOption,
         },
       },
       "GetAllProductsBySeller",

@@ -7,7 +7,7 @@ import {
   ControllerRenderProps,
 } from "react-hook-form";
 import { useMutation, useReactiveVar, useLazyQuery } from "@apollo/client";
-import { modalVar, systemModalVar } from "@cache/index";
+import { modalVar, systemModalVar, checkAllBoxStatusVar } from "@cache/index";
 
 import {
   DISCOUNT_AMOUNT,
@@ -33,13 +33,10 @@ import {
 import {
   selectedProductListVar,
   getProductBySellerVar,
-  filterOptionStatusVar,
-  filterOptionSkipQuantityVar,
-  checkAllBoxStatusVar,
-  filterOptionQueryVar,
   showHasServerErrorModal,
-  filterOptionPageNumberVar,
 } from "@cache/productManagement";
+import { filterOptionVar } from "@cache/index";
+
 import {
   GET_ALL_PRODUCTS_BY_SELLER,
   GetAllProductsBySellerInputType,
@@ -56,16 +53,7 @@ const ChangeDiscountModal = () => {
   });
   const { register, watch, control, getValues } = method;
 
-  const filterOptionPageNumber: number = useReactiveVar(
-    filterOptionPageNumberVar
-  );
-  const filterOptionStatus: string | null = useReactiveVar(
-    filterOptionStatusVar
-  );
-  const filterOptionSkipQuantity: number = useReactiveVar(
-    filterOptionSkipQuantityVar
-  );
-  const filterQuery = useReactiveVar(filterOptionQueryVar);
+  const filterOption = useReactiveVar(filterOptionVar);
 
   const selectedProdcutList = useReactiveVar(selectedProductListVar);
   const selectedProductListIds: Array<number> = selectedProdcutList.map(
@@ -87,12 +75,7 @@ const ChangeDiscountModal = () => {
     GetAllProductsBySellerInputType
   >(GET_ALL_PRODUCTS_BY_SELLER, {
     variables: {
-      input: {
-        page: filterOptionPageNumber,
-        skip: filterOptionSkipQuantity,
-        status: filterOptionStatus,
-        query: filterQuery,
-      },
+      input: filterOption,
     },
     fetchPolicy: "no-cache",
   });
@@ -105,12 +88,7 @@ const ChangeDiscountModal = () => {
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
-          input: {
-            page: filterOptionPageNumber,
-            skip: filterOptionSkipQuantity,
-            status: filterOptionStatus,
-            query: filterQuery,
-          },
+          input: filterOption,
         },
       },
       "GetAllProductsBySeller",

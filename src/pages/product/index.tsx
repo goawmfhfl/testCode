@@ -2,26 +2,33 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { useLazyQuery, useMutation, useReactiveVar } from "@apollo/client";
+
 import {
   GET_ALL_PRODUCTS_BY_SELLER,
   GetAllProductsBySellerType,
   GetAllProductsBySellerInputType,
 } from "@graphql/queries/getAllProductsBySeller";
 import {
+  ChangeProductsInfoInputType,
+  ChangeProductsInfoType,
+  CHANGE_PRODUCTS_INFO,
+} from "@graphql/mutations/changeProductsInfo";
+
+import {
   selectedProductListVar,
-  checkAllBoxStatusVar,
-  pageNumberListVar,
-  filterOptionSkipQuantityVar,
-  filterOptionStatusVar,
-  filterOptionQueryVar,
   showHasServerErrorModal,
-  filterOptionPageNumberVar,
   ProductsListVarType,
+  getProductBySellerVar,
 } from "@cache/productManagement";
+import {
+  systemModalVar,
+  filterOptionVar,
+  pageNumberListVar,
+  checkAllBoxStatusVar,
+} from "@cache/index";
+import { tableData } from "@cache/productManagement/table";
 
-import { systemModalVar } from "@cache/index";
-import { getProductBySellerVar } from "@cache/productManagement";
-
+import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
 import ContentsHeader from "@components/common/ContentsHeader";
@@ -34,14 +41,6 @@ import {
   SelectInput as Dropdown,
   OptionInput as Option,
 } from "@components/common/input/Dropdown";
-import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
-
-import {
-  ChangeProductsInfoInputType,
-  ChangeProductsInfoType,
-  CHANGE_PRODUCTS_INFO,
-} from "@graphql/mutations/changeProductsInfo";
-import { tableData } from "@cache/productManagement/table";
 import {
   ThContainer,
   Th,
@@ -61,23 +60,12 @@ const saleStatusList = [
 
 const Product = () => {
   const productList = useReactiveVar(getProductBySellerVar);
+
+  const filterOption = useReactiveVar(filterOptionVar);
+
   const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
     selectedProductListVar
   );
-
-  const filterOptionPageNumber: number = useReactiveVar(
-    filterOptionPageNumberVar
-  );
-
-  const filterOptionStatus: string | null = useReactiveVar(
-    filterOptionStatusVar
-  );
-
-  const filterOptionSkipQuantity: number = useReactiveVar(
-    filterOptionSkipQuantityVar
-  );
-
-  const filterOptionQuery = useReactiveVar(filterOptionQueryVar);
 
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
 
@@ -86,12 +74,7 @@ const Product = () => {
     GetAllProductsBySellerInputType
   >(GET_ALL_PRODUCTS_BY_SELLER, {
     variables: {
-      input: {
-        page: filterOptionPageNumber,
-        skip: filterOptionSkipQuantity,
-        status: filterOptionStatus,
-        query: filterOptionQuery,
-      },
+      input: filterOption,
     },
     fetchPolicy: "no-cache",
   });
@@ -104,12 +87,7 @@ const Product = () => {
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
-          input: {
-            page: filterOptionPageNumber,
-            skip: filterOptionSkipQuantity,
-            status: filterOptionStatus,
-            query: filterOptionQuery,
-          },
+          input: filterOption,
         },
       },
       "GetAllProductsBySeller",
@@ -322,12 +300,7 @@ const Product = () => {
         showHasServerErrorModal(error);
       }
     })();
-  }, [
-    filterOptionStatus,
-    filterOptionSkipQuantity,
-    filterOptionQuery,
-    filterOptionPageNumber,
-  ]);
+  }, [filterOption]);
 
   return (
     <Layout>

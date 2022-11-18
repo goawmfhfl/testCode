@@ -7,7 +7,26 @@ import {
   PRODUCT_REGISTRATION_SECTIONS,
 } from "@constants/index";
 
+// TABLE: 테이블 필터
+export const filterOptionVar = makeVar<{
+  page: number;
+  skip?: number;
+  status?: string;
+  query: string;
+}>({
+  page: 1,
+  skip: 20,
+  status: null,
+  query: "",
+});
+
+// TABLE: 페이지네이션
+export const pageNumberListVar = makeVar<Array<number>>([]);
 export const paginationSkipVar = makeVar<number>(0);
+
+// TABLE: 기타
+export const temporaryQueryVar = makeVar<string>("");
+export const checkAllBoxStatusVar = makeVar<boolean>(false);
 
 export const modalVar = makeVar<{
   isVisible: boolean;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled, { css } from "styled-components";
 import mediumDoubleLeftActiveSvg from "@icons/medium-double-left-active.svg";
 import mediumDoubleRightActiveSvg from "@icons/medium-double-right-active.svg";
@@ -11,15 +11,15 @@ import mediumLeftInActvieSvg from "@icons/medium-left-inactive.svg";
 import mediumRightInActiveSvg from "@icons/medium-right-inactive.svg";
 
 import { useReactiveVar } from "@apollo/client";
-import { paginationSkipVar } from "@cache/index";
 import {
-  filterOptionPageNumberVar,
+  paginationSkipVar,
   pageNumberListVar,
-} from "@cache/productManagement";
+  filterOptionVar,
+} from "@cache/index";
 
 const Pagination = () => {
   const pageNumberList = useReactiveVar(pageNumberListVar);
-  const filterOptionPageNumber = useReactiveVar(filterOptionPageNumberVar);
+  const filterOption = useReactiveVar(filterOptionVar);
   const paginationSkip = useReactiveVar(paginationSkipVar);
 
   const [pageList, setPageList] = useState<Array<number>>(
@@ -28,31 +28,44 @@ const Pagination = () => {
   const totalSkipPage: number = Math.floor(pageNumberList.length / 10);
 
   const handlePageNumberClick = (pageNumber: number) => () => {
-    filterOptionPageNumberVar(pageNumber);
+    filterOptionVar({ ...filterOption, page: pageNumber });
   };
 
   const handleNextPageClick = () => {
     if (paginationSkip >= totalSkipPage) return;
 
     paginationSkipVar(paginationSkip + 1);
-    filterOptionPageNumberVar((paginationSkip + 1) * 10 + 1);
+    filterOptionVar({
+      ...filterOption,
+      page: (paginationSkip + 1) * 10 + 1,
+    });
   };
 
   const handlePrevPageClick = () => {
     if (paginationSkip <= 0) return;
 
     paginationSkipVar(paginationSkip - 1);
-    filterOptionPageNumberVar(paginationSkip * 10);
+    filterOptionVar({
+      ...filterOption,
+      page: paginationSkip * 10,
+    });
   };
 
   const handleStartPageClick = () => {
     paginationSkipVar(0);
-    filterOptionPageNumberVar(1);
+
+    filterOptionVar({
+      ...filterOption,
+      page: 1,
+    });
   };
 
   const handleEndPageClick = () => {
     paginationSkipVar(totalSkipPage);
-    filterOptionPageNumberVar(pageNumberList.length);
+    filterOptionVar({
+      ...filterOption,
+      page: pageNumberList.length,
+    });
   };
 
   useEffect(() => {
@@ -80,7 +93,7 @@ const Pagination = () => {
           <PageItem
             key={index}
             onClick={handlePageNumberClick(page)}
-            isActive={filterOptionPageNumber === page}
+            isActive={filterOption.page === page}
           >
             {page}
           </PageItem>

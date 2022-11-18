@@ -1,28 +1,28 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useLazyQuery, useReactiveVar } from "@apollo/client";
-import questionMarkSrc from "@icons/questionmark.svg";
 
+import questionMarkSrc from "@icons/questionmark.svg";
 import Button from "@components/common/Button";
-import {
-  filterOptionStatusVar,
-  getProductBySellerVar,
-} from "@cache/productManagement";
-import { useNavigate } from "react-router-dom";
+
 import {
   GET_ALL_PRODCUCTS_STATUS_BY_SELLER,
   GetAllProductsStatusBySellerType,
   GetAllProductsStatusBySellerInPutType,
 } from "@graphql/queries/getAllProductsBySeller";
-import { useEffect, useState } from "react";
-import { systemModalVar } from "@cache/index";
+
+import { systemModalVar, filterOptionVar } from "@cache/index";
+import { getProductBySellerVar } from "@cache/productManagement";
+
 import { Pathnames } from "@constants/index";
 
 const FilterBar = () => {
   const navigate = useNavigate();
 
-  const productList = useReactiveVar(getProductBySellerVar);
+  const filterOption = useReactiveVar(filterOptionVar);
 
-  const filterOptionStatus = useReactiveVar(filterOptionStatusVar);
+  const productList = useReactiveVar(getProductBySellerVar);
 
   const [totalPageLength, setTotalPageLength] = useState<{
     onSaleProducutsLength: number;
@@ -42,7 +42,7 @@ const FilterBar = () => {
 
   const changeFilterOptionNameClick =
     (filterOptionName: string | null) => () => {
-      filterOptionStatusVar(filterOptionName);
+      filterOptionVar({ ...filterOption, status: filterOptionName });
     };
 
   const handleButtonClick = () => {
@@ -137,25 +137,25 @@ const FilterBar = () => {
       <FilterList>
         <Filter
           onClick={changeFilterOptionNameClick(null)}
-          isActvie={filterOptionStatus === null}
+          isActvie={filterOption.status === null}
         >
           전체
         </Filter>
         <Filter
           onClick={changeFilterOptionNameClick("ON_SALE")}
-          isActvie={filterOptionStatus === "ON_SALE"}
+          isActvie={filterOption.status === "ON_SALE"}
         >
           판매중{onSaleProducutsLength}
         </Filter>
         <Filter
           onClick={changeFilterOptionNameClick("STOP_SALE")}
-          isActvie={filterOptionStatus === "STOP_SALE"}
+          isActvie={filterOption.status === "STOP_SALE"}
         >
           숨김{stopSaleProducutsLength}
         </Filter>
         <Filter
           onClick={changeFilterOptionNameClick("SOLD_OUT")}
-          isActvie={filterOptionStatus === "SOLD_OUT"}
+          isActvie={filterOption.status === "SOLD_OUT"}
         >
           <QuestionMarkIcon src={questionMarkSrc} />
           품절{soldOutProductsLength}
