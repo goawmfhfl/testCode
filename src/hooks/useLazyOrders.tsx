@@ -16,7 +16,7 @@ import {
 import caculateOrderItem from "@utils/order/caculateOrderItem";
 import contructOrderItem from "@utils/order/contructOrderItem";
 
-const useLazyOrder = (orderStatus: OrderStatus) => {
+const useLazyOrders = (orderStatus: OrderStatus) => {
   const [orderItems, setOrderItems] = useState<Array<caculatedOrderItemType>>(
     []
   );
@@ -42,4 +42,4 @@ const useLazyOrder = (orderStatus: OrderStatus) => {
 
   return { loading, error, orderItems, getOrderItem };
 };
-export default useLazyOrder;
+export default useLazyOrders;

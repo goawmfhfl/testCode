@@ -26,7 +26,7 @@ import {
   ThContainer,
   Tr,
 } from "@components/common/table/Table";
-import useLazyOrder from "hooks/useLazyOrder";
+import useLazyOrder from "hooks/useLazyOrders";
 import { fixedTableData, scrollTableData } from "@cache/order/table";
 import { OrderStatus } from "@models/order";
 
