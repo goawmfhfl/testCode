@@ -220,6 +220,7 @@ export enum Pathnames {
 }
 
 export enum HeaderNames {
+  Order = "주문관리",
   Shop = "샵 설정",
   Product = "상품 관리",
   ProductRegistration = "상품 등록",

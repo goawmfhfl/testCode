@@ -3,7 +3,6 @@ import {
   orderCodeType,
   orderProductType,
   orderStatusType,
-  ORDER_MANAGEMENT,
   PAYMENT_DAY,
   recipientType,
   sellerType,
@@ -29,6 +28,7 @@ import {
 import useLazyOrder from "hooks/useLazyOrders";
 import { fixedTableData, scrollTableData } from "@cache/order/table";
 import { OrderStatus } from "@models/order";
+import { HeaderNames } from "@constants/index";
 
 const OrderManagement = () => {
   const { error, loading, orderItems, getOrderItem } = useLazyOrder(
@@ -50,7 +50,7 @@ const OrderManagement = () => {
 
   return (
     <ContentsContainer>
-      <ContentsHeader headerName={ORDER_MANAGEMENT} />
+      <ContentsHeader headerName={HeaderNames.Order} />
       <FilterBar />
       <Controller />
       <Table width={tableWidth.index}>
