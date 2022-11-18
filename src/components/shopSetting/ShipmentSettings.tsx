@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { SyntheticEvent, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import styled from "styled-components/macro";
 
@@ -21,18 +21,9 @@ import {
 
 const ShipmentSettings = () => {
   const { register, watch, setValue } = useFormContext();
+
   const shipmentPriceType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
-
   const isShipmentPriceFree = shipmentPriceType === ShipmentChargeType.Free;
-
-  useEffect(() => {
-    if (shipmentPriceType === ShipmentChargeType.Free) {
-      setValue(SHIPMENT_PRICE, 0);
-      setValue(SHIPMENT_CONDITIONAL_PRICE, null);
-    } else {
-      setValue(SHIPMENT_PRICE, null);
-    }
-  }, [shipmentPriceType]);
 
   return (
     <Container>
@@ -76,7 +67,22 @@ const ShipmentSettings = () => {
                     value: ShipmentChargeType.Free,
                   },
                 ]}
-                register={register(SHIPMENT_PRICE_TYPE)}
+                register={{
+                  ...register(SHIPMENT_PRICE_TYPE),
+                  // eslint-disable-next-line
+                  onChange: async (e: SyntheticEvent<HTMLSelectElement>) => {
+                    setValue(SHIPMENT_PRICE_TYPE, e.currentTarget.value);
+
+                    if (e.currentTarget.value === ShipmentChargeType.Free) {
+                      setValue(SHIPMENT_PRICE, 0);
+                      setValue(SHIPMENT_CONDITIONAL_PRICE, null);
+                    }
+
+                    if (e.currentTarget.value === ShipmentChargeType.Charged) {
+                      setValue(SHIPMENT_PRICE, null);
+                    }
+                  },
+                }}
               />
 
               <PriceInputContainer>

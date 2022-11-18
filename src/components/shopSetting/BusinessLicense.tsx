@@ -25,7 +25,9 @@ const BusinessLicense = () => {
     (el: string) => el !== ""
   ) as boolean;
 
-  const handleRegisterButtonClick = () => {
+  const handleRegisterButtonClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+
     modalVar({
       ...modalVar(),
       isVisible: true,

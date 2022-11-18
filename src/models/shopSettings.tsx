@@ -1,5 +1,30 @@
 import { UploadFileType } from "@models/index";
-import { ShipmentChargeType } from "./productRegistration/shipmentTemplate";
+import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
+import {
+  RETURN_POLICY,
+  SHIPMENT_POLICY,
+  SHOP_INTRODUCTION,
+  SHIPMENT_BUNDLING,
+  SHIPMENT_PRICE_TYPE,
+  SHIPMENT_PRICE,
+  SHIPMENT_DISTANT_PRICE,
+  SHIPMENT_RETURN_PRICE,
+  SHIPMENT_EXCHANGE_PRICE,
+  SHIPMENT_CONDITIONAL_PRICE,
+} from "@cache/shopSettings";
+
+export interface ShopFormFields {
+  [SHOP_INTRODUCTION]: string;
+  [SHIPMENT_POLICY]: string;
+  [RETURN_POLICY]: string;
+  [SHIPMENT_BUNDLING]: string;
+  [SHIPMENT_PRICE_TYPE]: ShipmentChargeType;
+  [SHIPMENT_PRICE]: number;
+  [SHIPMENT_DISTANT_PRICE]: number;
+  [SHIPMENT_RETURN_PRICE]: number;
+  [SHIPMENT_EXCHANGE_PRICE]: number;
+  [SHIPMENT_CONDITIONAL_PRICE]: number;
+}
 
 export type InputValueTypes =
   | string
@@ -40,7 +65,7 @@ export interface SettlementAccountVariables {
   hasInformation: boolean;
   accountName: string;
   accountNumber: string;
-  bankCode: string;
+  bankCode?: string;
   bankName: string;
 }
 

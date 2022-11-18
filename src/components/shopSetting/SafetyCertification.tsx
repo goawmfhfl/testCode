@@ -11,7 +11,11 @@ import { safetyCertificationVar } from "@cache/shopSettings";
 const SafetyCertification = () => {
   const safetyCerification = useReactiveVar(safetyCertificationVar);
 
-  const handleAuthenticationButtonClick = () => {
+  const handleAuthenticationButtonClick = (
+    e: React.MouseEvent<HTMLElement>
+  ) => {
+    e.preventDefault();
+
     modalVar({
       ...modalVar(),
       isVisible: true,

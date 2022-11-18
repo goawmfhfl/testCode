@@ -115,11 +115,6 @@ const ProductRegistration = () => {
     }
   );
 
-  const onSubmit: SubmitHandler<ProductRegistrationFormValues> = (data) => {
-    console.log("form is submitted!");
-    console.log(data);
-  };
-
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     productId &&
@@ -128,7 +123,6 @@ const ProductRegistration = () => {
           data: {
             getProductById: { product, ok, error },
           },
-          loading,
         } = await getData();
 
         if (ok) {
@@ -243,10 +237,7 @@ const ProductRegistration = () => {
   return (
     <FormProvider {...methods}>
       <Layout hasSaveBar={true}>
-        <ContentsContainer
-          isForm={true}
-          onSubmit={methods.handleSubmit(onSubmit)}
-        >
+        <ContentsContainer isForm={true}>
           <ContentsHeader
             headerName={HeaderNames.ProductRegistration as HeaderNames}
           >

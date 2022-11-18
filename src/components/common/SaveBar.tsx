@@ -1,7 +1,8 @@
 import React from "react";
 import styled, { useTheme } from "styled-components/macro";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 import Button from "@components/common/Button";
 
@@ -25,6 +26,7 @@ import { shipmentTemplatesVar } from "@cache/productRegistration/shipmentTemplat
 import {
   shopSettingsSectionMapper,
   productRegistrationSectionMapper,
+  Pathnames,
 } from "@constants/index";
 
 import {
@@ -38,46 +40,19 @@ import {
 } from "@models/productRegistration/index";
 
 import { hasEveryInputFulfilled } from "@utils/index";
-import { restructureShopSettingStates } from "@utils/shopSettings";
+import restructureShopSettingStates from "@utils/shopSettings/restructureShopSettingStates";
 import { restructureProductRegistrationStates } from "@utils/productRegistration";
-
-const TEMPORARY_SAVE_SHOP_SETTINGS = gql`
-  mutation TemporarySaveShop($input: TemporarySaveShopInput!) {
-    temporarySaveShop(input: $input) {
-      ok
-      error
-    }
-  }
-`;
-
-const SAVE_SHOP_SETTINGS = gql`
-  mutation SubmitShop($input: RegisterShopInput!) {
-    registerShop(input: $input) {
-      ok
-      error
-    }
-  }
-`;
-
-const TEMPORARY_SAVE_PRODUCT = gql`
-  mutation TemporarySaveProduct($input: TemporarySaveProductInput!) {
-    temporarySaveProduct(input: $input) {
-      ok
-      error
-    }
-  }
-`;
-
-const CREATE_PRODUCT = gql`
-  mutation CreateProduct($input: CreateProductInput!) {
-    createProduct(input: $input) {
-      ok
-      error
-    }
-  }
-`;
+import useShopInfo from "@hooks/useShopInfo";
+import { GET_SHOP_INFO, ShopInfo } from "@graphql/queries/getShopInfo";
+import {
+  TEMPORARY_SAVE_PRODUCT,
+  TEMPORARY_SAVE_SHOP_SETTINGS,
+  SAVE_SHOP_SETTINGS,
+  CREATE_PRODUCT,
+} from "@graphql/mutations/shop";
 
 const SaveBar = () => {
+  const navigate = useNavigate();
   const theme = useTheme();
 
   const formContext = useFormContext();
@@ -88,12 +63,31 @@ const SaveBar = () => {
       temporarySaveShop: {
         ok: boolean;
         error: string;
+        __typename;
       };
     },
     {
       input: TemporarySaveShopSettingsInputType;
     }
-  >(TEMPORARY_SAVE_SHOP_SETTINGS);
+  >(TEMPORARY_SAVE_SHOP_SETTINGS, {
+    update(cache) {
+      const shopInfo = cache.readQuery<{ getShopInfo: ShopInfo }>({
+        query: GET_SHOP_INFO,
+      });
+
+      const update = {
+        ...shopInfo.getShopInfo,
+        ...restructureShopSettingStates(watch),
+      };
+
+      cache.writeQuery({
+        query: GET_SHOP_INFO,
+        data: {
+          getShopInfo: update,
+        },
+      });
+    },
+  });
 
   const [submitShopSettings] =
     useMutation<
@@ -133,23 +127,27 @@ const SaveBar = () => {
       }
     >(CREATE_PRODUCT);
 
+  const { data: shopData, loading } = useShopInfo();
+
   const handleTemporarySaveButtonClick = async (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
     e.preventDefault();
 
-    if (location.pathname === "/shop/settings") {
+    if (location.pathname === Pathnames.Shop) {
       const temporarySaveShopInput = restructureShopSettingStates(watch);
+
+      const result = await temporarySaveShopSettings({
+        variables: {
+          input: temporarySaveShopInput,
+        },
+      });
 
       const {
         data: {
           temporarySaveShop: { ok, error },
         },
-      } = await temporarySaveShopSettings({
-        variables: {
-          input: temporarySaveShopInput,
-        },
-      });
+      } = result;
 
       if (!ok) {
         systemModalVar({
@@ -169,12 +167,18 @@ const SaveBar = () => {
         isVisible: true,
         description: <>임시저장 되었습니다.</>,
         cancelButtonVisibility: false,
+        confirmButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
       });
 
       return;
     }
 
-    if (location.pathname === "/product/registration") {
+    if (location.pathname === Pathnames.ProductRegistration) {
       const input = restructureProductRegistrationStates(formContext);
 
       const result = await temporarySaveProduct({
@@ -192,7 +196,7 @@ const SaveBar = () => {
   ) => {
     e.preventDefault();
 
-    if (location.pathname === "/shop/settings") {
+    if (location.pathname === Pathnames.Shop) {
       const input = restructureShopSettingStates(watch);
 
       const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
@@ -257,17 +261,17 @@ const SaveBar = () => {
         return;
       }
 
-      const {
-        data: {
-          registerShop: { ok, error },
-        },
-      } = await submitShopSettings({
+      const result = await submitShopSettings({
         variables: {
           input,
         },
       });
 
-      console.log(ok, error);
+      const {
+        data: {
+          registerShop: { ok, error },
+        },
+      } = result;
 
       if (!ok) {
         systemModalVar({
@@ -282,17 +286,40 @@ const SaveBar = () => {
         return;
       }
 
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        description: <>저장 되었습니다.</>,
-        cancelButtonVisibility: false,
-      });
+      if (!shopData.getShopInfo.registered) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: <>샵 등록을 축하드려요!</>,
+          cancelButtonVisibility: false,
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+            });
+          },
+        });
+
+        navigate("/product");
+      } else {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: <>저장 되었습니다.</>,
+          cancelButtonVisibility: false,
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+            });
+          },
+        });
+      }
 
       return;
     }
 
-    if (location.pathname === "/product/registration") {
+    if (location.pathname === Pathnames.ProductRegistration) {
       const input = restructureProductRegistrationStates(formContext);
 
       const isDiscounted = watch(IS_DISCOUNTED) as boolean;
@@ -380,19 +407,23 @@ const SaveBar = () => {
     }
   };
 
+  const hasShopRegistered = shopData?.getShopInfo.registered;
+
   return (
     <Container>
       <ButtonContainer>
-        <TemporarySaveButton
-          size="big"
-          width="126px"
-          color={theme.palette.white}
-          backgroundColor={theme.palette.grey700}
-          // eslint-disable-next-line
-          onClick={handleTemporarySaveButtonClick}
-        >
-          임시 저장
-        </TemporarySaveButton>
+        {!hasShopRegistered && (
+          <TemporarySaveButton
+            size="big"
+            width="126px"
+            color={theme.palette.white}
+            backgroundColor={theme.palette.grey700}
+            // eslint-disable-next-line
+            onClick={handleTemporarySaveButtonClick}
+          >
+            임시 저장
+          </TemporarySaveButton>
+        )}
 
         <SubmitButton
           size="big"
@@ -403,7 +434,7 @@ const SaveBar = () => {
           // eslint-disable-next-line
           onClick={handleSubmitButtonClick}
         >
-          등록
+          {hasShopRegistered ? "저장" : "등록"}
         </SubmitButton>
 
         <Button size="big" width="126px">

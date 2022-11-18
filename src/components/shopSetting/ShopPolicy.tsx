@@ -11,7 +11,7 @@ const ShopPolicy = () => {
   const { register } = useFormContext();
 
   return (
-    <ShopPolicyContainer>
+    <Container>
       <NoticeContainer icon={questionMarkIconSource} width={"379px"}>
         배송 정책, 교환/환불 정책은 상품 상세페이지 하단에 노출됩니다.
       </NoticeContainer>
@@ -39,11 +39,11 @@ const ShopPolicy = () => {
           />
         </TextareaContainer>
       </SectionContainer>
-    </ShopPolicyContainer>
+    </Container>
   );
 };
 
-const ShopPolicyContainer = styled.div`
+const Container = styled.div`
   display: flex;
   flex-direction: column;
 

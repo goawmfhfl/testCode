@@ -118,7 +118,7 @@ const UnfulfilledMessageWrapper = styled.div`
 
 const Wrapper = styled.div`
   width: 100%;
-  overflow: scroll;
+  overflow: hidden;
   -ms-overflow-style: none;
 `;
 

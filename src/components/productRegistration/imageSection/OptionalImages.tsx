@@ -9,7 +9,7 @@ import ProductImage from "@components/productRegistration/imageSection/common/Pr
 import AddImageInputWrapper from "@components/productRegistration/imageSection/common/AddImageInputWrapper";
 import AddImageInput from "@components/productRegistration/imageSection/common/AddImageInput";
 
-import { ProductImageType, ImageType } from "@models/productImages";
+import { ProductImageType, UploadedFileType } from "@models/productImages";
 
 import { optionalImagesVar } from "@cache/productRegistration/productImages";
 import {
@@ -130,7 +130,7 @@ const ProductImageSection = () => {
 
     optionalImagesVar([
       ...optionalImagesVar(),
-      { id: uuidv4(), url: "", type: ImageType.PRODUCT_OPTIONAL },
+      { id: uuidv4(), url: "", type: UploadedFileType.PRODUCT_OPTIONAL },
     ]);
   }, [optionalImages]);
 

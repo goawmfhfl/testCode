@@ -26,6 +26,7 @@ module.exports = {
       "@cache": path.resolve(__dirname, "cache"),
       "@constants": path.resolve(__dirname, "constants"),
       "@graphql": path.resolve(__dirname, "graphql"),
+      "@hooks": path.resolve(__dirname, "hooks"),
     },
     configure: {
       resolve: {

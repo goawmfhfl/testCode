@@ -22,7 +22,11 @@ const PhoneNumber = () => {
     );
   };
 
-  const handleChangePhoneNumberButtonClick = () => {
+  const handleChangePhoneNumberButtonClick = (
+    e: React.MouseEvent<HTMLElement>
+  ) => {
+    e.preventDefault();
+
     modalVar({
       ...modalVar(),
       isVisible: true,

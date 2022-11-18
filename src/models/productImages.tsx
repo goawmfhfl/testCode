@@ -1,10 +1,10 @@
 export interface ProductImageType {
   id: string;
   url: string | undefined;
-  type: ImageType;
+  type: UploadedFileType;
 }
 
-export enum ImageType {
+export enum UploadedFileType {
   PRODUCT_THUMBNAIL = "PRODUCT_THUMBNAIL",
   PRODUCT_REQUIRED = "PRODUCT_REQUIRED",
   PRODUCT_OPTIONAL = "PRODUCT_OPTIONAL",

@@ -40,7 +40,9 @@ const SettlementAccount = () => {
       component: <SettlementAccountModal />,
     });
 
-  const handleRegisterButtonClick = () => {
+  const handleRegisterButtonClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+
     showSettlementAccountModal();
   };
 

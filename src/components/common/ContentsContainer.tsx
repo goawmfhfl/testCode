@@ -1,20 +1,13 @@
-import React, { BaseSyntheticEvent } from "react";
+import React from "react";
 import styled, { css } from "styled-components/macro";
 
 interface ContentsContainerProps {
   isForm?: boolean | undefined;
-  onSubmit?: (
-    e?: BaseSyntheticEvent<object, any, any> | undefined
-  ) => Promise<void>;
   children: React.ReactNode;
 }
 
-const ContentsContainer = ({
-  isForm,
-  onSubmit,
-  children,
-}: ContentsContainerProps) => {
-  if (!(isForm ?? false) || !onSubmit) {
+const ContentsContainer = ({ isForm, children }: ContentsContainerProps) => {
+  if (!(isForm ?? false)) {
     return <Container>{children}</Container>;
   }
 
@@ -25,14 +18,6 @@ const ContentsContainer = ({
         if (e.key === "Enter") {
           e.preventDefault();
         }
-      }}
-      onSubmit={(e) => {
-        e.preventDefault();
-
-        // eslint-disable-next-line
-        (async () => {
-          await onSubmit();
-        })();
       }}
     >
       {children}

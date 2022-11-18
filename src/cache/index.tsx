@@ -27,7 +27,7 @@ export const overModalVar = makeVar<{
 
 export const systemModalVar = makeVar<{
   isVisible: boolean;
-  icon: string;
+  icon?: string;
   description: React.ReactNode;
   confirmButtonText: string;
   confirmButtonVisibility: boolean;

@@ -1,4 +1,4 @@
-import { ImageType } from "@models/productImages";
+import { UploadedFileType } from "@models/productImages";
 import { ShipmentChargeType } from "./shipmentTemplate";
 
 export enum CategoryName {
@@ -43,7 +43,7 @@ export enum CategoryName {
 
 export interface UploadedFileInfos {
   url: string;
-  type: ImageType;
+  type: UploadedFileType;
 }
 
 export enum ColorType {

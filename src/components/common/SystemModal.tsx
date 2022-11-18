@@ -30,7 +30,11 @@ const SystemModal = () => {
             size="small"
             full={false}
             className={hasAllButtons && "positive"}
-            onClick={confirmButtonClickHandler}
+            onClick={(e: React.MouseEvent<HTMLElement>) => {
+              e.preventDefault();
+
+              confirmButtonClickHandler();
+            }}
             autoFocus={true}
           >
             {confirmButtonText}

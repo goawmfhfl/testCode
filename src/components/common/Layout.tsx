@@ -30,11 +30,13 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
         <SideNavigationBar />
 
         <ContentsContainer
+          hasBottomMargin={hasSaveBar}
           ref={(newRef: HTMLElement) => contentsContainerReferenceVar(newRef)}
         >
           <ContentsWrapper>{children}</ContentsWrapper>
           <Footer />
         </ContentsContainer>
+
         {hasSaveBar && <SaveBar />}
       </Container>
 
@@ -60,7 +62,9 @@ const Container = styled.div`
   min-height: 100vh;
 `;
 
-const ContentsContainer = styled.div`
+const ContentsContainer = styled.div<{
+  hasBottomMargin: boolean;
+}>`
   flex: 1 1 0;
 
   display: flex;
@@ -68,6 +72,7 @@ const ContentsContainer = styled.div`
 
   margin-left: 210px;
   margin-top: 56px;
+  margin-bottom: ${({ hasBottomMargin }) => (hasBottomMargin ? "72px" : "")};
 
   overflow: scroll;
 `;

@@ -24,7 +24,7 @@ import {
 
 import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
 
-export function restructureShopSettingStates(
+export default function restructureShopSettingStates(
   watch: UseFormWatch<Record<string, any>>
 ): SaveShopSettingsInputType {
   const description = watch(SHOP_INTRODUCTION) as string;

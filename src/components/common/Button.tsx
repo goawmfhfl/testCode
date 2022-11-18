@@ -38,6 +38,8 @@ const Button = styled.button<{
   justify-content: center;
   align-items: center;
 
+  user-select: none;
+
   ${sizeStyles};
   width: ${({ full, width }) => (full ? "100%" : width ? width : "")};
   border: 1px solid
@@ -65,7 +67,6 @@ const Button = styled.button<{
       color: ${palette.grey500} !important;
 
       cursor: default;
-      user-select: none;
       pointer-events: none;
       `
       : ""};

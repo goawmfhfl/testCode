@@ -177,6 +177,7 @@ const SafetyModal = () => {
           })
         }
       />
+
       <Title>안전기준 적합 확인 검사 신고번호 인증하기</Title>
       <NoticeContainer icon={exclamationmarkSrc} width={"458px"}>
         캔들, 디퓨저 판매 창작자는 검사 인증을 완료해야 상품 등록시 카테고리
@@ -216,8 +217,11 @@ const SafetyModal = () => {
             size="small"
             full={false}
             // eslint-disable-next-line
-            onClick={async () => {
+            onClick={async (e) => {
+              e.preventDefault();
+
               await handleAuthenticationButtonClick();
+
               setIsLoading(false);
             }}
             disabled={isLoading}
@@ -273,6 +277,9 @@ const Icon = styled.img`
   position: absolute;
   top: 12.79px;
   right: 12.77px;
+
+  cursor: pointer;
+  user-select: none;
 `;
 
 const Title = styled.h2`
@@ -325,6 +332,8 @@ const AuthenticationButton = styled(Button)`
   line-height: 14px;
   text-align: center;
   letter-spacing: 0.1px;
+
+  user-select: none;
 `;
 
 const AuthenticationStatus = styled.span`

@@ -1,22 +1,21 @@
-// eslint-disable
 import React, { ChangeEvent } from "react";
 import { useReactiveVar } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
 import axios from "axios";
 import styled from "styled-components/macro";
 
+import { shopImagesVar, SHOP_INTRODUCTION } from "@cache/shopSettings";
+import { systemModalVar } from "@cache/index";
+import { validateImageDimensionRatio } from "@utils/index";
+
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
-
 import addImageSrc from "@icons/addImage.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import infoIconSrc from "@icons/info.svg";
 import questionmarkSrc from "@icons/questionmark.svg";
 import closeIconSource from "@icons/delete.svg";
 import photochangeSrc from "@icons/photochange.svg";
-import { shopImagesVar, SHOP_INTRODUCTION } from "@cache/shopSettings";
-import { systemModalVar } from "@cache/index";
-import { validateImageDimensionRatio } from "@utils/index";
 
 const ShopInfo = () => {
   const { register, watch } = useFormContext();

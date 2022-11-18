@@ -209,13 +209,14 @@ export enum Pathnames {
   Product = "/product",
   ProductRegistration = "/product/registration",
   Order = "/order",
-  OrderCancel = "/order?claim=cancel",
-  OrderReturn = "/order?claim=return",
-  OrderExchange = "/order?claim=exchange",
+  // OrderCancel = "/order?claim=cancel",
+  // OrderReturn = "/order?claim=return",
+  // OrderExchange = "/order?claim=exchange",
   Inquiry = "/inquiry",
   Settlement = "/settlement",
   Shop = "/shop",
   Notice = "/notice",
+  Error = "/error",
 }
 
 export enum HeaderNames {
