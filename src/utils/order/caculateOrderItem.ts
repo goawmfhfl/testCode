@@ -7,6 +7,8 @@ const caculateOrderItem = (recontructOrderItem: NormalizedListType) => {
   const result = orderAllIds.map((id) => {
     const order = orderByid[id];
 
+    const orderId = order.id;
+
     const paymentDay = "결제일";
 
     const orderCodeStatus = () => {
@@ -84,6 +86,7 @@ const caculateOrderItem = (recontructOrderItem: NormalizedListType) => {
     } = sellerStatus();
 
     return {
+      orderId,
       paymentDay,
       merchantitemUid,
       productCode,

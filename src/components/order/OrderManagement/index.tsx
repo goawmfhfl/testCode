@@ -26,12 +26,27 @@ import {
   ThContainer,
   Tr,
 } from "@components/common/table/Table";
+import useLazyOrder from "hooks/useLazyOrder";
 import { fixedTableData, scrollTableData } from "@cache/order/table";
-import { useOrder } from "hooks/useOrder";
 import { OrderStatus } from "@models/order";
 
 const OrderManagement = () => {
-  const { ok, error, loading, caculatedOrderItem } = useOrder(OrderStatus.NEW);
+  const { error, loading, orderItems, getOrderItem } = useLazyOrder(
+    OrderStatus.NEW
+  );
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    (async () => {
+      await getOrderItem({
+        variables: {
+          input: {
+            status: OrderStatus.NEW,
+          },
+        },
+      });
+    })();
+  }, [getOrderItem]);
 
   return (
     <ContentsContainer>
@@ -57,15 +72,16 @@ const OrderManagement = () => {
             <Th width={fixedTableData[5].width}>{orderStatusType.ORDER}</Th>
           </ThContainer>
           <TbContainer>
-            {caculatedOrderItem.map(
+            {orderItems.map(
               ({
+                orderId,
                 merchantitemUid,
                 productCode,
                 orderProduct,
                 sellerName,
                 orderState,
               }) => (
-                <Tr>
+                <Tr key={orderId}>
                   <Td width={fixedTableData[0].width}>
                     <Checkbox />
                   </Td>
@@ -120,8 +136,9 @@ const OrderManagement = () => {
             </Th>
           </ThContainer>
           <TbContainer>
-            {caculatedOrderItem.map(
+            {orderItems.map(
               ({
+                orderId,
                 claimState,
                 courier,
                 invoiceNumber,
@@ -141,7 +158,7 @@ const OrderManagement = () => {
                 shipmentPrice,
                 shipmentDistantPrice,
               }) => (
-                <Tr>
+                <Tr key={orderId}>
                   <Td width={scrollTableData[0].width}>{claimState}</Td>
                   <Td width={scrollTableData[1].width}>{courier}</Td>
                   <Td width={scrollTableData[2].width}>{invoiceNumber}</Td>
