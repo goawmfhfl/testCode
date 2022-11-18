@@ -25,10 +25,10 @@ import DateInput from "@components/common/input/DateInput";
 import NoticeContainer from "@components/common/NoticeContainer";
 
 import {
-  ChangeProductsInfoInputType,
-  ChangeProductsInfoType,
-  CHANGE_PRODUCTS_INFO,
-} from "@graphql/mutations/changeProductsInfo";
+  ChangeProductsInfoBySellerInputType,
+  ChangeProductsInfoBySellerType,
+  CHANGE_PRODUCTS_INFO_BY_SELLER,
+} from "@graphql/mutations/changeProductsInfoBySeller";
 
 import {
   selectedProductListVar,
@@ -81,9 +81,9 @@ const ChangeDiscountModal = () => {
   });
 
   const [updateDiscount] = useMutation<
-    ChangeProductsInfoType,
-    ChangeProductsInfoInputType
-  >(CHANGE_PRODUCTS_INFO, {
+    ChangeProductsInfoBySellerType,
+    ChangeProductsInfoBySellerInputType
+  >(CHANGE_PRODUCTS_INFO_BY_SELLER, {
     refetchQueries: [
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
@@ -153,7 +153,7 @@ const ChangeDiscountModal = () => {
         (async () => {
           const {
             data: {
-              changeProductsInfo: { ok, error },
+              changeProductsInfoBySeller: { ok, error },
             },
           } = await updateDiscount({
             variables: {

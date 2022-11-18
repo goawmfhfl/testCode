@@ -3,10 +3,10 @@ import styled from "styled-components";
 
 import { useLazyQuery, useMutation, useReactiveVar } from "@apollo/client";
 import {
-  ChangeProductsInfoInputType,
-  ChangeProductsInfoType,
-  CHANGE_PRODUCTS_INFO,
-} from "@graphql/mutations/changeProductsInfo";
+  ChangeProductsInfoBySellerInputType,
+  ChangeProductsInfoBySellerType,
+  CHANGE_PRODUCTS_INFO_BY_SELLER,
+} from "@graphql/mutations/changeProductsInfoBySeller";
 import {
   DeleteProductsBySeller,
   DeleteProductsBySellerInputType,
@@ -73,9 +73,9 @@ const Controller = () => {
   });
 
   const [updateProductsStatus] = useMutation<
-    ChangeProductsInfoType,
-    ChangeProductsInfoInputType
-  >(CHANGE_PRODUCTS_INFO, {
+    ChangeProductsInfoBySellerType,
+    ChangeProductsInfoBySellerInputType
+  >(CHANGE_PRODUCTS_INFO_BY_SELLER, {
     refetchQueries: [
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
@@ -152,7 +152,7 @@ const Controller = () => {
         (async () => {
           const {
             data: {
-              changeProductsInfo: { ok, error },
+              changeProductsInfoBySeller: { ok, error },
             },
           } = await updateProductsStatus({
             variables: {

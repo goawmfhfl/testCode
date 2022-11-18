@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
 
-export interface ChangeProductsInfoType {
-  changeProductsInfo: {
+export interface ChangeProductsInfoBySellerType {
+  changeProductsInfoBySeller: {
     ok: boolean;
     error: string | null;
   };
 }
 
-export interface ChangeProductsInfoInputType {
+export interface ChangeProductsInfoBySellerInputType {
   input: {
     productIds: number[];
     categoryName?: string;
@@ -19,9 +19,12 @@ export interface ChangeProductsInfoInputType {
     isBmarket?: boolean;
   };
 }
-export const CHANGE_PRODUCTS_INFO = gql`
-  mutation ChangeProductsInfo($input: ChangeProductInfoInput!) {
-    changeProductsInfo(input: $input) {
+
+export const CHANGE_PRODUCTS_INFO_BY_SELLER = gql`
+  mutation ChangeProductsInfoBySeller(
+    $input: ChangeProductsInfoBySellerInput!
+  ) {
+    changeProductsInfoBySeller(input: $input) {
       ok
       error
     }

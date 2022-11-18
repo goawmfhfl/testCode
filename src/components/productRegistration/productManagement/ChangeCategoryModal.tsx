@@ -22,11 +22,11 @@ import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
 
 import { CATEGORIES, categoryMapper } from "@constants/index";
-import { CHANGE_PRODUCTS_INFO } from "@graphql/mutations/changeProductsInfo";
+import { CHANGE_PRODUCTS_INFO_BY_SELLER } from "@graphql/mutations/changeProductsInfoBySeller";
 import {
-  ChangeProductsInfoType,
-  ChangeProductsInfoInputType,
-} from "@graphql/mutations/changeProductsInfo";
+  ChangeProductsInfoBySellerType,
+  ChangeProductsInfoBySellerInputType,
+} from "@graphql/mutations/changeProductsInfoBySeller";
 
 import {
   getProductBySellerVar,
@@ -75,9 +75,9 @@ const ChangeCategoryModal = () => {
   });
 
   const [updateCategory] = useMutation<
-    ChangeProductsInfoType,
-    ChangeProductsInfoInputType
-  >(CHANGE_PRODUCTS_INFO, {
+    ChangeProductsInfoBySellerType,
+    ChangeProductsInfoBySellerInputType
+  >(CHANGE_PRODUCTS_INFO_BY_SELLER, {
     refetchQueries: [
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
@@ -134,7 +134,7 @@ const ChangeCategoryModal = () => {
           (async () => {
             const {
               data: {
-                changeProductsInfo: { ok, error },
+                changeProductsInfoBySeller: { ok, error },
               },
             } = await updateCategory({
               variables: {
