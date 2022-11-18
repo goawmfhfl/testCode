@@ -1,15 +1,17 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
+import { TableType } from "@models/index";
 
 interface NoDataContainerProps {
   children: React.ReactNode;
+  type: TableType;
 }
 
-const NoDataContainer = ({ children }: NoDataContainerProps) => {
+const NoDataContainer = ({ children, type }: NoDataContainerProps) => {
   return (
-    <Container>
+    <Container type={type}>
       <NoticeContainer>
         <ExclamationIcon />
         <NoticeText>{children}</NoticeText>
@@ -18,7 +20,15 @@ const NoDataContainer = ({ children }: NoDataContainerProps) => {
   );
 };
 
-const Container = styled.div`
+const Container = styled.div<{ type: TableType }>`
+  ${({ type }) =>
+    type === TableType.SCROLL &&
+    css`
+      position: absolute;
+      top: 40px;
+      left: 0;
+    `}
+
   display: flex;
   justify-content: center;
   align-items: center;

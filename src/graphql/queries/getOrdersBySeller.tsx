@@ -1,9 +1,20 @@
 import { gql } from "@apollo/client";
-import { OrderStatus } from "@models/order";
+import {
+  OrderSearchType,
+  OrderStatusGroup,
+  OrderStatusName,
+  OrderStatusType,
+} from "@models/order/orderManagement";
 
 export interface GetOrdersBySellerInputType {
   input: {
-    status: OrderStatus;
+    page?: number;
+    skip?: number;
+    query?: string;
+    type?: OrderSearchType;
+    statusName?: OrderStatusName;
+    statusType?: OrderStatusType;
+    statusGroup?: OrderStatusGroup;
   };
 }
 
@@ -71,7 +82,7 @@ export interface GetOrdersBySellerType {
   getOrdersBySeller: {
     ok: boolean;
     error: string;
-    orderItems: Array<OrderItemsType>;
+    totalOrderItems: Array<OrderItemsType>;
   };
 }
 
@@ -80,7 +91,7 @@ export const GET_ORDERS_BY_SELLER = gql`
     getOrdersBySeller(input: $input) {
       ok
       error
-      orderItems {
+      totalOrderItems {
         id
         #주문번호
         merchantItemUid

@@ -7,7 +7,6 @@ import {
   GET_ORDERS_BY_SELLER,
 } from "@graphql/queries/getOrdersBySeller";
 
-import { OrderStatus } from "@models/order";
 import {
   NormalizedListType,
   caculatedOrderItemType,
@@ -16,30 +15,32 @@ import {
 import caculateOrderItem from "@utils/order/caculateOrderItem";
 import contructOrderItem from "@utils/order/contructOrderItem";
 
-const useLazyOrders = (orderStatus: OrderStatus) => {
-  const [orderItems, setOrderItems] = useState<Array<caculatedOrderItemType>>(
-    []
-  );
+import { FilterOptionVarType } from "@models/order/orderManagement";
+
+const useLazyOrders = (input: FilterOptionVarType) => {
+  const [totalOrderItems, setTotalOrderItems] = useState<
+    Array<caculatedOrderItemType>
+  >([]);
 
   const [getOrderItem, { loading, error }] = useLazyQuery<
     GetOrdersBySellerType,
     GetOrdersBySellerInputType
   >(GET_ORDERS_BY_SELLER, {
-    variables: { input: { status: orderStatus } },
+    variables: { input },
     fetchPolicy: "no-cache",
     onCompleted: (data) => {
-      const orderItems = data.getOrdersBySeller.orderItems;
+      const totalOrderItems = data.getOrdersBySeller.totalOrderItems;
 
       const nomalizedOrderItem: NormalizedListType =
-        contructOrderItem(orderItems);
+        contructOrderItem(totalOrderItems);
 
       const caculatedOrderItem: Array<caculatedOrderItemType> =
         caculateOrderItem(nomalizedOrderItem);
 
-      setOrderItems(caculatedOrderItem);
+      setTotalOrderItems(caculatedOrderItem);
     },
   });
 
-  return { loading, error, orderItems, getOrderItem };
+  return { loading, error, totalOrderItems, getOrderItem };
 };
 export default useLazyOrders;

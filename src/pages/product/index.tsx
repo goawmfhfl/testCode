@@ -50,6 +50,7 @@ import {
   TableContainer,
 } from "@components/common/table/Table";
 import { HeaderNames } from "@constants/index";
+import { TableType } from "@models/index";
 
 const saleStatusList = [
   { id: 0, label: "DEFAULT", name: "판매상태 변경" },
@@ -466,7 +467,7 @@ const Product = () => {
             </TbContainer>
           ) : (
             !loading && (
-              <NoDataContainer>
+              <NoDataContainer type={TableType.FIX}>
                 검색어와 일치하는
                 <br />
                 상품이 없습니다.

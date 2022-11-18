@@ -8,3 +8,8 @@ export enum UploadFileType {
   SHOP_REGISTER_ZIP = "SHOP_REGISTER_ZIP",
   PROMOTION_MAIN_IMAGE = "PROMOTION_MAIN_IMAGE",
 }
+
+export enum TableType {
+  SCROLL = "SCROLL",
+  FIX = "FIX",
+}

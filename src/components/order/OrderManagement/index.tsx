@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useReactiveVar } from "@apollo/client";
 import {
   orderCodeType,
   orderProductType,
@@ -27,22 +28,25 @@ import {
 } from "@components/common/table/Table";
 import useLazyOrder from "hooks/useLazyOrders";
 import { fixedTableData, scrollTableData } from "@cache/order/table";
-import { OrderStatus } from "@models/order";
 import { HeaderNames } from "@constants/index";
 
+import { filterOptionVar } from "@cache/order/index";
+import { FilterOptionVarType } from "@models/order/orderManagement";
+import NoDataContainer from "@components/common/table/NoDataContainer";
+import { TableType } from "@models/index";
+
 const OrderManagement = () => {
-  const { error, loading, orderItems, getOrderItem } = useLazyOrder(
-    OrderStatus.NEW
-  );
+  const filterOption: FilterOptionVarType = useReactiveVar(filterOptionVar);
+
+  const { error, loading, totalOrderItems, getOrderItem } =
+    useLazyOrder(filterOption);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
       await getOrderItem({
         variables: {
-          input: {
-            status: OrderStatus.NEW,
-          },
+          input: filterOption,
         },
       });
     })();
@@ -53,7 +57,7 @@ const OrderManagement = () => {
       <ContentsHeader headerName={HeaderNames.Order} />
       <FilterBar />
       <Controller />
-      <Table width={tableWidth.index}>
+      <Table width={tableWidth.index} type={TableType.SCROLL}>
         <FixedTable width={tableWidth.left}>
           <ThContainer>
             <Th width={fixedTableData[0].width}>
@@ -72,7 +76,7 @@ const OrderManagement = () => {
             <Th width={fixedTableData[5].width}>{orderStatusType.ORDER}</Th>
           </ThContainer>
           <TbContainer>
-            {orderItems.map(
+            {totalOrderItems.map(
               ({
                 orderId,
                 merchantitemUid,
@@ -136,7 +140,7 @@ const OrderManagement = () => {
             </Th>
           </ThContainer>
           <TbContainer>
-            {orderItems.map(
+            {totalOrderItems.map(
               ({
                 orderId,
                 claimState,
@@ -186,6 +190,13 @@ const OrderManagement = () => {
             )}
           </TbContainer>
         </ScrollTable>
+        {!totalOrderItems.length && (
+          <NoDataContainer type={TableType.SCROLL}>
+            아직 들어온
+            <br />
+            주문이 없습니다
+          </NoDataContainer>
+        )}
       </Table>
     </ContentsContainer>
   );

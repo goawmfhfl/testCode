@@ -1,9 +1,18 @@
+import { TableType } from "@models/index";
 import styled, { css } from "styled-components";
 
-export const Table = styled.div<{ width: number }>`
+export const Table = styled.div<{ width: number; type: TableType }>`
+  position: relative;
+
   display: flex;
   width: 100%;
   min-width: ${({ width }) => `${width}px`};
+
+  ${({ type }) =>
+    type === TableType.SCROLL &&
+    css`
+      height: 500px;
+    `}
 `;
 interface FixedTableProps {
   width: number;
