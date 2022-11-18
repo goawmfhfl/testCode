@@ -290,7 +290,12 @@ const SaveBar = () => {
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
-          description: <>샵 등록을 축하드려요!</>,
+          description: (
+            <>
+              샵 설정 등록이 완료되었습니다. <br />
+              지금부터 상품 등록 및 판매가 가능합니다.
+            </>
+          ),
           cancelButtonVisibility: false,
           confirmButtonClickHandler: () => {
             systemModalVar({
