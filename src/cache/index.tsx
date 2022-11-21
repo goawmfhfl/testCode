@@ -7,6 +7,9 @@ import {
   PRODUCT_REGISTRATION_SECTIONS,
 } from "@constants/index";
 
+// Global Layout
+export const LoadingSpinnerVisivilityVar = makeVar<boolean>(false);
+
 // TABLE: 테이블 필터
 export const filterOptionVar = makeVar<{
   page: number;

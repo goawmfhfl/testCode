@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 export interface DuplicateProductsBySellerType {
   duplicateProductsBySeller: {
     ok: boolean;
-    error: string | null;
+    error?: string;
   };
 }
 

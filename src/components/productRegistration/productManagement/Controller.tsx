@@ -17,7 +17,11 @@ import {
   DuplicateProductsBySellerType,
   DUPLICATE_PRODUCTS_BY_SELLER,
 } from "@graphql/mutations/duplicateProductsBySeller";
-import { modalVar, systemModalVar } from "@cache/index";
+import {
+  LoadingSpinnerVisivilityVar,
+  modalVar,
+  systemModalVar,
+} from "@cache/index";
 
 import {
   getProductBySellerVar,
@@ -120,7 +124,6 @@ const Controller = () => {
     fetchPolicy: "no-cache",
   });
 
-  // 복수 상태 변경
   const changeMultiSaleStatusHandler = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -150,6 +153,7 @@ const Controller = () => {
       confirmButtonClickHandler: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         (async () => {
+          LoadingSpinnerVisivilityVar(true);
           const {
             data: {
               changeProductsInfoBySeller: { ok, error },
@@ -164,6 +168,7 @@ const Controller = () => {
           });
 
           if (ok) {
+            LoadingSpinnerVisivilityVar(false);
             const {
               data: {
                 getAllProductsBySeller: {
@@ -207,23 +212,26 @@ const Controller = () => {
 
             if (refetchError) {
               showHasServerErrorModal(refetchError);
+              LoadingSpinnerVisivilityVar(false);
             }
           }
 
           if (error) {
             showHasServerErrorModal(error);
+            LoadingSpinnerVisivilityVar(false);
           }
         })();
       },
     });
   };
-  // 선택
+
   const handleSaleStatusClick = () => {
     if (!selectedProductList.length) {
       showHasCheckedAnyProductModal();
       return;
     }
   };
+
   // 카테고리 변경 모달
   const handleChangeCategoryModalButtonClick = () => {
     if (!selectedProductList.length) {
@@ -267,6 +275,7 @@ const Controller = () => {
       confirmButtonClickHandler: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         (async () => {
+          LoadingSpinnerVisivilityVar(true);
           const {
             data: {
               duplicateProductsBySeller: { ok, error },
@@ -280,6 +289,7 @@ const Controller = () => {
           });
 
           if (ok) {
+            LoadingSpinnerVisivilityVar(false);
             const {
               data: {
                 getAllProductsBySeller: {
@@ -318,11 +328,13 @@ const Controller = () => {
             }
 
             if (refetchError) {
+              LoadingSpinnerVisivilityVar(false);
               showHasServerErrorModal(refetchError);
             }
           }
 
           if (error) {
+            LoadingSpinnerVisivilityVar(false);
             showHasServerErrorModal(error);
           }
         })();
@@ -347,6 +359,7 @@ const Controller = () => {
       confirmButtonClickHandler: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         (async () => {
+          LoadingSpinnerVisivilityVar(true);
           const {
             data: {
               deleteProductsBySeller: { ok, error },
@@ -360,6 +373,7 @@ const Controller = () => {
           });
 
           if (ok) {
+            LoadingSpinnerVisivilityVar(false);
             const {
               data: {
                 getAllProductsBySeller: {
@@ -398,11 +412,13 @@ const Controller = () => {
             }
 
             if (refetchError) {
+              LoadingSpinnerVisivilityVar(false);
               showHasServerErrorModal(error);
             }
           }
 
           if (error) {
+            LoadingSpinnerVisivilityVar(false);
             showHasServerErrorModal(error);
           }
         })();

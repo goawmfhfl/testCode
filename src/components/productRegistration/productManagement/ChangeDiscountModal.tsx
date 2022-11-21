@@ -7,7 +7,12 @@ import {
   ControllerRenderProps,
 } from "react-hook-form";
 import { useMutation, useReactiveVar, useLazyQuery } from "@apollo/client";
-import { modalVar, systemModalVar, checkAllBoxStatusVar } from "@cache/index";
+import {
+  modalVar,
+  systemModalVar,
+  checkAllBoxStatusVar,
+  LoadingSpinnerVisivilityVar,
+} from "@cache/index";
 
 import {
   DISCOUNT_AMOUNT,
@@ -153,6 +158,7 @@ const ChangeDiscountModal = () => {
       confirmButtonClickHandler: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         (async () => {
+          LoadingSpinnerVisivilityVar(true);
           const {
             data: {
               changeProductsInfoBySeller: { ok, error },
@@ -170,6 +176,7 @@ const ChangeDiscountModal = () => {
           });
 
           if (ok) {
+            LoadingSpinnerVisivilityVar(false);
             const {
               data: {
                 getAllProductsBySeller: {
@@ -209,11 +216,13 @@ const ChangeDiscountModal = () => {
             }
 
             if (refetchError) {
+              LoadingSpinnerVisivilityVar(false);
               showHasServerErrorModal(refetchError);
             }
           }
 
           if (error) {
+            LoadingSpinnerVisivilityVar(false);
             showHasServerErrorModal(error);
           }
         })();

@@ -1,5 +1,6 @@
 import styled from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
+import { TailSpin } from "react-loader-spinner";
 
 import GlobalNavigationBar from "@components/common/GlobalNavigationBar";
 import SideNavigationBar from "@components/common/SideNavigationBar";
@@ -10,6 +11,7 @@ import {
   overModalVar,
   systemModalVar,
   contentsContainerReferenceVar,
+  LoadingSpinnerVisivilityVar,
 } from "@cache/index";
 import SystemModal from "@components/common/SystemModal";
 
@@ -22,6 +24,7 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
   const modal = useReactiveVar(modalVar);
   const overModal = useReactiveVar(overModalVar);
   const systemModal = useReactiveVar(systemModalVar);
+  const loadingSpinnerVisivility = useReactiveVar(LoadingSpinnerVisivilityVar);
 
   return (
     <>
@@ -50,6 +53,17 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
         >
           {<SystemModal />}
         </SystemModalLayer>
+      )}
+      {loadingSpinnerVisivility && (
+        <LoaderSpinnerLayer>
+          <TailSpin
+            height="100"
+            width="100"
+            color={"#fff"}
+            ariaLabel="tail-spin-loading"
+            visible={true}
+          />
+        </LoaderSpinnerLayer>
       )}
     </>
   );
@@ -144,6 +158,26 @@ const SystemModalLayer = styled.div<{ hasOtherModal: boolean }>`
 
     transform: translate(-50%, -50%);
     box-shadow: 7px 10px 8px 0px #0000001a;
+  }
+`;
+
+const LoaderSpinnerLayer = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(1, 1, 1, 0.5);
+
+  & > div {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 2001;
+
+    transform: translate(-50%, -50%);
   }
 `;
 

@@ -25,6 +25,7 @@ import {
   filterOptionVar,
   pageNumberListVar,
   checkAllBoxStatusVar,
+  LoadingSpinnerVisivilityVar,
 } from "@cache/index";
 import { tableData } from "@cache/productManagement/table";
 
@@ -126,6 +127,7 @@ const Product = () => {
         confirmButtonClickHandler: () => {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           (async () => {
+            LoadingSpinnerVisivilityVar(true);
             const {
               data: {
                 changeProductsInfoBySeller: { ok, error },
@@ -140,6 +142,7 @@ const Product = () => {
             });
 
             if (ok) {
+              LoadingSpinnerVisivilityVar(false);
               const {
                 data: {
                   getAllProductsBySeller: {
@@ -183,11 +186,13 @@ const Product = () => {
               }
 
               if (refetchError) {
+                LoadingSpinnerVisivilityVar(false);
                 showHasServerErrorModal(refetchError);
               }
             }
 
             if (error) {
+              LoadingSpinnerVisivilityVar(false);
               showHasServerErrorModal(error);
             }
           })();

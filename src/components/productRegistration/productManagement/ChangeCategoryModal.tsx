@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { DetailNoticeVar, modalVar, systemModalVar } from "@cache/index";
+import {
+  DetailNoticeVar,
+  LoadingSpinnerVisivilityVar,
+  modalVar,
+  systemModalVar,
+} from "@cache/index";
 import { useForm } from "react-hook-form";
 import {
   CATEGORY_FIRST,
@@ -142,6 +147,7 @@ const ChangeCategoryModal = () => {
         confirmButtonClickHandler: () => {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           (async () => {
+            LoadingSpinnerVisivilityVar(true);
             const {
               data: {
                 changeProductsInfoBySeller: { ok, error },
@@ -157,6 +163,7 @@ const ChangeCategoryModal = () => {
             });
 
             if (ok) {
+              LoadingSpinnerVisivilityVar(false);
               const {
                 data: {
                   getAllProductsBySeller: {
@@ -200,11 +207,13 @@ const ChangeCategoryModal = () => {
               }
 
               if (refetchError) {
+                LoadingSpinnerVisivilityVar(false);
                 showHasServerErrorModal(refetchError);
               }
             }
 
             if (error) {
+              LoadingSpinnerVisivilityVar(false);
               showHasServerErrorModal(error);
             }
           })();
