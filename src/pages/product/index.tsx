@@ -52,6 +52,8 @@ import {
 import { HeaderNames } from "@constants/index";
 import { TableType } from "@models/index";
 
+import { getDiscountedPrice } from "@utils/calculate";
+
 const saleStatusList = [
   { id: 0, label: "DEFAULT", name: "판매상태 변경" },
   { id: 1, label: "ON_SALE", name: "판매중" },
@@ -343,9 +345,16 @@ const Product = () => {
                   },
                   index
                 ) => {
-                  // const discountAppliedPriceToWonSign = discountAppliedPrice
-                  //   ? `${discountAppliedPrice.toLocaleString("ko-KR")} ₩`
-                  //   : "-";
+                  const discountAppliedPrice =
+                    discountAmount && discountMethod
+                      ? Number(
+                          getDiscountedPrice(
+                            originalPrice,
+                            discountAmount,
+                            discountMethod
+                          )
+                        ).toLocaleString("ko-KR") + " ₩"
+                      : "-";
 
                   const firstCategory = category?.parent?.name
                     ? category.parent.name
@@ -430,7 +439,7 @@ const Product = () => {
                         width={tableData[8].width}
                         className={tableData[8].className}
                       >
-                        {/* {discountAppliedPriceToWonSign} */}
+                        {discountAppliedPrice}
                       </ProductManageMentTd>
                       <ProductManageMentTd
                         width={tableData[9].width}
