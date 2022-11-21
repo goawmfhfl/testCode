@@ -15,18 +15,29 @@ import {
 
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
-import { CATEGORIES, categoryMapper } from "@constants/index";
+import useCategories from "@hooks/useCategories";
+import { CategoryName } from "@models/index";
 
 const CategorySection = () => {
   const { watch, register, setValue } = useFormContext();
 
-  const selectedFirstCategory: string = watch(CATEGORY_FIRST) as string;
-  const selectedSecondCategory: string = watch(CATEGORY_SECOND) as string;
+  const { loading, error, categories } = useCategories();
 
-  const categoryDepthFirst: Array<string> = CATEGORIES.CATEGORY_FIRST;
+  const selectedFirstCategory: CategoryName = watch(
+    CATEGORY_FIRST
+  ) as CategoryName;
+  const selectedSecondCategory: CategoryName = watch(
+    CATEGORY_SECOND
+  ) as CategoryName;
 
-  const categoryDepthSecond: Array<string> =
-    (CATEGORIES.CATEGORY_SECOND[selectedFirstCategory] as Array<string>) || [];
+  const categoryDepthFirst: Array<CategoryName> =
+    categories?.firstCategories || [];
+
+  const categoryDepthSecond: Array<CategoryName> =
+    categories?.secondCategories[selectedFirstCategory] || [];
+
+  const categoryDepthThird: Array<CategoryName> =
+    categories?.secondCategories[selectedSecondCategory] || [];
 
   useEffect(() => {
     setValue(CATEGORY_SECOND, "");
@@ -36,6 +47,9 @@ const CategorySection = () => {
   useEffect(() => {
     setValue(CATEGORY_THIRD, "");
   }, [selectedSecondCategory]);
+
+  if (loading) return <>...loading</>;
+  if (error) return <>...error</>;
 
   return (
     <Container>
@@ -60,7 +74,7 @@ const CategorySection = () => {
                 value: "",
               },
               ...categoryDepthFirst.map((value: string) => ({
-                name: categoryMapper[value],
+                name: value,
                 value,
               })),
             ].map((option) => (
@@ -83,7 +97,7 @@ const CategorySection = () => {
             {[
               { name: "중분류를 선택해주세요", value: "" },
               ...categoryDepthSecond.map((value) => ({
-                name: categoryMapper[value],
+                name: value,
                 value,
               })),
             ].map((option) => (
@@ -103,7 +117,13 @@ const CategorySection = () => {
             {...register(CATEGORY_THIRD)}
             disabled={true}
           >
-            {[{ name: "소분류를 선택해주세요", value: "" }].map((option) => (
+            {[
+              { name: "소분류를 선택해주세요", value: "" },
+              ...categoryDepthThird.map((value) => ({
+                name: value,
+                value: value,
+              })),
+            ].map((option) => (
               <Option key={option.value} value={option.value}>
                 {option.name}
               </Option>

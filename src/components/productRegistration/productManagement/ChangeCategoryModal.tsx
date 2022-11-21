@@ -21,7 +21,6 @@ import {
 import NoticeContainer from "@components/common/NoticeContainer";
 import Button from "@components/common/Button";
 
-import { CATEGORIES, categoryMapper } from "@constants/index";
 import { CHANGE_PRODUCTS_INFO_BY_SELLER } from "@graphql/mutations/changeProductsInfoBySeller";
 import {
   ChangeProductsInfoBySellerType,
@@ -40,9 +39,13 @@ import {
   GetAllProductsBySellerInputType,
   GetAllProductsBySellerType,
 } from "@graphql/queries/getAllProductsBySeller";
+import useCategories from "@hooks/useCategories";
+import { CategoryName } from "@models/index";
 
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
+
+  const { loading, error, categories } = useCategories();
 
   const filterOption = useReactiveVar(filterOptionVar);
 
@@ -53,14 +56,21 @@ const ChangeCategoryModal = () => {
 
   const [isBmarketChecked, setIsBmarketChecked] = useState<boolean>(false);
 
-  const selectedFirstCategory: string = watch(CATEGORY_FIRST) as string;
-  const selectedSecondCategory: string = watch(CATEGORY_SECOND) as string;
+  const selectedFirstCategory: CategoryName = watch(
+    CATEGORY_FIRST
+  ) as CategoryName;
+  const selectedSecondCategory: CategoryName = watch(
+    CATEGORY_SECOND
+  ) as CategoryName;
 
-  const categoryDepthFirst: Array<string> = CATEGORIES.CATEGORY_FIRST;
-  const categoryDepthSecond: Array<string> =
-    (CATEGORIES.CATEGORY_SECOND[selectedFirstCategory] as Array<string>) || [];
-  const categoryDepthThird: Array<string> =
-    (CATEGORIES.CATEGORY_THIRD[selectedSecondCategory] as Array<string>) || [];
+  const categoryDepthFirst: Array<CategoryName> =
+    categories?.firstCategories || [];
+
+  const categoryDepthSecond: Array<CategoryName> =
+    categories?.secondCategories[selectedFirstCategory] || [];
+
+  const categoryDepthThird: Array<CategoryName> =
+    categories?.secondCategories[selectedSecondCategory] || [];
 
   const detailNotice = useReactiveVar(DetailNoticeVar);
 
@@ -229,6 +239,9 @@ const ChangeCategoryModal = () => {
     };
   }, []);
 
+  if (loading) return <>...loading</>;
+  if (error) return <>...error</>;
+
   return (
     <Container>
       <CloseButton onClick={handleCloseButtonClick} src={closeIconSource} />
@@ -262,7 +275,7 @@ const ChangeCategoryModal = () => {
                 value: "",
               },
               ...categoryDepthFirst.map((value: string) => ({
-                name: categoryMapper[value],
+                name: value,
                 value,
               })),
             ].map((option) => (
@@ -288,7 +301,7 @@ const ChangeCategoryModal = () => {
                 value: "",
               },
               ...categoryDepthSecond.map((value: string) => ({
-                name: categoryMapper[value],
+                name: value,
                 value,
               })),
             ].map((option) => (
@@ -314,7 +327,7 @@ const ChangeCategoryModal = () => {
                 value: "",
               },
               ...categoryDepthThird.map((value) => ({
-                name: categoryMapper[value],
+                name: value,
                 value: value,
               })),
             ].map((option) => (
