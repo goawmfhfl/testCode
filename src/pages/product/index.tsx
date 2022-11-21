@@ -53,7 +53,7 @@ import {
 import { HeaderNames } from "@constants/index";
 import { TableType } from "@models/index";
 
-import { getDiscountedPrice } from "@utils/calculate";
+import { getDiscountedPrice } from "@utils/calculator";
 
 const saleStatusList = [
   { id: 0, label: "DEFAULT", name: "판매상태 변경" },

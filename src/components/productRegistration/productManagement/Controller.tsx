@@ -515,6 +515,7 @@ const Container = styled.div`
 
   padding: 16px;
   background-color: ${({ theme: { palette } }) => palette.white};
+  white-space: nowrap;
 `;
 
 const ActiveButtonContainer = styled.div`
