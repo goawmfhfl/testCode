@@ -46,6 +46,8 @@ import {
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 
+import { getTodayTimeValue } from "@utils/date";
+
 const ChangeDiscountModal = () => {
   const method = useForm({
     mode: "onSubmit",
@@ -295,7 +297,8 @@ const ChangeDiscountModal = () => {
                     const endAt = new Date(
                       watch(DISCOUNT_ENDS_AT) as string
                     ).getTime();
-                    const today = new Date().getTime();
+
+                    const today = getTodayTimeValue();
 
                     const isBeforeToday = startAt < today;
 
