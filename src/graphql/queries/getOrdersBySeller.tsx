@@ -76,6 +76,23 @@ export interface OrderItemsType {
 
   // 배송비
   shipmentPrice: number;
+  // 도서산간 배송비
+  shipmentDistantPrice: number;
+
+  // 주문상태
+  orderStatus: {
+    name: OrderStatusName;
+  };
+
+  // 클레임상태
+  claimStatus: {
+    name: OrderStatusName;
+  };
+
+  // 결제일
+  payment: {
+    createdAt: string;
+  };
 }
 
 export interface GetOrdersBySellerType {
@@ -92,7 +109,9 @@ export const GET_ORDERS_BY_SELLER = gql`
       ok
       error
       totalOrderItems {
+        #아이디
         id
+
         #주문번호
         merchantItemUid
 
@@ -114,8 +133,6 @@ export const GET_ORDERS_BY_SELLER = gql`
           phoneNumber
         }
 
-        # 주문상태
-        # 클래임상태
         # 결제일
 
         orderByShop {
@@ -151,6 +168,24 @@ export const GET_ORDERS_BY_SELLER = gql`
 
         # 배송비
         shipmentPrice
+
+        # 도서산간 배송비
+        shipmentDistantPrice
+
+        # 주문상태
+        orderStatus {
+          name
+        }
+
+        # 클레임상태
+        claimStatus {
+          name
+        }
+
+        # 결제일
+        payment {
+          createdAt
+        }
       }
     }
   }
