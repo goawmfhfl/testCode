@@ -117,6 +117,7 @@ const Login = () => {
 
     const isLoginSucceed =
       loginData?.sellerLogin?.ok && !loginData?.sellerLogin?.error;
+
     setIsLoginSucceed(isLoginSucceed);
 
     if (isLoginSucceed) {
@@ -130,6 +131,7 @@ const Login = () => {
 
     if (!isLoginSucceed) {
       console.log("로그인에 실패했습니다.");
+      console.log(loginData.sellerLogin.error);
     }
   };
 
