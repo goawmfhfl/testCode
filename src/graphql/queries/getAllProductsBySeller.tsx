@@ -1,28 +1,30 @@
 import { gql } from "@apollo/client";
 
+export interface ProductsType {
+  id: number;
+  name: string;
+  category: {
+    id: number;
+    name: string;
+    parent: { id: number; name: string } | null;
+    children: { id: number; name: string } | null;
+  };
+  originalPrice: number;
+  discountAmount?: number;
+  discountMethod?: string;
+  status: string;
+  thumbnail: string;
+  quantity: number;
+  isChecked?: boolean;
+}
+
 export interface GetAllProductsBySellerType {
   getAllProductsBySeller: {
     ok: boolean;
     error: string;
     totalPages: number;
     totalResults: number;
-    products: Array<{
-      id: number;
-      name: string;
-      category: {
-        id: number;
-        name: string;
-        parent: { id: number; name: string } | null;
-        children: { id: number; name: string } | null;
-      };
-      originalPrice: number;
-      discountAmount?: number;
-      discountMethod?: string;
-      status: string;
-      thumbnail: string;
-      quantity: number;
-      isChecked?: boolean;
-    }>;
+    products: Array<ProductsType>;
   };
 }
 

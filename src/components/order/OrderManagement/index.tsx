@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+
 import { useReactiveVar } from "@apollo/client";
 import {
   orderCodeType,
@@ -26,6 +27,7 @@ import {
   ThContainer,
   Tr,
 } from "@components/common/table/Table";
+
 import useLazyOrder from "hooks/useLazyOrders";
 import { fixedTableData, scrollTableData } from "@cache/order/table";
 import { HeaderNames } from "@constants/index";
@@ -51,6 +53,9 @@ const OrderManagement = () => {
       });
     })();
   }, [getOrderItem]);
+
+  if (loading) return <>loading...</>;
+  if (error) return <>error!</>;
 
   return (
     <ContentsContainer>

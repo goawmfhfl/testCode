@@ -54,6 +54,7 @@ import { HeaderNames } from "@constants/index";
 import { TableType } from "@models/index";
 
 import { getDiscountedPrice } from "@utils/calculator";
+import useLazyProducts from "@hooks/userLazyProducts";
 
 const saleStatusList = [
   { id: 0, label: "DEFAULT", name: "판매상태 변경" },
@@ -64,24 +65,19 @@ const saleStatusList = [
 
 const Product = () => {
   const productList = useReactiveVar(getProductBySellerVar);
-
   const filterOption = useReactiveVar(filterOptionVar);
+  const { page, skip, status, query } = filterOption;
+
+  const { loading, error, products, totalPages, getProducts } =
+    useLazyProducts();
+
+  console.log("products", products);
 
   const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
     selectedProductListVar
   );
 
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
-
-  const [getProductList, { loading }] = useLazyQuery<
-    GetAllProductsBySellerType,
-    GetAllProductsBySellerInputType
-  >(GET_ALL_PRODUCTS_BY_SELLER, {
-    variables: {
-      input: filterOption,
-    },
-    fetchPolicy: "no-cache",
-  });
 
   const [updateProductsStatus] = useMutation<
     ChangeProductsInfoBySellerType,
@@ -143,52 +139,35 @@ const Product = () => {
 
             if (ok) {
               LoadingSpinnerVisivilityVar(false);
-              const {
-                data: {
-                  getAllProductsBySeller: {
-                    products,
-                    ok: refetchOk,
-                    error: refetchError,
-                  },
+
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                confirmButtonVisibility: true,
+                cancelButtonVisibility: false,
+                description: (
+                  <>
+                    {saleStatus[value] === "판매중" &&
+                      "판매중으로 변경되었습니다."}
+                    {saleStatus[value] === "숨김" && "숨김으로 변경되었습니다."}
+                    {saleStatus[value] === "품절" && "품절로 변경되었습니다."}
+                  </>
+                ),
+
+                confirmButtonClickHandler: () => {
+                  getProductBySellerVar(
+                    products.map((list) => ({ ...list, isChecked: false }))
+                  );
+
+                  checkAllBoxStatusVar(false);
+                  selectedProductListVar([]);
+
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
                 },
-              } = await getProductList();
-
-              if (refetchOk) {
-                systemModalVar({
-                  ...systemModalVar(),
-                  isVisible: true,
-                  confirmButtonVisibility: true,
-                  cancelButtonVisibility: false,
-                  description: (
-                    <>
-                      {saleStatus[value] === "판매중" &&
-                        "판매중으로 변경되었습니다."}
-                      {saleStatus[value] === "숨김" &&
-                        "숨김으로 변경되었습니다."}
-                      {saleStatus[value] === "품절" && "품절로 변경되었습니다."}
-                    </>
-                  ),
-
-                  confirmButtonClickHandler: () => {
-                    getProductBySellerVar(
-                      products.map((list) => ({ ...list, isChecked: false }))
-                    );
-
-                    checkAllBoxStatusVar(false);
-                    selectedProductListVar([]);
-
-                    systemModalVar({
-                      ...systemModalVar(),
-                      isVisible: false,
-                    });
-                  },
-                });
-              }
-
-              if (refetchError) {
-                LoadingSpinnerVisivilityVar(false);
-                showHasServerErrorModal(refetchError);
-              }
+              });
             }
 
             if (error) {
@@ -280,35 +259,29 @@ const Product = () => {
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
-      const {
-        data: {
-          getAllProductsBySeller: { products, ok, error, totalPages },
+      await getProducts({
+        variables: {
+          input: {
+            page,
+            skip,
+            status,
+            query,
+          },
         },
-      } = await getProductList();
-
+      });
       pageNumberListVar(
         Array(totalPages)
           .fill(null)
           .map((_, index) => index + 1)
       );
-
-      if (ok) {
-        getProductBySellerVar(
-          products.map((list) => ({
-            ...list,
-            isChecked: false,
-          }))
-        );
-
-        selectedProductListVar([]);
-        checkAllBoxStatusVar(false);
-      }
-
-      if (error) {
-        showHasServerErrorModal(error);
-      }
+      selectedProductListVar([]);
+      checkAllBoxStatusVar(false);
     })();
-  }, [filterOption]);
+  }, [page, skip, status, query]);
+
+  if (loading) return <>loading...</>;
+  if (error) return <>error</>;
+  // showHasServerErrorModal(error)
 
   return (
     <Layout>
@@ -332,9 +305,9 @@ const Product = () => {
             ))}
           </ThContainer>
 
-          {productList.length !== 0 ? (
+          {products.length !== 0 ? (
             <TbContainer>
-              {productList?.map(
+              {products?.map(
                 (
                   {
                     id,
@@ -490,7 +463,7 @@ const Product = () => {
           )}
         </TableContainer>
 
-        {productList.length ? <Pagination /> : <></>}
+        {products.length ? <Pagination /> : <></>}
       </ContentsContainer>
     </Layout>
   );
