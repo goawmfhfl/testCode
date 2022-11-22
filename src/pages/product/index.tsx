@@ -1,13 +1,9 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { useLazyQuery, useMutation, useReactiveVar } from "@apollo/client";
+import { useMutation, useReactiveVar } from "@apollo/client";
 
-import {
-  GET_ALL_PRODUCTS_BY_SELLER,
-  GetAllProductsBySellerType,
-  GetAllProductsBySellerInputType,
-} from "@graphql/queries/getAllProductsBySeller";
+import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
 import {
   ChangeProductsInfoBySellerInputType,
   ChangeProductsInfoBySellerType,
@@ -54,7 +50,7 @@ import { HeaderNames } from "@constants/index";
 import { TableType } from "@models/index";
 
 import { getDiscountedPrice } from "@utils/calculator";
-import useLazyProducts from "@hooks/userLazyProducts";
+import useLazyProducts from "@hooks/useLazyProducts";
 
 const saleStatusList = [
   { id: 0, label: "DEFAULT", name: "판매상태 변경" },
@@ -64,14 +60,11 @@ const saleStatusList = [
 ];
 
 const Product = () => {
-  const productList = useReactiveVar(getProductBySellerVar);
   const filterOption = useReactiveVar(filterOptionVar);
   const { page, skip, status, query } = filterOption;
 
-  const { loading, error, products, totalPages, getProducts } =
+  const { loading, error, products, setProducts, totalPages, getProducts } =
     useLazyProducts();
-
-  console.log("products", products);
 
   const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
     selectedProductListVar
@@ -124,6 +117,7 @@ const Product = () => {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           (async () => {
             LoadingSpinnerVisivilityVar(true);
+
             const {
               data: {
                 changeProductsInfoBySeller: { ok, error },
@@ -187,71 +181,68 @@ const Product = () => {
 
   // 복수 체크박스
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newProducts = [...products];
     checkAllBoxStatusVar(e.target.checked);
 
     if (e.target.checked) {
-      const checkAllProductList = productList.map((product) => ({
+      const checkAllProductList = newProducts.map((product) => ({
         ...product,
         isChecked: true,
       }));
 
-      getProductBySellerVar(checkAllProductList);
+      setProducts(checkAllProductList);
       selectedProductListVar(checkAllProductList);
     }
 
     if (!e.target.checked) {
-      const checkAllProductList = productList.map((product) => ({
+      const checkAllProductList = newProducts.map((product) => ({
         ...product,
         isChecked: false,
       }));
 
-      getProductBySellerVar(checkAllProductList);
+      setProducts(checkAllProductList);
       selectedProductListVar([]);
+      checkAllBoxStatusVar(false);
     }
   };
 
   // 단일 체크박스
   const changeSingleCheckBoxHandler =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newProducts = [...products];
+
       if (e.target.checked) {
-        const checkedProductList = { ...productList[index], isChecked: true };
+        const checkedProductList = { ...newProducts[index], isChecked: true };
         selectedProductListVar([...selectedProductList, checkedProductList]);
 
-        productList[index].isChecked = true;
-        getProductBySellerVar(productList);
+        newProducts[index].isChecked = true;
+        setProducts(newProducts);
       }
 
       if (!e.target.checked) {
-        const newProductList = [...productList];
-        const isCheckedList = selectedProductList.filter(
-          (product) => product.id === productList[index].id
+        const hasCheckedList = selectedProductList.filter(
+          (product) => product.id === newProducts[index].id
         );
 
-        if (isCheckedList) {
+        if (hasCheckedList) {
           const checkedListIndex = selectedProductList.findIndex(
-            (product) => product.id === productList[index].id
+            (product) => product.id === newProducts[index].id
           );
 
-          selectedProductListVar([
+          const deletedCheckedList = [
             ...selectedProductList.slice(0, checkedListIndex),
             ...selectedProductList.slice(checkedListIndex + 1),
-          ]);
+          ];
 
-          newProductList[index].isChecked = false;
-          getProductBySellerVar(productList);
+          selectedProductListVar(deletedCheckedList);
+
+          newProducts[index].isChecked = false;
+
+          setProducts(newProducts);
         }
 
-        if (!isCheckedList) {
-          const checkedProductList = {
-            ...productList[index],
-            isChecked: false,
-          };
-
-          selectedProductListVar([...selectedProductList, checkedProductList]);
-
-          newProductList[index].isChecked = false;
-          getProductBySellerVar(productList);
-        }
+        newProducts[index].isChecked = false;
+        setProducts(newProducts);
       }
     };
 
@@ -274,12 +265,13 @@ const Product = () => {
           .fill(null)
           .map((_, index) => index + 1)
       );
+
       selectedProductListVar([]);
       checkAllBoxStatusVar(false);
     })();
   }, [page, skip, status, query]);
 
-  if (loading) return <>loading...</>;
+  // if (loading) return <>loading...</>;
   if (error) return <>error</>;
   // showHasServerErrorModal(error)
 

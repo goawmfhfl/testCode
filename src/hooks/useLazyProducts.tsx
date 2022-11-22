@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useLazyQuery } from "@apollo/client";
 
 import {
@@ -8,6 +9,8 @@ import {
 } from "@graphql/queries/getAllProductsBySeller";
 
 const useLazyProducts = () => {
+  const [products, setProducts] = useState<Array<ProductsType>>([]);
+
   const [getProducts, { data, loading, error }] = useLazyQuery<
     GetAllProductsBySellerType,
     GetAllProductsBySellerInputType
@@ -25,13 +28,18 @@ const useLazyProducts = () => {
     fetchPolicy: "cache-first",
   });
 
-  const products: Array<ProductsType> =
-    data?.getAllProductsBySeller.products.map((list) => ({
-      ...list,
-      isChecked: false,
-    })) || [];
   const totalPages = data?.getAllProductsBySeller.totalPages || 1;
 
-  return { loading, error, products, totalPages, getProducts };
+  useEffect(() => {
+    const products: Array<ProductsType> =
+      data?.getAllProductsBySeller.products.map((list) => ({
+        ...list,
+        isChecked: false,
+      })) || [];
+
+    setProducts(products);
+  }, [data]);
+
+  return { loading, error, products, setProducts, totalPages, getProducts };
 };
 export default useLazyProducts;
