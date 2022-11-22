@@ -16,15 +16,6 @@ jobs:
         with:
           node-version: 16.15.0
 
-      # 실행 속도를 빠르게 하기 위해 설치된 Node 모듈을 캐시하도록 설정
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-build-
-            ${{ runner.OS }}-
       - name: Install Dependencies
         run: npm install
 
