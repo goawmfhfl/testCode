@@ -109,6 +109,7 @@
     "craco-alias": "^3.0.1",
     "dotenv-webpack": "^7.1.1",
     "eslint-plugin-react": "^7.30.0",
+    "mini-css-extract-plugin": "2.4.5",
     "msw": "^0.42.3",
     "process": "^0.11.10",
     "prop-types": "^15.8.1",
