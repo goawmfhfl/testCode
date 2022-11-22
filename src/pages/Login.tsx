@@ -44,6 +44,10 @@ const Login = () => {
   });
 
   useEffect(() => {
+    if (!google) return;
+    if (!naver) return;
+    if (!Kakao) return;
+
     // naver oauth
     const naverLogin = new naver.LoginWithNaverId({
       clientId: "CZm3jInQ9yUhzPJCFM_j",
@@ -97,7 +101,7 @@ const Login = () => {
     );
 
     google.accounts.id.prompt();
-  }, []);
+  }, [google]);
 
   const onSubmit: SubmitHandler<LoginFormType> = async ({
     id: email,
