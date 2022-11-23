@@ -4,14 +4,17 @@ import { useLazyQuery } from "@apollo/client";
 import {
   GetAllProductsBySellerInputType,
   GetAllProductsBySellerType,
-  ProductsType,
   GET_ALL_PRODUCTS_BY_SELLER,
+  ProductsType,
 } from "@graphql/queries/getAllProductsBySeller";
 
 const useLazyProducts = () => {
   const [products, setProducts] = useState<Array<ProductsType>>([]);
+  const [isCheckedList, setIsCheckedList] = useState<{
+    [key: string]: { isChecked: boolean };
+  }>({});
 
-  const [getProducts, { data, loading, error }] = useLazyQuery<
+  const [getProducts, { loading, error, data }] = useLazyQuery<
     GetAllProductsBySellerType,
     GetAllProductsBySellerInputType
   >(GET_ALL_PRODUCTS_BY_SELLER, {
@@ -24,22 +27,35 @@ const useLazyProducts = () => {
       },
     },
     notifyOnNetworkStatusChange: true,
+    fetchPolicy: "no-cache",
     errorPolicy: "all",
-    fetchPolicy: "cache-first",
   });
 
-  const totalPages = data?.getAllProductsBySeller.totalPages || 1;
+  const totalPages: number = data?.getAllProductsBySeller.totalPages || 1;
 
   useEffect(() => {
-    const products: Array<ProductsType> =
-      data?.getAllProductsBySeller.products.map((list) => ({
-        ...list,
-        isChecked: false,
-      })) || [];
+    const products: Array<ProductsType> = data?.getAllProductsBySeller.products;
+    const checkedList: {
+      [key: string]: { isChecked: boolean };
+    } =
+      products?.reduce((acc, cur) => {
+        acc[cur.id] = { isChecked: false };
+        return acc;
+      }, {}) || {};
 
+    setIsCheckedList(checkedList);
     setProducts(products);
   }, [data]);
 
-  return { loading, error, products, setProducts, totalPages, getProducts };
+  return {
+    loading,
+    error,
+    products,
+    setProducts,
+    isCheckedList,
+    setIsCheckedList,
+    totalPages,
+    getProducts,
+  };
 };
 export default useLazyProducts;

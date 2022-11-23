@@ -207,8 +207,10 @@ const Product = () => {
 
   // 단일 체크박스
   const changeSingleCheckBoxHandler =
-    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newProducts = [...products];
+    (id: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newIsCheckedList = JSON.parse(JSON.stringify(isCheckedList)) as {
+        [key: string]: { isChecked: boolean };
+      };
 
       if (e.target.checked) {
         newIsCheckedList[id].isChecked = true;
@@ -234,9 +236,6 @@ const Product = () => {
             ...checkedProductIds.slice(checkedListIndex + 1),
           ]);
         }
-
-        newProducts[index].isChecked = false;
-        setProducts(newProducts);
       }
     };
 
@@ -263,7 +262,7 @@ const Product = () => {
         <ContentsHeader headerName={HeaderNames.Product as HeaderNames} />
         <FilterBar />
         <Controller />
-        <TableContainer width={1182}>
+        <TableContainer>
           <ThContainer>
             {tableData.map(({ id, label, width, className }) => (
               <Th key={id} width={width} className={className}>

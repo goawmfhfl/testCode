@@ -49,12 +49,10 @@ const WrapperContainer = styled.div<{ width: number }>`
   border-left: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 
-export const TableContainer = styled.div<{ width: number }>`
+export const TableContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-
-  min-width: ${({ width }) => `${width}px`};
 `;
 
 export const ThContainer = styled.div`

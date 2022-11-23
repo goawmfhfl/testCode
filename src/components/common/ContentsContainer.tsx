@@ -29,8 +29,6 @@ const containerStyles = css`
   background-color: ${({ theme: { palette } }) => palette.grey100};
   padding: 16px 24px;
   height: 100%;
-
-  overflow: scroll;
 `;
 
 const Form = styled.form`

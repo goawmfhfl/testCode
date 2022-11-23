@@ -88,7 +88,8 @@ const ContentsContainer = styled.div<{
   margin-top: 56px;
   margin-bottom: ${({ hasBottomMargin }) => (hasBottomMargin ? "72px" : "")};
 
-  overflow: scroll;
+  min-width: 1182px;
+  min-height: 100%;
 `;
 
 const ContentsWrapper = styled.div`
