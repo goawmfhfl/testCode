@@ -22,6 +22,7 @@ import {
   pageNumberListVar,
   checkAllBoxStatusVar,
   LoadingSpinnerVisivilityVar,
+  checkedProductIdsVar,
 } from "@cache/index";
 import { tableData } from "@cache/productManagement/table";
 
@@ -66,9 +67,20 @@ const Product = () => {
   const { loading, error, products, setProducts, totalPages, getProducts } =
     useLazyProducts();
 
-  const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
-    selectedProductListVar
-  );
+  const {
+    loading,
+    error,
+    products,
+    isCheckedList,
+    setIsCheckedList,
+    totalPages,
+    getProducts,
+  } = useLazyProducts();
+
+  const selectedProductIds: Array<number> =
+    useReactiveVar(checkedProductIdsVar);
+
+  console.log("selectedProductIds", selectedProductIds);
 
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
 
@@ -275,6 +287,13 @@ const Product = () => {
   if (error) return <>error</>;
   // showHasServerErrorModal(error)
 
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    (async () => {
+      await getProducts({ variables: { input: filterOption } });
+    })();
+  }, [page, skip, status, query]);
+
   return (
     <Layout>
       <ContentsContainer>
@@ -352,8 +371,8 @@ const Product = () => {
                         className={tableData[0].className}
                       >
                         <Checkbox
-                          onChange={changeSingleCheckBoxHandler(index)}
-                          checked={isChecked}
+                          onChange={changeSingleCheckBoxHandler(id)}
+                          checked={isCheckedList[id].isChecked || false}
                         />
                       </ProductManageMentTd>
                       <ProductManageMentTd

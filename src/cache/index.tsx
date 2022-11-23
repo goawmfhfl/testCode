@@ -9,6 +9,7 @@ import {
 
 // Global Layout
 export const LoadingSpinnerVisivilityVar = makeVar<boolean>(false);
+export const checkedProductIdsVar = makeVar<Array<number>>([]);
 
 // TABLE: 테이블 필터
 export const filterOptionVar = makeVar<{
