@@ -13,8 +13,6 @@ import {
 import {
   selectedProductListVar,
   showHasServerErrorModal,
-  ProductsListVarType,
-  getProductBySellerVar,
 } from "@cache/productManagement";
 import {
   systemModalVar,
@@ -77,28 +75,25 @@ const Product = () => {
     getProducts,
   } = useLazyProducts();
 
+  console.log([
+    { loading },
+    { error },
+    { products },
+    { isCheckedList },
+    { setIsCheckedList },
+    { totalPages },
+    { getProducts },
+  ]);
+
   const selectedProductIds: Array<number> =
     useReactiveVar(checkedProductIdsVar);
-
-  console.log("selectedProductIds", selectedProductIds);
 
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
 
   const [updateProductsStatus] = useMutation<
     ChangeProductsInfoBySellerType,
     ChangeProductsInfoBySellerInputType
-  >(CHANGE_PRODUCTS_INFO_BY_SELLER, {
-    refetchQueries: [
-      {
-        query: GET_ALL_PRODUCTS_BY_SELLER,
-        variables: {
-          input: filterOption,
-        },
-      },
-      "GetAllProductsBySeller",
-    ],
-    fetchPolicy: "no-cache",
-  });
+  >(CHANGE_PRODUCTS_INFO_BY_SELLER);
 
   // 단일 상태 변경
   const changeSingleSaleStatusHandler =
@@ -145,35 +140,6 @@ const Product = () => {
 
             if (ok) {
               LoadingSpinnerVisivilityVar(false);
-
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                confirmButtonVisibility: true,
-                cancelButtonVisibility: false,
-                description: (
-                  <>
-                    {saleStatus[value] === "판매중" &&
-                      "판매중으로 변경되었습니다."}
-                    {saleStatus[value] === "숨김" && "숨김으로 변경되었습니다."}
-                    {saleStatus[value] === "품절" && "품절로 변경되었습니다."}
-                  </>
-                ),
-
-                confirmButtonClickHandler: () => {
-                  getProductBySellerVar(
-                    products.map((list) => ({ ...list, isChecked: false }))
-                  );
-
-                  checkAllBoxStatusVar(false);
-                  selectedProductListVar([]);
-
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-                },
-              });
             }
 
             if (error) {
@@ -193,28 +159,31 @@ const Product = () => {
 
   // 복수 체크박스
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newProducts = [...products];
+    const newIsCheckedList = JSON.parse(JSON.stringify(isCheckedList)) as {
+      [key: string]: { isChecked: boolean };
+    };
     checkAllBoxStatusVar(e.target.checked);
 
     if (e.target.checked) {
-      const checkAllProductList = newProducts.map((product) => ({
-        ...product,
-        isChecked: true,
-      }));
+      Object.keys(newIsCheckedList).forEach((key) => {
+        newIsCheckedList[key] = { isChecked: true };
+      });
 
-      setProducts(checkAllProductList);
-      selectedProductListVar(checkAllProductList);
+      const checkedProductIds = Object.keys(newIsCheckedList).map((id) =>
+        Number(id)
+      );
+
+      checkedProductIdsVar(checkedProductIds);
+      setIsCheckedList(newIsCheckedList);
     }
 
     if (!e.target.checked) {
-      const checkAllProductList = newProducts.map((product) => ({
-        ...product,
-        isChecked: false,
-      }));
+      Object.keys(newIsCheckedList).forEach((key) => {
+        newIsCheckedList[key] = { isChecked: false };
+      });
 
-      setProducts(checkAllProductList);
-      selectedProductListVar([]);
-      checkAllBoxStatusVar(false);
+      checkedProductIdsVar([]);
+      setIsCheckedList(newIsCheckedList);
     }
   };
 
@@ -258,20 +227,12 @@ const Product = () => {
       }
     };
 
-  // 필터 업데이트
+  // 업데이트
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
-      await getProducts({
-        variables: {
-          input: {
-            page,
-            skip,
-            status,
-            query,
-          },
-        },
-      });
+      await getProducts({ variables: { input: filterOption } });
+
       pageNumberListVar(
         Array(totalPages)
           .fill(null)
@@ -280,17 +241,6 @@ const Product = () => {
 
       selectedProductListVar([]);
       checkAllBoxStatusVar(false);
-    })();
-  }, [page, skip, status, query]);
-
-  // if (loading) return <>loading...</>;
-  if (error) return <>error</>;
-  // showHasServerErrorModal(error)
-
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
-      await getProducts({ variables: { input: filterOption } });
     })();
   }, [page, skip, status, query]);
 
@@ -316,24 +266,20 @@ const Product = () => {
             ))}
           </ThContainer>
 
-          {products.length !== 0 ? (
+          {products?.length !== 0 ? (
             <TbContainer>
               {products?.map(
-                (
-                  {
-                    id,
-                    name,
-                    category,
-                    originalPrice,
-                    discountAmount,
-                    discountMethod,
-                    quantity,
-                    status,
-                    thumbnail,
-                    isChecked,
-                  },
-                  index
-                ) => {
+                ({
+                  id,
+                  name,
+                  category,
+                  originalPrice,
+                  discountAmount,
+                  discountMethod,
+                  quantity,
+                  status,
+                  thumbnail,
+                }) => {
                   const discountAppliedPrice =
                     discountAmount && discountMethod
                       ? Number(
@@ -372,7 +318,7 @@ const Product = () => {
                       >
                         <Checkbox
                           onChange={changeSingleCheckBoxHandler(id)}
-                          checked={isCheckedList[id].isChecked || false}
+                          checked={isCheckedList[id]?.isChecked || false}
                         />
                       </ProductManageMentTd>
                       <ProductManageMentTd
@@ -474,7 +420,7 @@ const Product = () => {
           )}
         </TableContainer>
 
-        {products.length ? <Pagination /> : <></>}
+        {products?.length ? <Pagination /> : <></>}
       </ContentsContainer>
     </Layout>
   );

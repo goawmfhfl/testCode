@@ -25,16 +25,13 @@ const useLazyProducts = () => {
         query: "",
       },
     },
-    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: "cache-first",
     errorPolicy: "all",
   });
 
   const totalPages: number = data?.getAllProductsBySeller.totalPages || 1;
-  const products: Array<ProductsType> =
-    data?.getAllProductsBySeller.products.map((list) => ({
-      ...list,
-      isChecked: false,
-    })) || [];
+  const products: Array<ProductsType> = data?.getAllProductsBySeller.products;
 
   useEffect(() => {
     const checkedList: {

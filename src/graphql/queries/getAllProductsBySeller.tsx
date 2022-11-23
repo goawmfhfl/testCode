@@ -15,7 +15,6 @@ export interface ProductsType {
   status: string;
   thumbnail: string;
   quantity: number;
-  isChecked?: boolean;
 }
 
 export interface GetAllProductsBySellerType {
