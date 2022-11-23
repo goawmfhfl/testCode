@@ -6,12 +6,13 @@ import {
   Controller,
   ControllerRenderProps,
 } from "react-hook-form";
-import { useMutation, useReactiveVar, useLazyQuery } from "@apollo/client";
+import { useMutation, useReactiveVar } from "@apollo/client";
 import {
   modalVar,
   systemModalVar,
   checkAllBoxStatusVar,
   LoadingSpinnerVisivilityVar,
+  checkedProductIdsVar,
 } from "@cache/index";
 
 import {
@@ -35,18 +36,10 @@ import {
   CHANGE_PRODUCTS_INFO_BY_SELLER,
 } from "@graphql/mutations/changeProductsInfoBySeller";
 
-import {
-  selectedProductListVar,
-  getProductBySellerVar,
-  showHasServerErrorModal,
-} from "@cache/productManagement";
+import { showHasServerErrorModal } from "@cache/productManagement";
 import { filterOptionVar } from "@cache/index";
 
-import {
-  GET_ALL_PRODUCTS_BY_SELLER,
-  GetAllProductsBySellerInputType,
-  GetAllProductsBySellerType,
-} from "@graphql/queries/getAllProductsBySeller";
+import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -61,11 +54,7 @@ const ChangeDiscountModal = () => {
   const { register, watch, control, getValues } = method;
 
   const filterOption = useReactiveVar(filterOptionVar);
-
-  const selectedProdcutList = useReactiveVar(selectedProductListVar);
-  const selectedProductListIds: Array<number> = selectedProdcutList.map(
-    (list) => list.id
-  );
+  const checkedProductIds = useReactiveVar(checkedProductIdsVar);
 
   const discountAmount: number | string = Number(
     watch(DISCOUNT_AMOUNT) as string
@@ -77,20 +66,12 @@ const ChangeDiscountModal = () => {
   const discountStartsAt: string = watch(DISCOUNT_STARTS_AT) as string;
   const discountEndsAt: string = watch(DISCOUNT_ENDS_AT) as string;
 
-  const [getProductList] = useLazyQuery<
-    GetAllProductsBySellerType,
-    GetAllProductsBySellerInputType
-  >(GET_ALL_PRODUCTS_BY_SELLER, {
-    variables: {
-      input: filterOption,
-    },
-    fetchPolicy: "no-cache",
-  });
-
   const [updateDiscount] = useMutation<
     ChangeProductsInfoBySellerType,
     ChangeProductsInfoBySellerInputType
   >(CHANGE_PRODUCTS_INFO_BY_SELLER, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
@@ -100,7 +81,6 @@ const ChangeDiscountModal = () => {
       },
       "GetAllProductsBySeller",
     ],
-    fetchPolicy: "no-cache",
   });
 
   const handleCloseButtonClick = () => {
@@ -147,7 +127,7 @@ const ChangeDiscountModal = () => {
       isVisible: true,
       description: (
         <>
-          {selectedProdcutList.length}개 상품의 할인율을
+          {checkedProductIds.length}개 상품의 할인율을
           <br />
           이대로 변경하시겠습니까?
         </>
@@ -166,7 +146,7 @@ const ChangeDiscountModal = () => {
           } = await updateDiscount({
             variables: {
               input: {
-                productIds: selectedProductListIds,
+                productIds: checkedProductIds,
                 discountAmount,
                 discountMethod: discountOption,
                 startDiscountDate: discountStartsAt ? discountStartsAt : null,
@@ -177,48 +157,28 @@ const ChangeDiscountModal = () => {
 
           if (ok) {
             LoadingSpinnerVisivilityVar(false);
-            const {
-              data: {
-                getAllProductsBySeller: {
-                  products,
-                  ok: refetchOk,
-                  error: refetchError,
-                },
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: true,
+              description: <>할인율이 변경되었습니다</>,
+              confirmButtonVisibility: true,
+              cancelButtonVisibility: false,
+
+              confirmButtonClickHandler: () => {
+                modalVar({
+                  ...modalVar(),
+                  isVisible: false,
+                });
+
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: false,
+                });
+
+                checkedProductIdsVar([]);
+                checkAllBoxStatusVar(false);
               },
-            } = await getProductList();
-            if (refetchOk) {
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: <>할인율이 변경되었습니다</>,
-                confirmButtonVisibility: true,
-                cancelButtonVisibility: false,
-
-                confirmButtonClickHandler: () => {
-                  getProductBySellerVar(
-                    products.map((list) => ({ ...list, isChecked: false }))
-                  );
-
-                  modalVar({
-                    ...modalVar(),
-                    isVisible: false,
-                  });
-
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-
-                  selectedProductListVar([]);
-                  checkAllBoxStatusVar(false);
-                },
-              });
-            }
-
-            if (refetchError) {
-              LoadingSpinnerVisivilityVar(false);
-              showHasServerErrorModal(refetchError);
-            }
+            });
           }
 
           if (error) {

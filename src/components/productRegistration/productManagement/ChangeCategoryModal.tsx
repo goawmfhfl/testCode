@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import {
+  checkedProductIdsVar,
   DetailNoticeVar,
   LoadingSpinnerVisivilityVar,
   modalVar,
@@ -12,7 +13,7 @@ import {
   CATEGORY_SECOND,
   CATEGORY_THIRD,
 } from "@cache/productRegistration";
-import { useLazyQuery, useMutation, useReactiveVar } from "@apollo/client";
+import { useMutation, useReactiveVar } from "@apollo/client";
 
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
 import questionMarkIconSrc from "@icons/questionmark.svg";
@@ -32,33 +33,19 @@ import {
   ChangeProductsInfoBySellerInputType,
 } from "@graphql/mutations/changeProductsInfoBySeller";
 
-import {
-  getProductBySellerVar,
-  selectedProductListVar,
-  showHasServerErrorModal,
-} from "@cache/productManagement";
+import { showHasServerErrorModal } from "@cache/productManagement";
 import { checkAllBoxStatusVar, filterOptionVar } from "@cache/index";
 
-import {
-  GET_ALL_PRODUCTS_BY_SELLER,
-  GetAllProductsBySellerInputType,
-  GetAllProductsBySellerType,
-} from "@graphql/queries/getAllProductsBySeller";
+import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
 import useCategories from "@hooks/useCategories";
 import { CategoryName } from "@models/index";
 
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
-
-  const { loading, error, categories } = useCategories();
+  const { categories } = useCategories();
 
   const filterOption = useReactiveVar(filterOptionVar);
-
-  const selectedProdcutList = useReactiveVar(selectedProductListVar);
-  const selectedProductListIds: Array<number> = selectedProdcutList.map(
-    (list) => list.id
-  );
-
+  const checkedProductIds = useReactiveVar(checkedProductIdsVar);
   const [isBmarketChecked, setIsBmarketChecked] = useState<boolean>(false);
 
   const selectedFirstCategory: CategoryName = watch(
@@ -79,20 +66,13 @@ const ChangeCategoryModal = () => {
 
   const detailNotice = useReactiveVar(DetailNoticeVar);
 
-  const [getProductList] = useLazyQuery<
-    GetAllProductsBySellerType,
-    GetAllProductsBySellerInputType
-  >(GET_ALL_PRODUCTS_BY_SELLER, {
-    variables: {
-      input: filterOption,
-    },
-    fetchPolicy: "no-cache",
-  });
-
   const [updateCategory] = useMutation<
     ChangeProductsInfoBySellerType,
     ChangeProductsInfoBySellerInputType
   >(CHANGE_PRODUCTS_INFO_BY_SELLER, {
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: "no-cache",
+
     refetchQueries: [
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
@@ -102,7 +82,6 @@ const ChangeCategoryModal = () => {
       },
       "GetAllProductsBySeller",
     ],
-    fetchPolicy: "no-cache",
   });
 
   const handleCheckBoxChange = ({
@@ -138,7 +117,7 @@ const ChangeCategoryModal = () => {
         isVisible: true,
         description: (
           <>
-            {selectedProdcutList.length}개 상품의 카테고리를 <br />
+            {checkedProductIds.length}개 상품의 카테고리를 <br />
             이대로 변경하시겠습니까?
           </>
         ),
@@ -155,7 +134,7 @@ const ChangeCategoryModal = () => {
             } = await updateCategory({
               variables: {
                 input: {
-                  productIds: selectedProductListIds,
+                  productIds: checkedProductIds,
                   categoryName: selectedSecondCategory,
                   isBmarket: isBmarketChecked,
                 },
@@ -164,52 +143,28 @@ const ChangeCategoryModal = () => {
 
             if (ok) {
               LoadingSpinnerVisivilityVar(false);
-              const {
-                data: {
-                  getAllProductsBySeller: {
-                    products,
-                    ok: refetchOk,
-                    error: refetchError,
-                  },
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: "카테고리가 변경되었습니다.",
+                confirmButtonVisibility: true,
+                cancelButtonVisibility: false,
+
+                confirmButtonClickHandler: () => {
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+
+                  modalVar({
+                    ...modalVar(),
+                    isVisible: false,
+                  });
+
+                  checkedProductIdsVar([]);
+                  checkAllBoxStatusVar(false);
                 },
-              } = await getProductList();
-
-              if (refetchOk) {
-                systemModalVar({
-                  ...systemModalVar(),
-                  isVisible: true,
-                  description: "카테고리가 변경되었습니다.",
-                  confirmButtonVisibility: true,
-                  cancelButtonVisibility: false,
-
-                  confirmButtonClickHandler: () => {
-                    getProductBySellerVar(
-                      products.map((list) => ({
-                        ...list,
-                        isChecked: false,
-                      }))
-                    );
-
-                    systemModalVar({
-                      ...systemModalVar(),
-                      isVisible: false,
-                    });
-
-                    modalVar({
-                      ...modalVar(),
-                      isVisible: false,
-                    });
-
-                    selectedProductListVar([]);
-                    checkAllBoxStatusVar(false);
-                  },
-                });
-              }
-
-              if (refetchError) {
-                LoadingSpinnerVisivilityVar(false);
-                showHasServerErrorModal(refetchError);
-              }
+              });
             }
 
             if (error) {
@@ -247,9 +202,6 @@ const ChangeCategoryModal = () => {
       });
     };
   }, []);
-
-  if (loading) return <>...loading</>;
-  if (error) return <>...error</>;
 
   return (
     <Container>

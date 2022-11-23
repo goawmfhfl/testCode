@@ -10,10 +10,7 @@ import {
   CHANGE_PRODUCTS_INFO_BY_SELLER,
 } from "@graphql/mutations/changeProductsInfoBySeller";
 
-import {
-  selectedProductListVar,
-  showHasServerErrorModal,
-} from "@cache/productManagement";
+import { showHasServerErrorModal } from "@cache/productManagement";
 import {
   systemModalVar,
   filterOptionVar,
@@ -59,12 +56,6 @@ const saleStatusList = [
 ];
 
 const Product = () => {
-  const filterOption = useReactiveVar(filterOptionVar);
-  const { page, skip, status, query } = filterOption;
-
-  const { loading, error, products, setProducts, totalPages, getProducts } =
-    useLazyProducts();
-
   const {
     loading,
     error,
@@ -75,8 +66,11 @@ const Product = () => {
     totalPages,
     getProducts,
   } = useLazyProducts();
-  const selectedProductIds: Array<number> =
-    useReactiveVar(checkedProductIdsVar);
+
+  const filterOption = useReactiveVar(filterOptionVar);
+  const { page, skip, status, query } = filterOption;
+
+  const checkedProductIds: Array<number> = useReactiveVar(checkedProductIdsVar);
 
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
 
@@ -142,7 +136,27 @@ const Product = () => {
               LoadingSpinnerVisivilityVar(false);
               systemModalVar({
                 ...systemModalVar(),
-                isVisible: false,
+                isVisible: true,
+                confirmButtonVisibility: true,
+                cancelButtonVisibility: false,
+                description: (
+                  <>
+                    {saleStatus[value] === "판매중" &&
+                      "판매중으로 변경되었습니다."}
+                    {saleStatus[value] === "숨김" && "숨김으로 변경되었습니다."}
+                    {saleStatus[value] === "품절" && "품절로 변경되었습니다."}
+                  </>
+                ),
+
+                confirmButtonClickHandler: () => {
+                  checkAllBoxStatusVar(false);
+                  checkedProductIdsVar([]);
+
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+                },
               });
             }
 
@@ -197,33 +211,28 @@ const Product = () => {
       const newProducts = [...products];
 
       if (e.target.checked) {
-        const checkedProductList = { ...newProducts[index], isChecked: true };
-        selectedProductListVar([...selectedProductList, checkedProductList]);
-
-        newProducts[index].isChecked = true;
-        setProducts(newProducts);
+        newIsCheckedList[id].isChecked = true;
+        setIsCheckedList(newIsCheckedList);
+        checkedProductIdsVar([...checkedProductIds, id]);
       }
 
       if (!e.target.checked) {
-        const hasCheckedList = selectedProductList.filter(
-          (product) => product.id === newProducts[index].id
+        newIsCheckedList[id].isChecked = false;
+        setIsCheckedList(newIsCheckedList);
+
+        const isCheckedList = checkedProductIds.filter(
+          (selectedId) => selectedId === id
         );
 
-        if (hasCheckedList) {
-          const checkedListIndex = selectedProductList.findIndex(
-            (product) => product.id === newProducts[index].id
+        if (isCheckedList) {
+          const checkedListIndex = checkedProductIds.findIndex(
+            (selectedId) => selectedId === id
           );
 
-          const deletedCheckedList = [
-            ...selectedProductList.slice(0, checkedListIndex),
-            ...selectedProductList.slice(checkedListIndex + 1),
-          ];
-
-          selectedProductListVar(deletedCheckedList);
-
-          newProducts[index].isChecked = false;
-
-          setProducts(newProducts);
+          checkedProductIdsVar([
+            ...checkedProductIds.slice(0, checkedListIndex),
+            ...checkedProductIds.slice(checkedListIndex + 1),
+          ]);
         }
 
         newProducts[index].isChecked = false;
@@ -243,7 +252,7 @@ const Product = () => {
           .map((_, index) => index + 1)
       );
 
-      selectedProductListVar([]);
+      checkedProductIdsVar([]);
       checkAllBoxStatusVar(false);
     })();
   }, [page, skip, status, query]);

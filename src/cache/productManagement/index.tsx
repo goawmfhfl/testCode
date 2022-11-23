@@ -1,9 +1,6 @@
 import { makeVar } from "@apollo/client";
 import { systemModalVar } from "..";
 
-export const getProductBySellerVar = makeVar<Array<ProductsListVarType>>([]);
-export const selectedProductListVar = makeVar<Array<ProductsListVarType>>([]);
-
 export interface ProductsListVarType {
   id: number;
   name: string;

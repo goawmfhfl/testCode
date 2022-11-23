@@ -18,15 +18,13 @@ import {
   DUPLICATE_PRODUCTS_BY_SELLER,
 } from "@graphql/mutations/duplicateProductsBySeller";
 import {
+  checkedProductIdsVar,
   LoadingSpinnerVisivilityVar,
   modalVar,
   systemModalVar,
 } from "@cache/index";
 
 import {
-  getProductBySellerVar,
-  ProductsListVarType,
-  selectedProductListVar,
   showHasCheckedAnyProductModal,
   showHasServerErrorModal,
 } from "@cache/productManagement";
@@ -37,11 +35,7 @@ import {
   filterOptionVar,
 } from "@cache/index";
 
-import {
-  GetAllProductsBySellerInputType,
-  GetAllProductsBySellerType,
-  GET_ALL_PRODUCTS_BY_SELLER,
-} from "@graphql/queries/getAllProductsBySeller";
+import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
 import ChangeCategoryModal from "./ChangeCategoryModal";
 import ChangeDiscountModal from "./ChangeDiscountModal";
 import Button from "@components/common/Button";
@@ -55,31 +49,15 @@ import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 
 const Controller = () => {
   const filterOption = useReactiveVar(filterOptionVar);
-
-  const selectedProductList: Array<ProductsListVarType> = useReactiveVar(
-    selectedProductListVar
-  );
-
-  const selectedProductListIds: Array<number> = selectedProductList.map(
-    (list) => list.id
-  );
-
+  const checkedProductIds = useReactiveVar(checkedProductIdsVar);
   const temporaryQuery = useReactiveVar(temporaryQueryVar);
-
-  const [getProductList] = useLazyQuery<
-    GetAllProductsBySellerType,
-    GetAllProductsBySellerInputType
-  >(GET_ALL_PRODUCTS_BY_SELLER, {
-    variables: {
-      input: filterOption,
-    },
-    fetchPolicy: "no-cache",
-  });
 
   const [updateProductsStatus] = useMutation<
     ChangeProductsInfoBySellerType,
     ChangeProductsInfoBySellerInputType
   >(CHANGE_PRODUCTS_INFO_BY_SELLER, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
@@ -89,13 +67,14 @@ const Controller = () => {
       },
       "GetAllProductsBySeller",
     ],
-    fetchPolicy: "no-cache",
   });
 
   const [deleteProducts] = useMutation<
     DeleteProductsBySeller,
     DeleteProductsBySellerInputType
   >(DELETE_PRODUCTS_BY_SELLER, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
@@ -105,13 +84,14 @@ const Controller = () => {
       },
       "GetAllProductsBySeller",
     ],
-    fetchPolicy: "no-cache",
   });
 
   const [duplicateProducts] = useMutation<
     DuplicateProductsBySellerType,
     DuplicateProductsBySellerInputType
   >(DUPLICATE_PRODUCTS_BY_SELLER, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
@@ -121,7 +101,6 @@ const Controller = () => {
       },
       "GetAllProductsBySeller",
     ],
-    fetchPolicy: "no-cache",
   });
 
   const changeMultiSaleStatusHandler = (
@@ -161,7 +140,7 @@ const Controller = () => {
           } = await updateProductsStatus({
             variables: {
               input: {
-                productIds: selectedProductListIds,
+                productIds: checkedProductIds,
                 productStatus: value,
               },
             },
@@ -169,51 +148,30 @@ const Controller = () => {
 
           if (ok) {
             LoadingSpinnerVisivilityVar(false);
-            const {
-              data: {
-                getAllProductsBySeller: {
-                  products,
-                  ok: refetchOk,
-                  error: refetchError,
-                },
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: true,
+              description: (
+                <>
+                  {saleStatus[value] === "판매중" &&
+                    "판매중으로 변경되었습니다."}
+                  {saleStatus[value] === "숨김" && "숨김으로 변경되었습니다."}
+                  {saleStatus[value] === "품절" && "품절로 변경되었습니다."}
+                </>
+              ),
+              cancelButtonVisibility: false,
+
+              confirmButtonClickHandler: () => {
+                e.target.value = saleStatus["DEFAULT"];
+                checkAllBoxStatusVar(false);
+                checkedProductIdsVar([]);
+
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: false,
+                });
               },
-            } = await getProductList();
-
-            if (refetchOk) {
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: (
-                  <>
-                    {saleStatus[value] === "판매중" &&
-                      "판매중으로 변경되었습니다."}
-                    {saleStatus[value] === "숨김" && "숨김으로 변경되었습니다."}
-                    {saleStatus[value] === "품절" && "품절로 변경되었습니다."}
-                  </>
-                ),
-                cancelButtonVisibility: false,
-
-                confirmButtonClickHandler: () => {
-                  getProductBySellerVar(
-                    products.map((list) => ({ ...list, isChecked: false }))
-                  );
-
-                  e.target.value = saleStatus["DEFAULT"];
-                  checkAllBoxStatusVar(false);
-                  selectedProductListVar([]);
-
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-                },
-              });
-            }
-
-            if (refetchError) {
-              showHasServerErrorModal(refetchError);
-              LoadingSpinnerVisivilityVar(false);
-            }
+            });
           }
 
           if (error) {
@@ -226,7 +184,7 @@ const Controller = () => {
   };
 
   const handleSaleStatusClick = () => {
-    if (!selectedProductList.length) {
+    if (!checkedProductIds.length) {
       showHasCheckedAnyProductModal();
       return;
     }
@@ -234,7 +192,7 @@ const Controller = () => {
 
   // 카테고리 변경 모달
   const handleChangeCategoryModalButtonClick = () => {
-    if (!selectedProductList.length) {
+    if (!checkedProductIds.length) {
       showHasCheckedAnyProductModal();
       return;
     }
@@ -247,7 +205,7 @@ const Controller = () => {
 
   // 할인율 변경 모달
   const handleChangeDiscountModalButtonClick = () => {
-    if (!selectedProductList.length) {
+    if (!checkedProductIds.length) {
       showHasCheckedAnyProductModal();
       return;
     }
@@ -260,7 +218,7 @@ const Controller = () => {
 
   // 복제
   const handleDuplicateButtonClick = () => {
-    if (!selectedProductList.length) {
+    if (!checkedProductIds.length) {
       showHasCheckedAnyProductModal();
       return;
     }
@@ -283,54 +241,30 @@ const Controller = () => {
           } = await duplicateProducts({
             variables: {
               input: {
-                productIds: selectedProductListIds,
+                productIds: checkedProductIds,
               },
             },
           });
 
           if (ok) {
             LoadingSpinnerVisivilityVar(false);
-            const {
-              data: {
-                getAllProductsBySeller: {
-                  products,
-                  ok: refetchOk,
-                  error: refetchError,
-                },
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: true,
+              description: <>상품이 복제되었습니다.</>,
+              confirmButtonVisibility: true,
+              cancelButtonVisibility: false,
+
+              confirmButtonClickHandler: () => {
+                checkAllBoxStatusVar(false);
+                checkedProductIdsVar([]);
+
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: false,
+                });
               },
-            } = await getProductList();
-
-            if (refetchOk) {
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: <>상품이 복제되었습니다.</>,
-                confirmButtonVisibility: true,
-                cancelButtonVisibility: false,
-
-                confirmButtonClickHandler: () => {
-                  getProductBySellerVar(
-                    products.map((list) => ({
-                      ...list,
-                      isChecked: false,
-                    }))
-                  );
-
-                  checkAllBoxStatusVar(false);
-                  selectedProductListVar([]);
-
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-                },
-              });
-            }
-
-            if (refetchError) {
-              LoadingSpinnerVisivilityVar(false);
-              showHasServerErrorModal(refetchError);
-            }
+            });
           }
 
           if (error) {
@@ -344,7 +278,7 @@ const Controller = () => {
 
   // 삭제
   const handleDeleteButtonClick = () => {
-    if (!selectedProductList.length) {
+    if (!checkedProductIds.length) {
       showHasCheckedAnyProductModal();
       return;
     }
@@ -367,54 +301,30 @@ const Controller = () => {
           } = await deleteProducts({
             variables: {
               input: {
-                productIds: selectedProductListIds,
+                productIds: checkedProductIds,
               },
             },
           });
 
           if (ok) {
             LoadingSpinnerVisivilityVar(false);
-            const {
-              data: {
-                getAllProductsBySeller: {
-                  products,
-                  ok: refetchOk,
-                  error: refetchError,
-                },
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: true,
+              description: <>상품이 삭제되었습니다.</>,
+              confirmButtonVisibility: true,
+              cancelButtonVisibility: false,
+
+              confirmButtonClickHandler: () => {
+                checkAllBoxStatusVar(false);
+                checkedProductIdsVar([]);
+
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: false,
+                });
               },
-            } = await getProductList();
-
-            if (refetchOk) {
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: <>상품이 삭제되었습니다.</>,
-                confirmButtonVisibility: true,
-                cancelButtonVisibility: false,
-
-                confirmButtonClickHandler: () => {
-                  getProductBySellerVar(
-                    products.map((list) => ({
-                      ...list,
-                      isChecked: false,
-                    }))
-                  );
-
-                  checkAllBoxStatusVar(false);
-                  selectedProductListVar([]);
-
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-                },
-              });
-            }
-
-            if (refetchError) {
-              LoadingSpinnerVisivilityVar(false);
-              showHasServerErrorModal(error);
-            }
+            });
           }
 
           if (error) {
