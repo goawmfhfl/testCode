@@ -69,22 +69,12 @@ const Product = () => {
     loading,
     error,
     products,
+    setProducts,
     isCheckedList,
     setIsCheckedList,
     totalPages,
     getProducts,
   } = useLazyProducts();
-
-  console.log([
-    { loading },
-    { error },
-    { products },
-    { isCheckedList },
-    { setIsCheckedList },
-    { totalPages },
-    { getProducts },
-  ]);
-
   const selectedProductIds: Array<number> =
     useReactiveVar(checkedProductIdsVar);
 
@@ -93,7 +83,17 @@ const Product = () => {
   const [updateProductsStatus] = useMutation<
     ChangeProductsInfoBySellerType,
     ChangeProductsInfoBySellerInputType
-  >(CHANGE_PRODUCTS_INFO_BY_SELLER);
+  >(CHANGE_PRODUCTS_INFO_BY_SELLER, {
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: "no-cache",
+    refetchQueries: [
+      {
+        query: GET_ALL_PRODUCTS_BY_SELLER,
+        variables: { input: filterOption },
+      },
+      "GetAllProductsBySeller",
+    ],
+  });
 
   // 단일 상태 변경
   const changeSingleSaleStatusHandler =
@@ -140,6 +140,10 @@ const Product = () => {
 
             if (ok) {
               LoadingSpinnerVisivilityVar(false);
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
             }
 
             if (error) {

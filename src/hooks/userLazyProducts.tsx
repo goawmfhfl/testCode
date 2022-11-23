@@ -9,6 +9,7 @@ import {
 } from "@graphql/queries/getAllProductsBySeller";
 
 const useLazyProducts = () => {
+  const [products, setProducts] = useState<Array<ProductsType>>([]);
   const [isCheckedList, setIsCheckedList] = useState<{
     [key: string]: { isChecked: boolean };
   }>({});
@@ -26,14 +27,14 @@ const useLazyProducts = () => {
       },
     },
     notifyOnNetworkStatusChange: true,
-    fetchPolicy: "cache-first",
+    fetchPolicy: "no-cache",
     errorPolicy: "all",
   });
 
   const totalPages: number = data?.getAllProductsBySeller.totalPages || 1;
-  const products: Array<ProductsType> = data?.getAllProductsBySeller.products;
 
   useEffect(() => {
+    const products: Array<ProductsType> = data?.getAllProductsBySeller.products;
     const checkedList: {
       [key: string]: { isChecked: boolean };
     } =
@@ -43,12 +44,14 @@ const useLazyProducts = () => {
       }, {}) || {};
 
     setIsCheckedList(checkedList);
+    setProducts(products);
   }, [data]);
 
   return {
     loading,
     error,
     products,
+    setProducts,
     isCheckedList,
     setIsCheckedList,
     totalPages,

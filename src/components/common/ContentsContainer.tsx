@@ -30,7 +30,7 @@ const containerStyles = css`
   padding: 16px 24px;
   height: 100%;
 
-  overflow: hidden;
+  overflow: scroll;
 `;
 
 const Form = styled.form`
