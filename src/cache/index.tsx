@@ -6,6 +6,7 @@ import {
   SHOP_SETTING_SECTIONS,
   PRODUCT_REGISTRATION_SECTIONS,
 } from "@constants/index";
+import { ProductStatus } from "@constants/product";
 
 // Global Layout
 export const LoadingSpinnerVisivilityVar = makeVar<boolean>(false);
@@ -13,10 +14,10 @@ export const checkedProductIdsVar = makeVar<Array<number>>([]);
 
 // TABLE: 테이블 필터
 export const filterOptionVar = makeVar<{
-  page: number;
+  page?: number;
   skip?: number;
-  status?: string;
-  query: string;
+  status?: ProductStatus;
+  query?: string;
 }>({
   page: 1,
   skip: 20,

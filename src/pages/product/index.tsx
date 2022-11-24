@@ -46,7 +46,7 @@ import { HeaderNames } from "@constants/index";
 import { TableType } from "@models/index";
 
 import { getDiscountedPrice } from "@utils/calculator";
-import useLazyProducts from "@hooks/useLazyProducts";
+import useLazyProducts from "@hooks/product/useLazyProducts";
 
 const saleStatusList = [
   { id: 0, label: "DEFAULT", name: "판매상태 변경" },

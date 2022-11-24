@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { ProductStatus } from "@constants/product";
 
 export interface ProductsType {
   id: number;
@@ -76,12 +77,19 @@ export interface GetAllProductsStatusBySellerType {
     ok: boolean;
     error: string;
     totalResults: number;
+    products: Array<{
+      id: number;
+      status: ProductStatus;
+    }>;
   };
 }
 
 export interface GetAllProductsStatusBySellerInPutType {
   input: {
-    status: string | null;
+    page?: number;
+    skip?: number;
+    status?: ProductStatus;
+    query?: string;
   };
 }
 
@@ -91,6 +99,10 @@ export const GET_ALL_PRODCUCTS_STATUS_BY_SELLER = gql`
       ok
       error
       totalResults
+      products {
+        id
+        status
+      }
     }
   }
 `;

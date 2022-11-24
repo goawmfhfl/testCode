@@ -1,25 +1,56 @@
 import styled from "styled-components";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useReactiveVar } from "@apollo/client";
 
-import questionMarkSrc from "@icons/questionmark.svg";
-import { systemModalVar, filterOptionVar } from "@cache/index";
+import { filterOptionVar } from "@cache/index";
 import { Pathnames } from "@constants/index";
+
+import questionMarkSrc from "@icons/questionmark.svg";
 import Button from "@components/common/Button";
+
+import useLazyAllProductsStatus from "@hooks/product/useLazyAllProductsStatus";
+import { ProductStatus } from "@constants/product";
 
 const FilterBar = () => {
   const navigate = useNavigate();
 
+  const {
+    loading,
+    error,
+    getAllProductsStatus,
+    allProductsLength,
+    onSaleLength,
+    stopSaleLength,
+    soldOutLength,
+  } = useLazyAllProductsStatus();
+
   const filterOption = useReactiveVar(filterOptionVar);
 
   const changeFilterOptionNameClick =
-    (filterOptionName: string | null) => () => {
+    (filterOptionName: ProductStatus) => () => {
       filterOptionVar({ ...filterOption, status: filterOptionName });
     };
 
   const handleButtonClick = () => {
     navigate(Pathnames.ProductRegistration);
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    (async () => {
+      await getAllProductsStatus({
+        variables: {
+          input: {
+            page: 1,
+            skip: 20,
+            status: null,
+            query: null,
+          },
+        },
+      });
+    })();
+  }, []);
 
   return (
     <Container>
@@ -28,26 +59,26 @@ const FilterBar = () => {
           onClick={changeFilterOptionNameClick(null)}
           isActvie={filterOption.status === null}
         >
-          전체
+          전체 {allProductsLength}
         </Filter>
         <Filter
-          onClick={changeFilterOptionNameClick("ON_SALE")}
-          isActvie={filterOption.status === "ON_SALE"}
+          onClick={changeFilterOptionNameClick(ProductStatus.ON_SALE)}
+          isActvie={filterOption.status === ProductStatus.ON_SALE}
         >
-          판매중
+          판매중 {onSaleLength}
         </Filter>
         <Filter
-          onClick={changeFilterOptionNameClick("STOP_SALE")}
-          isActvie={filterOption.status === "STOP_SALE"}
+          onClick={changeFilterOptionNameClick(ProductStatus.STOP_SALE)}
+          isActvie={filterOption.status === ProductStatus.STOP_SALE}
         >
-          숨김
+          숨김 {stopSaleLength}
         </Filter>
         <Filter
-          onClick={changeFilterOptionNameClick("SOLD_OUT")}
-          isActvie={filterOption.status === "SOLD_OUT"}
+          onClick={changeFilterOptionNameClick(ProductStatus.SOLD_OUT)}
+          isActvie={filterOption.status === ProductStatus.SOLD_OUT}
         >
           <QuestionMarkIcon src={questionMarkSrc} />
-          품절
+          품절 {soldOutLength}
         </Filter>
       </FilterList>
       <Button
@@ -68,6 +99,7 @@ const Container = styled.div`
   justify-content: space-between;
   margin-bottom: 12px;
 `;
+
 const FilterList = styled.ul`
   display: flex;
 
