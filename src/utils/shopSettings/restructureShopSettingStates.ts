@@ -17,16 +17,18 @@ import {
   shopImagesVar,
   safetyCertificationVar,
   businessLicenseVar,
-  registrationNumberVar,
+  REGISTRATION_NUMBER_PREFIX,
+  REGISTRATION_NUMBER_SUFFIX,
+  PHOTOCOPY,
   phoneNumberVar,
   settlementAccountVar,
 } from "@cache/shopSettings";
 
 import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
 
-export default function restructureShopSettingStates(
+const restructureShopSettingStates = (
   watch: UseFormWatch<Record<string, any>>
-): SaveShopSettingsInputType {
+): SaveShopSettingsInputType => {
   const description = watch(SHOP_INTRODUCTION) as string;
   const shipmentPolicy = watch(SHIPMENT_POLICY) as string;
   const returnPolicy = watch(RETURN_POLICY) as string;
@@ -63,11 +65,12 @@ export default function restructureShopSettingStates(
     onlineSalesLicense,
   } = businessLicenseVar();
 
-  const {
-    identificationCardOwner,
-    identificationCardNumber,
-    identificationCardIssueDate,
-  } = registrationNumberVar();
+  const registrationNumberPrefix = watch(REGISTRATION_NUMBER_PREFIX) as string;
+  const registrationNumberSuffix = watch(REGISTRATION_NUMBER_SUFFIX) as string;
+  const registrationNumber =
+    registrationNumberPrefix + registrationNumberSuffix;
+
+  const photoCopy = watch(PHOTOCOPY) as string;
 
   const phoneNumber = phoneNumberVar();
 
@@ -97,9 +100,8 @@ export default function restructureShopSettingStates(
     isSimpleTaxpayers: isSimpleTaxpayers === "대상" ? true : false,
     companyLocation,
     onlineSalesLicense,
-    identificationCardOwner,
-    identificationCardNumber,
-    identificationCardIssueDate,
+    identificationCardNumber: registrationNumber,
+    identificationCardCopyPhoto: photoCopy,
     phoneNumber,
     bankAccountNumber,
     bankAccountHolder,
@@ -107,4 +109,6 @@ export default function restructureShopSettingStates(
   };
 
   return input;
-}
+};
+
+export default restructureShopSettingStates;

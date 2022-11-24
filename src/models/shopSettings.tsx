@@ -24,6 +24,13 @@ export interface ShopFormFields {
   [SHIPMENT_RETURN_PRICE]: number;
   [SHIPMENT_EXCHANGE_PRICE]: number;
   [SHIPMENT_CONDITIONAL_PRICE]: number;
+  IDENTIFICATION: {
+    REGISTRATION_NUMBER: {
+      PREFIX: string;
+      SUFFIX: string;
+    };
+    PHOTOCOPY: string;
+  };
 }
 
 export type InputValueTypes =
@@ -52,13 +59,6 @@ export interface BusinessLicenseVariables {
   isSimpleTaxpayers: string;
   companyLocation: string;
   onlineSalesLicense: string;
-}
-
-export interface RegistrationVariables {
-  isConfirmed: boolean;
-  identificationCardOwner: string;
-  identificationCardNumber: string;
-  identificationCardIssueDate: Date;
 }
 
 export interface SettlementAccountVariables {
@@ -98,9 +98,8 @@ export interface TemporarySaveShopSettingsInputType {
   onlineSalesLicense?: string;
 
   // 주민등록증
-  identificationCardOwner?: string;
   identificationCardNumber?: string;
-  identificationCardIssueDate?: Date;
+  identificationCardCopyPhoto?: string;
 
   // 전화번호
   phoneNumber?: string;
@@ -140,9 +139,8 @@ export interface SaveShopSettingsInputType {
   onlineSalesLicense: string;
 
   // 주민등록증
-  identificationCardOwner?: string;
   identificationCardNumber?: string;
-  identificationCardIssueDate?: Date;
+  identificationCardCopyPhoto?: string;
 
   // 전화번호
   phoneNumber: string;

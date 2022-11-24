@@ -5,7 +5,6 @@ import {
   SafetyCertificationVariables,
   BusinessLicenseVariables,
   SettlementAccountVariables,
-  RegistrationVariables,
 } from "@models/shopSettings";
 
 export const shopImagesVar = makeVar<ShopImageVariables>({
@@ -42,12 +41,11 @@ export const businessLicenseVar = makeVar<BusinessLicenseVariables>({
   onlineSalesLicense: "",
 });
 
-export const registrationNumberVar = makeVar<RegistrationVariables>({
-  isConfirmed: false,
-  identificationCardOwner: "",
-  identificationCardNumber: "",
-  identificationCardIssueDate: new Date(),
-});
+export const REGISTRATION_NUMBER_PREFIX =
+  "IDENTIFICATION.REGISTRATION_NUMBER.PREFIX";
+export const REGISTRATION_NUMBER_SUFFIX =
+  "IDENTIFICATION.REGISTRATION_NUMBER.SUFFIX";
+export const PHOTOCOPY = "IDENTIFICATION.PHOTOCOPY";
 
 export const phoneNumberVar = makeVar<string>("");
 

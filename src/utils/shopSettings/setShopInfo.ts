@@ -14,10 +14,12 @@ import {
   SHIPMENT_EXCHANGE_PRICE,
   SHIPMENT_CONDITIONAL_PRICE,
   businessLicenseVar,
-  registrationNumberVar,
   phoneNumberVar,
   settlementAccountVar,
   shopImagesVar,
+  REGISTRATION_NUMBER_PREFIX,
+  REGISTRATION_NUMBER_SUFFIX,
+  PHOTOCOPY,
 } from "@cache/shopSettings";
 import { ShopFormFields } from "@models/shopSettings";
 import { UploadedFileType } from "@models/productImages";
@@ -46,9 +48,8 @@ export default function setShopInfo(
     isSimpleTaxpayers,
     companyLocation,
     onlineSalesLicense,
-    identificationCardOwner,
     identificationCardNumber,
-    identificationCardIssueDate,
+    identificationCardCopyPhoto,
     phoneNumber,
     bankName,
     bankAccountNumber,
@@ -58,14 +59,25 @@ export default function setShopInfo(
   const mobileImage = uploadedFileUrls.find(
     (file) => file.type === UploadedFileType.SHOP_MOBILE
   );
+
   const pcImage = uploadedFileUrls.find(
     (file) => file.type === UploadedFileType.SHOP_PC
   );
 
-  shopImagesVar({
-    mobileImage: mobileImage.url,
-    pcImage: pcImage.url,
-  });
+  if (mobileImage) {
+    shopImagesVar({
+      ...shopImagesVar(),
+      pcImage: pcImage.url,
+    });
+  }
+
+  if (pcImage) {
+    shopImagesVar({
+      ...shopImagesVar(),
+      mobileImage: mobileImage.url,
+    });
+  }
+
   setValue(SHOP_INTRODUCTION, description);
   setValue(SHIPMENT_POLICY, shipmentPolicy);
   setValue(RETURN_POLICY, returnPolicy);
@@ -105,17 +117,16 @@ export default function setShopInfo(
     });
   }
 
-  if (
-    identificationCardOwner &&
-    identificationCardNumber &&
-    identificationCardIssueDate
-  ) {
-    registrationNumberVar({
-      isConfirmed: true,
-      identificationCardOwner,
-      identificationCardNumber,
-      identificationCardIssueDate,
-    });
+  if (identificationCardNumber) {
+    const prefix = identificationCardNumber.split("-")[0];
+    const suffix = identificationCardNumber.split("-")[1];
+
+    setValue(REGISTRATION_NUMBER_PREFIX, prefix);
+    setValue(REGISTRATION_NUMBER_SUFFIX, suffix);
+  }
+
+  if (identificationCardCopyPhoto) {
+    setValue(PHOTOCOPY, identificationCardCopyPhoto);
   }
 
   phoneNumberVar(phoneNumber);

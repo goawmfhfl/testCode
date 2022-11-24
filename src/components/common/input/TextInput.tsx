@@ -49,12 +49,6 @@ const TextInput = ({
     }
   };
 
-  const changeVacancyToZero = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (!e.target.value) {
-      setValue(register.name, 0);
-    }
-  };
-
   return (
     <Input
       {...register}
@@ -65,8 +59,6 @@ const TextInput = ({
       placeholder={placeholder}
       // eslint-disable-next-line
       onKeyDown={numbersOnly ? preventNaNValues : () => {}}
-      // eslint-disable-next-line
-      onBlur={numbersOnly ? changeVacancyToZero : () => {}}
     />
   );
 };

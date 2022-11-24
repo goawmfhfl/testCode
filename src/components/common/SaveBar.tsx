@@ -202,18 +202,15 @@ const SaveBar = () => {
       const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
       const isShipmentPriceFree = shipmentType === ShipmentChargeType.Free;
       const hasIdentificationCardAuthenticated =
-        input.identificationCardIssueDate &&
-        input.identificationCardNumber &&
-        input.identificationCardOwner;
+        Boolean(input.identificationCardNumber) &&
+        Boolean(input.identificationCardCopyPhoto);
 
       const { isFulfilled, unfulfilledInputNames } = hasEveryInputFulfilled(
         input,
         [
           "safetyAuthentication",
           "safetyAuthenticationExpiredDate",
-          "identificationCardOwner",
           "identificationCardNumber",
-          "identificationCardIssueDate",
           hasIdentificationCardAuthenticated && "representativeName",
           hasIdentificationCardAuthenticated && "businessRegistrationNumber",
           hasIdentificationCardAuthenticated && "isSimpleTaxpayers",

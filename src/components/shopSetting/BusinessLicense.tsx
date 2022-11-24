@@ -101,6 +101,7 @@ const InfoContainer = styled.div`
   align-items: center;
 
   background-color: ${({ theme: { palette } }) => palette.grey100};
+  border-radius: 7px;
   width: 702px;
 `;
 

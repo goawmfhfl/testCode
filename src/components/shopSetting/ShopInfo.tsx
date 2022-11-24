@@ -7,6 +7,7 @@ import styled from "styled-components/macro";
 import { shopImagesVar, SHOP_INTRODUCTION } from "@cache/shopSettings";
 import { systemModalVar } from "@cache/index";
 import { validateImageDimensionRatio } from "@utils/index";
+import deleteImageUrl from "@utils/shopSettings/deleteImageUrl";
 
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
@@ -107,6 +108,11 @@ const ShopInfo = () => {
       if (version === "mobileImage") {
         if (mobileImage) {
           await deleteImageUrl(mobileImage);
+
+          shopImagesVar({
+            ...shopImagesVar(),
+            mobileImage: "",
+          });
         }
 
         shopImagesVar({
@@ -118,6 +124,11 @@ const ShopInfo = () => {
       if (version === "pcImage") {
         if (pcImage) {
           await deleteImageUrl(pcImage);
+
+          shopImagesVar({
+            ...shopImagesVar(),
+            pcImage: "",
+          });
         }
 
         shopImagesVar({
@@ -130,19 +141,16 @@ const ShopInfo = () => {
     }
   };
 
-  const deleteImageUrl = async (imageUrl: string) => {
-    try {
-      const response: { data: { result: boolean } } = await axios.delete(
-        "https://dev.chopsticks-store.com/upload",
-        {
-          data: {
-            url: imageUrl.toString(),
-          },
-        }
-      );
+  const handleDeleteButtonClick =
+    (imageUrl: string) => async (e: React.MouseEvent<HTMLImageElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-      if (!response.data.result) {
-        console.log("이미지 삭제 서버 에러", response);
+      const { ok } = await deleteImageUrl(imageUrl);
+
+      if (!ok) {
+        alert("이미지 삭제에 실패하였습니다");
+        return;
       }
 
       if (imageUrl === mobileImage) {
@@ -158,19 +166,6 @@ const ShopInfo = () => {
           pcImage: "",
         });
       }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleDeleteButtonClick =
-    (imageUrl: string) => async (e: React.MouseEvent<HTMLImageElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      console.log(imageUrl);
-
-      await deleteImageUrl(imageUrl);
     };
 
   const shopIntroduction = watch(SHOP_INTRODUCTION) as string;

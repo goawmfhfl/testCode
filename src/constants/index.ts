@@ -33,9 +33,8 @@ export const shopSettingsSectionMapper: { [key: string]: string } = {
   companyLocation: SHOP_SETTING_SECTIONS.BUSINESS_LICENSE,
   onlineSalesLicense: SHOP_SETTING_SECTIONS.BUSINESS_LICENSE,
 
-  identificationCardOwner: SHOP_SETTING_SECTIONS.REGISTRATION_NUMBER,
   identificationCardNumber: SHOP_SETTING_SECTIONS.REGISTRATION_NUMBER,
-  identificationCardIssueDate: SHOP_SETTING_SECTIONS.REGISTRATION_NUMBER,
+  identificationCardCopyPhoto: SHOP_SETTING_SECTIONS.REGISTRATION_NUMBER,
 
   phoneNumber: SHOP_SETTING_SECTIONS.PHONE_NUMBER,
 

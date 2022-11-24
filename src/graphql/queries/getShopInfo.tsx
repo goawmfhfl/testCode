@@ -28,9 +28,8 @@ export interface ShopInfo {
   isSimpleTaxpayers: boolean;
   companyLocation: string;
   onlineSalesLicense: string;
-  identificationCardOwner: string;
   identificationCardNumber: string;
-  identificationCardIssueDate: Date;
+  identificationCardCopyPhoto: string;
   phoneNumber: string;
   bankName: string;
   bankAccountNumber: string;
@@ -68,9 +67,8 @@ export const GET_SHOP_INFO = gql`
       isSimpleTaxpayers
       companyLocation
       onlineSalesLicense
-      identificationCardOwner
       identificationCardNumber
-      identificationCardIssueDate
+      identificationCardCopyPhoto
       phoneNumber
       bankName
       bankAccountNumber

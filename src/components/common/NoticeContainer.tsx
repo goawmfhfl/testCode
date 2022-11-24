@@ -37,11 +37,8 @@ const NoticeText = styled.div<{ hasTopMargin: boolean }>`
 
   margin-top: ${({ hasTopMargin }) => (hasTopMargin ? "4px" : "")};
 
-  font-family: "Spoqa Han Sans Neo";
-  font-weight: 300;
-  font-size: 12px;
-  line-height: 18px;
-  letter-spacing: 0.1px;
+  ${({ theme }) => theme.typo.korean.body.secondary.basic};
+
   white-space: nowrap;
 `;
 

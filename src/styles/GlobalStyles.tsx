@@ -47,6 +47,10 @@ const GlobalStyles = createGlobalStyle<{ isModalVisible: boolean }>`
       }
     }
 
+    input {
+      cursor: text;
+    }
+
     input[type="radio"] {
       margin: 0;
       margin-left: 8px;
