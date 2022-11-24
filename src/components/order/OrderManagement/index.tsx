@@ -32,16 +32,16 @@ import useLazyOrder from "hooks/useLazyOrders";
 import { fixedTableData, scrollTableData } from "@cache/order/table";
 import { HeaderNames } from "@constants/index";
 
-import { filterOptionVar } from "@cache/order/index";
-import { FilterOptionVarType } from "@models/order/orderManagement";
 import NoDataContainer from "@components/common/table/NoDataContainer";
 import { TableType } from "@models/index";
 
+import { FilterOptionVarType } from "@models/order/orderManagement";
+import { filterOptionVar } from "@cache/order/index";
+
 const OrderManagement = () => {
   const filterOption: FilterOptionVarType = useReactiveVar(filterOptionVar);
-
   const { error, loading, totalOrderItems, totalOrderItemsVar, getOrderItem } =
-    useLazyOrder(filterOption);
+    useLazyOrder();
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

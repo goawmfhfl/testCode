@@ -10,14 +10,16 @@ import {
 import {
   NormalizedListType,
   caculatedOrderItemType,
+  OrderSearchType,
+  OrderStatusName,
+  OrderStatusType,
+  OrderStatusGroup,
 } from "@models/order/orderManagement";
 
 import caculateOrderItem from "@utils/order/caculateOrderItem";
 import contructOrderItem from "@utils/order/contructOrderItem";
 
-import { FilterOptionVarType } from "@models/order/orderManagement";
-
-const useLazyOrders = (input: FilterOptionVarType) => {
+const useLazyOrders = () => {
   const totalOrderItemsVar = makeVar<Array<caculatedOrderItemType>>([]);
   const totalOrderItems = useReactiveVar(totalOrderItemsVar);
 
@@ -25,7 +27,17 @@ const useLazyOrders = (input: FilterOptionVarType) => {
     GetOrdersBySellerType,
     GetOrdersBySellerInputType
   >(GET_ORDERS_BY_SELLER, {
-    variables: { input },
+    variables: {
+      input: {
+        page: 1,
+        skip: 20,
+        query: "",
+        type: OrderSearchType.MERCHANT_UID,
+        statusName: OrderStatusName.PAYMENT_COMPLETED,
+        statusType: OrderStatusType.ORDER,
+        statusGroup: OrderStatusGroup.ORDER,
+      },
+    },
     fetchPolicy: "no-cache",
     errorPolicy: "all",
   });

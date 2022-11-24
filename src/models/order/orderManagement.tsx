@@ -7,7 +7,7 @@ export interface FilterOptionVarType {
   type?: OrderSearchType;
   statusName?: OrderStatusName;
   statusType?: OrderStatusType;
-  statusGroup?: OrderStatusGroup;
+  statusGroup: OrderStatusGroup;
 }
 
 export enum OrderStatusGroup {
