@@ -10,14 +10,18 @@ import {
   CHANGE_PRODUCTS_INFO_BY_SELLER,
 } from "@graphql/mutations/changeProductsInfoBySeller";
 
-import { showHasServerErrorModal } from "@cache/productManagement";
+import {
+  showHasServerErrorModal,
+  filterOptionVar,
+} from "@cache/productManagement";
+
 import {
   systemModalVar,
-  filterOptionVar,
   pageNumberListVar,
   checkAllBoxStatusVar,
   LoadingSpinnerVisivilityVar,
   checkedProductIdsVar,
+  pageNumberVar,
 } from "@cache/index";
 import { tableData } from "@cache/productManagement/table";
 
@@ -27,7 +31,7 @@ import ContentsContainer from "@components/common/ContentsContainer";
 import ContentsHeader from "@components/common/ContentsHeader";
 import Checkbox from "@components/common/input/Checkbox";
 import FilterBar from "@components/productRegistration/productManagement/FilterBar";
-import Pagination from "@components/productRegistration/productManagement/Pagination";
+import Pagination from "@components/common/Pagination";
 import Controller from "@components/productRegistration/productManagement/Controller";
 import NoDataContainer from "@components/common/table/NoDataContainer";
 import {
@@ -63,12 +67,12 @@ const Product = () => {
     setProducts,
     isCheckedList,
     setIsCheckedList,
-    totalPages,
     getProducts,
   } = useLazyProducts();
 
+  const pageNumber = useReactiveVar(pageNumberVar);
   const filterOption = useReactiveVar(filterOptionVar);
-  const { page, skip, status, query } = filterOption;
+  const { skip, status, query } = filterOption;
 
   const checkedProductIds: Array<number> = useReactiveVar(checkedProductIdsVar);
 
@@ -83,7 +87,7 @@ const Product = () => {
     refetchQueries: [
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
-        variables: { input: filterOption },
+        variables: { input: { page: pageNumber, skip, status, query } },
       },
       "GetAllProductsBySeller",
     ],
@@ -243,18 +247,11 @@ const Product = () => {
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
-      await getProducts({ variables: { input: filterOption } });
-
-      pageNumberListVar(
-        Array(totalPages)
-          .fill(null)
-          .map((_, index) => index + 1)
-      );
-
-      checkedProductIdsVar([]);
-      checkAllBoxStatusVar(false);
+      await getProducts({
+        variables: { input: { page: pageNumber, skip, status, query } },
+      });
     })();
-  }, [page, skip, status, query]);
+  }, [pageNumber, skip, status, query]);
 
   return (
     <Layout>

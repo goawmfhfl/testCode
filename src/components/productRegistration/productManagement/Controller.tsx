@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
 
-import { useLazyQuery, useMutation, useReactiveVar } from "@apollo/client";
+import { useMutation, useReactiveVar } from "@apollo/client";
 import {
   ChangeProductsInfoBySellerInputType,
   ChangeProductsInfoBySellerType,
@@ -21,19 +21,18 @@ import {
   checkedProductIdsVar,
   LoadingSpinnerVisivilityVar,
   modalVar,
+  pageNumberVar,
+  paginationSkipVar,
   systemModalVar,
 } from "@cache/index";
 
 import {
   showHasCheckedAnyProductModal,
   showHasServerErrorModal,
+  filterOptionVar,
 } from "@cache/productManagement";
 
-import {
-  temporaryQueryVar,
-  checkAllBoxStatusVar,
-  filterOptionVar,
-} from "@cache/index";
+import { temporaryQueryVar, checkAllBoxStatusVar } from "@cache/index";
 
 import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
 import ChangeCategoryModal from "./ChangeCategoryModal";
@@ -343,6 +342,9 @@ const Controller = () => {
 
   // 필터 쿼리
   const changeSkipQuantityHandler = ({ target: { value } }) => {
+    paginationSkipVar(0);
+    pageNumberVar(1);
+
     filterOptionVar({
       ...filterOption,
       skip: Number(value),

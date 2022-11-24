@@ -98,9 +98,7 @@ export const GET_ALL_PRODCUCTS_STATUS_BY_SELLER = gql`
     getAllProductsBySeller(input: $input) {
       ok
       error
-      totalResults
       products {
-        id
         status
       }
     }

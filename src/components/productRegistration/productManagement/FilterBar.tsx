@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useReactiveVar } from "@apollo/client";
 
-import { filterOptionVar } from "@cache/index";
+import { filterOptionVar } from "@cache/productManagement";
 import { Pathnames } from "@constants/index";
 
 import questionMarkSrc from "@icons/questionmark.svg";

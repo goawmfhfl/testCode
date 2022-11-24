@@ -14,58 +14,46 @@ import { useReactiveVar } from "@apollo/client";
 import {
   paginationSkipVar,
   pageNumberListVar,
-  filterOptionVar,
+  pageNumberVar,
 } from "@cache/index";
 
 const Pagination = () => {
+  const pageNumber = useReactiveVar(pageNumberVar);
   const pageNumberList = useReactiveVar(pageNumberListVar);
-  const filterOption = useReactiveVar(filterOptionVar);
   const paginationSkip = useReactiveVar(paginationSkipVar);
 
   const [pageList, setPageList] = useState<Array<number>>(
     pageNumberList.slice(0 * 10, (0 + 1) * 10)
   );
+
   const totalSkipPage: number = Math.floor(pageNumberList.length / 10);
 
   const handlePageNumberClick = (pageNumber: number) => () => {
-    filterOptionVar({ ...filterOption, page: pageNumber });
+    pageNumberVar(pageNumber);
   };
 
   const handleNextPageClick = () => {
     if (paginationSkip >= totalSkipPage) return;
 
     paginationSkipVar(paginationSkip + 1);
-    filterOptionVar({
-      ...filterOption,
-      page: (paginationSkip + 1) * 10 + 1,
-    });
+    pageNumberVar((paginationSkip + 1) * 10 + 1);
   };
 
   const handlePrevPageClick = () => {
     if (paginationSkip <= 0) return;
 
     paginationSkipVar(paginationSkip - 1);
-    filterOptionVar({
-      ...filterOption,
-      page: paginationSkip * 10,
-    });
+    pageNumberVar(paginationSkip * 10);
   };
 
   const handleStartPageClick = () => {
     paginationSkipVar(0);
-
-    filterOptionVar({
-      ...filterOption,
-      page: 1,
-    });
+    pageNumberVar(1);
   };
 
   const handleEndPageClick = () => {
     paginationSkipVar(totalSkipPage);
-    filterOptionVar({
-      ...filterOption,
-      page: pageNumberList.length,
-    });
+    pageNumberVar(pageNumberList.length);
   };
 
   useEffect(() => {
@@ -93,7 +81,7 @@ const Pagination = () => {
           <PageItem
             key={index}
             onClick={handlePageNumberClick(page)}
-            isActive={filterOption.page === page}
+            isActive={pageNumber === page}
           >
             {page}
           </PageItem>

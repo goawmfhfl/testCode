@@ -8,6 +8,12 @@ import {
   ProductsType,
 } from "@graphql/queries/getAllProductsBySeller";
 
+import {
+  pageNumberListVar,
+  checkedProductIdsVar,
+  checkAllBoxStatusVar,
+} from "@cache/index";
+
 const useLazyProducts = () => {
   const [products, setProducts] = useState<Array<ProductsType>>([]);
   const [isCheckedList, setIsCheckedList] = useState<{
@@ -18,23 +24,15 @@ const useLazyProducts = () => {
     GetAllProductsBySellerType,
     GetAllProductsBySellerInputType
   >(GET_ALL_PRODUCTS_BY_SELLER, {
-    variables: {
-      input: {
-        page: 1,
-        skip: 20,
-        status: null,
-        query: "",
-      },
-    },
     notifyOnNetworkStatusChange: true,
     fetchPolicy: "no-cache",
     errorPolicy: "all",
   });
 
-  const totalPages: number = data?.getAllProductsBySeller.totalPages || 1;
-
   useEffect(() => {
+    const totalPages: number = data?.getAllProductsBySeller.totalPages;
     const products: Array<ProductsType> = data?.getAllProductsBySeller.products;
+
     const checkedList: {
       [key: string]: { isChecked: boolean };
     } =
@@ -43,8 +41,15 @@ const useLazyProducts = () => {
         return acc;
       }, {}) || {};
 
-    setIsCheckedList(checkedList);
+    pageNumberListVar(
+      Array(totalPages)
+        .fill(null)
+        .map((_, index) => index + 1)
+    );
     setProducts(products);
+    setIsCheckedList(checkedList);
+    checkedProductIdsVar([]);
+    checkAllBoxStatusVar(false);
   }, [data]);
 
   return {
@@ -54,7 +59,6 @@ const useLazyProducts = () => {
     setProducts,
     isCheckedList,
     setIsCheckedList,
-    totalPages,
     getProducts,
   };
 };

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useMutation, useReactiveVar } from "@apollo/client";
 import styled from "styled-components";
 import {
   checkedProductIdsVar,
@@ -13,7 +14,6 @@ import {
   CATEGORY_SECOND,
   CATEGORY_THIRD,
 } from "@cache/productRegistration";
-import { useMutation, useReactiveVar } from "@apollo/client";
 
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
 import questionMarkIconSrc from "@icons/questionmark.svg";
@@ -33,8 +33,12 @@ import {
   ChangeProductsInfoBySellerInputType,
 } from "@graphql/mutations/changeProductsInfoBySeller";
 
-import { showHasServerErrorModal } from "@cache/productManagement";
-import { checkAllBoxStatusVar, filterOptionVar } from "@cache/index";
+import {
+  showHasServerErrorModal,
+  filterOptionVar,
+} from "@cache/productManagement";
+
+import { checkAllBoxStatusVar } from "@cache/index";
 
 import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
 import useCategories from "@hooks/useCategories";

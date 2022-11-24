@@ -6,26 +6,13 @@ import {
   SHOP_SETTING_SECTIONS,
   PRODUCT_REGISTRATION_SECTIONS,
 } from "@constants/index";
-import { ProductStatus } from "@constants/product";
 
 // Global Layout
 export const LoadingSpinnerVisivilityVar = makeVar<boolean>(false);
 export const checkedProductIdsVar = makeVar<Array<number>>([]);
 
-// TABLE: 테이블 필터
-export const filterOptionVar = makeVar<{
-  page?: number;
-  skip?: number;
-  status?: ProductStatus;
-  query?: string;
-}>({
-  page: 1,
-  skip: 20,
-  status: null,
-  query: "",
-});
-
 // TABLE: 페이지네이션
+export const pageNumberVar = makeVar<number>(1);
 export const pageNumberListVar = makeVar<Array<number>>([]);
 export const paginationSkipVar = makeVar<number>(0);
 

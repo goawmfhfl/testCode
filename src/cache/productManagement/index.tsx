@@ -1,5 +1,18 @@
 import { makeVar } from "@apollo/client";
-import { systemModalVar } from "..";
+
+import { systemModalVar } from "@cache/index";
+import { ProductStatus } from "@constants/product";
+
+// TABLE: 테이블 필터
+export const filterOptionVar = makeVar<{
+  skip?: number;
+  status?: ProductStatus;
+  query?: string;
+}>({
+  skip: 20,
+  status: null,
+  query: "",
+});
 
 export interface ProductsListVarType {
   id: number;
