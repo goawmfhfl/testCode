@@ -64,6 +64,10 @@ const Pagination = () => {
     setPageList(newPageList);
   }, [paginationSkip, pageNumberList]);
 
+  if (!pageList?.length) {
+    return null;
+  }
+
   return (
     <Container>
       <DoubleLeftButton
