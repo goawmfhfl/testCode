@@ -40,7 +40,7 @@ import { TableType } from "@models/index";
 const OrderManagement = () => {
   const filterOption: FilterOptionVarType = useReactiveVar(filterOptionVar);
 
-  const { error, loading, totalOrderItems, getOrderItem } =
+  const { error, loading, totalOrderItems, totalOrderItemsVar, getOrderItem } =
     useLazyOrder(filterOption);
 
   useEffect(() => {

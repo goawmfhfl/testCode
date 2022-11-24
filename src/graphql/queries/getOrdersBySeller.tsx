@@ -90,9 +90,9 @@ export interface OrderItemsType {
   };
 
   // 결제일
-  payment: {
-    createdAt: string;
-  };
+  // payments: {
+  //   createdAt: string;
+  // };
 }
 
 export interface GetOrdersBySellerType {
@@ -183,9 +183,9 @@ export const GET_ORDERS_BY_SELLER = gql`
         }
 
         # 결제일
-        payment {
-          createdAt
-        }
+        # payments {
+        #   createdAt
+        # }
       }
     }
   }

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useLazyQuery } from "@apollo/client";
+import { useEffect } from "react";
+import { makeVar, useLazyQuery, useReactiveVar } from "@apollo/client";
 
 import {
   GetOrdersBySellerInputType,
@@ -18,29 +18,27 @@ import contructOrderItem from "@utils/order/contructOrderItem";
 import { FilterOptionVarType } from "@models/order/orderManagement";
 
 const useLazyOrders = (input: FilterOptionVarType) => {
-  const [totalOrderItems, setTotalOrderItems] = useState<
-    Array<caculatedOrderItemType>
-  >([]);
+  const totalOrderItemsVar = makeVar<Array<caculatedOrderItemType>>([]);
+  const totalOrderItems = useReactiveVar(totalOrderItemsVar);
 
-  const [getOrderItem, { loading, error }] = useLazyQuery<
+  const [getOrderItem, { loading, error, data }] = useLazyQuery<
     GetOrdersBySellerType,
     GetOrdersBySellerInputType
   >(GET_ORDERS_BY_SELLER, {
     variables: { input },
     fetchPolicy: "no-cache",
-    onCompleted: (data) => {
-      const totalOrderItems = data.getOrdersBySeller.totalOrderItems;
-
-      const nomalizedOrderItem: NormalizedListType =
-        contructOrderItem(totalOrderItems);
-
-      const caculatedOrderItem: Array<caculatedOrderItemType> =
-        caculateOrderItem(nomalizedOrderItem);
-
-      setTotalOrderItems(caculatedOrderItem);
-    },
+    errorPolicy: "all",
   });
 
-  return { loading, error, totalOrderItems, getOrderItem };
+  const orderItems = data?.getOrdersBySeller.totalOrderItems || [];
+  const nomalizedOrderItem: NormalizedListType = contructOrderItem(orderItems);
+  const caculatedOrderItem: Array<caculatedOrderItemType> =
+    caculateOrderItem(nomalizedOrderItem);
+
+  useEffect(() => {
+    totalOrderItemsVar(caculatedOrderItem);
+  }, [data]);
+
+  return { loading, error, totalOrderItems, totalOrderItemsVar, getOrderItem };
 };
 export default useLazyOrders;
