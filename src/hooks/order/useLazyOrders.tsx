@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { makeVar, useLazyQuery, useReactiveVar } from "@apollo/client";
 
 import {
@@ -21,8 +21,9 @@ import {
 } from "@cache/index";
 
 const useLazyOrders = () => {
-  const totalOrderItemsVar = makeVar<Array<caculatedOrderItemType>>([]);
-  const totalOrderItems = useReactiveVar(totalOrderItemsVar);
+  const [totalOrderItems, setTotalOrderItems] = useState<
+    Array<caculatedOrderItemType>
+  >([]);
 
   const [getOrderItem, { loading, error, data }] = useLazyQuery<
     GetOrdersBySellerType,
@@ -33,26 +34,30 @@ const useLazyOrders = () => {
   });
 
   useEffect(() => {
-    const totalPages: number = data?.getOrdersBySeller.totalPages;
+    // null
+    const totalPages: number = data?.getOrdersBySeller.totalPages || 1;
+
     const orderItems = data?.getOrdersBySeller.totalOrderItems || [];
+
     const nomalizedOrderItem: NormalizedListType =
       contructOrderItem(orderItems);
+
     const caculatedOrderItem: Array<caculatedOrderItemType> =
       caculateOrderItem(nomalizedOrderItem);
 
     if (totalPages) {
       pageNumberListVar(
-        Array(totalPages)
+        Array(1)
           .fill(null)
           .map((_, index) => index + 1)
       );
     }
 
-    totalOrderItemsVar(caculatedOrderItem);
+    setTotalOrderItems(caculatedOrderItem);
     checkedProductIdsVar([]);
     checkAllBoxStatusVar(false);
   }, [data]);
 
-  return { loading, error, totalOrderItems, totalOrderItemsVar, getOrderItem };
+  return { loading, error, totalOrderItems, setTotalOrderItems, getOrderItem };
 };
 export default useLazyOrders;

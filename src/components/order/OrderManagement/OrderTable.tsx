@@ -40,11 +40,12 @@ import { filterOptionVar } from "@cache/order/orderManagement";
 import { commonFilterOptionVar } from "@cache/index";
 
 const OrderTable = () => {
-  const { error, loading, totalOrderItems, totalOrderItemsVar, getOrderItem } =
+  const { error, loading, totalOrderItems, setTotalOrderItems, getOrderItem } =
     useLazyOrders();
 
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
+
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
 
   useEffect(() => {
@@ -53,13 +54,13 @@ const OrderTable = () => {
       await getOrderItem({
         variables: {
           input: {
-            page,
-            skip,
-            query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            page: null,
+            skip: null,
+            query: null,
+            type: null,
+            statusName: null,
+            statusType: null,
+            statusGroup: OrderStatusGroup.ORDER,
           },
         },
       });
