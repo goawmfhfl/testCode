@@ -37,7 +37,7 @@ import { getDiscountedPrice } from "@utils/productRegistration";
 import {
   ThContainer,
   Th,
-  TbContainer,
+  TdContainer,
   Tr,
   Td,
   TableContainer,
@@ -257,7 +257,7 @@ const ProductTable = () => {
     );
 
   return (
-    <TableContainer>
+    <TableContainer type={TableType.FIX}>
       <ThContainer>
         {tableData.map(({ id, label, width, className }) => (
           <Th key={id} width={width} className={className}>
@@ -273,7 +273,7 @@ const ProductTable = () => {
         ))}
       </ThContainer>
       {products?.length ? (
-        <TbContainer>
+        <TdContainer>
           {products?.map(
             ({
               id,
@@ -414,7 +414,7 @@ const ProductTable = () => {
               );
             }
           )}
-        </TbContainer>
+        </TdContainer>
       ) : (
         !loading && (
           <NoDataContainer type={TableType.FIX}>

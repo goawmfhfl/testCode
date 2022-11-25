@@ -1,12 +1,16 @@
 import { TableType } from "@models/index";
 import styled, { css } from "styled-components";
 
-export const Table = styled.div<{ width: number; type: TableType }>`
-  position: relative;
-
+export const TableContainer = styled.div<{ type: TableType }>`
   display: flex;
+  position: relative;
   width: 100%;
-  min-width: ${({ width }) => `${width}px`};
+
+  ${({ type }) =>
+    type === TableType.FIX &&
+    css`
+      flex-direction: column;
+    `}
 
   ${({ type }) =>
     type === TableType.SCROLL &&
@@ -49,12 +53,6 @@ const WrapperContainer = styled.div<{ width: number }>`
   border-left: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 
-export const TableContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-`;
-
 export const ThContainer = styled.div`
   display: flex;
   width: 100%;
@@ -95,7 +93,7 @@ export const Th = styled.div<{
   white-space: nowrap;
 `;
 
-export const TbContainer = styled.div`
+export const TdContainer = styled.div`
   width: 100%;
   background-color: ${({ theme: { palette } }) => palette.white};
   border-radius: 0px 0px 7px 7px;
