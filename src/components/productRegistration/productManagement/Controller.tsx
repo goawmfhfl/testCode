@@ -19,9 +19,9 @@ import {
 } from "@graphql/mutations/duplicateProductsBySeller";
 import {
   checkedProductIdsVar,
+  commonFilterOptionVar,
   LoadingSpinnerVisivilityVar,
   modalVar,
-  pageNumberVar,
   paginationSkipVar,
   systemModalVar,
 } from "@cache/index";
@@ -35,8 +35,8 @@ import {
 import { temporaryQueryVar, checkAllBoxStatusVar } from "@cache/index";
 
 import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
-import ChangeCategoryModal from "./ChangeCategoryModal";
-import ChangeDiscountModal from "./ChangeDiscountModal";
+import ChangeCategoryModal from "@components/productRegistration/productManagement/ChangeCategoryModal";
+import ChangeDiscountModal from "@components/productRegistration/productManagement/ChangeDiscountModal";
 import Button from "@components/common/Button";
 import {
   SelectInput as Dropdown,
@@ -47,7 +47,9 @@ import { Input as SearchInput } from "@components/common/input/SearchInput";
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 
 const Controller = () => {
-  const filterOption = useReactiveVar(filterOptionVar);
+  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
+  const { status } = useReactiveVar(filterOptionVar);
+
   const checkedProductIds = useReactiveVar(checkedProductIdsVar);
   const temporaryQuery = useReactiveVar(temporaryQueryVar);
 
@@ -61,7 +63,7 @@ const Controller = () => {
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
-          input: filterOption,
+          input: { page, skip, status, query },
         },
       },
       "GetAllProductsBySeller",
@@ -78,7 +80,7 @@ const Controller = () => {
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
-          input: filterOption,
+          input: { page, skip, status, query },
         },
       },
       "GetAllProductsBySeller",
@@ -95,7 +97,7 @@ const Controller = () => {
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
         variables: {
-          input: filterOption,
+          input: { page, skip, status, query },
         },
       },
       "GetAllProductsBySeller",
@@ -342,19 +344,21 @@ const Controller = () => {
 
   // 필터 쿼리
   const changeSkipQuantityHandler = ({ target: { value } }) => {
-    paginationSkipVar(0);
-    pageNumberVar(1);
-
-    filterOptionVar({
-      ...filterOption,
+    commonFilterOptionVar({
+      ...commonFilterOptionVar(),
+      page: 1,
       skip: Number(value),
     });
+    paginationSkipVar(0);
   };
 
   // 디바운스
   useEffect(() => {
     const debounce = setTimeout(() => {
-      return filterOptionVar({ ...filterOption, query: temporaryQuery });
+      return commonFilterOptionVar({
+        ...commonFilterOptionVar(),
+        query: temporaryQuery,
+      });
     }, 500);
 
     return () => clearTimeout(debounce);

@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useReactiveVar } from "@apollo/client";
 import { TableType } from "@models/index";
 
 import {
@@ -34,11 +36,16 @@ import {
 } from "@components/common/table/Table";
 import Checkbox from "@components/common/input/Checkbox";
 import NoDataContainer from "@components/common/table/NoDataContainer";
-import { useEffect } from "react";
+import { filterOptionVar } from "@cache/order/orderManagement";
+import { commonFilterOptionVar } from "@cache/index";
 
 const OrderTable = () => {
   const { error, loading, totalOrderItems, totalOrderItemsVar, getOrderItem } =
     useLazyOrders();
+
+  const { type, statusName, statusType, statusGroup } =
+    useReactiveVar(filterOptionVar);
+  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -46,18 +53,18 @@ const OrderTable = () => {
       await getOrderItem({
         variables: {
           input: {
-            page: 1,
-            skip: 20,
-            query: null,
-            type: OrderSearchType.MERCHANT_UID,
-            statusName: OrderStatusName.SHIPPING,
-            statusType: OrderStatusType.CLAIM,
-            statusGroup: OrderStatusGroup.CANCEL,
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
           },
         },
       });
     })();
-  }, []);
+  }, [page, skip, query, type, statusName, statusType, statusGroup]);
 
   if (loading) return <>loading...</>;
   if (error) return <>error!</>;

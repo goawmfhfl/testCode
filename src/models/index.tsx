@@ -100,3 +100,9 @@ export interface CategoriesType {
     type: CategoryType;
   }>;
 }
+
+export interface CommonFilterOptionType {
+  page: number;
+  skip: number;
+  query: string;
+}

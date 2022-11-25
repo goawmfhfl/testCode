@@ -1,9 +1,6 @@
 import { OrderItemsType } from "@graphql/queries/getOrdersBySeller";
 
 export interface FilterOptionVarType {
-  page?: number;
-  skip?: number;
-  query?: string;
   type?: OrderSearchType;
   statusName?: OrderStatusName;
   statusType?: OrderStatusType;
@@ -55,11 +52,17 @@ export enum OrderStatusName {
   PICK_UP_COMPLETED = "PICK_UP_COMPLETED",
 }
 
-export interface SearchQueryCacheType {
+export interface SearchQueryType {
   id: number;
   label: string;
   value: string;
 }
+
+export const searchQueryType: Array<SearchQueryType> = [
+  { id: 0, label: "구매자명", value: "BUYER_NAME" },
+  { id: 1, label: "구매자 전화번호", value: "BUYER_PHONE_NUMBER" },
+  { id: 2, label: "주문번호", value: "ORDER_NUMBER" },
+];
 
 export interface NormalizedListType {
   orders: {

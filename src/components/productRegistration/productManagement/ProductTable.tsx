@@ -13,8 +13,8 @@ import {
 import {
   checkAllBoxStatusVar,
   checkedProductIdsVar,
+  commonFilterOptionVar,
   LoadingSpinnerVisivilityVar,
-  pageNumberVar,
   systemModalVar,
 } from "@cache/index";
 
@@ -60,9 +60,9 @@ const ProductTable = () => {
     getProducts,
   } = useLazyProducts();
 
-  const pageNumber = useReactiveVar(pageNumberVar);
-  const filterOption = useReactiveVar(filterOptionVar);
-  const { skip, status, query } = filterOption;
+  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
+  const { status } = useReactiveVar(filterOptionVar);
+
   const checkedProductIds: Array<number> = useReactiveVar(checkedProductIdsVar);
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
 
@@ -75,7 +75,7 @@ const ProductTable = () => {
     refetchQueries: [
       {
         query: GET_ALL_PRODUCTS_BY_SELLER,
-        variables: { input: { page: pageNumber, skip, status, query } },
+        variables: { input: { page, skip, status, query } },
       },
       "GetAllProductsBySeller",
     ],
@@ -231,10 +231,10 @@ const ProductTable = () => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
       await getProducts({
-        variables: { input: { page: pageNumber, skip, status, query } },
+        variables: { input: { page, skip, status, query } },
       });
     })();
-  }, [pageNumber, skip, status, query]);
+  }, [page, skip, status, query]);
 
   if (loading)
     return (

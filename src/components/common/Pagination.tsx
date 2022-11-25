@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import styled, { css } from "styled-components";
+import { useReactiveVar } from "@apollo/client";
+
 import mediumDoubleLeftActiveSvg from "@icons/medium-double-left-active.svg";
 import mediumDoubleRightActiveSvg from "@icons/medium-double-right-active.svg";
 import mediumLeftActvieSvg from "@icons/medium-left-active.svg";
@@ -10,50 +12,61 @@ import mediumDoubleRightInActiveSvg from "@icons/medium-double-right-inactive.sv
 import mediumLeftInActvieSvg from "@icons/medium-left-inactive.svg";
 import mediumRightInActiveSvg from "@icons/medium-right-inactive.svg";
 
-import { useReactiveVar } from "@apollo/client";
 import {
   paginationSkipVar,
   pageNumberListVar,
-  pageNumberVar,
+  commonFilterOptionVar,
 } from "@cache/index";
 
 const Pagination = () => {
-  const pageNumber = useReactiveVar(pageNumberVar);
+  const { page: commonPage } = useReactiveVar(commonFilterOptionVar);
   const pageNumberList = useReactiveVar(pageNumberListVar);
   const paginationSkip = useReactiveVar(paginationSkipVar);
 
-  const [pageList, setPageList] = useState<Array<number>>(
-    pageNumberList.slice(0 * 10, (0 + 1) * 10)
-  );
-
-  const totalSkipPage: number = Math.floor(pageNumberList.length / 10);
+  const [pageList, setPageList] = useState<Array<number>>([]);
+  const totalSkipPage: number = Math.floor((pageNumberList.length - 1) / 10);
 
   const handlePageNumberClick = (pageNumber: number) => () => {
-    pageNumberVar(pageNumber);
+    commonFilterOptionVar({
+      ...commonFilterOptionVar(),
+      page: pageNumber,
+    });
   };
 
   const handleNextPageClick = () => {
-    if (paginationSkip >= totalSkipPage) return;
-
     paginationSkipVar(paginationSkip + 1);
-    pageNumberVar((paginationSkip + 1) * 10 + 1);
+
+    commonFilterOptionVar({
+      ...commonFilterOptionVar(),
+      page: (paginationSkip + 1) * 10 + 1,
+    });
   };
 
   const handlePrevPageClick = () => {
-    if (paginationSkip <= 0) return;
-
     paginationSkipVar(paginationSkip - 1);
-    pageNumberVar(paginationSkip * 10);
+
+    commonFilterOptionVar({
+      ...commonFilterOptionVar(),
+      page: paginationSkip * 10,
+    });
   };
 
   const handleStartPageClick = () => {
     paginationSkipVar(0);
-    pageNumberVar(1);
+
+    commonFilterOptionVar({
+      ...commonFilterOptionVar(),
+      page: 1,
+    });
   };
 
   const handleEndPageClick = () => {
     paginationSkipVar(totalSkipPage);
-    pageNumberVar(pageNumberList.length);
+
+    commonFilterOptionVar({
+      ...commonFilterOptionVar(),
+      page: pageNumberList.length,
+    });
   };
 
   useEffect(() => {
@@ -86,7 +99,7 @@ const Pagination = () => {
             <PageItem
               key={index}
               onClick={handlePageNumberClick(page)}
-              isActive={pageNumber === page}
+              isActive={commonPage === page}
             >
               {page}
             </PageItem>

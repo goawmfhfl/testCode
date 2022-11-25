@@ -11,6 +11,7 @@ import Button from "@components/common/Button";
 
 import useLazyAllProductsStatus from "@hooks/product/useLazyAllProductsStatus";
 import { ProductStatus } from "@constants/product";
+import { commonFilterOptionVar, paginationSkipVar } from "@cache/index";
 
 const FilterBar = () => {
   const navigate = useNavigate();
@@ -25,11 +26,17 @@ const FilterBar = () => {
     soldOutLength,
   } = useLazyAllProductsStatus();
 
-  const filterOption = useReactiveVar(filterOptionVar);
+  const { status } = useReactiveVar(filterOptionVar);
+  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
 
   const changeFilterOptionNameClick =
     (filterOptionName: ProductStatus) => () => {
-      filterOptionVar({ ...filterOption, status: filterOptionName });
+      commonFilterOptionVar({
+        ...commonFilterOptionVar(),
+        page: 1,
+      });
+      paginationSkipVar(0);
+      filterOptionVar({ status: filterOptionName });
     };
 
   const handleButtonClick = () => {
@@ -57,25 +64,25 @@ const FilterBar = () => {
       <FilterList>
         <Filter
           onClick={changeFilterOptionNameClick(null)}
-          isActvie={filterOption.status === null}
+          isActvie={status === null}
         >
           전체 {allProductsLength}
         </Filter>
         <Filter
           onClick={changeFilterOptionNameClick(ProductStatus.ON_SALE)}
-          isActvie={filterOption.status === ProductStatus.ON_SALE}
+          isActvie={status === ProductStatus.ON_SALE}
         >
           판매중 {onSaleLength}
         </Filter>
         <Filter
           onClick={changeFilterOptionNameClick(ProductStatus.STOP_SALE)}
-          isActvie={filterOption.status === ProductStatus.STOP_SALE}
+          isActvie={status === ProductStatus.STOP_SALE}
         >
           숨김 {stopSaleLength}
         </Filter>
         <Filter
           onClick={changeFilterOptionNameClick(ProductStatus.SOLD_OUT)}
-          isActvie={filterOption.status === ProductStatus.SOLD_OUT}
+          isActvie={status === ProductStatus.SOLD_OUT}
         >
           <QuestionMarkIcon src={questionMarkSrc} />
           품절 {soldOutLength}

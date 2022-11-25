@@ -1,6 +1,7 @@
 import React from "react";
 import { makeVar } from "@apollo/client";
 import { SkipQuantityCacheType } from "@models/order/index";
+import { CommonFilterOptionType } from "@models/index";
 
 import {
   SHOP_SETTING_SECTIONS,
@@ -12,7 +13,12 @@ export const LoadingSpinnerVisivilityVar = makeVar<boolean>(false);
 export const checkedProductIdsVar = makeVar<Array<number>>([]);
 
 // TABLE: 페이지네이션
-export const pageNumberVar = makeVar<number>(1);
+
+export const commonFilterOptionVar = makeVar<CommonFilterOptionType>({
+  page: 1,
+  skip: 20,
+  query: "",
+});
 export const pageNumberListVar = makeVar<Array<number>>([]);
 export const paginationSkipVar = makeVar<number>(0);
 

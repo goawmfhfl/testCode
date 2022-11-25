@@ -12,7 +12,7 @@ import { Input as SearchInput } from "@components/common/input/SearchInput";
 import ControllerContainer from "@components/order/ControllerContainer";
 
 import { SkipQuantityCache } from "@cache/index";
-import { searchQueryCache } from "@cache/order/orderManagement";
+import { searchQueryType } from "@models/order/orderManagement";
 
 const Controller = () => {
   return (
@@ -31,7 +31,7 @@ const Controller = () => {
           width={"119px"}
           defaultValue={"BUYER_NAME"}
         >
-          {searchQueryCache.map(({ id, label, value }) => (
+          {searchQueryType.map(({ id, label, value }) => (
             <Option value={value} key={id}>
               {label}
             </Option>
