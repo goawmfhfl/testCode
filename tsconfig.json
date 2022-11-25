@@ -1,16 +1,13 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "downlevelIteration": true,
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
+    "noImplicitAny": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
@@ -18,9 +15,25 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": "./src",
+    "paths": {
+      "@components/*": ["components/*"],
+      "@pages/*": ["pages/*"],
+      "@icons/*": ["assets/icons/*"],
+      "@images/*": ["assets/images/*"],
+      "@fonts/*": ["assets/fonts/*"],
+      "@styles/*": ["styles/*"],
+      "@utils/*": ["utils/*"],
+      "@models/*": ["models/*"],
+      "@cache/*": ["cache/*"],
+      "@constants/*": ["constants/*"],
+      "@graphql/*": ["graphql/*"],
+      "@hooks/*": ["hooks/*"]
+    },
+    "suppressImplicitAnyIndexErrors": true,
+    "strictNullChecks": false,
+    "strictPropertyInitialization": false
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src", "types"]
 }
