@@ -4,6 +4,7 @@ import ContentsContainer from "@components/common/ContentsContainer";
 import FilterBar from "@components/order/OrderManagement/FilterBar";
 import Controller from "@components/order/OrderManagement/Controller";
 import OrderTable from "@components/order/OrderManagement/OrderTable";
+import Pagination from "@components/common/Pagination";
 
 const OrderManagement = () => {
   return (
@@ -12,6 +13,7 @@ const OrderManagement = () => {
       <FilterBar />
       <Controller />
       <OrderTable />
+      <Pagination />
     </ContentsContainer>
   );
 };

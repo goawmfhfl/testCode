@@ -99,6 +99,8 @@ export interface GetOrdersBySellerType {
   getOrdersBySeller: {
     ok: boolean;
     error: string;
+    totalPages: number;
+    totalResults: number;
     totalOrderItems: Array<OrderItemsType>;
   };
 }
@@ -108,6 +110,8 @@ export const GET_ORDERS_BY_SELLER = gql`
     getOrdersBySeller(input: $input) {
       ok
       error
+      totalPages
+      totalResults
       totalOrderItems {
         #아이디
         id
