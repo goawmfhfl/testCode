@@ -32,7 +32,6 @@ const useLazyProducts = () => {
   useEffect(() => {
     const totalPages: number = data?.getAllProductsBySeller.totalPages;
     const products: Array<ProductsType> = data?.getAllProductsBySeller.products;
-
     const checkedList: {
       [key: string]: { isChecked: boolean };
     } =
@@ -41,11 +40,13 @@ const useLazyProducts = () => {
         return acc;
       }, {}) || {};
 
-    pageNumberListVar(
-      Array(totalPages)
-        .fill(null)
-        .map((_, index) => index + 1)
-    );
+    if (totalPages) {
+      pageNumberListVar(
+        Array(totalPages)
+          .fill(null)
+          .map((_, index) => index + 1)
+      );
+    }
     setProducts(products);
     setIsCheckedList(checkedList);
     checkedProductIdsVar([]);

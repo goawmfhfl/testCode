@@ -4,10 +4,12 @@ import { Link } from "react-router-dom";
 import { useMutation, useReactiveVar } from "@apollo/client";
 
 import { tableData } from "@cache/productManagement/table";
+
 import {
   filterOptionVar,
   showHasServerErrorModal,
 } from "@cache/productManagement";
+
 import {
   checkAllBoxStatusVar,
   checkedProductIdsVar,
@@ -46,7 +48,6 @@ import {
 } from "@components/common/input/Dropdown";
 import Checkbox from "@components/common/input/Checkbox";
 import NoDataContainer from "@components/common/table/NoDataContainer";
-import Pagination from "@components/common/Pagination";
 
 const ProductTable = () => {
   const {
@@ -80,7 +81,6 @@ const ProductTable = () => {
     ],
   });
 
-  // 복수 체크박스
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newIsCheckedList = JSON.parse(JSON.stringify(isCheckedList)) as {
       [key: string]: { isChecked: boolean };
@@ -110,7 +110,6 @@ const ProductTable = () => {
     }
   };
 
-  // 단일 체크박스
   const changeSingleCheckBoxHandler =
     (id: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const newIsCheckedList = JSON.parse(JSON.stringify(isCheckedList)) as {
@@ -143,6 +142,7 @@ const ProductTable = () => {
         }
       }
     };
+
   const changeSingleSaleStatusHandler =
     (id: number) => (e: React.ChangeEvent<HTMLSelectElement>) => {
       const value = e.target.value;
@@ -236,6 +236,26 @@ const ProductTable = () => {
     })();
   }, [pageNumber, skip, status, query]);
 
+  if (loading)
+    return (
+      <>
+        loading...
+        <br />
+        로딩중 입니다..
+        <br />* 로딩중 상태 추후 개발 예정
+      </>
+    );
+  if (error)
+    return (
+      <>
+        에러가 발생했습니다!!
+        <br />
+        * 에러 상태 추후 개발 예정
+        <br />
+        에러메세지: {error.message}
+      </>
+    );
+
   return (
     <TableContainer>
       <ThContainer>
@@ -252,7 +272,7 @@ const ProductTable = () => {
           </Th>
         ))}
       </ThContainer>
-      {products?.length !== 0 ? (
+      {products?.length ? (
         <TbContainer>
           {products?.map(
             ({
@@ -396,14 +416,14 @@ const ProductTable = () => {
           )}
         </TbContainer>
       ) : (
-        <NoDataContainer type={TableType.FIX}>
-          검색어와 일치하는
-          <br />
-          상품이 없습니다.
-        </NoDataContainer>
+        !loading && (
+          <NoDataContainer type={TableType.FIX}>
+            아직 들어온
+            <br />
+            상품이 없습니다.
+          </NoDataContainer>
+        )
       )}
-
-      {products?.length !== 0 && !loading && <Pagination />}
     </TableContainer>
   );
 };

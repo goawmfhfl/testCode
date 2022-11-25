@@ -13,14 +13,6 @@ const useLazyAllProductsStatus = () => {
     GetAllProductsStatusBySellerType,
     GetAllProductsStatusBySellerInPutType
   >(GET_ALL_PRODCUCTS_STATUS_BY_SELLER, {
-    variables: {
-      input: {
-        page: 1,
-        skip: 20,
-        status: null,
-        query: null,
-      },
-    },
     notifyOnNetworkStatusChange: true,
     fetchPolicy: "no-cache",
     errorPolicy: "all",

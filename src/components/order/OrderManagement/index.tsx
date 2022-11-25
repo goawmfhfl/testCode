@@ -28,7 +28,7 @@ import {
   Tr,
 } from "@components/common/table/Table";
 
-import useLazyOrder from "hooks/useLazyOrders";
+import useLazyOrder from "@hooks/order/useLazyOrders";
 import { fixedTableData, scrollTableData } from "@cache/order/table";
 import { HeaderNames } from "@constants/index";
 

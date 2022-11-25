@@ -42,8 +42,8 @@ const FilterBar = () => {
       await getAllProductsStatus({
         variables: {
           input: {
-            page: 1,
-            skip: 20,
+            page: null,
+            skip: null,
             status: null,
             query: null,
           },

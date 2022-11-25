@@ -6,6 +6,7 @@ import ContentsHeader from "@components/common/ContentsHeader";
 import FilterBar from "@components/productRegistration/productManagement/FilterBar";
 import Controller from "@components/productRegistration/productManagement/Controller";
 import ProductTable from "@components/productRegistration/productManagement/ProductTable";
+import Pagination from "@components/common/Pagination";
 
 const Product = () => {
   return (
@@ -15,6 +16,7 @@ const Product = () => {
         <FilterBar />
         <Controller />
         <ProductTable />
+        <Pagination />
       </ContentsContainer>
     </Layout>
   );

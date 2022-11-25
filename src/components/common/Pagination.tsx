@@ -64,46 +64,48 @@ const Pagination = () => {
     setPageList(newPageList);
   }, [paginationSkip, pageNumberList]);
 
-  if (!pageList?.length) {
+  if (pageNumberList.length === 0) {
     return null;
   }
 
-  return (
-    <Container>
-      <DoubleLeftButton
-        isActive={paginationSkip > 0}
-        disabled={paginationSkip === 0}
-        onClick={handleStartPageClick}
-      />
-      <SingleLeftButton
-        isActive={paginationSkip > 0}
-        disabled={paginationSkip === 0}
-        onClick={handlePrevPageClick}
-      />
-      <PageNumberList>
-        {pageList.map((page, index) => (
-          <PageItem
-            key={index}
-            onClick={handlePageNumberClick(page)}
-            isActive={pageNumber === page}
-          >
-            {page}
-          </PageItem>
-        ))}
-      </PageNumberList>
-      <SingleRightButton
-        isActive={totalSkipPage !== paginationSkip}
-        disabled={totalSkipPage === paginationSkip}
-        onClick={handleNextPageClick}
-      />
+  if (pageNumberList.length !== 0) {
+    return (
+      <Container>
+        <DoubleLeftButton
+          isActive={paginationSkip > 0}
+          disabled={paginationSkip === 0}
+          onClick={handleStartPageClick}
+        />
+        <SingleLeftButton
+          isActive={paginationSkip > 0}
+          disabled={paginationSkip === 0}
+          onClick={handlePrevPageClick}
+        />
+        <PageNumberList>
+          {pageList.map((page, index) => (
+            <PageItem
+              key={index}
+              onClick={handlePageNumberClick(page)}
+              isActive={pageNumber === page}
+            >
+              {page}
+            </PageItem>
+          ))}
+        </PageNumberList>
+        <SingleRightButton
+          isActive={totalSkipPage !== paginationSkip}
+          disabled={totalSkipPage === paginationSkip}
+          onClick={handleNextPageClick}
+        />
 
-      <DoubleRightButton
-        isActive={totalSkipPage !== paginationSkip}
-        disabled={totalSkipPage === paginationSkip}
-        onClick={handleEndPageClick}
-      />
-    </Container>
-  );
+        <DoubleRightButton
+          isActive={totalSkipPage !== paginationSkip}
+          disabled={totalSkipPage === paginationSkip}
+          onClick={handleEndPageClick}
+        />
+      </Container>
+    );
+  }
 };
 
 const Container = styled.div`
