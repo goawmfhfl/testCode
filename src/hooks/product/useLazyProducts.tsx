@@ -40,13 +40,11 @@ const useLazyProducts = () => {
         return acc;
       }, {}) || {};
 
-    if (totalPages) {
-      pageNumberListVar(
-        Array(totalPages)
-          .fill(null)
-          .map((_, index) => index + 1)
-      );
-    }
+    pageNumberListVar(
+      Array(totalPages)
+        .fill(null)
+        .map((_, index) => index + 1)
+    );
     setProducts(products);
     setIsCheckedList(checkedList);
     checkedProductIdsVar([]);
