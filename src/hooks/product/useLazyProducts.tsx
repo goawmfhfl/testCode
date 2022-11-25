@@ -12,6 +12,7 @@ import {
   pageNumberListVar,
   checkedProductIdsVar,
   checkAllBoxStatusVar,
+  paginationVisibilityVar,
 } from "@cache/index";
 
 const useLazyProducts = () => {
@@ -30,6 +31,10 @@ const useLazyProducts = () => {
   });
 
   useEffect(() => {
+    paginationVisibilityVar(loading);
+  }, [loading]);
+
+  useEffect(() => {
     const totalPages: number = data?.getAllProductsBySeller.totalPages;
     const products: Array<ProductsType> = data?.getAllProductsBySeller.products;
     const checkedList: {
@@ -45,6 +50,7 @@ const useLazyProducts = () => {
         .fill(null)
         .map((_, index) => index + 1)
     );
+
     setProducts(products);
     setIsCheckedList(checkedList);
     checkedProductIdsVar([]);

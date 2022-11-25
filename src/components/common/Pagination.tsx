@@ -16,9 +16,11 @@ import {
   paginationSkipVar,
   pageNumberListVar,
   commonFilterOptionVar,
+  paginationVisibilityVar,
 } from "@cache/index";
 
 const Pagination = () => {
+  const paginationVisibility = useReactiveVar(paginationVisibilityVar);
   const { page: commonPage } = useReactiveVar(commonFilterOptionVar);
   const pageNumberList = useReactiveVar(pageNumberListVar);
   const paginationSkip = useReactiveVar(paginationSkipVar);
@@ -76,6 +78,10 @@ const Pagination = () => {
     );
     setPageList(newPageList);
   }, [paginationSkip, pageNumberList]);
+
+  if (paginationVisibility) {
+    return null;
+  }
 
   if (pageNumberList.length === 0) {
     return null;

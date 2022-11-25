@@ -13,6 +13,7 @@ export const LoadingSpinnerVisivilityVar = makeVar<boolean>(false);
 export const checkedProductIdsVar = makeVar<Array<number>>([]);
 
 // TABLE: 페이지네이션
+export const paginationVisibilityVar = makeVar<boolean>(true);
 
 export const commonFilterOptionVar = makeVar<CommonFilterOptionType>({
   page: 1,

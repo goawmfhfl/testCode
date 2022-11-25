@@ -18,6 +18,7 @@ import {
   checkedProductIdsVar,
   checkAllBoxStatusVar,
   pageNumberListVar,
+  paginationVisibilityVar,
 } from "@cache/index";
 
 const useLazyOrders = () => {
@@ -57,6 +58,10 @@ const useLazyOrders = () => {
     checkedProductIdsVar([]);
     checkAllBoxStatusVar(false);
   }, [data]);
+
+  useEffect(() => {
+    paginationVisibilityVar(loading);
+  }, [loading]);
 
   return { loading, error, totalOrderItems, setTotalOrderItems, getOrderItem };
 };
