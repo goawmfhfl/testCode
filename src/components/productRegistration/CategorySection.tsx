@@ -1,5 +1,5 @@
 import styled from "styled-components/macro";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 import {
@@ -16,12 +16,22 @@ import {
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import useCategories from "@hooks/useCategories";
-import { CategoryName } from "@models/index";
+import contructCategories from "@utils/contructCategories";
+import { CategoriesType, CategoryName } from "@models/index";
 
 const CategorySection = () => {
   const { watch, register, setValue } = useFormContext();
-
-  const { loading, error, categories } = useCategories();
+  const { loading, error, data } = useCategories();
+  const [categories, setCategories] =
+    useState<{
+      firstCategories: Array<CategoryName>;
+      secondCategories: {
+        [key: string]: Array<CategoryName>;
+      };
+      thirdCategories: {
+        [key: string]: Array<CategoryName>;
+      }[];
+    }>();
 
   const selectedFirstCategory: CategoryName = watch(
     CATEGORY_FIRST
@@ -47,6 +57,13 @@ const CategorySection = () => {
   useEffect(() => {
     setValue(CATEGORY_THIRD, "");
   }, [selectedSecondCategory]);
+
+  useEffect(() => {
+    const categories: Array<CategoriesType> =
+      data?.getAllCategories.categories || [];
+    const recontructCategories = contructCategories(categories);
+    setCategories(recontructCategories);
+  }, [data]);
 
   if (loading) return <>...loading</>;
   if (error) return <>...error</>;
