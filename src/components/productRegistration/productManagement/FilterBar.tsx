@@ -16,18 +16,25 @@ import { commonFilterOptionVar, paginationSkipVar } from "@cache/index";
 const FilterBar = () => {
   const navigate = useNavigate();
 
-  const {
-    loading,
-    error,
-    getAllProductsStatus,
-    allProductsLength,
-    onSaleLength,
-    stopSaleLength,
-    soldOutLength,
-  } = useLazyAllProductsStatus();
+  const { loading, error, data, getAllProductsStatus } =
+    useLazyAllProductsStatus();
 
-  const { status } = useReactiveVar(filterOptionVar);
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
+  const { status } = useReactiveVar(filterOptionVar);
+
+  const products = data?.getAllProductsBySeller.products || [];
+
+  const productsLength = {
+    allProducts: products.length,
+    onSale: products.filter((list) => list.status === ProductStatus.ON_SALE)
+      .length,
+    stopSale: products.filter((list) => list.status === ProductStatus.STOP_SALE)
+      .length,
+    soldOut: products.filter((list) => list.status === ProductStatus.SOLD_OUT)
+      .length,
+  };
+
+  const { allProducts, onSale, stopSale, soldOut } = productsLength;
 
   const changeFilterOptionNameClick =
     (filterOptionName: ProductStatus) => () => {
@@ -66,26 +73,26 @@ const FilterBar = () => {
           onClick={changeFilterOptionNameClick(null)}
           isActvie={status === null}
         >
-          전체 {allProductsLength}
+          전체 {allProducts}
         </Filter>
         <Filter
           onClick={changeFilterOptionNameClick(ProductStatus.ON_SALE)}
           isActvie={status === ProductStatus.ON_SALE}
         >
-          판매중 {onSaleLength}
+          판매중 {onSale}
         </Filter>
         <Filter
           onClick={changeFilterOptionNameClick(ProductStatus.STOP_SALE)}
           isActvie={status === ProductStatus.STOP_SALE}
         >
-          숨김 {stopSaleLength}
+          숨김 {stopSale}
         </Filter>
         <Filter
           onClick={changeFilterOptionNameClick(ProductStatus.SOLD_OUT)}
           isActvie={status === ProductStatus.SOLD_OUT}
         >
           <QuestionMarkIcon src={questionMarkSrc} />
-          품절 {soldOutLength}
+          품절 {soldOut}
         </Filter>
       </FilterList>
       <Button

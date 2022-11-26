@@ -1,7 +1,10 @@
 import { TableType } from "@models/index";
 import styled, { css } from "styled-components";
 
-export const TableContainer = styled.div<{ type: TableType }>`
+export const TableContainer = styled.div<{
+  type: TableType;
+  hasNoData?: boolean;
+}>`
   display: flex;
   position: relative;
   width: 100%;
@@ -12,11 +15,12 @@ export const TableContainer = styled.div<{ type: TableType }>`
       flex-direction: column;
     `}
 
-  ${({ type }) =>
-    type === TableType.SCROLL &&
-    css`
-      height: 500px;
-    `}
+  ${({ type, hasNoData }) =>
+    type === TableType.SCROLL && hasNoData
+      ? css`
+          height: 500px;
+        `
+      : css``}
 `;
 interface FixedTableProps {
   width: number;
@@ -45,7 +49,9 @@ export const ScrollTable = ({ width, children }: ScrollTableProps) => {
 };
 
 const ScrollTableContainer = styled.div`
-  overflow: scroll;
+  width: 100%;
+  height: 100%;
+  overflow-x: scroll;
 `;
 
 const WrapperContainer = styled.div<{ width: number }>`

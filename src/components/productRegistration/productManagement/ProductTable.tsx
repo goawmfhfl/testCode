@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { useMutation, useReactiveVar } from "@apollo/client";
@@ -16,11 +16,16 @@ import {
   commonFilterOptionVar,
   LoadingSpinnerVisivilityVar,
   systemModalVar,
+  pageNumberListVar,
+  paginationVisibilityVar,
 } from "@cache/index";
 
 import { ProductStatus, productStatus, productType } from "@constants/product";
 
-import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
+import {
+  GET_ALL_PRODUCTS_BY_SELLER,
+  ProductsType,
+} from "@graphql/queries/getAllProductsBySeller";
 import {
   ChangeProductsInfoBySellerInputType,
   ChangeProductsInfoBySellerType,
@@ -50,21 +55,16 @@ import Checkbox from "@components/common/input/Checkbox";
 import NoDataContainer from "@components/common/table/NoDataContainer";
 
 const ProductTable = () => {
-  const {
-    loading,
-    error,
-    products,
-    setProducts,
-    isCheckedList,
-    setIsCheckedList,
-    getProducts,
-  } = useLazyProducts();
-
+  const { loading, error, data, getProducts } = useLazyProducts();
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { status } = useReactiveVar(filterOptionVar);
-
   const checkedProductIds: Array<number> = useReactiveVar(checkedProductIdsVar);
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
+
+  const [products, setProducts] = useState<Array<ProductsType>>([]);
+  const [isCheckedList, setIsCheckedList] = useState<{
+    [key: string]: { isChecked: boolean };
+  }>({});
 
   const [changeProductsStatus] = useMutation<
     ChangeProductsInfoBySellerType,
@@ -235,6 +235,33 @@ const ProductTable = () => {
       });
     })();
   }, [page, skip, status, query]);
+
+  useEffect(() => {
+    const totalPages: number = data?.getAllProductsBySeller.totalPages;
+    const products: Array<ProductsType> = data?.getAllProductsBySeller.products;
+    const checkedList: {
+      [key: string]: { isChecked: boolean };
+    } =
+      products?.reduce((acc, cur) => {
+        acc[cur.id] = { isChecked: false };
+        return acc;
+      }, {}) || {};
+
+    pageNumberListVar(
+      Array(totalPages)
+        .fill(null)
+        .map((_, index) => index + 1)
+    );
+
+    setProducts(products);
+    setIsCheckedList(checkedList);
+    checkedProductIdsVar([]);
+    checkAllBoxStatusVar(false);
+  }, [data]);
+
+  useEffect(() => {
+    paginationVisibilityVar(loading);
+  }, [loading]);
 
   if (loading)
     return (

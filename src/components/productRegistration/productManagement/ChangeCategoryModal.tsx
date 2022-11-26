@@ -42,11 +42,22 @@ import { checkAllBoxStatusVar } from "@cache/index";
 
 import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
 import useCategories from "@hooks/useCategories";
-import { CategoryName } from "@models/index";
+import contructCategories from "@utils/contructCategories";
+import { CategoriesType, CategoryName } from "@models/index";
 
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
-  const { categories } = useCategories();
+  const { loading, error, data } = useCategories();
+  const [categories, setCategories] =
+    useState<{
+      firstCategories: Array<CategoryName>;
+      secondCategories: {
+        [key: string]: Array<CategoryName>;
+      };
+      thirdCategories: {
+        [key: string]: Array<CategoryName>;
+      }[];
+    }>();
 
   const filterOption = useReactiveVar(filterOptionVar);
   const checkedProductIds = useReactiveVar(checkedProductIdsVar);
@@ -197,6 +208,13 @@ const ChangeCategoryModal = () => {
       ),
     });
   };
+
+  useEffect(() => {
+    const categories: Array<CategoriesType> =
+      data?.getAllCategories.categories || [];
+    const recontructCategories = contructCategories(categories);
+    setCategories(recontructCategories);
+  }, [data]);
 
   useEffect(() => {
     return () => {
