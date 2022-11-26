@@ -237,10 +237,6 @@ const ProductTable = () => {
   }, [page, skip, status, query]);
 
   useEffect(() => {
-    paginationVisibilityVar(loading);
-  }, [loading]);
-
-  useEffect(() => {
     const totalPages: number = data?.getAllProductsBySeller.totalPages;
     const products: Array<ProductsType> = data?.getAllProductsBySeller.products;
     const checkedList: {
@@ -262,6 +258,10 @@ const ProductTable = () => {
     checkedProductIdsVar([]);
     checkAllBoxStatusVar(false);
   }, [data]);
+
+  useEffect(() => {
+    paginationVisibilityVar(loading);
+  }, [loading]);
 
   if (loading)
     return (

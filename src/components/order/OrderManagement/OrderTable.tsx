@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useReactiveVar } from "@apollo/client";
 import { TableType } from "@models/index";
 
@@ -39,14 +39,55 @@ import NoDataContainer from "@components/common/table/NoDataContainer";
 import { filterOptionVar } from "@cache/order/orderManagement";
 import { commonFilterOptionVar } from "@cache/index";
 
-const OrderTable = () => {
-  const { error, loading, totalOrderItems, setTotalOrderItems, getOrderItem } =
-    useLazyOrders();
+import {
+  NormalizedListType,
+  caculatedOrderItemType,
+} from "@models/order/orderManagement";
 
+import caculateOrderItem from "@utils/order/caculateOrderItem";
+import contructOrderItem from "@utils/order/contructOrderItem";
+import {
+  checkedProductIdsVar,
+  checkAllBoxStatusVar,
+  pageNumberListVar,
+  paginationVisibilityVar,
+} from "@cache/index";
+
+const OrderTable = () => {
+  const { getOrderItem, error, loading, data } = useLazyOrders();
+
+  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
+  const [totalOrderItems, setTotalOrderItems] = useState<
+    Array<caculatedOrderItemType>
+  >([]);
+
+  useEffect(() => {
+    // need Check Because totalPages get null from Server GraphQl
+    const totalPages: number = data?.getOrdersBySeller.totalPages || 1;
+    const orderItems = data?.getOrdersBySeller.totalOrderItems || [];
+    const nomalizedOrderItem: NormalizedListType =
+      contructOrderItem(orderItems);
+
+    const caculatedOrderItem: Array<caculatedOrderItemType> =
+      caculateOrderItem(nomalizedOrderItem);
+
+    pageNumberListVar(
+      Array(totalPages)
+        .fill(null)
+        .map((_, index) => index + 1)
+    );
+
+    setTotalOrderItems(caculatedOrderItem);
+    checkedProductIdsVar([]);
+    checkAllBoxStatusVar(false);
+  }, [data]);
+
+  useEffect(() => {
+    paginationVisibilityVar(loading);
+  }, [loading]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -71,7 +112,10 @@ const OrderTable = () => {
   if (error) return <>error!</>;
 
   return (
-    <TableContainer type={TableType.SCROLL}>
+    <TableContainer
+      type={TableType.SCROLL}
+      hasNoData={totalOrderItems?.length === 0}
+    >
       <FixedTable width={tableWidth.left}>
         <ThContainer>
           <Th width={fixedTableType[0].width}>
@@ -147,6 +191,7 @@ const OrderTable = () => {
             {shipmentType.SHIPMENT_DISTANT_PRICE}
           </Th>
         </ThContainer>
+
         <TdContainer>
           {totalOrderItems.map(
             ({
