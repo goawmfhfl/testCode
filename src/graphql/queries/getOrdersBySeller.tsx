@@ -39,6 +39,10 @@ export interface OrderItemsType {
     email: string;
     // 유저 핸드폰번호
     phoneNumber: string;
+    // 유저 결제일
+    payments: {
+      createdAt: string;
+    };
   };
 
   orderByShop: {
@@ -76,6 +80,7 @@ export interface OrderItemsType {
 
   // 배송비
   shipmentPrice: number;
+
   // 도서산간 배송비
   shipmentDistantPrice: number;
 
@@ -88,11 +93,6 @@ export interface OrderItemsType {
   claimStatus: {
     name: OrderStatusName;
   };
-
-  // 결제일
-  // payments: {
-  //   createdAt: string;
-  // };
 }
 
 export interface GetOrdersBySellerType {
@@ -135,6 +135,10 @@ export const GET_ORDERS_BY_SELLER = gql`
           email
           #구매자 전화번호
           phoneNumber
+          #구매자 결제일
+          payments {
+            createdAt
+          }
         }
 
         # 결제일
@@ -185,11 +189,6 @@ export const GET_ORDERS_BY_SELLER = gql`
         claimStatus {
           name
         }
-
-        # 결제일
-        # payments {
-        #   createdAt
-        # }
       }
     }
   }

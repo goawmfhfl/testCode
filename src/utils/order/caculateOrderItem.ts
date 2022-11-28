@@ -6,21 +6,18 @@ const caculateOrderItem = (recontructOrderItem: NormalizedListType) => {
 
   const result = orderAllIds.map((id) => {
     const order = orderByid[id];
-
     const orderId = order.id;
-
-    const paymentDay = "결제일";
 
     const orderCodeStatus = () => {
       return {
-        merchantitemUid: order.merchantItemUid,
-        productCode: order.product.code,
+        merchantitemUid: order.merchantItemUid ? order.merchantItemUid : "-",
+        productCode: order.product.code ? order.product.code : "-",
       };
     };
 
     const orderProductStatus = () => {
       return {
-        orderProduct: order.product.name,
+        orderProduct: order.product.name ? order.product.name : "-",
         quantity: order.quantity ? order.quantity : 0,
         price: order.discountAppliedPrice
           ? order.discountAppliedPrice
@@ -35,33 +32,48 @@ const caculateOrderItem = (recontructOrderItem: NormalizedListType) => {
       return {
         courier: "택배사",
         invoiceNumber: "운송장번호",
-        shipmentPrice: order.shipmentPrice,
-        shipmentDistantPrice: "제주/도서 추가배송비",
+        shipmentPrice: order.shipmentPrice ? order.shipmentPrice : "-",
+        shipmentDistantPrice: order.shipmentDistantPrice
+          ? order.shipmentDistantPrice
+          : "-",
       };
     };
 
     const orderStatus = () => {
       return {
-        order: "주문 상태",
-        claim: "클레임 상태",
+        order: order.orderStatus?.name ? order.orderStatus?.name : "-",
+        claim: order.claimStatus?.name ? order.claimStatus?.name : "-",
       };
     };
 
     const recipientStatus = () => {
       return {
-        name: order.orderByShop.order.recipientName,
-        phoneNumber: order.orderByShop.order.recipientPhoneNumber,
-        address: order.orderByShop.order.recipientAddress,
-        postCode: order.orderByShop.order.postCode,
-        shipmentMemo: order.orderByShop.order.shipmentMemo,
+        name: order.orderByShop.order?.recipientName
+          ? order.orderByShop.order.recipientName
+          : "-",
+        phoneNumber: order.orderByShop.order?.recipientPhoneNumber
+          ? order.orderByShop.order.recipientPhoneNumber
+          : "-",
+        address: order.orderByShop.order?.recipientAddress
+          ? order.orderByShop.order.recipientAddress
+          : "-",
+        postCode: order.orderByShop.order?.postCode
+          ? order.orderByShop.order.postCode
+          : "-",
+        shipmentMemo: order.orderByShop.order?.shipmentMemo
+          ? order.orderByShop.order.shipmentMemo
+          : "-",
       };
     };
 
     const sellerStatus = () => {
       return {
-        id: "구매자 아이디",
-        name: "구매자명",
-        phoneNumber: "구매자 전화번호",
+        id: order.user?.email ? order.user.email : "-",
+        name: order.user?.name ? order.user.name : "-",
+        phoneNumber: order.user?.phoneNumber ? order.user.phoneNumber : "-",
+        paymentDay: order.user?.payments?.createdAt
+          ? order.user?.payments?.createdAt
+          : "-",
       };
     };
 
@@ -79,10 +91,12 @@ const caculateOrderItem = (recontructOrderItem: NormalizedListType) => {
       postCode,
       shipmentMemo,
     } = recipientStatus();
+
     const {
       id: sellerId,
       name: sellerName,
       phoneNumber: sellerPhoneNumber,
+      paymentDay,
     } = sellerStatus();
 
     return {
