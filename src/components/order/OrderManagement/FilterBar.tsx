@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import styled from "styled-components";
 import { useReactiveVar } from "@apollo/client";
 
@@ -6,20 +7,19 @@ import { commonFilterOptionVar, paginationSkipVar } from "@cache/index";
 
 import { orderStatusType } from "@constants/order/index";
 
+import useLazyAllOrderStatus from "@hooks/order/useLazyAllOrderStatus";
+
 import {
   OrderStatusGroup,
   OrderStatusName,
 } from "@models/order/orderManagement";
+
 import { OrderStatusType } from "@models/order/orderManagement";
 
 import FilterBarContainer from "@components/order/FilterBarContainer";
-import { useEffect } from "react";
-import useLazyAllOrderStatus from "@hooks/order/useLazyAllOrderStatus";
 
-// OrderStatusName
 const FilterBar = () => {
   const { loading, error, data, getAllOrderStatus } = useLazyAllOrderStatus();
-
   const { statusName } = useReactiveVar(filterOptionVar);
 
   const orders = data?.getOrdersBySeller.totalOrderItems || [];
