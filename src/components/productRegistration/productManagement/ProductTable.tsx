@@ -260,8 +260,8 @@ const ProductTable = () => {
   }, [data]);
 
   useEffect(() => {
-    paginationVisibilityVar(loading);
-  }, [loading]);
+    paginationVisibilityVar(loading || error);
+  }, [loading, error]);
 
   if (loading)
     return (

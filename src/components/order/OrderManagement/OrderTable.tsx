@@ -47,22 +47,89 @@ import {
 import caculateOrderItem from "@utils/order/caculateOrderItem";
 import contructOrderItem from "@utils/order/contructOrderItem";
 import {
-  checkedProductIdsVar,
   checkAllBoxStatusVar,
   pageNumberListVar,
   paginationVisibilityVar,
 } from "@cache/index";
+import { checkedOrderIdsVar } from "@cache/order";
 
 const OrderTable = () => {
   const { getOrderItem, error, loading, data } = useLazyOrders();
-
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
+  const checkedOrderIds: Array<number> = useReactiveVar(checkedOrderIdsVar);
+  const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
+
   const [totalOrderItems, setTotalOrderItems] = useState<
     Array<caculatedOrderItemType>
   >([]);
+  const [isCheckedList, setIsCheckedList] = useState<{
+    [key: string]: { isChecked: boolean };
+  }>({});
+
+  const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newIsCheckedList = JSON.parse(JSON.stringify(isCheckedList)) as {
+      [key: string]: { isChecked: boolean };
+    };
+    checkAllBoxStatusVar(e.target.checked);
+
+    if (e.target.checked) {
+      Object.keys(newIsCheckedList).forEach((key) => {
+        newIsCheckedList[key] = { isChecked: true };
+      });
+
+      const checkedProductIds = Object.keys(newIsCheckedList).map((id) =>
+        Number(id)
+      );
+
+      checkedOrderIdsVar(checkedProductIds);
+      setIsCheckedList(newIsCheckedList);
+    }
+
+    if (!e.target.checked) {
+      Object.keys(newIsCheckedList).forEach((key) => {
+        newIsCheckedList[key] = { isChecked: false };
+      });
+
+      checkedOrderIdsVar([]);
+      setIsCheckedList(newIsCheckedList);
+    }
+  };
+
+  const changeSingleCheckBoxHandler =
+    (id: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newIsCheckedList = JSON.parse(JSON.stringify(isCheckedList)) as {
+        [key: string]: { isChecked: boolean };
+      };
+
+      if (e.target.checked) {
+        newIsCheckedList[id].isChecked = true;
+        setIsCheckedList(newIsCheckedList);
+        checkedOrderIdsVar([...checkedOrderIds, id]);
+      }
+
+      if (!e.target.checked) {
+        newIsCheckedList[id].isChecked = false;
+        setIsCheckedList(newIsCheckedList);
+
+        const isCheckedList = checkedOrderIds.filter(
+          (selectedId) => selectedId === id
+        );
+
+        if (isCheckedList) {
+          const checkedListIndex = checkedOrderIds.findIndex(
+            (selectedId) => selectedId === id
+          );
+
+          checkedOrderIdsVar([
+            ...checkedOrderIds.slice(0, checkedListIndex),
+            ...checkedOrderIds.slice(checkedListIndex + 1),
+          ]);
+        }
+      }
+    };
 
   useEffect(() => {
     // need Check Because totalPages get null from Server GraphQl
@@ -74,6 +141,14 @@ const OrderTable = () => {
     const caculatedOrderItem: Array<caculatedOrderItemType> =
       caculateOrderItem(nomalizedOrderItem);
 
+    const checkedList: {
+      [key: string]: { isChecked: boolean };
+    } =
+      caculatedOrderItem?.reduce((acc, cur) => {
+        acc[cur.orderId] = { isChecked: false };
+        return acc;
+      }, {}) || {};
+
     pageNumberListVar(
       Array(totalPages)
         .fill(null)
@@ -81,13 +156,14 @@ const OrderTable = () => {
     );
 
     setTotalOrderItems(caculatedOrderItem);
-    checkedProductIdsVar([]);
+    setIsCheckedList(checkedList);
+    checkedOrderIdsVar([]);
     checkAllBoxStatusVar(false);
   }, [data]);
 
   useEffect(() => {
     paginationVisibilityVar(loading || error);
-  }, [loading]);
+  }, [loading, error]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -95,10 +171,10 @@ const OrderTable = () => {
       await getOrderItem({
         variables: {
           input: {
-            page: null,
-            skip: null,
-            query: null,
-            type: null,
+            page,
+            skip,
+            query,
+            type,
             statusName,
             statusType,
             statusGroup,
@@ -108,8 +184,25 @@ const OrderTable = () => {
     })();
   }, [page, skip, query, type, statusName, statusType, statusGroup]);
 
-  if (loading) return <>loading...</>;
-  if (error) return <>error!</>;
+  if (loading)
+    return (
+      <>
+        loading...
+        <br />
+        로딩중 입니다..
+        <br />* 로딩중 상태 추후 개발 예정
+      </>
+    );
+  if (error)
+    return (
+      <>
+        에러가 발생했습니다!!
+        <br />
+        * 에러 상태 추후 개발 예정
+        <br />
+        에러메세지: {error.message}
+      </>
+    );
 
   return (
     <TableContainer
@@ -119,7 +212,10 @@ const OrderTable = () => {
       <FixedTable width={tableWidth.left}>
         <ThContainer>
           <Th width={fixedTableType[0].width}>
-            <Checkbox />
+            <Checkbox
+              onChange={changeAllCheckBoxHandler}
+              checked={checkAllBoxStatus}
+            />
           </Th>
           <Th width={fixedTableType[1].width}>
             {orderCodeType.MERCHANTITEM_UID}
@@ -143,7 +239,10 @@ const OrderTable = () => {
             }) => (
               <Tr key={orderId}>
                 <Td width={fixedTableType[0].width}>
-                  <Checkbox />
+                  <Checkbox
+                    onChange={changeSingleCheckBoxHandler(orderId)}
+                    checked={isCheckedList[orderId]?.isChecked || false}
+                  />
                 </Td>
                 <Td width={fixedTableType[1].width}>{merchantitemUid}</Td>
                 <Td width={fixedTableType[2].width}>{productCode}</Td>

@@ -59,9 +59,13 @@ export interface SearchQueryType {
 }
 
 export const searchQueryType: Array<SearchQueryType> = [
-  { id: 0, label: "구매자명", value: "BUYER_NAME" },
-  { id: 1, label: "구매자 전화번호", value: "BUYER_PHONE_NUMBER" },
-  { id: 2, label: "주문번호", value: "ORDER_NUMBER" },
+  { id: 0, label: "구매자명", value: OrderSearchType.RECIPIENT_NAME },
+  {
+    id: 1,
+    label: "구매자 전화번호",
+    value: OrderSearchType.RECIPIENT_PHONE_NUMBER,
+  },
+  { id: 2, label: "주문번호", value: OrderSearchType.MERCHANT_UID },
 ];
 
 export interface NormalizedListType {

@@ -28,28 +28,6 @@ export interface ProductsListVarType {
   isChecked?: boolean;
 }
 
-export const showHasCheckedAnyProductModal = () => {
-  return systemModalVar({
-    ...systemModalVar(),
-    isVisible: true,
-    description: (
-      <>
-        선택된 주문건이 없습니다
-        <br />
-        주문건을 선택해주세요.
-      </>
-    ),
-    confirmButtonVisibility: true,
-    confirmButtonClickHandler: () => {
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: false,
-      });
-    },
-    cancelButtonVisibility: false,
-  });
-};
-
 export const showHasServerErrorModal = (error: string) => {
   return systemModalVar({
     ...systemModalVar(),
