@@ -17,6 +17,7 @@ import {
   DuplicateProductsBySellerType,
   DUPLICATE_PRODUCTS_BY_SELLER,
 } from "@graphql/mutations/duplicateProductsBySeller";
+
 import {
   checkedProductIdsVar,
   commonFilterOptionVar,
@@ -24,15 +25,15 @@ import {
   modalVar,
   paginationSkipVar,
   systemModalVar,
+  showHasCheckedAnyCheckBoxModal,
+  temporaryQueryVar,
+  checkAllBoxStatusVar,
 } from "@cache/index";
 
 import {
-  showHasCheckedAnyProductModal,
   showHasServerErrorModal,
   filterOptionVar,
 } from "@cache/productManagement";
-
-import { temporaryQueryVar, checkAllBoxStatusVar } from "@cache/index";
 
 import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
 import ChangeCategoryModal from "@components/productRegistration/productManagement/ChangeCategoryModal";
@@ -43,8 +44,8 @@ import {
   OptionInput as Option,
 } from "@components/common/input/Dropdown";
 
-import { Input as SearchInput } from "@components/common/input/SearchInput";
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
+import { Input as SearchInput } from "@components/common/input/SearchInput";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -186,15 +187,26 @@ const Controller = () => {
 
   const handleSaleStatusClick = () => {
     if (!checkedProductIds.length) {
-      showHasCheckedAnyProductModal();
+      showHasCheckedAnyCheckBoxModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
       return;
     }
   };
 
-  // 카테고리 변경 모달
   const handleChangeCategoryModalButtonClick = () => {
     if (!checkedProductIds.length) {
-      showHasCheckedAnyProductModal();
+      showHasCheckedAnyCheckBoxModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
       return;
     }
 
@@ -204,10 +216,15 @@ const Controller = () => {
     });
   };
 
-  // 할인율 변경 모달
   const handleChangeDiscountModalButtonClick = () => {
     if (!checkedProductIds.length) {
-      showHasCheckedAnyProductModal();
+      showHasCheckedAnyCheckBoxModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
       return;
     }
 
@@ -217,10 +234,15 @@ const Controller = () => {
     });
   };
 
-  // 복제
   const handleDuplicateButtonClick = () => {
     if (!checkedProductIds.length) {
-      showHasCheckedAnyProductModal();
+      showHasCheckedAnyCheckBoxModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
       return;
     }
 
@@ -277,10 +299,15 @@ const Controller = () => {
     });
   };
 
-  // 삭제
   const handleDeleteButtonClick = () => {
     if (!checkedProductIds.length) {
-      showHasCheckedAnyProductModal();
+      showHasCheckedAnyCheckBoxModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
       return;
     }
 
@@ -337,12 +364,10 @@ const Controller = () => {
     });
   };
 
-  // 필터 임시 쿼리
   const changeFilterQueryHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     temporaryQueryVar(e.target.value);
   };
 
-  // 필터 쿼리
   const changeSkipQuantityHandler = ({ target: { value } }) => {
     commonFilterOptionVar({
       ...commonFilterOptionVar(),
@@ -352,7 +377,6 @@ const Controller = () => {
     paginationSkipVar(0);
   };
 
-  // 디바운스
   useEffect(() => {
     const debounce = setTimeout(() => {
       return commonFilterOptionVar({
