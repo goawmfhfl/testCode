@@ -86,7 +86,7 @@ const OrderTable = () => {
   }, [data]);
 
   useEffect(() => {
-    paginationVisibilityVar(loading);
+    paginationVisibilityVar(loading || error);
   }, [loading]);
 
   useEffect(() => {
