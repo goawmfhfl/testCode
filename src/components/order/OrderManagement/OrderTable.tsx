@@ -99,9 +99,9 @@ const OrderTable = () => {
             skip: null,
             query: null,
             type: null,
-            statusName: null,
-            statusType: null,
-            statusGroup: OrderStatusGroup.ORDER,
+            statusName,
+            statusType,
+            statusGroup,
           },
         },
       });

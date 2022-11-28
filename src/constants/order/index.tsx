@@ -1,6 +1,13 @@
 export const SEND_EXCEL = "내보내기";
 export const SEND_ALL_EXCEL = "전체 내역 내보내기";
 
+export enum OrderStatusType {
+  NEW = "NEW",
+  PREPARING = "PREPARING",
+  SHIPPING = "SHIPPING",
+  SHIPPING_COMPLETED = "SHIPPING_COMPLETED",
+}
+
 export const orderStatusType = {
   ALL: "전체",
   NEW: "새주문",

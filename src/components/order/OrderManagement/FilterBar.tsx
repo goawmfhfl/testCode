@@ -1,17 +1,67 @@
-import React from "react";
 import styled from "styled-components";
+import { useReactiveVar } from "@apollo/client";
+
+import { filterOptionVar } from "@cache/order/orderManagement";
+import { commonFilterOptionVar, paginationSkipVar } from "@cache/index";
 
 import { orderStatusType } from "@constants/order/index";
+
+import { OrderStatusName } from "@models/order/orderManagement";
+import { OrderStatusType } from "@models/order/orderManagement";
+
 import FilterBarContainer from "@components/order/FilterBarContainer";
 
 const FilterBar = () => {
+  const { statusName } = useReactiveVar(filterOptionVar);
+
+  const handleFilterOptionNameClick =
+    (filterOptionName: OrderStatusName) => () => {
+      commonFilterOptionVar({
+        ...commonFilterOptionVar(),
+        page: 1,
+      });
+      paginationSkipVar(0);
+      filterOptionVar({
+        ...filterOptionVar(),
+        statusName: filterOptionName,
+        statusType: OrderStatusType.ORDER,
+      });
+    };
+
   return (
     <FilterBarContainer>
-      <Filter isActvie={true}>{orderStatusType.ALL}</Filter>
-      <Filter isActvie={false}>{orderStatusType.NEW}</Filter>
-      <Filter isActvie={false}>{orderStatusType.PREPARING}</Filter>
-      <Filter isActvie={false}>{orderStatusType.SHIPPING}</Filter>
-      <Filter isActvie={false}>{orderStatusType.SHIPPING_COMPLETED}</Filter>
+      <Filter
+        isActvie={statusName === null}
+        onClick={handleFilterOptionNameClick(null)}
+      >
+        {orderStatusType.ALL}
+      </Filter>
+      <Filter
+        isActvie={statusName === OrderStatusName.PAYMENT_COMPLETED}
+        onClick={handleFilterOptionNameClick(OrderStatusName.PAYMENT_COMPLETED)}
+      >
+        {orderStatusType.NEW}
+      </Filter>
+      <Filter
+        isActvie={statusName === OrderStatusName.PREPARING}
+        onClick={handleFilterOptionNameClick(OrderStatusName.PREPARING)}
+      >
+        {orderStatusType.PREPARING}
+      </Filter>
+      <Filter
+        isActvie={statusName === OrderStatusName.SHIPPING}
+        onClick={handleFilterOptionNameClick(OrderStatusName.SHIPPING)}
+      >
+        {orderStatusType.SHIPPING}
+      </Filter>
+      <Filter
+        isActvie={statusName === OrderStatusName.SHIPPING_COMPLETED}
+        onClick={handleFilterOptionNameClick(
+          OrderStatusName.SHIPPING_COMPLETED
+        )}
+      >
+        {orderStatusType.SHIPPING_COMPLETED}
+      </Filter>
     </FilterBarContainer>
   );
 };
