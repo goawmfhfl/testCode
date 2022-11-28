@@ -41,11 +41,13 @@ const Button = styled.button<{
   user-select: none;
 
   ${sizeStyles};
+
   width: ${({ full, width }) => (full ? "100%" : width ? width : "")};
   border: 1px solid
     ${({ backgroundColor, theme: { palette } }) =>
       backgroundColor ? backgroundColor : palette.grey500};
   color: ${({ color }) => (color ? color : "black")};
+
   background-color: ${({ backgroundColor }) =>
     backgroundColor ? backgroundColor : "transparent"};
 

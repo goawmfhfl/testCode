@@ -83,7 +83,7 @@ const FilterBar = () => {
   }, []);
 
   return (
-    <FilterBarContainer>
+    <FilterBarContainer isExportData={true}>
       <Filter
         isActvie={statusName === null}
         onClick={handleFilterOptionNameClick(null)}
