@@ -14,7 +14,7 @@ export interface GetOrdersBySellerInputType {
     type?: OrderSearchType;
     statusName?: OrderStatusName;
     statusType?: OrderStatusType;
-    statusGroup?: OrderStatusGroup;
+    statusGroup: OrderStatusGroup;
   };
 }
 
@@ -141,8 +141,6 @@ export const GET_ORDERS_BY_SELLER = gql`
           }
         }
 
-        # 결제일
-
         orderByShop {
           order {
             # 수취인
@@ -187,6 +185,43 @@ export const GET_ORDERS_BY_SELLER = gql`
 
         # 클레임상태
         claimStatus {
+          name
+        }
+      }
+    }
+  }
+`;
+
+export interface GetAllOrderStatusBySellerType {
+  getOrdersBySeller: {
+    ok: boolean;
+    error: string;
+    totalOrderItems: Array<{
+      orderStatus: {
+        name: OrderStatusName;
+      };
+    }>;
+  };
+}
+
+export interface GetAllOrderStatusBySellerInputType {
+  page?: number;
+  skip?: number;
+  query?: string;
+  type?: OrderSearchType;
+  statusName?: OrderStatusName;
+  statusType?: OrderStatusType;
+  statusGroup?: OrderStatusGroup;
+}
+
+export const GET_ALL_ORDER_STATUS_BY_SELLER = gql`
+  query GetAllOrderStatusBySeller($input: GetOrdersBySellerInput!) {
+    getOrdersBySeller(input: $input) {
+      ok
+      error
+      totalOrderItems {
+        # 주문상태
+        orderStatus {
           name
         }
       }

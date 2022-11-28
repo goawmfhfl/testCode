@@ -6,13 +6,48 @@ import { commonFilterOptionVar, paginationSkipVar } from "@cache/index";
 
 import { orderStatusType } from "@constants/order/index";
 
-import { OrderStatusName } from "@models/order/orderManagement";
+import {
+  OrderStatusGroup,
+  OrderStatusName,
+} from "@models/order/orderManagement";
 import { OrderStatusType } from "@models/order/orderManagement";
 
 import FilterBarContainer from "@components/order/FilterBarContainer";
+import { useEffect } from "react";
+import useLazyAllOrderStatus from "@hooks/order/useLazyAllOrderStatus";
 
+// OrderStatusName
 const FilterBar = () => {
+  const { loading, error, data, getAllOrderStatus } = useLazyAllOrderStatus();
+
   const { statusName } = useReactiveVar(filterOptionVar);
+
+  const orders = data?.getOrdersBySeller.totalOrderItems || [];
+
+  const ordersLength = {
+    allOrders: orders.length,
+    paymentCompleted: orders?.filter(
+      (list) => list.orderStatus.name === OrderStatusName.PAYMENT_COMPLETED
+    ).length,
+    preparing: orders.filter(
+      (list) => list.orderStatus.name === OrderStatusName.PREPARING
+    ).length,
+    shipping: orders.filter(
+      (list) => list.orderStatus.name === OrderStatusName.SHIPPING
+    ).length,
+
+    shippingCompleted: orders.filter(
+      (list) => list.orderStatus.name === OrderStatusName.SHIPPING_COMPLETED
+    ).length,
+  };
+
+  const {
+    allOrders,
+    paymentCompleted,
+    preparing,
+    shipping,
+    shippingCompleted,
+  } = ordersLength;
 
   const handleFilterOptionNameClick =
     (filterOptionName: OrderStatusName) => () => {
@@ -28,31 +63,50 @@ const FilterBar = () => {
       });
     };
 
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    (async () => {
+      await getAllOrderStatus({
+        variables: {
+          input: {
+            page: null,
+            skip: null,
+            query: null,
+            type: null,
+            statusName: null,
+            statusType: null,
+            statusGroup: OrderStatusGroup.ORDER,
+          },
+        },
+      });
+    })();
+  }, []);
+
   return (
     <FilterBarContainer>
       <Filter
         isActvie={statusName === null}
         onClick={handleFilterOptionNameClick(null)}
       >
-        {orderStatusType.ALL}
+        {orderStatusType.ALL} {allOrders}
       </Filter>
       <Filter
         isActvie={statusName === OrderStatusName.PAYMENT_COMPLETED}
         onClick={handleFilterOptionNameClick(OrderStatusName.PAYMENT_COMPLETED)}
       >
-        {orderStatusType.NEW}
+        {orderStatusType.NEW} {paymentCompleted}
       </Filter>
       <Filter
         isActvie={statusName === OrderStatusName.PREPARING}
         onClick={handleFilterOptionNameClick(OrderStatusName.PREPARING)}
       >
-        {orderStatusType.PREPARING}
+        {orderStatusType.PREPARING} {preparing}
       </Filter>
       <Filter
         isActvie={statusName === OrderStatusName.SHIPPING}
         onClick={handleFilterOptionNameClick(OrderStatusName.SHIPPING)}
       >
-        {orderStatusType.SHIPPING}
+        {orderStatusType.SHIPPING} {shipping}
       </Filter>
       <Filter
         isActvie={statusName === OrderStatusName.SHIPPING_COMPLETED}
@@ -60,7 +114,7 @@ const FilterBar = () => {
           OrderStatusName.SHIPPING_COMPLETED
         )}
       >
-        {orderStatusType.SHIPPING_COMPLETED}
+        {orderStatusType.SHIPPING_COMPLETED} {shippingCompleted}
       </Filter>
     </FilterBarContainer>
   );
