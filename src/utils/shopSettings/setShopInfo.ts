@@ -129,7 +129,9 @@ export default function setShopInfo(
     setValue(PHOTOCOPY, identificationCardCopyPhoto);
   }
 
-  phoneNumberVar(phoneNumber);
+  if (phoneNumber) {
+    phoneNumberVar(phoneNumber);
+  }
 
   if (bankName && bankAccountNumber && bankAccountHolder) {
     settlementAccountVar({
