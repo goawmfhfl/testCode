@@ -36,7 +36,7 @@ const FilterBar = () => {
 
   const { allProducts, onSale, stopSale, soldOut } = productsLength;
 
-  const changeFilterOptionNameClick =
+  const handleFilterOptionNameClick =
     (filterOptionName: ProductStatus) => () => {
       commonFilterOptionVar({
         ...commonFilterOptionVar(),
@@ -46,7 +46,7 @@ const FilterBar = () => {
       filterOptionVar({ status: filterOptionName });
     };
 
-  const handleButtonClick = () => {
+  const handleProductRegistrationButtonClick = () => {
     navigate(Pathnames.ProductRegistration);
   };
 
@@ -70,25 +70,25 @@ const FilterBar = () => {
     <Container>
       <FilterList>
         <Filter
-          onClick={changeFilterOptionNameClick(null)}
+          onClick={handleFilterOptionNameClick(null)}
           isActvie={status === null}
         >
           전체 {allProducts}
         </Filter>
         <Filter
-          onClick={changeFilterOptionNameClick(ProductStatus.ON_SALE)}
+          onClick={handleFilterOptionNameClick(ProductStatus.ON_SALE)}
           isActvie={status === ProductStatus.ON_SALE}
         >
           판매중 {onSale}
         </Filter>
         <Filter
-          onClick={changeFilterOptionNameClick(ProductStatus.STOP_SALE)}
+          onClick={handleFilterOptionNameClick(ProductStatus.STOP_SALE)}
           isActvie={status === ProductStatus.STOP_SALE}
         >
           숨김 {stopSale}
         </Filter>
         <Filter
-          onClick={changeFilterOptionNameClick(ProductStatus.SOLD_OUT)}
+          onClick={handleFilterOptionNameClick(ProductStatus.SOLD_OUT)}
           isActvie={status === ProductStatus.SOLD_OUT}
         >
           <QuestionMarkIcon src={questionMarkSrc} />
@@ -100,7 +100,7 @@ const FilterBar = () => {
         width="126px"
         type="button"
         className="positive"
-        onClick={handleButtonClick}
+        onClick={handleProductRegistrationButtonClick}
       >
         상품 등록
       </Button>
