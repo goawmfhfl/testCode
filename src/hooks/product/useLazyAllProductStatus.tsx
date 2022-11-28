@@ -6,7 +6,7 @@ import {
   GET_ALL_PRODCUCTS_STATUS_BY_SELLER,
 } from "@graphql/queries/getAllProductsBySeller";
 
-const useLazyAllProductsStatus = () => {
+const useLazyAllProductStatus = () => {
   const [getAllProductsStatus, { loading, error, data }] = useLazyQuery<
     GetAllProductsStatusBySellerType,
     GetAllProductsStatusBySellerInPutType
@@ -23,4 +23,4 @@ const useLazyAllProductsStatus = () => {
     data,
   };
 };
-export default useLazyAllProductsStatus;
+export default useLazyAllProductStatus;

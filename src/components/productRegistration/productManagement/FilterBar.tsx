@@ -9,7 +9,7 @@ import { Pathnames } from "@constants/index";
 import questionMarkSrc from "@icons/questionmark.svg";
 import Button from "@components/common/Button";
 
-import useLazyAllProductsStatus from "@hooks/product/useLazyAllProductsStatus";
+import useLazyAllProductStatus from "@hooks/product/useLazyAllProductStatus";
 import { ProductStatus } from "@constants/product";
 import { commonFilterOptionVar, paginationSkipVar } from "@cache/index";
 
@@ -17,7 +17,7 @@ const FilterBar = () => {
   const navigate = useNavigate();
 
   const { loading, error, data, getAllProductsStatus } =
-    useLazyAllProductsStatus();
+    useLazyAllProductStatus();
 
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { status } = useReactiveVar(filterOptionVar);
