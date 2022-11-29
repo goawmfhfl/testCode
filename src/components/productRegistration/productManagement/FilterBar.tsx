@@ -3,27 +3,36 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useReactiveVar } from "@apollo/client";
 
+import { commonFilterOptionVar, paginationSkipVar } from "@cache/index";
 import { filterOptionVar } from "@cache/productManagement";
 import { Pathnames } from "@constants/index";
+import { ProductStatus } from "@constants/product";
+
+import useLazyAllProductStatus from "@hooks/product/useLazyAllProductStatus";
 
 import questionMarkSrc from "@icons/questionmark.svg";
 import Button from "@components/common/Button";
-
-import useLazyAllProductStatus from "@hooks/product/useLazyAllProductStatus";
-import { ProductStatus } from "@constants/product";
-import { commonFilterOptionVar, paginationSkipVar } from "@cache/index";
+import useLazyProducts from "@hooks/product/useLazyProducts";
 
 const FilterBar = () => {
   const navigate = useNavigate();
 
-  const { loading, error, data, getAllProductsStatus } =
-    useLazyAllProductStatus();
+  const {
+    loading,
+    error,
+    data: productStatus,
+    getAllProductStatus,
+  } = useLazyAllProductStatus();
+
+  const { data: productsData, getProducts } = useLazyProducts();
 
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { status } = useReactiveVar(filterOptionVar);
 
-  const products = data?.getAllProductsBySeller.products || [];
+  const products = productStatus?.getAllProductsBySeller.products || [];
 
+  const searchResultLength =
+    productsData?.getAllProductsBySeller.totalResults || 0;
   const productsLength = {
     allProducts: products.length,
     onSale: products.filter((list) => list.status === ProductStatus.ON_SALE)
@@ -53,7 +62,7 @@ const FilterBar = () => {
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
-      await getAllProductsStatus({
+      await getAllProductStatus({
         variables: {
           input: {
             page: null,
@@ -66,35 +75,60 @@ const FilterBar = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    (async () => {
+      await getProducts({
+        variables: {
+          input: {
+            page: null,
+            skip: null,
+            status,
+            query,
+          },
+        },
+      });
+    })();
+  }, [query]);
+
   return (
     <Container>
-      <FilterList>
-        <Filter
-          onClick={handleFilterOptionNameClick(null)}
-          isActvie={status === null}
-        >
-          전체 {allProducts}
-        </Filter>
-        <Filter
-          onClick={handleFilterOptionNameClick(ProductStatus.ON_SALE)}
-          isActvie={status === ProductStatus.ON_SALE}
-        >
-          판매중 {onSale}
-        </Filter>
-        <Filter
-          onClick={handleFilterOptionNameClick(ProductStatus.STOP_SALE)}
-          isActvie={status === ProductStatus.STOP_SALE}
-        >
-          숨김 {stopSale}
-        </Filter>
-        <Filter
-          onClick={handleFilterOptionNameClick(ProductStatus.SOLD_OUT)}
-          isActvie={status === ProductStatus.SOLD_OUT}
-        >
-          <QuestionMarkIcon src={questionMarkSrc} />
-          품절 {soldOut}
-        </Filter>
-      </FilterList>
+      {!query ? (
+        <FilterList>
+          <Filter
+            onClick={handleFilterOptionNameClick(null)}
+            isActvie={status === null}
+          >
+            전체 {allProducts}
+          </Filter>
+          <Filter
+            onClick={handleFilterOptionNameClick(ProductStatus.ON_SALE)}
+            isActvie={status === ProductStatus.ON_SALE}
+          >
+            판매중 {onSale}
+          </Filter>
+          <Filter
+            onClick={handleFilterOptionNameClick(ProductStatus.STOP_SALE)}
+            isActvie={status === ProductStatus.STOP_SALE}
+          >
+            숨김 {stopSale}
+          </Filter>
+          <Filter
+            onClick={handleFilterOptionNameClick(ProductStatus.SOLD_OUT)}
+            isActvie={status === ProductStatus.SOLD_OUT}
+          >
+            <QuestionMarkIcon src={questionMarkSrc} />
+            품절 {soldOut}
+          </Filter>
+        </FilterList>
+      ) : (
+        <FilterList>
+          <Filter onClick={handleFilterOptionNameClick(null)} isActvie={true}>
+            검색 {searchResultLength}
+          </Filter>
+        </FilterList>
+      )}
+
       <Button
         size="big"
         width="126px"

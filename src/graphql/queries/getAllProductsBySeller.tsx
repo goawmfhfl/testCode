@@ -72,7 +72,7 @@ export const GET_ALL_PRODUCTS_BY_SELLER = gql`
   }
 `;
 
-export interface GetAllProductsStatusBySellerType {
+export interface GetAllProductStatusBySellerType {
   getAllProductsBySeller: {
     ok: boolean;
     error: string;
@@ -84,7 +84,7 @@ export interface GetAllProductsStatusBySellerType {
   };
 }
 
-export interface GetAllProductsStatusBySellerInPutType {
+export interface GetAllProductStatusBySellerInPutType {
   input: {
     page?: number;
     skip?: number;

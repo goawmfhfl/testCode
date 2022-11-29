@@ -1,15 +1,15 @@
 import { useLazyQuery } from "@apollo/client";
 
 import {
-  GetAllProductsStatusBySellerInPutType,
-  GetAllProductsStatusBySellerType,
+  GetAllProductStatusBySellerInPutType,
+  GetAllProductStatusBySellerType,
   GET_ALL_PRODCUCTS_STATUS_BY_SELLER,
 } from "@graphql/queries/getAllProductsBySeller";
 
 const useLazyAllProductStatus = () => {
-  const [getAllProductsStatus, { loading, error, data }] = useLazyQuery<
-    GetAllProductsStatusBySellerType,
-    GetAllProductsStatusBySellerInPutType
+  const [getAllProductStatus, { loading, error, data }] = useLazyQuery<
+    GetAllProductStatusBySellerType,
+    GetAllProductStatusBySellerInPutType
   >(GET_ALL_PRODCUCTS_STATUS_BY_SELLER, {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: "no-cache",
@@ -17,7 +17,7 @@ const useLazyAllProductStatus = () => {
   });
 
   return {
-    getAllProductsStatus,
+    getAllProductStatus,
     loading,
     error,
     data,
