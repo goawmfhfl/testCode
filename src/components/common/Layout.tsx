@@ -47,7 +47,7 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
         </ContentsContainer>
 
         {hasSaveBar && isShopPage && <ShopSaveBar />}
-        {/* {hasSaveBar && isProductPage && <ProductSaveBar />} */}
+        {hasSaveBar && isProductPage && <ProductSaveBar />}
       </Container>
 
       {modal.isVisible && <ModalLayer>{modal.component}</ModalLayer>}
