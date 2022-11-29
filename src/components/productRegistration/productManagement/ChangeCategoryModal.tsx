@@ -184,7 +184,7 @@ const ChangeCategoryModal = () => {
 
             if (error) {
               LoadingSpinnerVisivilityVar(false);
-              showHasServerErrorModal(error);
+              showHasServerErrorModal(error, "카테고리 변경");
             }
           })();
         },

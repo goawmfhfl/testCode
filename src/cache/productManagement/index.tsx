@@ -28,17 +28,21 @@ export interface ProductsListVarType {
   isChecked?: boolean;
 }
 
-export const showHasServerErrorModal = (error: string) => {
+export const showHasServerErrorModal = (
+  error: string,
+  mutationType: string
+) => {
   return systemModalVar({
     ...systemModalVar(),
     isVisible: true,
     description: (
       <>
-        인터넷 서버 장애로 인해
+        {mutationType}을(를) 완료하지 못했습니다.
         <br />
-        해당 작업을 완료하지 못했습니다.
+        다시 시도 후 같은 문제가 발생할 시
         <br />
-        다시 시도해 주시길 바랍니다.
+        찹스틱스에 문의해주세요
+        <br />
         <br />
         에러메시지: {error}
       </>

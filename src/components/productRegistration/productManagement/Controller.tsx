@@ -177,7 +177,7 @@ const Controller = () => {
           }
 
           if (error) {
-            showHasServerErrorModal(error);
+            showHasServerErrorModal(error, "판매상태 변경");
             LoadingSpinnerVisivilityVar(false);
           }
         })();
@@ -292,7 +292,7 @@ const Controller = () => {
 
           if (error) {
             LoadingSpinnerVisivilityVar(false);
-            showHasServerErrorModal(error);
+            showHasServerErrorModal(error, "상품 복제");
           }
         })();
       },
@@ -357,7 +357,7 @@ const Controller = () => {
 
           if (error) {
             LoadingSpinnerVisivilityVar(false);
-            showHasServerErrorModal(error);
+            showHasServerErrorModal(error, "상품 삭제");
           }
         })();
       },

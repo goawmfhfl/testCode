@@ -185,7 +185,7 @@ const ChangeDiscountModal = () => {
 
           if (error) {
             LoadingSpinnerVisivilityVar(false);
-            showHasServerErrorModal(error);
+            showHasServerErrorModal(error, "할인율 변경");
           }
         })();
       },

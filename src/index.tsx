@@ -11,7 +11,7 @@ import {
   from,
 } from "@apollo/client";
 import App from "./App";
-import { systemModalVar } from "./cache";
+import { systemModalVar } from "@cache/index";
 import { AUTH_TOKEN_KEY } from "@constants/auth";
 
 const httpLink = createHttpLink({
@@ -31,40 +31,30 @@ const authLink = setContext((_, { headers }) => {
 });
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
-  const {
-    extensions: { code },
-    message,
-  } = graphQLErrors[0];
-
-  if (graphQLErrors && networkError) {
-    console.log(`
-  [에러코드]: ${code as string}
-  [에러메세지]: ${message}
-  `);
-
+  if (networkError) {
     systemModalVar({
       ...systemModalVar(),
       isVisible: true,
       description: (
         <>
-          인터넷 서버 장애로 인해
+          해당 작업을 완료하지 못했습니다
           <br />
-          해당 작업을 완료하지 못했습니다.
+          다시 시도 후 같은 문제가 발생할 시
           <br />
-          다시 시도해 주시길 바랍니다.
+          찹스틱스에 문의해 주세요
           <br />
-          에러 코드: {code}
+          <br />
+          code: {networkError.message}
         </>
       ),
       confirmButtonVisibility: true,
-      cancelButtonVisibility: false,
-
       confirmButtonClickHandler: () => {
         systemModalVar({
           ...systemModalVar(),
           isVisible: false,
         });
       },
+      cancelButtonVisibility: false,
     });
   }
 });

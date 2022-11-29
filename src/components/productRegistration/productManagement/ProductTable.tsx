@@ -58,6 +58,7 @@ const ProductTable = () => {
   const { loading, error, data, getProducts } = useLazyProducts();
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { status } = useReactiveVar(filterOptionVar);
+
   const checkedProductIds: Array<number> = useReactiveVar(checkedProductIdsVar);
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
 
@@ -66,7 +67,7 @@ const ProductTable = () => {
     [key: string]: { isChecked: boolean };
   }>({});
 
-  const [changeProductsStatus] = useMutation<
+  const [changeProductStatus] = useMutation<
     ChangeProductsInfoBySellerType,
     ChangeProductsInfoBySellerInputType
   >(CHANGE_PRODUCTS_INFO_BY_SELLER, {
@@ -173,7 +174,7 @@ const ProductTable = () => {
               data: {
                 changeProductsInfoBySeller: { ok, error },
               },
-            } = await changeProductsStatus({
+            } = await changeProductStatus({
               variables: {
                 input: {
                   productIds: [id],
@@ -214,7 +215,7 @@ const ProductTable = () => {
 
             if (error) {
               LoadingSpinnerVisivilityVar(false);
-              showHasServerErrorModal(error);
+              showHasServerErrorModal(error, "판매상태 변경");
             }
           })();
         },
@@ -270,16 +271,6 @@ const ProductTable = () => {
         <br />
         로딩중 입니다..
         <br />* 로딩중 상태 추후 개발 예정
-      </>
-    );
-  if (error)
-    return (
-      <>
-        에러가 발생했습니다!!
-        <br />
-        * 에러 상태 추후 개발 예정
-        <br />
-        에러메세지: {error.message}
       </>
     );
 
