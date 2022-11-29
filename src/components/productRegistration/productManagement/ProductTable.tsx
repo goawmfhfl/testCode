@@ -445,9 +445,15 @@ const ProductTable = () => {
       ) : (
         !loading && (
           <NoDataContainer type={TableType.FIX}>
-            아직 들어온
-            <br />
-            상품이 없습니다.
+            {query === "" ? (
+              <>
+                아직 들어온 <br /> 상품이 없습니다.
+              </>
+            ) : (
+              <>
+                검색어와 일치하는 <br /> 상품이 없습니다.
+              </>
+            )}
           </NoDataContainer>
         )
       )}
