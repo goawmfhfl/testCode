@@ -37,11 +37,15 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
       isVisible: true,
       description: (
         <>
-          해당 작업을 완료하지 못했습니다
+          내부 서버 오류로 인해 요청하신
           <br />
-          다시 시도 후 같은 문제가 발생할 시
+          작업을 완료하지 못했습니다.
           <br />
-          찹스틱스에 문의해 주세요
+          다시 한 번 시도 후
+          <br />
+          같은 문제가 발생할 경우
+          <br />
+          찹스틱스로 문의해주세요
           <br />
           <br />
           code: {networkError.message}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { useMutation, useReactiveVar } from "@apollo/client";
+import { TailSpin } from "react-loader-spinner";
 
 import { tableData } from "@cache/productManagement/table";
 
@@ -264,16 +265,6 @@ const ProductTable = () => {
     paginationVisibilityVar(loading || error);
   }, [loading, error]);
 
-  if (loading)
-    return (
-      <>
-        loading...
-        <br />
-        로딩중 입니다..
-        <br />* 로딩중 상태 추후 개발 예정
-      </>
-    );
-
   return (
     <TableContainer type={TableType.FIX}>
       <ThContainer>
@@ -290,7 +281,20 @@ const ProductTable = () => {
           </Th>
         ))}
       </ThContainer>
-      {products?.length ? (
+
+      {loading ? (
+        <LoadingContainer>
+          <TailSpin
+            height="56"
+            width="56"
+            color={"#000"}
+            ariaLabel="tail-spin-loading"
+            visible={true}
+          />
+        </LoadingContainer>
+      ) : null}
+
+      {!loading && products?.length !== 0 ? (
         <TdContainer>
           {products?.map(
             ({
@@ -481,6 +485,15 @@ const ProductName = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 460px;
+  background-color: ${({ theme: { palette } }) => palette.white};
 `;
 
 export default ProductTable;
