@@ -9,7 +9,7 @@ import {
 } from "@constants/index";
 
 // Global Layout
-export const LoadingSpinnerVisivilityVar = makeVar<boolean>(false);
+export const loadingSpinnerVisibilityVar = makeVar<boolean>(false);
 export const checkedProductIdsVar = makeVar<Array<number>>([]);
 
 // TABLE: 페이지네이션

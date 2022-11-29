@@ -11,7 +11,7 @@ import {
   overModalVar,
   systemModalVar,
   contentsContainerReferenceVar,
-  LoadingSpinnerVisivilityVar,
+  loadingSpinnerVisibilityVar,
 } from "@cache/index";
 import SystemModal from "@components/common/SystemModal";
 
@@ -24,7 +24,7 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
   const modal = useReactiveVar(modalVar);
   const overModal = useReactiveVar(overModalVar);
   const systemModal = useReactiveVar(systemModalVar);
-  const loadingSpinnerVisivility = useReactiveVar(LoadingSpinnerVisivilityVar);
+  const loadingSpinnerVisivility = useReactiveVar(loadingSpinnerVisibilityVar);
 
   return (
     <>

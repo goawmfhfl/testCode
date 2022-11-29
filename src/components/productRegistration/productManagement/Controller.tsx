@@ -21,7 +21,7 @@ import {
 import {
   checkedProductIdsVar,
   commonFilterOptionVar,
-  LoadingSpinnerVisivilityVar,
+  loadingSpinnerVisibilityVar,
   modalVar,
   paginationSkipVar,
   systemModalVar,
@@ -134,7 +134,7 @@ const Controller = () => {
       confirmButtonClickHandler: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         (async () => {
-          LoadingSpinnerVisivilityVar(true);
+          loadingSpinnerVisibilityVar(true);
           const {
             data: {
               changeProductsInfoBySeller: { ok, error },
@@ -149,7 +149,7 @@ const Controller = () => {
           });
 
           if (ok) {
-            LoadingSpinnerVisivilityVar(false);
+            loadingSpinnerVisibilityVar(false);
             systemModalVar({
               ...systemModalVar(),
               isVisible: true,
@@ -177,8 +177,8 @@ const Controller = () => {
           }
 
           if (error) {
+            loadingSpinnerVisibilityVar(false);
             showHasServerErrorModal(error, "판매상태 변경");
-            LoadingSpinnerVisivilityVar(false);
           }
         })();
       },
@@ -256,7 +256,7 @@ const Controller = () => {
       confirmButtonClickHandler: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         (async () => {
-          LoadingSpinnerVisivilityVar(true);
+          loadingSpinnerVisibilityVar(true);
           const {
             data: {
               duplicateProductsBySeller: { ok, error },
@@ -270,7 +270,7 @@ const Controller = () => {
           });
 
           if (ok) {
-            LoadingSpinnerVisivilityVar(false);
+            loadingSpinnerVisibilityVar(false);
             systemModalVar({
               ...systemModalVar(),
               isVisible: true,
@@ -291,7 +291,7 @@ const Controller = () => {
           }
 
           if (error) {
-            LoadingSpinnerVisivilityVar(false);
+            loadingSpinnerVisibilityVar(false);
             showHasServerErrorModal(error, "상품 복제");
           }
         })();
@@ -321,7 +321,7 @@ const Controller = () => {
       confirmButtonClickHandler: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         (async () => {
-          LoadingSpinnerVisivilityVar(true);
+          loadingSpinnerVisibilityVar(true);
           const {
             data: {
               deleteProductsBySeller: { ok, error },
@@ -335,7 +335,7 @@ const Controller = () => {
           });
 
           if (ok) {
-            LoadingSpinnerVisivilityVar(false);
+            loadingSpinnerVisibilityVar(false);
             systemModalVar({
               ...systemModalVar(),
               isVisible: true,
@@ -356,7 +356,7 @@ const Controller = () => {
           }
 
           if (error) {
-            LoadingSpinnerVisivilityVar(false);
+            loadingSpinnerVisibilityVar(false);
             showHasServerErrorModal(error, "상품 삭제");
           }
         })();

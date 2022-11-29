@@ -4,7 +4,7 @@ import styled from "styled-components";
 import {
   checkedProductIdsVar,
   DetailNoticeVar,
-  LoadingSpinnerVisivilityVar,
+  loadingSpinnerVisibilityVar,
   modalVar,
   systemModalVar,
 } from "@cache/index";
@@ -141,7 +141,7 @@ const ChangeCategoryModal = () => {
         confirmButtonClickHandler: () => {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           (async () => {
-            LoadingSpinnerVisivilityVar(true);
+            loadingSpinnerVisibilityVar(true);
             const {
               data: {
                 changeProductsInfoBySeller: { ok, error },
@@ -157,7 +157,7 @@ const ChangeCategoryModal = () => {
             });
 
             if (ok) {
-              LoadingSpinnerVisivilityVar(false);
+              loadingSpinnerVisibilityVar(false);
               systemModalVar({
                 ...systemModalVar(),
                 isVisible: true,
@@ -183,7 +183,7 @@ const ChangeCategoryModal = () => {
             }
 
             if (error) {
-              LoadingSpinnerVisivilityVar(false);
+              loadingSpinnerVisibilityVar(false);
               showHasServerErrorModal(error, "카테고리 변경");
             }
           })();

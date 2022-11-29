@@ -12,7 +12,7 @@ import {
   modalVar,
   systemModalVar,
   checkAllBoxStatusVar,
-  LoadingSpinnerVisivilityVar,
+  loadingSpinnerVisibilityVar,
   checkedProductIdsVar,
 } from "@cache/index";
 import {
@@ -140,7 +140,7 @@ const ChangeDiscountModal = () => {
       confirmButtonClickHandler: () => {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         (async () => {
-          LoadingSpinnerVisivilityVar(true);
+          loadingSpinnerVisibilityVar(true);
           const {
             data: {
               changeProductsInfoBySeller: { ok, error },
@@ -158,7 +158,7 @@ const ChangeDiscountModal = () => {
           });
 
           if (ok) {
-            LoadingSpinnerVisivilityVar(false);
+            loadingSpinnerVisibilityVar(false);
             systemModalVar({
               ...systemModalVar(),
               isVisible: true,
@@ -184,7 +184,7 @@ const ChangeDiscountModal = () => {
           }
 
           if (error) {
-            LoadingSpinnerVisivilityVar(false);
+            loadingSpinnerVisibilityVar(false);
             showHasServerErrorModal(error, "할인율 변경");
           }
         })();

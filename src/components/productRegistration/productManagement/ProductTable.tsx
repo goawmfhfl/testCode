@@ -15,7 +15,7 @@ import {
   checkAllBoxStatusVar,
   checkedProductIdsVar,
   commonFilterOptionVar,
-  LoadingSpinnerVisivilityVar,
+  loadingSpinnerVisibilityVar,
   systemModalVar,
   pageNumberListVar,
   paginationVisibilityVar,
@@ -169,7 +169,7 @@ const ProductTable = () => {
         confirmButtonClickHandler: () => {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           (async () => {
-            LoadingSpinnerVisivilityVar(true);
+            loadingSpinnerVisibilityVar(true);
 
             const {
               data: {
@@ -185,7 +185,7 @@ const ProductTable = () => {
             });
 
             if (ok) {
-              LoadingSpinnerVisivilityVar(false);
+              loadingSpinnerVisibilityVar(false);
               systemModalVar({
                 ...systemModalVar(),
                 isVisible: true,
@@ -215,7 +215,7 @@ const ProductTable = () => {
             }
 
             if (error) {
-              LoadingSpinnerVisivilityVar(false);
+              loadingSpinnerVisibilityVar(false);
               showHasServerErrorModal(error, "판매상태 변경");
             }
           })();
