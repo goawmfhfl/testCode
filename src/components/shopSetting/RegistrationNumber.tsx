@@ -205,6 +205,8 @@ const AttachedPhotocopyWrapper = styled.div`
 
     ${({ theme }) => theme.typo.korean.headline.emphasized};
     text-align: center;
+
+    pointer-events: none;
   }
 
   & > div:nth-child(2) {
