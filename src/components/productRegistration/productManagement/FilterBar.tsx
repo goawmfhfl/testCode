@@ -13,6 +13,7 @@ import useLazyAllProductStatus from "@hooks/product/useLazyAllProductStatus";
 import questionMarkSrc from "@icons/questionmark.svg";
 import Button from "@components/common/Button";
 import useLazyProducts from "@hooks/product/useLazyProducts";
+import FilterBarContainer from "@components/order/FilterBarContainer";
 
 const FilterBar = () => {
   const navigate = useNavigate();
@@ -92,61 +93,50 @@ const FilterBar = () => {
   }, [query]);
 
   return (
-    <Container>
-      {!query ? (
-        <FilterList>
-          <Filter
-            onClick={handleFilterOptionNameClick(null)}
-            isActvie={status === null}
-          >
-            전체 {allProducts}
-          </Filter>
-          <Filter
-            onClick={handleFilterOptionNameClick(ProductStatus.ON_SALE)}
-            isActvie={status === ProductStatus.ON_SALE}
-          >
-            판매중 {onSale}
-          </Filter>
-          <Filter
-            onClick={handleFilterOptionNameClick(ProductStatus.STOP_SALE)}
-            isActvie={status === ProductStatus.STOP_SALE}
-          >
-            숨김 {stopSale}
-          </Filter>
-          <Filter
-            onClick={handleFilterOptionNameClick(ProductStatus.SOLD_OUT)}
-            isActvie={status === ProductStatus.SOLD_OUT}
-          >
-            <QuestionMarkIcon src={questionMarkSrc} />
-            품절 {soldOut}
-          </Filter>
-        </FilterList>
-      ) : (
-        <FilterList>
-          <Filter onClick={handleFilterOptionNameClick(null)} isActvie={true}>
-            검색 {searchResultLength}
-          </Filter>
-        </FilterList>
-      )}
-
-      <Button
-        size="big"
-        width="126px"
-        type="button"
-        className="positive"
-        onClick={handleProductRegistrationButtonClick}
-      >
-        상품 등록
-      </Button>
-    </Container>
+    <FilterBarContainer
+      button={
+        <Button
+          size="big"
+          width="126px"
+          type="button"
+          className="positive"
+          onClick={handleProductRegistrationButtonClick}
+        >
+          상품 등록
+        </Button>
+      }
+      searchResultLength={searchResultLength}
+    >
+      <FilterList>
+        <Filter
+          onClick={handleFilterOptionNameClick(null)}
+          isActvie={status === null}
+        >
+          전체 {allProducts}
+        </Filter>
+        <Filter
+          onClick={handleFilterOptionNameClick(ProductStatus.ON_SALE)}
+          isActvie={status === ProductStatus.ON_SALE}
+        >
+          판매중 {onSale}
+        </Filter>
+        <Filter
+          onClick={handleFilterOptionNameClick(ProductStatus.STOP_SALE)}
+          isActvie={status === ProductStatus.STOP_SALE}
+        >
+          숨김 {stopSale}
+        </Filter>
+        <Filter
+          onClick={handleFilterOptionNameClick(ProductStatus.SOLD_OUT)}
+          isActvie={status === ProductStatus.SOLD_OUT}
+        >
+          <QuestionMarkIcon src={questionMarkSrc} />
+          품절 {soldOut}
+        </Filter>
+      </FilterList>
+    </FilterBarContainer>
   );
 };
-
-const Container = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-`;
 
 const FilterList = styled.ul`
   display: flex;

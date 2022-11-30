@@ -1,26 +1,31 @@
 import React from "react";
 import styled from "styled-components";
 
-import Button from "@components/common/Button";
+import { useReactiveVar } from "@apollo/client";
+
+import { commonFilterOptionVar } from "@cache/index";
 
 interface FilterBarContainerProps {
   children: React.ReactNode;
-  isExportData?: boolean;
+  button?: React.ReactNode;
+  searchResultLength?: number;
 }
 
 const FilterBarContainer = ({
   children,
-  isExportData,
+  button,
+  searchResultLength,
 }: FilterBarContainerProps) => {
+  const { query } = useReactiveVar(commonFilterOptionVar);
+
   return (
     <Container>
-      <FilterList>{children}</FilterList>
+      <FilterList>
+        {!query && children}
+        {query && <Filter isActvie={true}>검색 {searchResultLength}</Filter>}
+      </FilterList>
 
-      {isExportData && (
-        <ButtonWrapper>
-          <Button size={"small"}>전체 내역 내보내기</Button>
-        </ButtonWrapper>
-      )}
+      {button && <ButtonWrapper>{button}</ButtonWrapper>}
     </Container>
   );
 };
@@ -51,6 +56,19 @@ const FilterList = styled.ul`
   line-height: 20px;
   letter-spacing: -0.015em;
   text-align: left;
+`;
+
+const Filter = styled.li<{ isActvie: boolean }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 14px 56px;
+  border-bottom: 1px solid
+    ${({ theme: { palette }, isActvie }) =>
+      isActvie ? palette.grey500 : "none"};
+
+  cursor: pointer;
 `;
 
 const ButtonWrapper = styled.div`

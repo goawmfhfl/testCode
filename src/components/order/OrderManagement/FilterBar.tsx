@@ -17,6 +17,7 @@ import {
 import { OrderStatusType } from "@models/order/orderManagement";
 
 import FilterBarContainer from "@components/order/FilterBarContainer";
+import Button from "@components/common/Button";
 
 const FilterBar = () => {
   const { loading, error, data, getAllOrderStatus } = useLazyAllOrderStatus();
@@ -83,7 +84,9 @@ const FilterBar = () => {
   }, []);
 
   return (
-    <FilterBarContainer isExportData={true}>
+    <FilterBarContainer
+      button={<Button size={"small"}>전체 내역 내보내기</Button>}
+    >
       <Filter
         isActvie={statusName === null}
         onClick={handleFilterOptionNameClick(null)}
