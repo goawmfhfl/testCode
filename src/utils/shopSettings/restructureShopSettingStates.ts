@@ -33,8 +33,11 @@ const restructureShopSettingStates = (
   const shipmentPolicy = watch(SHIPMENT_POLICY) as string;
   const returnPolicy = watch(RETURN_POLICY) as string;
 
-  const { safetyAuthenticationNumber, safetyAuthenticationExpiredDate } =
-    safetyCertificationVar();
+  const {
+    isConfirmed,
+    safetyAuthenticationNumber,
+    safetyAuthenticationExpiredDate,
+  } = safetyCertificationVar();
 
   const isBundleShipment = watch(SHIPMENT_BUNDLING) === "가능" ? true : false;
   const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
@@ -86,8 +89,10 @@ const restructureShopSettingStates = (
     description,
     shipmentPolicy,
     returnPolicy,
-    safetyAuthentication: safetyAuthenticationNumber,
-    safetyAuthenticationExpiredDate: new Date(safetyAuthenticationExpiredDate),
+    safetyAuthentication: isConfirmed ? safetyAuthenticationNumber : null,
+    safetyAuthenticationExpiredDate: isConfirmed
+      ? new Date(safetyAuthenticationExpiredDate)
+      : null,
     shipmentType,
     shipmentPrice,
     shipmentDistantPrice,

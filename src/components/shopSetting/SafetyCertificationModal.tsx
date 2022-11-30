@@ -1,8 +1,6 @@
-/* eslint-disable */
 import React, { useState } from "react";
-import axios from "axios";
-import X2JS from "x2js";
 import styled from "styled-components/macro";
+import { useLazyQuery } from "@apollo/client";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -13,57 +11,41 @@ import { modalVar, systemModalVar } from "@cache/index";
 import { safetyCertificationVar } from "@cache/shopSettings";
 import AuthenticationLoader from "@components/shopSetting/AuthenticationLoader";
 import { Input as TextInput } from "@components/common/input/TextInput";
-
-interface parsedDataType {
-  rows: {
-    count: string;
-    pagenum: string;
-    pagesize: string;
-    resultcode: string;
-    row: {
-      comp_nm: string;
-      df: string;
-      eff_prd: string;
-      expired_date: string;
-      inspct_org: string;
-      item: string;
-      mf_icm: string;
-      mod_date: string;
-      pkg_unit: string;
-      prdt_nm: string;
-      prdt_type: string;
-      renew_yn: string;
-      safe_sd: string;
-      slfsfcfst_no: string;
-      start_date: string;
-      sttus: string;
-      valid_yn: string;
-    };
-  };
-  error: {
-    msg: string;
-    resultcode: string;
-  };
-}
+import { VALIDATE_SAFETY_NUMBER } from "@graphql/queries/validateSafetyNumber";
+import {
+  evaluateSafetyCertificationResponse,
+  parseXMLString,
+} from "@utils/shopSettings/safetyCertification";
 
 const SafetyModal = () => {
+  const [validateSafetyNumber, { loading: isValidationLoading }] =
+    useLazyQuery<{
+      validateSafetyNumber: {
+        ok: boolean;
+        error: string | null;
+        data: string;
+      };
+    }>(VALIDATE_SAFETY_NUMBER, {
+      fetchPolicy: "no-cache",
+    });
+
   const [validation, setValidation] = useState<{
-    isVerified: boolean;
+    isVerified: boolean | null;
     isWrongNumber: boolean;
   }>({
-    isVerified: false,
+    isVerified: null,
     isWrongNumber: false,
   });
+
   const [safetyInformation, setSafetyInformation] = useState<{
     safetyNumber: string;
     safetyExpiredDate: string;
+    isAuthenticated: boolean;
   }>({
     safetyNumber: "",
     safetyExpiredDate: "",
+    isAuthenticated: false,
   });
-  const [isLoading, setIsLoading] = useState(false);
-
-  const { safetyNumber, safetyExpiredDate } = safetyInformation;
 
   const handleSafetyNumberInputChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -74,42 +56,62 @@ const SafetyModal = () => {
     }));
   };
 
-  const handleAuthenticationButtonClick = async () => {
-    try {
-      const parameter = {
-        params: {
-          AuthKey: process.env.REACT_APP_ECOLIFE_API_KEY,
-          ServiceName: "slfsfcfstChk",
-          SlfsfcfstNo: safetyNumber,
-        },
+  const unAuthenticateSafetyInformation = () => {
+    setSafetyInformation((prev) => {
+      return {
+        ...prev,
+        isAuthenticated: false,
       };
+    });
+  };
 
-      setIsLoading(true);
+  const initializeSafetyInformation = () => {
+    setSafetyInformation({
+      safetyNumber: "",
+      safetyExpiredDate: "",
+      isAuthenticated: false,
+    });
+  };
 
-      const { data } = await axios.get(
-        "https://ecolife.me.go.kr/openapi/ServiceSvl?idx=13",
-        parameter
-      );
+  const handleAuthenticationButtonClick = async (safetyNumber: string) => {
+    unAuthenticateSafetyInformation();
 
-      const x2js = new X2JS();
-      const parsedData: parsedDataType = x2js.xml2js(data);
+    try {
+      const result = await validateSafetyNumber({
+        variables: {
+          input: {
+            safetyNumber,
+          },
+        },
+      });
 
-      const hasNoData = parsedData?.rows?.count === "0";
-      const hasWrongAuthenticationNumber =
-        parsedData?.rows?.row?.valid_yn === "N";
+      const { data: xmlResponseDataString } = result.data.validateSafetyNumber;
+      const parsed = parseXMLString(xmlResponseDataString);
 
-      if (hasNoData || hasWrongAuthenticationNumber) {
-        setValidation(() => ({
+      const { hasNoData, hasWrongAuthenticationNumber } =
+        evaluateSafetyCertificationResponse(parsed);
+
+      if (hasNoData) {
+        setValidation({
+          isVerified: false,
+          isWrongNumber: false,
+        });
+
+        return;
+      }
+
+      if (hasWrongAuthenticationNumber) {
+        setValidation({
           isVerified: false,
           isWrongNumber: true,
-        }));
+        });
 
         return;
       }
 
       setSafetyInformation((prev) => ({
         ...prev,
-        safetyExpiredDate: parsedData.rows.row.expired_date,
+        safetyExpiredDate: parsed.rows.row.expired_date,
       }));
 
       setValidation(() => ({
@@ -117,20 +119,21 @@ const SafetyModal = () => {
         isWrongNumber: false,
       }));
     } catch (error) {
-      console.log("error", error);
+      console.log("안전확인대상번호 인증 도중 에러 발생", error);
     }
   };
 
-  const handleSaveButtonClick = () => {
+  const handleSaveButtonClick = ({
+    safetyNumber,
+    safetyExpiredDate,
+  }: {
+    safetyNumber: string;
+    safetyExpiredDate: string;
+  }) => {
     safetyCertificationVar({
       isConfirmed: true,
       safetyAuthenticationNumber: safetyNumber,
       safetyAuthenticationExpiredDate: safetyExpiredDate,
-    });
-
-    setSafetyInformation({
-      safetyNumber: "",
-      safetyExpiredDate: null,
     });
 
     systemModalVar({
@@ -147,6 +150,8 @@ const SafetyModal = () => {
           ...modalVar(),
           isVisible: false,
         });
+
+        initializeSafetyInformation();
       },
       cancelButtonVisibility: false,
     });
@@ -158,12 +163,10 @@ const SafetyModal = () => {
       isVisible: false,
     });
 
-    setSafetyInformation({
-      safetyNumber: "",
-      safetyExpiredDate: null,
-    });
+    initializeSafetyInformation();
   };
 
+  const { safetyNumber, safetyExpiredDate } = safetyInformation;
   const { isVerified, isWrongNumber } = validation;
 
   return (
@@ -188,46 +191,47 @@ const SafetyModal = () => {
       <ConfirmContainer>
         <Label>안전기준 적합 확인 검사 신고번호</Label>
         <RegisterContainer>
-          <InputContainer>
-            <>
+          <RegisterInput>
+            <InputContainer>
               <SafetyNumberInput
                 onChange={handleSafetyNumberInputChange}
                 value={safetyNumber}
+                placeholder={"CB19-12-2032"}
               />
-              <AuthenticationStatus>
-                {isLoading ? (
-                  <AuthenticationLoader />
-                ) : (
-                  <>
-                    {isVerified && (
-                      <ValidText valid={isVerified}>인증되었습니다.</ValidText>
-                    )}
-                    {isWrongNumber && (
-                      <ValidText valid={!isWrongNumber}>
-                        존재하지 않는 번호 입니다. 다시 확인해주세요.
-                      </ValidText>
-                    )}
-                  </>
+            </InputContainer>
+
+            <AuthenticationButton
+              size="small"
+              full={false}
+              // eslint-disable-next-line
+              onClick={async (e) => {
+                e.preventDefault();
+
+                await handleAuthenticationButtonClick(safetyNumber);
+              }}
+              disabled={isValidationLoading}
+            >
+              인증
+            </AuthenticationButton>
+          </RegisterInput>
+
+          <AuthenticationStatus>
+            {isValidationLoading ? (
+              <AuthenticationLoader />
+            ) : (
+              <>
+                {isVerified && (
+                  <ValidText valid={isVerified}>인증되었습니다.</ValidText>
                 )}
-              </AuthenticationStatus>
-            </>
-          </InputContainer>
 
-          <AuthenticationButton
-            size="small"
-            full={false}
-            // eslint-disable-next-line
-            onClick={async (e) => {
-              e.preventDefault();
-
-              await handleAuthenticationButtonClick();
-
-              setIsLoading(false);
-            }}
-            disabled={isLoading}
-          >
-            인증
-          </AuthenticationButton>
+                {(isVerified === false || isWrongNumber) && (
+                  <ValidText valid={false}>
+                    존재하지 않는 번호 입니다. 다시 확인해주세요.
+                  </ValidText>
+                )}
+              </>
+            )}
+          </AuthenticationStatus>
         </RegisterContainer>
       </ConfirmContainer>
 
@@ -236,7 +240,12 @@ const SafetyModal = () => {
           size="small"
           full={false}
           className="positive"
-          onClick={handleSaveButtonClick}
+          onClick={() =>
+            handleSaveButtonClick({
+              safetyNumber,
+              safetyExpiredDate,
+            })
+          }
           disabled={!isVerified}
         >
           저장
@@ -309,7 +318,9 @@ const Label = styled.span`
   margin-top: 8px;
 `;
 
-const RegisterContainer = styled.div`
+const RegisterContainer = styled.div``;
+
+const RegisterInput = styled.div`
   display: flex;
 `;
 
@@ -336,7 +347,7 @@ const AuthenticationButton = styled(Button)`
   user-select: none;
 `;
 
-const AuthenticationStatus = styled.span`
+const AuthenticationStatus = styled.div`
   margin-top: 8px;
 `;
 

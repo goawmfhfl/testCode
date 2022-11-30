@@ -7,12 +7,10 @@ const ValidText = styled.span<{ valid: boolean }>`
   line-height: 14px;
   letter-spacing: 0.1px;
 
+  word-wrap: nowrap;
+
   color: ${({ valid, theme: { palette } }) =>
     valid ? palette.black : palette.red900};
-
-  span.red-text {
-    color: ${({ theme: { palette } }) => palette.red900};
-  }
 `;
 
 export default ValidText;
