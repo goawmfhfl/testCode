@@ -18,7 +18,7 @@ export const paginationVisibilityVar = makeVar<boolean | ApolloError>(true);
 export const commonFilterOptionVar = makeVar<CommonFilterOptionType>({
   page: 1,
   skip: 20,
-  query: "",
+  query: null,
 });
 export const pageNumberListVar = makeVar<Array<number>>([]);
 export const paginationSkipVar = makeVar<number>(0);

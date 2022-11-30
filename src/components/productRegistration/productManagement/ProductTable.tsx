@@ -260,15 +260,6 @@ const ProductTable = () => {
     setIsCheckedList(checkedList);
     checkedProductIdsVar([]);
     checkAllBoxStatusVar(false);
-
-    return () => {
-      setProducts([]);
-      setIsCheckedList({});
-      commonFilterOptionVar({ page: 1, skip: 20, query: "" });
-      filterOptionVar({ status: null });
-      checkedProductIdsVar([]);
-      checkAllBoxStatusVar(false);
-    };
   }, [data]);
 
   useEffect(() => {
