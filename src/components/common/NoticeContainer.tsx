@@ -45,7 +45,7 @@ const NoticeText = styled.div<{ hasTopMargin: boolean }>`
 const NoticeIcon = styled.img`
   width: 24px;
   height: 24px;
-  margin-right: 15px;
+  margin-right: 12px;
 
   user-select: none;
 `;

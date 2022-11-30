@@ -1,18 +1,18 @@
-import { last } from "lodash";
 import axios from "axios";
 import styled from "styled-components/macro";
 import { useFormContext } from "react-hook-form";
 
-import exclamationmarkSrc from "@icons/exclamationmark.svg";
-
-import NoticeContainer from "@components/common/NoticeContainer";
-import TextInput from "@components/common/input/TextInput";
 import {
   PHOTOCOPY,
   REGISTRATION_NUMBER_PREFIX,
   REGISTRATION_NUMBER_SUFFIX,
 } from "@cache/shopSettings";
 import deleteImageUrl from "@utils/shopSettings/deleteImageUrl";
+
+import exclamationmarkSource from "@icons/exclamationmark.svg";
+import exclamationIconGreySource from "@icons/exclamation-grey.svg";
+import NoticeContainer from "@components/common/NoticeContainer";
+import TextInput from "@components/common/input/TextInput";
 
 const RegistrationNumber = () => {
   const { register, watch, setValue, getValues } = useFormContext();
@@ -51,7 +51,7 @@ const RegistrationNumber = () => {
 
   return (
     <Container>
-      <NoticeContainer icon={exclamationmarkSrc} width={"100%"}>
+      <NoticeContainer icon={exclamationmarkSource} width={"100%"}>
         ᐧ 사업자등록증 없이 판매하시는 경우 주민등록증를 입력 및 사본을
         첨부해주세요(주민등록번호 및 사본은 정산에만 활용)
         <br />
@@ -92,7 +92,22 @@ const RegistrationNumber = () => {
               onChange={handleChangePhotocopyInput}
             />
           </Attach>
-          {attachedPhotocopy && <AttachedPhotocopy src={attachedPhotocopy} />}
+
+          {attachedPhotocopy && (
+            <AttachedPhotocopyWrapper>
+              <AttachedPhotocopy src={attachedPhotocopy} />
+
+              <NoticeContainer icon={exclamationIconGreySource}>
+                미리보기 용으로만 블러처리되며 첨부된 이미지는 <br />
+                원본 그대로 등록됩니다.
+              </NoticeContainer>
+
+              <span>
+                미리보기는 <br />
+                블러처리 됩니다.
+              </span>
+            </AttachedPhotocopyWrapper>
+          )}
         </RegistrationPhotocopy>
       </Section>
     </Container>
@@ -138,6 +153,7 @@ const RegistrationNumbers = styled.div`
     flex: 1;
   }
 `;
+
 const Label = styled.label``;
 const Prefix = styled(TextInput)``;
 const Suffix = styled(TextInput)``;
@@ -151,6 +167,7 @@ const RegistrationPhotocopy = styled.div`
 
   margin-top: 24px;
 `;
+
 const Attach = styled.span`
   height: 32px;
   display: flex;
@@ -173,13 +190,44 @@ const Attach = styled.span`
 const PhotocopyInput = styled.input`
   display: none;
 `;
+
+const AttachedPhotocopyWrapper = styled.div`
+  margin-left: 8px;
+  position: relative;
+
+  & > span {
+    width: 100%;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    ${({ theme }) => theme.typo.korean.headline.emphasized};
+    text-align: center;
+  }
+
+  & > div:nth-child(2) {
+    visibility: hidden;
+
+    position: absolute;
+    top: 70%;
+    left: 45%;
+    width: 305px;
+  }
+
+  &:hover {
+    & > div:nth-child(2) {
+      visibility: visible;
+    }
+  }
+`;
+
 const AttachedPhotocopy = styled.div<{ src: string }>`
   width: 160px;
   height: 160px;
 
-  margin-left: 8px;
-
-  background-image: ${({ src }) => `url(${src})`};
+  background-image: ${({ src }) => `url("${src}")`};
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
