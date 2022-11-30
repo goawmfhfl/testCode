@@ -29,6 +29,8 @@ export const SHIPMENT_PRICE = "SHIPMENT_PRICE";
 export const SHIPMENT_DISTANT_PRICE = "SHIPMENT_DISTANT_PRICE";
 export const SHIPMENT_RETURN_PRICE = "SHIPMENT_RETURN_PRICE";
 export const SHIPMENT_EXCHANGE_PRICE = "SHIPMENT_EXCHANGE_PRICE";
+export const HAS_SET_CONDITIONAL_FREE_SHIPMENT =
+  "HAS_SET_CONDITIONAL_FREE_SHIPMENT";
 export const SHIPMENT_CONDITIONAL_PRICE = "SHIPMENT_CONDITIONAL_PRICE";
 
 export const businessLicenseVar = makeVar<BusinessLicenseVariables>({
@@ -56,3 +58,5 @@ export const settlementAccountVar = makeVar<SettlementAccountVariables>({
   bankCode: "",
   bankName: "",
 });
+
+export const unfulfilledInputNamesVar = makeVar<Array<string>>([]);

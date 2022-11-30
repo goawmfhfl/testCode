@@ -20,9 +20,12 @@ import {
   REGISTRATION_NUMBER_PREFIX,
   REGISTRATION_NUMBER_SUFFIX,
   PHOTOCOPY,
+  HAS_SET_CONDITIONAL_FREE_SHIPMENT,
 } from "@cache/shopSettings";
 import { ShopFormFields } from "@models/shopSettings";
 import { UploadedFileType } from "@models/productImages";
+import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
+import { ConditionalFreeShipmentPolicy } from "@constants/shop";
 
 export default function setShopInfo(
   shopInfo: ShopInfo,
@@ -93,10 +96,19 @@ export default function setShopInfo(
   setValue(SHIPMENT_BUNDLING, isBundleShipment ? "가능" : "불가능");
   setValue(SHIPMENT_PRICE, shipmentPrice);
   setValue(SHIPMENT_DISTANT_PRICE, shipmentDistantPrice);
+  setValue(
+    HAS_SET_CONDITIONAL_FREE_SHIPMENT,
+    shipmentConditionalPrice
+      ? ConditionalFreeShipmentPolicy.Set
+      : ConditionalFreeShipmentPolicy.Unset
+  );
   setValue(SHIPMENT_CONDITIONAL_PRICE, shipmentConditionalPrice);
   setValue(SHIPMENT_RETURN_PRICE, shipmentReturnPrice);
   setValue(SHIPMENT_EXCHANGE_PRICE, shipmentExchangePrice);
-  setValue(SHIPMENT_PRICE_TYPE, shipmentType);
+  setValue(
+    SHIPMENT_PRICE_TYPE,
+    shipmentType ? shipmentType : ShipmentChargeType.Charged
+  );
 
   if (
     representativeName &&

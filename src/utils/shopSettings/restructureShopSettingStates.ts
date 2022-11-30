@@ -43,7 +43,9 @@ const restructureShopSettingStates = (
 
   const shipmentReturnPrice = Number(watch(SHIPMENT_RETURN_PRICE));
   const shipmentExchangePrice = Number(watch(SHIPMENT_EXCHANGE_PRICE));
-  const shipmentConditionalPrice = Number(watch(SHIPMENT_CONDITIONAL_PRICE));
+  const shipmentConditionalPrice = watch(SHIPMENT_CONDITIONAL_PRICE) as
+    | number
+    | null;
 
   const uploadedFileInfos = [
     {
@@ -67,10 +69,9 @@ const restructureShopSettingStates = (
 
   const registrationNumberPrefix = watch(REGISTRATION_NUMBER_PREFIX) as string;
   const registrationNumberSuffix = watch(REGISTRATION_NUMBER_SUFFIX) as string;
-  const registrationNumber =
-    registrationNumberPrefix + registrationNumberSuffix;
+  const registrationNumber = `${registrationNumberPrefix}-${registrationNumberSuffix}`;
 
-  const photoCopy = watch(PHOTOCOPY) as string;
+  const photoCopy = (watch(PHOTOCOPY) as string) || null;
 
   const phoneNumber = phoneNumberVar();
 
@@ -92,7 +93,10 @@ const restructureShopSettingStates = (
     shipmentDistantPrice,
     shipmentReturnPrice,
     shipmentExchangePrice,
-    shipmentConditionalPrice,
+    shipmentConditionalPrice:
+      shipmentConditionalPrice !== null
+        ? Number(shipmentConditionalPrice)
+        : null,
     isBundleShipment,
     representativeName,
     businessRegistrationNumber,

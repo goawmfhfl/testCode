@@ -7,3 +7,8 @@ export enum SectionLabels {
   PhoneNumber = "전화번호 변경",
   SettlementAccount = "정산 계좌 정보",
 }
+
+export enum ConditionalFreeShipmentPolicy {
+  Set = "Set",
+  Unset = "Unset",
+}

@@ -20,19 +20,26 @@ const RegistrationNumber = () => {
   const handleChangePhotocopyInput = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
+    if (!e.target.files.length) return;
+
     const previous = getValues(PHOTOCOPY) as string;
+    const [image] = e.target.files;
 
     if (previous) {
       await deleteImageUrl(previous);
     }
 
     const formData = new FormData();
-    const [image] = e.target.files;
     formData.append("files", image);
 
     const { data }: { data: Array<string> } = await axios.post(
-      "https://dev.chopsticks-store.com/upload",
-      formData
+      `${process.env.REACT_APP_SERVER_URI}/upload`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
     );
 
     const photocopy = data[0];
@@ -85,9 +92,7 @@ const RegistrationNumber = () => {
               onChange={handleChangePhotocopyInput}
             />
           </Attach>
-          <AttachedPhotocopy>
-            {attachedPhotocopy && last(attachedPhotocopy.split("/"))}
-          </AttachedPhotocopy>
+          {attachedPhotocopy && <AttachedPhotocopy src={attachedPhotocopy} />}
         </RegistrationPhotocopy>
       </Section>
     </Container>
@@ -121,7 +126,7 @@ const Section = styled.div`
   }
 `;
 
-const InputContainer = styled.div`
+const RegistrationNumbers = styled.div`
   display: flex;
   align-items: center;
 
@@ -133,13 +138,17 @@ const InputContainer = styled.div`
     flex: 1;
   }
 `;
-
-const RegistrationNumbers = styled(InputContainer)``;
 const Label = styled.label``;
 const Prefix = styled(TextInput)``;
 const Suffix = styled(TextInput)``;
 
-const RegistrationPhotocopy = styled(InputContainer)`
+const RegistrationPhotocopy = styled.div`
+  display: flex;
+
+  & label {
+    flex-basis: 200px;
+  }
+
   margin-top: 24px;
 `;
 const Attach = styled.span`
@@ -164,9 +173,20 @@ const Attach = styled.span`
 const PhotocopyInput = styled.input`
   display: none;
 `;
-const AttachedPhotocopy = styled.div`
+const AttachedPhotocopy = styled.div<{ src: string }>`
+  width: 160px;
+  height: 160px;
+
   margin-left: 8px;
-  word-wrap: nowrap;
+
+  background-image: ${({ src }) => `url(${src})`};
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  filter: blur(8px);
+  -webkit-filter: blur(8px);
+  clip-path: inset(0px 0px 0px 0px);
 `;
 
 export default RegistrationNumber;

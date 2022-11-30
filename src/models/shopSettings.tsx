@@ -11,7 +11,9 @@ import {
   SHIPMENT_RETURN_PRICE,
   SHIPMENT_EXCHANGE_PRICE,
   SHIPMENT_CONDITIONAL_PRICE,
+  HAS_SET_CONDITIONAL_FREE_SHIPMENT,
 } from "@cache/shopSettings";
+import { ConditionalFreeShipmentPolicy } from "@constants/shop";
 
 export interface ShopFormFields {
   [SHOP_INTRODUCTION]: string;
@@ -23,6 +25,7 @@ export interface ShopFormFields {
   [SHIPMENT_DISTANT_PRICE]: number;
   [SHIPMENT_RETURN_PRICE]: number;
   [SHIPMENT_EXCHANGE_PRICE]: number;
+  [HAS_SET_CONDITIONAL_FREE_SHIPMENT]: ConditionalFreeShipmentPolicy;
   [SHIPMENT_CONDITIONAL_PRICE]: number;
   IDENTIFICATION: {
     REGISTRATION_NUMBER: {

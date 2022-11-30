@@ -17,13 +17,42 @@ import {
   SHIPMENT_EXCHANGE_PRICE,
   SHIPMENT_CONDITIONAL_PRICE,
   SHIPMENT_BUNDLING,
+  HAS_SET_CONDITIONAL_FREE_SHIPMENT,
 } from "@cache/shopSettings";
+import { ConditionalFreeShipmentPolicy } from "@constants/shop";
+import { unfulfilledInputNamesVar } from "@cache/shopSettings";
+import { useReactiveVar } from "@apollo/client";
 
 const ShipmentSettings = () => {
   const { register, watch, setValue } = useFormContext();
 
+  const handleSetConditionalFreePolicyChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = e.target.value;
+
+    setValue(HAS_SET_CONDITIONAL_FREE_SHIPMENT, value);
+
+    if (value === ConditionalFreeShipmentPolicy.Set) {
+      setValue(SHIPMENT_CONDITIONAL_PRICE, 0);
+    }
+
+    if (value === ConditionalFreeShipmentPolicy.Unset) {
+      setValue(SHIPMENT_CONDITIONAL_PRICE, null);
+    }
+  };
+
   const shipmentPriceType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
   const isShipmentPriceFree = shipmentPriceType === ShipmentChargeType.Free;
+  const isSetConditionalShipmentPolicy =
+    watch(HAS_SET_CONDITIONAL_FREE_SHIPMENT) ===
+    ConditionalFreeShipmentPolicy.Set;
+
+  const unfulfilledInputNames = useReactiveVar(unfulfilledInputNamesVar);
+
+  const isShipmentConditionalPriceUnfulfilled = unfulfilledInputNames.includes(
+    "shipmentConditionalPrice"
+  );
 
   return (
     <Container>
@@ -42,13 +71,14 @@ const ShipmentSettings = () => {
         <Contents>
           <InputContainer>
             <InputLabel>묶음 배송</InputLabel>
-            가능{" "}
+            <RadioLabel>가능</RadioLabel>
             <Radio
               {...register(SHIPMENT_BUNDLING)}
               value="가능"
               defaultChecked
             />
-            불가능 <Radio {...register(SHIPMENT_BUNDLING)} value="불가능" />
+            <RadioLabel>불가능</RadioLabel>
+            <Radio {...register(SHIPMENT_BUNDLING)} value="불가능" />
           </InputContainer>
 
           <InputContainer>
@@ -68,7 +98,9 @@ const ShipmentSettings = () => {
                   },
                 ]}
                 register={{
-                  ...register(SHIPMENT_PRICE_TYPE),
+                  ...register(SHIPMENT_PRICE_TYPE, {
+                    value: ShipmentChargeType.Charged,
+                  }),
                   // eslint-disable-next-line
                   onChange: async (e: SyntheticEvent<HTMLSelectElement>) => {
                     setValue(SHIPMENT_PRICE_TYPE, e.currentTarget.value);
@@ -137,14 +169,26 @@ const ShipmentSettings = () => {
 
       <ConditionalShipmentSection>
         <SectionLabelContainer>
-          <SectionLabel>샵 조건부 무료배송</SectionLabel>
-          <NoticeContainer
-            icon={informationMarkSource}
-            width={"377px"}
-            isOneLiner={true}
-          >
-            상단의 배송비 ‘유료' 선택시 조건부 무료배송 설정이 가능합니다.
-          </NoticeContainer>
+          <SectionLabel style={{ marginRight: "16px" }}>
+            샵 조건부 무료배송
+          </SectionLabel>
+
+          <RadioLabel>설정</RadioLabel>
+          <Radio
+            {...register(HAS_SET_CONDITIONAL_FREE_SHIPMENT)}
+            onChange={handleSetConditionalFreePolicyChange}
+            type="radio"
+            value={ConditionalFreeShipmentPolicy.Set}
+          />
+
+          <RadioLabel>설정안함</RadioLabel>
+          <Radio
+            {...register(HAS_SET_CONDITIONAL_FREE_SHIPMENT)}
+            onChange={handleSetConditionalFreePolicyChange}
+            type="radio"
+            value={ConditionalFreeShipmentPolicy.Unset}
+            defaultChecked
+          />
         </SectionLabelContainer>
 
         <Contents>
@@ -153,9 +197,14 @@ const ShipmentSettings = () => {
               register={register(SHIPMENT_CONDITIONAL_PRICE)}
               placeholder={"숫자만 입력"}
               numbersOnly={true}
-              disabled={isShipmentPriceFree}
+              disabled={!isSetConditionalShipmentPolicy}
             />
             원 이상 구매시 무료배송
+            {isShipmentConditionalPriceUnfulfilled && (
+              <UnfulfilledMessageWrapper>
+                1원 이상의 값을 입력해주세요
+              </UnfulfilledMessageWrapper>
+            )}
           </InputContainer>
         </Contents>
       </ConditionalShipmentSection>
@@ -195,6 +244,8 @@ const SectionLabelContainer = styled.div`
 const SectionLabel = styled.label`
   margin-right: 8px;
   white-space: nowrap;
+
+  ${({ theme }) => theme.typo.korean.title.tertiary.basic};
 `;
 
 const Contents = styled.div`
@@ -209,6 +260,11 @@ const Contents = styled.div`
   & > div:last-child {
     margin-bottom: 0;
   }
+`;
+
+const UnfulfilledMessageWrapper = styled.div`
+  color: red;
+  margin-left: 8px;
 `;
 
 const InputContainer = styled.div`
@@ -227,6 +283,10 @@ const InputLabel = styled.label`
   text-align: left;
 
   width: 234px;
+`;
+
+const RadioLabel = styled.label`
+  ${({ theme }) => theme.typo.korean.body.secondary.basic};
 `;
 
 const ReturnPriceLabel = styled.label`

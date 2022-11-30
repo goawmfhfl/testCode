@@ -8,7 +8,11 @@ import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Input from "@components/common/Input";
 import Button from "@components/common/Button";
-import { modalVar, systemModalVar } from "@cache/index";
+import {
+  loadingSpinnerVisibilityVar,
+  modalVar,
+  systemModalVar,
+} from "@cache/index";
 import { businessLicenseVar } from "@cache/shopSettings";
 
 const BusinessLicenseModal = () => {
@@ -75,6 +79,8 @@ const BusinessLicenseModal = () => {
         return;
       }
 
+      loadingSpinnerVisibilityVar(true);
+
       const parameter = {
         params: {
           ServiceKey: process.env.REACT_APP_BUSINESS_AUTHENTICATION_API_KEY,
@@ -108,6 +114,8 @@ const BusinessLicenseModal = () => {
             }
           | string;
       };
+
+      loadingSpinnerVisibilityVar(false);
 
       console.log(data);
 
@@ -281,16 +289,19 @@ const BusinessLicenseModal = () => {
             <Input
               onChange={handleChangeInput("ecommerceNumber-0")}
               value={ecommerceNumber[0]}
+              placeholder={"2022"}
             />
             -
             <Input
               onChange={handleChangeInput("ecommerceNumber-1")}
               value={ecommerceNumber[1]}
+              placeholder={"서울종로"}
             />
             -
             <Input
               onChange={handleChangeInput("ecommerceNumber-2")}
               value={ecommerceNumber[2]}
+              placeholder={"0138"}
             />
           </EcommerceNumber>
         </InputContainer>

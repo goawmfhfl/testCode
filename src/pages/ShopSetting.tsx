@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useLazyQuery } from "@apollo/client";
 import { FormProvider, useForm } from "react-hook-form";
 
-import { systemModalVar } from "@cache/index";
+import { loadingSpinnerVisibilityVar, systemModalVar } from "@cache/index";
 import {
   HeaderNames,
   Pathnames,
@@ -16,7 +16,6 @@ import { UserRole } from "@models/login";
 import useShopInfo from "@hooks/useShopInfo";
 import setShopInfo from "@utils/shopSettings/setShopInfo";
 import { ShopFormFields } from "@models/shopSettings";
-import { phoneNumberVar } from "@cache/shopSettings";
 
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
@@ -43,17 +42,21 @@ const ShopSetting = () => {
     reValidateMode: "onSubmit",
   });
 
-  const [getUserInfo, { data }] = useLazyQuery<GetUserInfoType>(GET_USER_INFO);
+  const [getUserInfo, { data: userInfo, loading: isUserLoading }] =
+    useLazyQuery<GetUserInfoType>(GET_USER_INFO);
 
   const hasUserLoggedIn = false; // TODO: session storage에서 가져온 토큰정보로 판단
 
   const { data: shopData, loading: isShopLoading } = useShopInfo();
 
   const hasSetStoredSettings = useRef(false);
-  const hasShopSettingUpdated =
-    shopData?.getShopInfo.createdAt !== shopData?.getShopInfo.updatedAt;
 
   useEffect(() => {
+    if (!shopData) return;
+
+    const hasShopSettingUpdated =
+      shopData.getShopInfo.createdAt !== shopData.getShopInfo.updatedAt;
+
     // eslint-disable-next-line
     (async () => {
       const authToken = sessionStorage.getItem(AUTH_TOKEN_KEY);
@@ -87,12 +90,15 @@ const ShopSetting = () => {
         });
       }
     })();
-  }, [data]);
+  }, [userInfo]);
 
   useEffect(() => {
     if (hasSetStoredSettings.current) return;
 
     if (!shopData || isShopLoading) return;
+
+    const hasShopSettingUpdated =
+      shopData.getShopInfo.createdAt !== shopData.getShopInfo.updatedAt;
 
     if (shopData.getShopInfo.registered) {
       hasSetStoredSettings.current = true;
@@ -133,25 +139,25 @@ const ShopSetting = () => {
         },
       });
     }
-  }, [shopData, hasSetStoredSettings]);
+  }, [shopData, hasSetStoredSettings.current]);
 
   useEffect(() => {
-    if (!shopData || isShopLoading) return;
-
-    phoneNumberVar(shopData.getShopInfo.phoneNumber);
-  }, [shopData]);
-
-  useEffect(() => {
-    if (hasSetStoredSettings && shopData) {
+    if (hasSetStoredSettings.current && shopData) {
       setShopInfo(shopData.getShopInfo, methods.setValue);
     }
-  }, [shopData, hasSetStoredSettings]);
+  }, [shopData, hasSetStoredSettings.current]);
+
+  useEffect(() => {
+    const isLoading = isShopLoading || isUserLoading;
+
+    loadingSpinnerVisibilityVar(isLoading);
+  }, [isShopLoading, isUserLoading]);
 
   return (
     <FormProvider {...methods}>
       <Layout hasSaveBar={true}>
         {isShopLoading ? (
-          <>로딩중..</>
+          <></>
         ) : (
           <ContentsContainer isForm={true}>
             <ContentsHeader headerName={HeaderNames.Shop} />

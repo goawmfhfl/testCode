@@ -5,7 +5,8 @@ import { TailSpin } from "react-loader-spinner";
 import GlobalNavigationBar from "@components/common/GlobalNavigationBar";
 import SideNavigationBar from "@components/common/SideNavigationBar";
 import Footer from "@components/common/Footer";
-import SaveBar from "@components/common/SaveBar";
+import ProductSaveBar from "@components/productRegistration/SaveBar";
+import ShopSaveBar from "@components/shopSetting/SaveBar";
 import {
   modalVar,
   overModalVar,
@@ -14,6 +15,7 @@ import {
   loadingSpinnerVisibilityVar,
 } from "@cache/index";
 import SystemModal from "@components/common/SystemModal";
+import { Pathnames } from "@constants/index";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -24,7 +26,10 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
   const modal = useReactiveVar(modalVar);
   const overModal = useReactiveVar(overModalVar);
   const systemModal = useReactiveVar(systemModalVar);
-  const loadingSpinnerVisivility = useReactiveVar(loadingSpinnerVisibilityVar);
+  const loadingSpinnerVisibility = useReactiveVar(loadingSpinnerVisibilityVar);
+
+  const isShopPage = location.pathname === Pathnames.Shop;
+  const isProductPage = location.pathname.includes(Pathnames.Product);
 
   return (
     <>
@@ -35,12 +40,14 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
         <ContentsContainer
           hasBottomMargin={hasSaveBar}
           ref={(newRef: HTMLElement) => contentsContainerReferenceVar(newRef)}
+          preventScroll={loadingSpinnerVisibility}
         >
           <ContentsWrapper>{children}</ContentsWrapper>
-          <Footer />
+          {!loadingSpinnerVisibility && <Footer />}
         </ContentsContainer>
 
-        {hasSaveBar && <SaveBar />}
+        {hasSaveBar && isShopPage && <ShopSaveBar />}
+        {hasSaveBar && isProductPage && <ProductSaveBar />}
       </Container>
 
       {modal.isVisible && <ModalLayer>{modal.component}</ModalLayer>}
@@ -54,7 +61,7 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
           {<SystemModal />}
         </SystemModalLayer>
       )}
-      {loadingSpinnerVisivility && (
+      {loadingSpinnerVisibility && (
         <LoaderSpinnerLayer>
           <TailSpin
             height="100"
@@ -78,9 +85,8 @@ const Container = styled.div`
 
 const ContentsContainer = styled.div<{
   hasBottomMargin: boolean;
+  preventScroll: boolean;
 }>`
-  flex: 1 1 0;
-
   display: flex;
   flex-direction: column;
 
@@ -90,6 +96,16 @@ const ContentsContainer = styled.div<{
 
   min-width: 1182px;
   min-height: 100%;
+
+  ${({ preventScroll }) =>
+    preventScroll
+      ? `
+        height: 100vh;
+        margin-top: 0;
+        margin-bottom: 0;
+        overflow: hidden;
+        `
+      : ""};
 `;
 
 const ContentsWrapper = styled.div`

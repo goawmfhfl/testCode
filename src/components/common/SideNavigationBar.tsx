@@ -1,22 +1,27 @@
 import styled from "styled-components/macro";
 import { Link } from "react-router-dom";
 import { Pathnames } from "@constants/index";
+import useShopInfo from "@hooks/useShopInfo";
 
 const SideNavigationBar = () => {
+  const { data } = useShopInfo();
+
+  const isRegisteredShop = data?.getShopInfo.registered;
+
   return (
     <Container>
       <Header>Shop Manager</Header>
       <NavList>
-        <NavItem>
+        <NavItem disabled={!isRegisteredShop}>
           <Link to={Pathnames.Product}>상품관리</Link>
         </NavItem>
-        <NavItem>
+        <NavItem disabled={true}>
           <Link to={Pathnames.Order}>판매관리</Link>
         </NavItem>
-        <NavItem>
+        <NavItem disabled={true}>
           <Link to={Pathnames.Inquiry}>문의관리</Link>
         </NavItem>
-        <NavItem>
+        <NavItem disabled={true}>
           <Link to={Pathnames.Settlement}>정산관리</Link>
         </NavItem>
         <NavItem>
@@ -60,11 +65,15 @@ const NavList = styled.ul`
   flex-direction: column;
 `;
 
-const NavItem = styled.li`
+const NavItem = styled.li<{ disabled?: boolean }>`
   ${({ theme }) => theme.typo.korean.title.secondary.basic};
   padding: 15px 30px;
 
   cursor: pointer;
+
+  color: ${({ disabled, theme }) =>
+    disabled ? theme.palette.grey500 : "white"};
+  pointer-events: ${({ disabled }) => (disabled ? "none" : "initial")}; ;
 `;
 
 export default SideNavigationBar;
