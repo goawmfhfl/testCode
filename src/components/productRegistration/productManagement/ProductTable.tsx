@@ -54,6 +54,7 @@ import {
 } from "@components/common/input/Dropdown";
 import Checkbox from "@components/common/input/Checkbox";
 import NoDataContainer from "@components/common/table/NoDataContainer";
+import Loading from "@components/common/table/Loading";
 
 const ProductTable = () => {
   const { loading, error, data, getProducts } = useLazyProducts();
@@ -265,6 +266,10 @@ const ProductTable = () => {
     paginationVisibilityVar(loading || error);
   }, [loading, error]);
 
+  useEffect(() => {
+    commonFilterOptionVar({ ...commonFilterOptionVar(), page: 1 });
+  }, [query]);
+
   return (
     <TableContainer type={TableType.FIX}>
       <ThContainer>
@@ -282,17 +287,7 @@ const ProductTable = () => {
         ))}
       </ThContainer>
 
-      {loading ? (
-        <LoadingContainer>
-          <TailSpin
-            height="56"
-            width="56"
-            color={"#000"}
-            ariaLabel="tail-spin-loading"
-            visible={true}
-          />
-        </LoadingContainer>
-      ) : null}
+      {loading && <Loading />}
 
       {!loading && products?.length !== 0 ? (
         <TdContainer>
@@ -485,15 +480,6 @@ const ProductName = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-`;
-
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  height: 460px;
-  background-color: ${({ theme: { palette } }) => palette.white};
 `;
 
 export default ProductTable;
