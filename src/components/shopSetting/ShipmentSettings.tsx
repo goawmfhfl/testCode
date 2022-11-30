@@ -249,6 +249,8 @@ const SectionLabel = styled.label`
 `;
 
 const Contents = styled.div`
+  max-width: 631px;
+
   display: flex;
   flex-direction: column;
   padding: 24px;
