@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
 import { Link } from "react-router-dom";
+import styled from "styled-components";
 import { useMutation, useReactiveVar } from "@apollo/client";
-import { TailSpin } from "react-loader-spinner";
 
 import { tableData } from "@cache/productManagement/table";
 
