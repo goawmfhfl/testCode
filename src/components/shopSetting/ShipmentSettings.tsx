@@ -8,7 +8,7 @@ import Radio from "@components/common/input/Radio";
 import NoticeContainer from "@components/common/NoticeContainer";
 
 import informationMarkSource from "@icons/info.svg";
-import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
+import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 import {
   SHIPMENT_PRICE_TYPE,
   SHIPMENT_PRICE,

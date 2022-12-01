@@ -4,44 +4,39 @@ import styled, { useTheme } from "styled-components/macro";
 import { useFormContext, useWatch } from "react-hook-form";
 import { useReactiveVar } from "@apollo/client";
 
-import { ProductRegistrationFormValues } from "@pages/product/Registration";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Checkbox from "@components/common/input/Checkbox";
 import Button from "@components/common/Button";
-import OptionInput from "@components/productRegistration/optionSection/OptionInput";
-import AdaptedOption from "@components/productRegistration/optionSection/AdaptedOption";
+import OptionInput from "@components/productForm/optionSection/OptionInput";
+import AdaptedOption from "@components/productForm/optionSection/AdaptedOption";
 
-import { HAS_REQUIRED_OPTION } from "@cache/productRegistration/index";
-import { requiredOptionVar } from "@cache/productRegistration/productOptions";
-import {
-  OptionInputType,
-  OptionTypes,
-} from "@models/productRegistration/options";
-import { isElementOverflown } from "@utils/index";
+import { selectiveOptionVar } from "@cache/productRegistration/productOptions";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import smallDownwardArrowIconSrc from "@icons/arrow-downward-small-red.svg";
-import { tableScrollbarStyles } from "@styles/GlobalStyles";
+import { HAS_SELECTIVE_OPTION } from "@cache/productRegistration";
+import { OptionInputType, OptionTypes } from "@models/product/options";
+import { ProductFormValues } from "@models/product";
 
-const RequiredOption = () => {
+const SelectiveOption = () => {
   const theme = useTheme();
   const { register, getValues } = useFormContext();
-  const productRegistrationInputs = useWatch<ProductRegistrationFormValues>();
-  const { optionInputList, adaptedOption } = useReactiveVar(requiredOptionVar);
+  const productRegistrationInputs = useWatch<ProductFormValues>();
+  const { optionInputList, adaptedOption } = useReactiveVar(selectiveOptionVar);
 
   const handleAdaptButtonClick = () => {
-    if (!getValues(HAS_REQUIRED_OPTION)) return;
+    if (!getValues(HAS_SELECTIVE_OPTION)) return;
 
-    const optionHeaders = optionInputList.map(({ id }) => {
+    const optionHeaders = ["추가 옵션명", "추가 옵션값"].map((header) => {
       return {
         key: uuidv4(),
-        header: productRegistrationInputs[`requiredOptionName-${id}`] as string,
+        header,
       };
     });
 
     const optionValues = optionInputList.map(
       ({ id }: OptionInputType): Array<string> => {
         const optionValue = productRegistrationInputs[
-          `requiredOptionValue-${id}`
+          `selectiveOptionValue-${id}`
         ] as string;
 
         return optionValue
@@ -68,25 +63,24 @@ const RequiredOption = () => {
     }
 
     const optionRows = optionValues.reduce(
-      (prevPermutations: Array<Array<string>>, optionValue: Array<string>) => {
-        const permutation = optionValue.reduce(
-          (acc: Array<Array<string>>, value: string) => {
-            prevPermutations.forEach((permutation: Array<string>) => {
-              acc.push([...permutation, value]);
-            });
+      (acc: Array<Array<string>>, optionValueList, optionValueIndex) => {
+        optionValueList.forEach((optionValue) => {
+          const optionInputId = optionInputList[optionValueIndex].id;
 
-            return acc;
-          },
-          []
-        );
+          const header = getValues(
+            `selectiveOptionName-${optionInputId}`
+          ) as string;
 
-        return permutation;
+          acc.push([header, optionValue]);
+        });
+
+        return acc;
       },
-      [[]]
+      []
     );
 
-    requiredOptionVar({
-      ...requiredOptionVar(),
+    selectiveOptionVar({
+      ...selectiveOptionVar(),
       adaptedOption: {
         optionHeaders,
         optionRows: optionRows.map((optionRow) => ({
@@ -98,40 +92,42 @@ const RequiredOption = () => {
   };
 
   const [tableRef, setTableRef] = useState<HTMLDivElement | null>(null);
-  const [isTableOverflown, setIsTableOverflown] = useState<boolean>(false);
+  const [isTableOverflown, setIsTableOverflown] = useState(false);
 
   useEffect(() => {
-    const isTableOverflown = isElementOverflown(tableRef) as boolean;
-
-    setIsTableOverflown(isTableOverflown);
+    setIsTableOverflown(isOverflown(tableRef));
   }, [adaptedOption]);
 
-  const hasOptionInputEnabled = getValues(HAS_REQUIRED_OPTION) as boolean;
+  function isOverflown(element: HTMLDivElement | null): undefined | boolean {
+    if (!element) return;
+
+    return element?.scrollHeight > element?.clientHeight;
+  }
+
+  const hasOptionInputEnabled = getValues(HAS_SELECTIVE_OPTION) as boolean;
 
   return (
     <Container>
       <CheckboxContainer>
-        <PurchaseOptionCheckbox {...register(HAS_REQUIRED_OPTION)} /> 옵션
+        <PurchaseOptionCheckbox {...register(HAS_SELECTIVE_OPTION)} /> 옵션
         설정하기
       </CheckboxContainer>
 
-      <NoticeContainer icon={exclamationMarkSrc}>
+      <NoticeContainer icon={exclamationMarkSrc} width={"723px"}>
         <NoticeList>
           <li>
-            필수 옵션은 구매자가 필수로 선택해야 하는 옵션입니다. ex) 핸드폰
-            케이스의 기종 옵션
+            '추가 상품'은 구매자가 필수로 선택하지 않아도 되는 옵션입니다.
           </li>
-          <li>옵션값은 쉼표로 구분해주세요.</li>
           <li>
-            옵션명과 쉼표로 구분된 각각의 옵션값은 최대 25자(한글, 영문
-            동일)까지 작성하실 수 있습니다.
+            '추가 상품 설정하기'를 체크하여 기본 상품과 함께 구매하면 좋은
+            상품으로 구성해보세요 ex) 기본상품 베개 커버, 추가상품 베개 솜
           </li>
-          <li>최대 추가 가능한 옵션은 5개 입니다.</li>
+          <li>추가 상품은 단독형만 가능합니다.</li>
         </NoticeList>
       </NoticeContainer>
 
       <OptionInput
-        optionType={OptionTypes.Required}
+        optionType={OptionTypes.Selective}
         hasEnabled={hasOptionInputEnabled}
       />
 
@@ -148,9 +144,8 @@ const RequiredOption = () => {
       <AdaptedTableWrapper
         ref={(ref) => setTableRef(ref)}
         isOverflown={isTableOverflown}
-        hasManyColumns={adaptedOption.optionHeaders.length > 3}
       >
-        <AdaptedOption optionType={OptionTypes.Required} />
+        <AdaptedOption optionType={OptionTypes.Selective} />
       </AdaptedTableWrapper>
     </Container>
   );
@@ -189,18 +184,8 @@ const AdaptButton = styled(Button).attrs({ type: "button" })`
   margin: 0 auto;
 `;
 
-const AdaptedTableWrapper = styled.div<{
-  isOverflown: boolean | undefined;
-  hasManyColumns: boolean;
-}>`
-  width: ${({ hasManyColumns, isOverflown }) =>
-    hasManyColumns
-      ? isOverflown
-        ? "909px"
-        : "892px"
-      : isOverflown
-      ? "774px"
-      : "757px"};
+const AdaptedTableWrapper = styled.div<{ isOverflown: boolean | undefined }>`
+  width: ${({ isOverflown }) => (isOverflown ? "774px" : "757px")};
   max-height: 300px;
   ${({ isOverflown }) =>
     isOverflown ? "overflow-y: scroll" : "overflow: hidden"};
@@ -209,7 +194,20 @@ const AdaptedTableWrapper = styled.div<{
 
   margin-top: 16px;
 
-  ${tableScrollbarStyles}
+  &::-webkit-scrollbar {
+    width: 14px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: none;
+    background-color: ${({ theme: { palette } }) => palette.grey500};
+  }
+
+  &::-webkit-scrollbar-track {
+    border-radius: none;
+    -webkit-box-shadow: inset 0 0 2px
+      ${({ theme: { palette } }) => palette.grey300};
+  }
 `;
 
-export default RequiredOption;
+export default SelectiveOption;

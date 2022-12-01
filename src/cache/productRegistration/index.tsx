@@ -1,5 +1,5 @@
 import { makeVar } from "@apollo/client";
-import { ProductType } from "@models/productRegistration/index";
+import { ProductType } from "@models/product/index";
 
 export const updatedProductRegistrationStatesVar = makeVar<ProductType>(null);
 

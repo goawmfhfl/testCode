@@ -4,10 +4,10 @@ import { useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { useReactiveVar } from "@apollo/client";
 
-import ProductImageContainer from "@components/productRegistration/imageSection/common/ProductImageContainer";
-import ProductImage from "@components/productRegistration/imageSection/common/ProductImage";
-import AddImageInputWrapper from "@components/productRegistration/imageSection/common/AddImageInputWrapper";
-import AddImageInput from "@components/productRegistration/imageSection/common/AddImageInput";
+import ProductImageContainer from "@components/productForm/imageSection/common/ProductImageContainer";
+import ProductImage from "@components/productForm/imageSection/common/ProductImage";
+import AddImageInputWrapper from "@components/productForm/imageSection/common/AddImageInputWrapper";
+import AddImageInput from "@components/productForm/imageSection/common/AddImageInput";
 
 import { ProductImageType, UploadedFileType } from "@models/productImages";
 

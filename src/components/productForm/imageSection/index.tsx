@@ -1,7 +1,7 @@
 import styled from "styled-components/macro";
 
-import RequiredImages from "@components/productRegistration/imageSection/RequiredImages";
-import OptionalImages from "@components/productRegistration/imageSection/OptionalImages";
+import RequiredImages from "@components/productForm/imageSection/RequiredImages";
+import OptionalImages from "@components/productForm/imageSection/OptionalImages";
 import NoticeContainer from "@components/common/NoticeContainer";
 
 import exclamationMarkSrc from "@icons/exclamationmark.svg";

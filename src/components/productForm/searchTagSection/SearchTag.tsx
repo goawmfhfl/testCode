@@ -8,7 +8,7 @@ import whiteCloseIconSource from "@icons/close-white.svg";
 import {
   TagTypes,
   SearchTag as SearchTagType,
-} from "@models/productRegistration/searchTag";
+} from "@models/product/searchTag";
 import { systemModalVar } from "@cache/index";
 import { tagListVar } from "@cache/productRegistration/searchTag";
 

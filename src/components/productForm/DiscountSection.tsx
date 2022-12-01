@@ -20,7 +20,7 @@ import {
   HAS_DISCOUNT_SPAN,
   IS_DISCOUNTED,
 } from "@cache/productRegistration/index";
-import { DiscountMethod } from "@models/productRegistration";
+import { DiscountMethod } from "@models/product";
 import { getDiscountedPrice } from "@utils/productRegistration";
 
 const ProductDiscount = () => {

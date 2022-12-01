@@ -25,7 +25,7 @@ import {
   TemporarySaveShopSettingsInputType,
   SaveShopSettingsInputType,
 } from "@models/shopSettings";
-import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
+import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 import { hasEveryInputFulfilled } from "@utils/index";
 import restructureShopSettingStates from "@utils/shopSettings/restructureShopSettingStates";
 import useShopInfo from "@hooks/useShopInfo";

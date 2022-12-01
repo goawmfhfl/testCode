@@ -6,7 +6,7 @@ import {
   shipmentTemplateVar,
   initialState as shipmentTemplateInitialState,
 } from "@cache/productRegistration/shipmentTemplate";
-import { CreateShipmentInputType } from "@models/productRegistration/shipmentTemplate";
+import { CreateShipmentInputType } from "@models/product/shipmentTemplate";
 
 interface EditShipmentTemplateModalProps {
   templateId: number;

@@ -237,3 +237,49 @@ export interface ProductType {
     tag: Array<{ id: number; name: string }>;
   }>;
 }
+
+export interface ProductFormValues {
+  TITLE: string;
+  PRODUCT_DESCRIPTION: string;
+  PRODUCT_COLOR: Array<string>;
+  PRODUCT_PRICE: number;
+  IS_DISCOUNTED: boolean;
+  DISCOUNT_AMOUNT: number;
+  DISCOUNT_OPTION: string;
+  DISCOUNT_STARTS_AT: string;
+  DISCOUNT_ENDS_AT: string;
+  HAS_DISCOUNT_SPAN: boolean;
+  PRODUCT_STOCK: number;
+  HAS_REQUIRED_OPTION: boolean;
+  HAS_MANUFACTURING_LEAD_TIME: boolean;
+  LEAD_TIME_MAX: number;
+  LEAD_TIME_MIN: number;
+  SPEC_NAME: string;
+  MATERIAL: string;
+  SIZE: string;
+  WEIGHT: string;
+  MANUFACTURER: string;
+  PRECAUTION: string;
+  AUTHORIZATION: string;
+  PERSON_IN_CHARGE: string;
+  HAS_TAG_INFOS: boolean;
+  CATEGORY_FIRST: string;
+  CATEGORY_SECOND: string;
+  CATEGORY_THIRD: string;
+
+  productName: string;
+  productPrice: string;
+  productDescription: string;
+  productStock: string;
+  productNameSpec: string;
+  productTextileSpec: string;
+  discountValue: string;
+  minLeadTime: string;
+  maxLeadTime: string;
+  optionValues: string;
+  cautionsSpec: string;
+  certifiedMattersSpec: string;
+  countrysideAdditionalShipmentCharge: string;
+  contactInformationSpec: string;
+  deliveryFee: string;
+}

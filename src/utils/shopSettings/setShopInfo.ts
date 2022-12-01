@@ -24,7 +24,7 @@ import {
 } from "@cache/shopSettings";
 import { ShopFormFields } from "@models/shopSettings";
 import { UploadedFileType } from "@models/productImages";
-import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
+import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 import { ConditionalFreeShipmentPolicy } from "@constants/shop";
 
 export default function setShopInfo(

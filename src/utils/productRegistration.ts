@@ -56,13 +56,13 @@ import {
   CategoryName,
   ColorType,
   UploadedFileInfos,
-} from "@models/productRegistration/index";
+} from "@models/product/index";
 
-import { TagTypes } from "@models/productRegistration/searchTag";
+import { TagTypes } from "@models/product/searchTag";
 import {
   ShipmentChargeType,
   CreateShipmentInputType,
-} from "@models/productRegistration/shipmentTemplate";
+} from "@models/product/shipmentTemplate";
 
 export function restructureProductRegistrationStates(
   formContext: UseFormReturn

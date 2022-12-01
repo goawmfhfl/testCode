@@ -16,11 +16,11 @@ import {
   TextInputWrapper,
   ReturnExchangeFeeInputContainer,
   ShipmentChargeInputContainer,
-} from "@components/productRegistration/ShipmentChargeSection";
+} from "@components/productForm/ShipmentChargeSection";
 import closeIconSource from "@icons/delete.svg";
 import downwordArrowMedium from "@icons/arrow-downward-medium.svg";
 import { hasEveryInputFulfilled } from "@utils/index";
-import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
+import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 import { overModalVar } from "@cache/index";
 import { shipmentTemplateVar } from "@cache/productRegistration/shipmentTemplate";
 

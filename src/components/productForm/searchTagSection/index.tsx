@@ -7,14 +7,14 @@ import { useReactiveVar } from "@apollo/client";
 import Checkbox from "@components/common/input/Checkbox";
 import { Input as TextInput } from "@components/common/input/TextInput";
 import NoticeContainer from "@components/common/NoticeContainer";
-import SearchTag from "@components/productRegistration/searchTagSection/SearchTag";
+import SearchTag from "@components/productForm/searchTagSection/SearchTag";
 
 import questionMarkIconSource from "@icons/questionmark.svg";
 import rightArrowIconSource from "@icons/arrow-rightward-small.svg";
 import { tagListVar } from "@cache/productRegistration/searchTag";
 import { systemModalVar } from "@cache/index";
 import { HAS_TAG_INFOS } from "@cache/productRegistration/index";
-import { TagTypes } from "@models/productRegistration/searchTag";
+import { TagTypes } from "@models/product/searchTag";
 
 const SearchTagSection = () => {
   const { register, watch } = useFormContext();

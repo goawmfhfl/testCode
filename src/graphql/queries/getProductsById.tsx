@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-import { ProductType } from "@models/productRegistration/index";
+import { ProductType } from "@models/product/index";
 
 export interface GetProductsByIdType {
   getProductById: {

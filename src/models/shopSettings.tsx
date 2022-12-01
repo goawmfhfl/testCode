@@ -1,5 +1,5 @@
 import { UploadFileType } from "@models/index";
-import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
+import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 import {
   RETURN_POLICY,
   SHIPMENT_POLICY,

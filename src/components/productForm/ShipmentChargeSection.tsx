@@ -7,7 +7,7 @@ import TextInput from "@components/common/input/TextInput";
 import Dropdown from "@components/common/input/Dropdown";
 import Radio from "@components/common/input/Radio";
 import Button from "@components/common/Button";
-import ShipmentChargeTemplateModal from "@components/productRegistration/ShipmentChargeTemplateModal";
+import ShipmentChargeTemplateModal from "@components/productForm/ShipmentChargeTemplateModal";
 
 import { modalVar } from "@cache/index";
 import {
@@ -24,7 +24,7 @@ import { shipmentTemplatesVar } from "@cache/productRegistration/shipmentTemplat
 import {
   CreateShipmentInputType,
   ShipmentChargeType,
-} from "@models/productRegistration/shipmentTemplate";
+} from "@models/product/shipmentTemplate";
 
 const GET_SHIPMENT_TEMPLATES = gql`
   query GetUserShipmentTemplates {

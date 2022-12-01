@@ -27,7 +27,7 @@ import {
   DISCOUNT_STARTS_AT,
   HAS_DISCOUNT_SPAN,
 } from "@cache/productRegistration";
-import { DiscountMethod } from "@models/productRegistration";
+import { DiscountMethod } from "@models/product";
 import TextInput from "@components/common/input/TextInput";
 import Dropdown from "@components/common/input/Dropdown";
 import Checkbox from "@components/common/input/Checkbox";

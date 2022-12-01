@@ -13,70 +13,24 @@ import ContentsSection from "@components/common/ContentsSection";
 import SectionWrapper from "@components/common/SectionWrapper";
 import NoticeContainer from "@components/common/NoticeContainer";
 
-import NameSection from "@components/productRegistration/NameSection";
-import CategorySection from "@components/productRegistration/CategorySection";
-import ImageSection from "@components/productRegistration/imageSection/index";
-import ColorSection from "@components/productRegistration/ColorSection";
-import PriceSection from "@components/productRegistration/PriceSection";
-import DiscountSection from "@components/productRegistration/DiscountSection";
-import StockSection from "@components/productRegistration/StockSection";
-import RequiredOptionSection from "@components/productRegistration/optionSection/RequiredOption";
-import SelectiveOptionSection from "@components/productRegistration/optionSection/SelectiveOption";
-import OrderProductionSection from "@components/productRegistration/OrderProductionSection";
-import ShipmentChargeSection from "@components/productRegistration/ShipmentChargeSection";
-import SpecificationSection from "@components/productRegistration/SpecificationSection";
-import DescriptionSection from "@components/productRegistration/DescriptionSection";
+import NameSection from "@components/productForm/NameSection";
+import CategorySection from "@components/productForm/CategorySection";
+import ImageSection from "@components/productForm/imageSection/index";
+import ColorSection from "@components/productForm/ColorSection";
+import PriceSection from "@components/productForm/PriceSection";
+import DiscountSection from "@components/productForm/DiscountSection";
+import StockSection from "@components/productForm/StockSection";
+import RequiredOptionSection from "@components/productForm/optionSection/RequiredOption";
+import SelectiveOptionSection from "@components/productForm/optionSection/SelectiveOption";
+import OrderProductionSection from "@components/productForm/OrderProductionSection";
+import ShipmentChargeSection from "@components/productForm/ShipmentChargeSection";
+import SpecificationSection from "@components/productForm/SpecificationSection";
+import DescriptionSection from "@components/productForm/DescriptionSection";
 
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import questionMarkSource from "@icons/questionmark.svg";
-import SearchTagSection from "@components/productRegistration/searchTagSection";
+import SearchTagSection from "@components/productForm/searchTagSection";
 import { HeaderNames, PRODUCT_REGISTRATION_SECTIONS } from "@constants/index";
-
-export interface ProductRegistrationFormValues {
-  TITLE: string;
-  PRODUCT_DESCRIPTION: string;
-  PRODUCT_COLOR: Array<string>;
-  PRODUCT_PRICE: number;
-  IS_DISCOUNTED: boolean;
-  DISCOUNT_AMOUNT: number;
-  DISCOUNT_OPTION: string;
-  DISCOUNT_STARTS_AT: string;
-  DISCOUNT_ENDS_AT: string;
-  HAS_DISCOUNT_SPAN: boolean;
-  PRODUCT_STOCK: number;
-  HAS_REQUIRED_OPTION: boolean;
-  HAS_MANUFACTURING_LEAD_TIME: boolean;
-  LEAD_TIME_MAX: number;
-  LEAD_TIME_MIN: number;
-  SPEC_NAME: string;
-  MATERIAL: string;
-  SIZE: string;
-  WEIGHT: string;
-  MANUFACTURER: string;
-  PRECAUTION: string;
-  AUTHORIZATION: string;
-  PERSON_IN_CHARGE: string;
-  HAS_TAG_INFOS: boolean;
-  CATEGORY_FIRST: string;
-  CATEGORY_SECOND: string;
-  CATEGORY_THIRD: string;
-
-  productName: string;
-  productPrice: string;
-  productDescription: string;
-  productStock: string;
-  productNameSpec: string;
-  productTextileSpec: string;
-  discountValue: string;
-  minLeadTime: string;
-  maxLeadTime: string;
-  optionValues: string;
-  cautionsSpec: string;
-  certifiedMattersSpec: string;
-  countrysideAdditionalShipmentCharge: string;
-  contactInformationSpec: string;
-  deliveryFee: string;
-}
 
 import {
   GET_PRODUCTS_BY_ID,
@@ -85,7 +39,7 @@ import {
 } from "@graphql/queries/getProductsById";
 
 import { updatedProductRegistrationStatesVar } from "@cache/productRegistration";
-import { CreateProductInputType } from "@models/productRegistration/index";
+import { ProductFormValues } from "@models/product/index";
 
 interface LocationType {
   state: { productId: number | null };
@@ -100,7 +54,7 @@ const ProductRegistration = () => {
 
   const productId: number | undefined = state?.productId;
 
-  const methods = useForm<ProductRegistrationFormValues>();
+  const methods = useForm<ProductFormValues>();
 
   const watchAllField = methods.watch();
 

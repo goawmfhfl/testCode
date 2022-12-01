@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { useForm, FormProvider } from "react-hook-form";
-import { useLazyQuery } from "@apollo/client";
-import { useLocation } from "react-router-dom";
-import { useReactiveVar } from "@apollo/client";
 
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
@@ -13,226 +10,28 @@ import ContentsSection from "@components/common/ContentsSection";
 import SectionWrapper from "@components/common/SectionWrapper";
 import NoticeContainer from "@components/common/NoticeContainer";
 
-import NameSection from "@components/productRegistration/NameSection";
-import CategorySection from "@components/productRegistration/CategorySection";
-import ImageSection from "@components/productRegistration/imageSection/index";
-import ColorSection from "@components/productRegistration/ColorSection";
-import PriceSection from "@components/productRegistration/PriceSection";
-import DiscountSection from "@components/productRegistration/DiscountSection";
-import StockSection from "@components/productRegistration/StockSection";
-import RequiredOptionSection from "@components/productRegistration/optionSection/RequiredOption";
-import SelectiveOptionSection from "@components/productRegistration/optionSection/SelectiveOption";
-import OrderProductionSection from "@components/productRegistration/OrderProductionSection";
-import ShipmentChargeSection from "@components/productRegistration/ShipmentChargeSection";
-import SpecificationSection from "@components/productRegistration/SpecificationSection";
-import DescriptionSection from "@components/productRegistration/DescriptionSection";
+import NameSection from "@components/productForm/NameSection";
+import CategorySection from "@components/productForm/CategorySection";
+import ImageSection from "@components/productForm/imageSection/index";
+import ColorSection from "@components/productForm/ColorSection";
+import PriceSection from "@components/productForm/PriceSection";
+import DiscountSection from "@components/productForm/DiscountSection";
+import StockSection from "@components/productForm/StockSection";
+import RequiredOptionSection from "@components/productForm/optionSection/RequiredOption";
+import SelectiveOptionSection from "@components/productForm/optionSection/SelectiveOption";
+import OrderProductionSection from "@components/productForm/OrderProductionSection";
+import ShipmentChargeSection from "@components/productForm/ShipmentChargeSection";
+import SpecificationSection from "@components/productForm/SpecificationSection";
+import DescriptionSection from "@components/productForm/DescriptionSection";
 
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import questionMarkSource from "@icons/questionmark.svg";
-import SearchTagSection from "@components/productRegistration/searchTagSection";
+import SearchTagSection from "@components/productForm/searchTagSection";
 import { HeaderNames, PRODUCT_REGISTRATION_SECTIONS } from "@constants/index";
-
-export interface ProductRegistrationFormValues {
-  TITLE: string;
-  PRODUCT_DESCRIPTION: string;
-  PRODUCT_COLOR: Array<string>;
-  PRODUCT_PRICE: number;
-  IS_DISCOUNTED: boolean;
-  DISCOUNT_AMOUNT: number;
-  DISCOUNT_OPTION: string;
-  DISCOUNT_STARTS_AT: string;
-  DISCOUNT_ENDS_AT: string;
-  HAS_DISCOUNT_SPAN: boolean;
-  PRODUCT_STOCK: number;
-  HAS_REQUIRED_OPTION: boolean;
-  HAS_MANUFACTURING_LEAD_TIME: boolean;
-  LEAD_TIME_MAX: number;
-  LEAD_TIME_MIN: number;
-  SPEC_NAME: string;
-  MATERIAL: string;
-  SIZE: string;
-  WEIGHT: string;
-  MANUFACTURER: string;
-  PRECAUTION: string;
-  AUTHORIZATION: string;
-  PERSON_IN_CHARGE: string;
-  HAS_TAG_INFOS: boolean;
-  CATEGORY_FIRST: string;
-  CATEGORY_SECOND: string;
-  CATEGORY_THIRD: string;
-
-  productName: string;
-  productPrice: string;
-  productDescription: string;
-  productStock: string;
-  productNameSpec: string;
-  productTextileSpec: string;
-  discountValue: string;
-  minLeadTime: string;
-  maxLeadTime: string;
-  optionValues: string;
-  cautionsSpec: string;
-  certifiedMattersSpec: string;
-  countrysideAdditionalShipmentCharge: string;
-  contactInformationSpec: string;
-  deliveryFee: string;
-}
-
-import {
-  GET_PRODUCTS_BY_ID,
-  GetProductsByIdType,
-  GetProductsByIdInputType,
-} from "@graphql/queries/getProductsById";
-
-import { updatedProductRegistrationStatesVar } from "@cache/productRegistration";
-import { CreateProductInputType } from "@models/productRegistration/index";
-
-interface LocationType {
-  state: { productId: number | null };
-}
+import { ProductFormValues } from "@models/product";
 
 const ProductRegistration = () => {
-  const updatedProductRegistrationStates = useReactiveVar(
-    updatedProductRegistrationStatesVar
-  );
-
-  const { state } = useLocation() as LocationType;
-
-  const productId: number | undefined = state?.productId;
-
-  const methods = useForm<ProductRegistrationFormValues>();
-
-  const watchAllField = methods.watch();
-
-  const [getData] = useLazyQuery<GetProductsByIdType, GetProductsByIdInputType>(
-    GET_PRODUCTS_BY_ID,
-    {
-      variables: {
-        input: {
-          productId: productId,
-        },
-      },
-    }
-  );
-
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    productId &&
-      (async () => {
-        const {
-          data: {
-            getProductById: { product, ok, error },
-          },
-        } = await getData();
-
-        if (ok) {
-          updatedProductRegistrationStatesVar(product);
-        }
-
-        if (error) {
-          // TODO: 에러 핸들링 로직 추가
-          console.log(error);
-        }
-      })();
-  }, [productId]);
-
-  useEffect(() => {
-    methods.reset({
-      ...watchAllField,
-
-      // 상품명
-      TITLE: updatedProductRegistrationStates?.name
-        ? updatedProductRegistrationStates?.name
-        : "",
-      // 카테고리
-      CATEGORY_FIRST: updatedProductRegistrationStates?.category?.parent.name
-        ? updatedProductRegistrationStates?.category?.parent.name
-        : "",
-
-      CATEGORY_SECOND: updatedProductRegistrationStates?.category?.name
-        ? updatedProductRegistrationStates?.category?.name
-        : "",
-
-      CATEGORY_THIRD: updatedProductRegistrationStates?.category?.children.name
-        ? updatedProductRegistrationStates?.category?.children.name
-        : "",
-
-      // 상품설명
-      PRODUCT_DESCRIPTION: updatedProductRegistrationStates?.description,
-
-      // 상품 컬러
-      PRODUCT_COLOR: updatedProductRegistrationStates?.colors?.map(
-        (color) => color?.name
-      ),
-
-      // 판매가
-      PRODUCT_PRICE: updatedProductRegistrationStates?.originalPrice,
-
-      // 할인
-      IS_DISCOUNTED: updatedProductRegistrationStates?.discountAmount
-        ? true
-        : false,
-
-      // 할인 금액
-      DISCOUNT_AMOUNT: updatedProductRegistrationStates?.discountAmount,
-
-      // 할인 옵션
-      DISCOUNT_OPTION:
-        updatedProductRegistrationStates?.discountMethod === "PERCENT"
-          ? "PERCENT"
-          : "WON",
-
-      //  기간할인 설정
-      HAS_DISCOUNT_SPAN:
-        updatedProductRegistrationStates?.startDiscountDate &&
-        updatedProductRegistrationStates?.endDiscountDate
-          ? true
-          : false,
-
-      //  재고
-      PRODUCT_STOCK: updatedProductRegistrationStates?.quantity
-        ? updatedProductRegistrationStates?.quantity
-        : 0,
-
-      // 주문 후 제작 여부
-      HAS_MANUFACTURING_LEAD_TIME:
-        updatedProductRegistrationStates?.manufacturingLeadTime?.max &&
-        updatedProductRegistrationStates?.manufacturingLeadTime?.min
-          ? true
-          : false,
-      LEAD_TIME_MAX: updatedProductRegistrationStates?.manufacturingLeadTime
-        ?.max
-        ? updatedProductRegistrationStates?.manufacturingLeadTime?.max
-        : 0,
-      LEAD_TIME_MIN: updatedProductRegistrationStates?.manufacturingLeadTime
-        ?.min
-        ? updatedProductRegistrationStates?.manufacturingLeadTime?.min
-        : 0,
-
-      // 작품정보제공고시
-      SPEC_NAME: updatedProductRegistrationStates?.specName
-        ? updatedProductRegistrationStates?.specName
-        : "",
-      MATERIAL: updatedProductRegistrationStates?.material
-        ? updatedProductRegistrationStates?.material
-        : "",
-      SIZE: updatedProductRegistrationStates?.size
-        ? updatedProductRegistrationStates?.size
-        : "",
-      WEIGHT: updatedProductRegistrationStates?.weight
-        ? updatedProductRegistrationStates?.weight
-        : "",
-      PRECAUTION: updatedProductRegistrationStates?.precaution
-        ? updatedProductRegistrationStates?.precaution
-        : "",
-      AUTHORIZATION: updatedProductRegistrationStates?.authorization
-        ? updatedProductRegistrationStates?.authorization
-        : "",
-      PERSON_IN_CHARGE: updatedProductRegistrationStates?.personInCharge
-        ? updatedProductRegistrationStates?.personInCharge
-        : "",
-    });
-  }, [updatedProductRegistrationStates]);
+  const methods = useForm<ProductFormValues>();
 
   return (
     <FormProvider {...methods}>

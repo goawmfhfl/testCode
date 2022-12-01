@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { UploadedFileType } from "@models/productImages";
-import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
+import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 
 export interface ShopInfo {
   id: number;

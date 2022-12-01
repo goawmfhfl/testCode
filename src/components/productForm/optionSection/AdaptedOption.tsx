@@ -7,7 +7,7 @@ import {
   OptionRowType,
   OptionType,
   OptionTypes,
-} from "@models/productRegistration/options";
+} from "@models/product/options";
 import {
   requiredOptionVar,
   selectiveOptionVar,

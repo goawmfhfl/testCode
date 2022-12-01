@@ -5,12 +5,12 @@ import format from "date-fns/format";
 import styled, { useTheme } from "styled-components/macro";
 import { gql, useQuery, useMutation, useReactiveVar } from "@apollo/client";
 
-import CreateShipmentTemplateModal from "@components/productRegistration/CreateShipmentTemplateModal";
-import EditShipmentTemplateModal from "@components/productRegistration/EditShipmentTemplateModal";
+import CreateShipmentTemplateModal from "@components/productForm/CreateShipmentTemplateModal";
+import EditShipmentTemplateModal from "@components/productForm/EditShipmentTemplateModal";
 import Button from "@components/common/Button";
 import { modalVar, overModalVar, systemModalVar } from "@cache/index";
 import closeIconSource from "@icons/delete.svg";
-import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
+import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 import { isElementOverflown } from "@utils/index";
 import { tableScrollbarStyles } from "@styles/GlobalStyles";
 

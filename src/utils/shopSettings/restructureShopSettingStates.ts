@@ -24,7 +24,7 @@ import {
   settlementAccountVar,
 } from "@cache/shopSettings";
 
-import { ShipmentChargeType } from "@models/productRegistration/shipmentTemplate";
+import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 
 const restructureShopSettingStates = (
   watch: UseFormWatch<Record<string, any>>

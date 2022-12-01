@@ -2,7 +2,7 @@ import { gql, useMutation } from "@apollo/client";
 
 import ShipmentTemplateForm from "./ShipmentTemplateForm";
 import { overModalVar, systemModalVar } from "@cache/index";
-import { CreateShipmentInputType } from "@models/productRegistration/shipmentTemplate";
+import { CreateShipmentInputType } from "@models/product/shipmentTemplate";
 import {
   shipmentTemplateVar,
   initialState as shipmentTemplateInitialState,

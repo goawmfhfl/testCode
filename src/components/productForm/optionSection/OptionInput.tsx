@@ -7,7 +7,7 @@ import { useReactiveVar } from "@apollo/client";
 import TextInput from "@components/common/input/TextInput";
 import removeOptionIconSrc from "@icons/remove-option.svg";
 import addOptionInputIconSrc from "@icons/add-option-input.svg";
-import { OptionTypes } from "@models/productRegistration/options";
+import { OptionTypes } from "@models/product/options";
 import {
   requiredOptionVar,
   selectiveOptionVar,
