@@ -4,9 +4,9 @@ import { HeaderNames } from "@constants/index";
 import Layout from "@components/common/Layout";
 import ContentsContainer from "@components/common/ContentsContainer";
 import ContentsHeader from "@components/common/ContentsHeader";
-import FilterBar from "@components/productRegistration/productManagement/FilterBar";
-import Controller from "@components/productRegistration/productManagement/Controller";
-import ProductTable from "@components/productRegistration/productManagement/ProductTable";
+import FilterBar from "@components/productManagement/FilterBar";
+import Controller from "@components/productManagement/Controller";
+import ProductTable from "@components/productManagement/ProductTable";
 import Pagination from "@components/common/Pagination";
 
 import { commonFilterOptionVar } from "@cache/index";

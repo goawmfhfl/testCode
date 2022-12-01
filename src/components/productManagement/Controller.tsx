@@ -36,8 +36,8 @@ import {
 } from "@cache/productManagement";
 
 import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
-import ChangeCategoryModal from "@components/productRegistration/productManagement/ChangeCategoryModal";
-import ChangeDiscountModal from "@components/productRegistration/productManagement/ChangeDiscountModal";
+import ChangeCategoryModal from "@components/productManagement/ChangeCategoryModal";
+import ChangeDiscountModal from "@components/productManagement/ChangeDiscountModal";
 import Button from "@components/common/Button";
 import {
   SelectInput as Dropdown,

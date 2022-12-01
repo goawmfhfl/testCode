@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { useLazyQuery } from "@apollo/client";
 import { useLocation } from "react-router-dom";
 import { useReactiveVar } from "@apollo/client";

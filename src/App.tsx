@@ -12,7 +12,7 @@ import Login from "@pages/Login";
 import OAuth from "@pages/OAuth";
 import ShopSetting from "@pages/ShopSetting";
 import ProductManagement from "@pages/product/index";
-import ProductRegistration from "@pages/product/registration";
+import ProductRegistration from "@pages/product/Registration";
 import Order from "@pages/Order";
 import Inquiry from "@pages/Inquiry";
 import Settlement from "@pages/Settlement";

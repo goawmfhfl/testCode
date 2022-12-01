@@ -4,7 +4,7 @@ import styled, { useTheme } from "styled-components/macro";
 import { useFormContext, useWatch } from "react-hook-form";
 import { useReactiveVar } from "@apollo/client";
 
-import { ProductRegistrationFormValues } from "@pages/product/registration";
+import { ProductRegistrationFormValues } from "@pages/product/Registration";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Checkbox from "@components/common/input/Checkbox";
 import Button from "@components/common/Button";
