@@ -11,7 +11,7 @@ import {
   from,
 } from "@apollo/client";
 import App from "./App";
-import { systemModalVar } from "@cache/index";
+import { loadingSpinnerVisibilityVar, systemModalVar } from "@cache/index";
 import { AUTH_TOKEN_KEY } from "@constants/auth";
 
 const httpLink = createHttpLink({
@@ -32,6 +32,7 @@ const authLink = setContext((_, { headers }) => {
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (networkError) {
+    loadingSpinnerVisibilityVar(false);
     systemModalVar({
       ...systemModalVar(),
       isVisible: true,
