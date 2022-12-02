@@ -80,7 +80,7 @@ const SaveBar = () => {
     },
   });
 
-  const [submitShopSettings] =
+  const [submitShopSettings, { loading: isLoadingSubmission }] =
     useMutation<
       {
         registerShop: {
@@ -93,7 +93,7 @@ const SaveBar = () => {
       }
     >(SAVE_SHOP_SETTINGS);
 
-  const { data: shopData, loading } = useShopInfo();
+  const { data: shopData } = useShopInfo();
 
   const handleTemporarySaveButtonClick = async (
     e: React.MouseEvent<HTMLButtonElement>
@@ -104,15 +104,11 @@ const SaveBar = () => {
 
     const temporarySaveShopInput = restructureShopSettingStates(watch);
 
-    console.log("보내는 인풋", temporarySaveShopInput);
-
     const result = await temporarySaveShopSettings({
       variables: {
         input: temporarySaveShopInput,
       },
     });
-
-    console.log("result", result);
 
     const {
       data: {
@@ -153,6 +149,8 @@ const SaveBar = () => {
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
     e.preventDefault();
+    loadingSpinnerVisibilityVar(true);
+
     const input = restructureShopSettingStates(watch);
 
     const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
@@ -213,6 +211,8 @@ const SaveBar = () => {
 
       contentsContainerReferenceVar().scrollTo(0, scrollTo);
 
+      loadingSpinnerVisibilityVar(false);
+
       return;
     }
 
@@ -237,6 +237,8 @@ const SaveBar = () => {
       });
 
       console.log(error);
+
+      loadingSpinnerVisibilityVar(false);
 
       return;
     }
@@ -275,6 +277,8 @@ const SaveBar = () => {
         },
       });
     }
+
+    loadingSpinnerVisibilityVar(false);
   };
 
   const hasShopRegistered = shopData?.getShopInfo.registered;
@@ -303,6 +307,7 @@ const SaveBar = () => {
           form="hook-form"
           // eslint-disable-next-line
           onClick={handleSubmitButtonClick}
+          disabled={isLoadingSubmission}
         >
           {hasShopRegistered ? "저장" : "등록"}
         </SubmitButton>

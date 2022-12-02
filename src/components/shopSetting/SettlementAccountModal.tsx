@@ -12,6 +12,7 @@ import { modalVar, systemModalVar } from "@cache/index";
 import { settlementAccountVar } from "@cache/shopSettings";
 import { isNumber } from "@utils/index";
 import AuthenticationLoader from "@components/shopSetting/AuthenticationLoader";
+import { AUTH_TOKEN_KEY } from "@constants/auth";
 
 const SettlementAccountModal = () => {
   const [accountInformation, setAccountInformation] = useState<{
@@ -34,67 +35,33 @@ const SettlementAccountModal = () => {
     if (!hasTriedAuthentication) setHasTriedAuthentication(true);
 
     try {
-      const configs = {
-        headers: { Authorization: process.env.REACT_APP_DATA_API_KEY || "" },
-      };
+      const token = sessionStorage.getItem(AUTH_TOKEN_KEY);
 
-      const { accountNumber, accountName, bankCode } = accountInformation;
-
-      setIsLoading(true);
-
-      const response: {
+      const result: {
         data: {
-          data: {
-            OUTRSLTMSG: string;
-            RESULT: string;
+          response: {
+            bank_holder: string;
           };
-          result: string;
         };
-      } = await axios.post(
-        `${process.env.REACT_APP_DATAHUB_API_URL_DEV}/scrap/common/settlebank/accountOwner`,
-        {
-          ACCTNO: accountNumber,
-          BANKCODE: bankCode,
-          CUSTNM: accountName,
+      } = await axios({
+        url: `${process.env.REACT_APP_SERVER_URI}/payments/validateAccount`,
+        method: "GET",
+        params: {
+          bankCode: accountInformation.bankCode,
+          accountNumber: accountInformation.accountNumber,
         },
-        configs
-      );
+        headers: {
+          "x-jwt": token,
+        },
+      });
 
-      console.log(response);
-
-      // API Error
-      if (response.data.result === "ERROR") {
-        systemModalVar({
-          ...systemModalVar(),
-          isVisible: true,
-          description: (
-            <>
-              인증 서비스에 문제가 발생하였습니다.
-              <br />
-              찹스틱스로 문의해주시면
-              <br />
-              빠르게 조치하겠습니다.
-              <br />
-              (문의 전화 070-4187-3848)
-            </>
-          ),
-        });
-
-        console.log("정산 계좌 확인 요청 에러", response.data);
-
-        return;
+      if (result.data.response.bank_holder) {
+        setIsAuthenticated(true);
       }
-
-      // User Input Error
-      if (response.data.data.RESULT === "FAILURE") {
-        setIsAuthenticated(false);
-
-        return;
-      }
-
-      setIsAuthenticated(true);
     } catch (error) {
       console.log(error);
+
+      setIsAuthenticated(false);
     }
   };
 
