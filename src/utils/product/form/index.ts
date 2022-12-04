@@ -1,5 +1,7 @@
 import { last } from "lodash";
-import { UseFormReturn } from "react-hook-form";
+import { v4 as uuidv4 } from "uuid";
+import { UseFormReturn, UseFormReset } from "react-hook-form";
+import { ProductFormValues } from "@models/product/index";
 
 import {
   TITLE,
@@ -36,33 +38,34 @@ import {
   AUTHORIZATION,
   PERSON_IN_CHARGE,
   HAS_TAG_INFOS,
-} from "@cache/productRegistration";
-
+} from "@cache/productForm";
 import {
   requiredImagesVar,
   optionalImagesVar,
-} from "@cache/productRegistration/productImages";
-
+  requiredImagesInitialValue,
+  optionalImagesInitialValue,
+} from "@cache/productForm/productImages";
 import {
   requiredOptionVar,
   selectiveOptionVar,
-} from "@cache/productRegistration/productOptions";
-
-import { shipmentTemplatesVar } from "@cache/productRegistration/shipmentTemplate";
-
-import { tagListVar } from "@cache/productRegistration/searchTag";
+} from "@cache/productForm/productOptions";
+import { shipmentTemplatesVar } from "@cache/productForm/shipmentTemplate";
+import { tagListVar } from "@cache/productForm/searchTag";
 
 import {
   CategoryName,
   ColorType,
   UploadedFileInfos,
 } from "@models/product/index";
-
 import { TagTypes } from "@models/product/searchTag";
 import {
   ShipmentChargeType,
   CreateShipmentInputType,
 } from "@models/product/shipmentTemplate";
+import {
+  descriptionImagesInitialValue,
+  descriptionImagesVar,
+} from "@cache/productForm/descriptionImages";
 
 export function restructureProductRegistrationStates(
   formContext: UseFormReturn
@@ -123,7 +126,7 @@ export function restructureProductRegistrationStates(
   return {
     name,
     categoryName: getCategoryName(formContext),
-    uploadedFileInfos: getPhotoInfos(),
+    uploadedFileInfos: combineProductFormImages(),
     description,
     colors: colors.map((color) => ({ name: color })),
     originalPrice: Number(originalPrice),
@@ -154,18 +157,25 @@ export function restructureProductRegistrationStates(
   };
 }
 
-function getPhotoInfos(): Array<UploadedFileInfos> {
-  const requiredImages = [...requiredImagesVar()].map(({ type, url }) => ({
+function combineProductFormImages(): Array<UploadedFileInfos> {
+  const requiredImages = requiredImagesVar().map(({ type, url }) => ({
     type,
     url,
   }));
 
-  const optionalImages = [...optionalImagesVar()].map(({ type, url }) => ({
+  const optionalImages = optionalImagesVar().map(({ type, url }) => ({
     type,
     url,
   }));
 
-  return [...requiredImages, ...optionalImages].filter((image) => image.url);
+  const descriptionImages = descriptionImagesVar().map(({ type, url }) => ({
+    type,
+    url,
+  }));
+
+  return [...requiredImages, ...optionalImages, ...descriptionImages].filter(
+    (image) => image.url
+  );
 }
 
 function getCategoryName(formContext: UseFormReturn): CategoryName {
@@ -271,4 +281,43 @@ export function getDiscountedPrice(
   }
 
   return String(originalPrice);
+}
+
+export function resetForm(reset: UseFormReset<ProductFormValues>) {
+  reset();
+
+  // TODO: reactive var로 관리되는 인풋상태들을 모두 초기화
+  initializeProductImages();
+  initializeOptionalImages();
+  initializeDescriptionImages();
+}
+
+function initializeProductImages() {
+  requiredImagesVar([
+    ...requiredImagesInitialValue.map((img) => ({
+      ...img,
+      id: uuidv4(),
+      url: "",
+    })),
+  ]);
+}
+
+function initializeOptionalImages() {
+  optionalImagesVar([
+    ...optionalImagesInitialValue.map((img) => ({
+      ...img,
+      id: uuidv4(),
+      url: "",
+    })),
+  ]);
+}
+
+function initializeDescriptionImages() {
+  descriptionImagesVar([
+    ...descriptionImagesInitialValue.map((img) => ({
+      ...img,
+      id: uuidv4(),
+      url: "",
+    })),
+  ]);
 }

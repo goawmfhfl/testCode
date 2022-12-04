@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import {
   FormProvider,
   useForm,
@@ -26,7 +26,7 @@ import {
   DISCOUNT_OPTION,
   DISCOUNT_STARTS_AT,
   HAS_DISCOUNT_SPAN,
-} from "@cache/productRegistration";
+} from "@cache/productForm";
 import { DiscountMethod } from "@models/product";
 import TextInput from "@components/common/input/TextInput";
 import Dropdown from "@components/common/input/Dropdown";

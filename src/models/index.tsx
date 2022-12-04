@@ -2,6 +2,7 @@ export enum UploadFileType {
   PRODUCT_THUMBNAIL = "PRODUCT_THUMBNAIL",
   PRODUCT_REQUIRED = "PRODUCT_REQUIRED",
   PRODUCT_OPTIONAL = "PRODUCT_OPTIONAL",
+  PRODUCT_DETAIL_PAGE = "PRODUCT_DETAIL_PAGE",
   SHOP_MOBILE = "SHOP_MOBILE",
   SHOP_PC = "SHOP_PC",
   SHOP_REGISTER_PDF = "SHOP_REGISTER_PDF",
@@ -106,3 +107,8 @@ export interface CommonFilterOptionType {
   skip: number;
   query: string;
 }
+
+export type QueryResponse<T> = T & {
+  ok: boolean;
+  error: string | null;
+};

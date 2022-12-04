@@ -28,6 +28,7 @@
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "react": "^18.2.0",
+    "react-datepicker": "^4.8.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.32.2",
     "react-loader-spinner": "^5.3.4",
@@ -86,6 +87,7 @@
     ]
   },
   "devDependencies": {
+    "@hookform/devtools": "^4.2.3",
     "@storybook/addon-actions": "^6.5.9",
     "@storybook/addon-essentials": "^6.5.9",
     "@storybook/addon-interactions": "^6.5.9",

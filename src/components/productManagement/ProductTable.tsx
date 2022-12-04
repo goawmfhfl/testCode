@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import { useMutation, useReactiveVar } from "@apollo/client";
 
 import { tableData } from "@cache/productManagement/table";
-
 import {
   filterOptionVar,
   showHasServerErrorModal,
 } from "@cache/productManagement";
-
 import {
   checkAllBoxStatusVar,
   checkedProductIdsVar,
@@ -19,9 +17,7 @@ import {
   pageNumberListVar,
   paginationVisibilityVar,
 } from "@cache/index";
-
 import { ProductStatus, productStatus, productType } from "@constants/product";
-
 import {
   GET_ALL_PRODUCTS_BY_SELLER,
   ProductsType,
@@ -31,14 +27,10 @@ import {
   ChangeProductsInfoBySellerType,
   CHANGE_PRODUCTS_INFO_BY_SELLER,
 } from "@graphql/mutations/changeProductsInfoBySeller";
-
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
-
 import { TableType } from "@models/index";
-
 import useLazyProducts from "@hooks/product/useLazyProducts";
-
-import { getDiscountedPrice } from "@utils/productRegistration";
+import { getDiscountedPrice } from "@utils/product/form/index";
 import {
   ThContainer,
   Th,
@@ -273,7 +265,7 @@ const ProductTable = () => {
     <TableContainer type={TableType.FIX}>
       <ThContainer>
         {tableData.map(({ id, label, width, className }) => (
-          <Th key={id} width={width} className={className}>
+          <Th key={`th-${id}`} width={width} className={className}>
             {label === "checkBox" ? (
               <Checkbox
                 onChange={changeAllCheckBoxHandler}
@@ -292,7 +284,7 @@ const ProductTable = () => {
         <TdContainer>
           {products?.map(
             ({
-              id,
+              id: productId,
               name,
               category,
               originalPrice,
@@ -333,23 +325,23 @@ const ProductTable = () => {
               )} ₩`;
 
               return (
-                <Tr key={id}>
-                  <ProductManageMentTd
+                <Tr key={`product-${productId}-row`}>
+                  <TableData
                     width={tableData[0].width}
                     className={tableData[0].className}
                   >
                     <Checkbox
-                      onChange={changeSingleCheckBoxHandler(id)}
-                      checked={isCheckedList[id]?.isChecked || false}
+                      onChange={changeSingleCheckBoxHandler(productId)}
+                      checked={isCheckedList[productId]?.isChecked || false}
                     />
-                  </ProductManageMentTd>
-                  <ProductManageMentTd
+                  </TableData>
+                  <TableData
                     width={tableData[1].width}
                     className={tableData[1].className}
                   >
-                    {id}
-                  </ProductManageMentTd>
-                  <ProductManageMentTd
+                    {productId}
+                  </TableData>
+                  <TableData
                     width={tableData[2].width}
                     className={tableData[2].className}
                   >
@@ -357,67 +349,66 @@ const ProductTable = () => {
                       <ProductThumbNail src={thumbnail} />
                     </ProductThumbNailWrapper>
                     <ProductName>
-                      <Link to={`/product/${id}`} state={{ productId: id }}>
-                        {name}
-                      </Link>
+                      <Link to={`/product/${productId}`}>{name}</Link>
                     </ProductName>
-                  </ProductManageMentTd>
-                  <ProductManageMentTd
+                  </TableData>
+                  <TableData
                     width={tableData[3].width}
                     className={tableData[3].className}
                   >
                     {firstCategory}
-                  </ProductManageMentTd>
-                  <ProductManageMentTd
+                  </TableData>
+                  <TableData
                     width={tableData[4].width}
                     className={tableData[4].className}
                   >
                     {secondCategory}
-                  </ProductManageMentTd>
-                  <ProductManageMentTd
+                  </TableData>
+                  <TableData
                     width={tableData[5].width}
                     className={tableData[5].className}
                   >
                     {thirdCategory}
-                  </ProductManageMentTd>
-                  <ProductManageMentTd
+                  </TableData>
+                  <TableData
                     width={tableData[6].width}
                     className={tableData[6].className}
                   >
                     {originalPriceToWonSign}
-                  </ProductManageMentTd>
-                  <ProductManageMentTd
+                  </TableData>
+                  <TableData
                     width={tableData[7].width}
                     className={tableData[7].className}
                   >
                     {rateOfDiscount}
-                  </ProductManageMentTd>
-                  <ProductManageMentTd
+                  </TableData>
+                  <TableData
                     width={tableData[8].width}
                     className={tableData[8].className}
                   >
                     {discountAppliedPrice}
-                  </ProductManageMentTd>
-                  <ProductManageMentTd
+                  </TableData>
+                  <TableData
                     width={tableData[9].width}
                     className={tableData[9].className}
                   >
                     {quantity}
-                  </ProductManageMentTd>
-                  <ProductManageMentTd
+                  </TableData>
+                  <TableData
                     width={tableData[10].width}
                     className={tableData[10].className}
                   >
                     <Dropdown
-                      onChange={changeSingleSaleStatusHandler(id)}
+                      onChange={changeSingleSaleStatusHandler(productId)}
                       arrowSrc={triangleArrowSvg}
                       value={status}
                       sizing={"medium"}
                       width={"146px"}
+                      disabled={status === ProductStatus.TEMPORARY}
                     >
-                      {productStatus.map(({ id, label, value }) => (
+                      {productStatus.map(({ label, value }) => (
                         <Option
-                          key={id}
+                          key={`product-${productId}-status-${label}`}
                           value={value}
                           hidden={value === ProductStatus.DEFAULT}
                         >
@@ -425,7 +416,7 @@ const ProductTable = () => {
                         </Option>
                       ))}
                     </Dropdown>
-                  </ProductManageMentTd>
+                  </TableData>
                 </Tr>
               );
             }
@@ -450,7 +441,7 @@ const ProductTable = () => {
   );
 };
 
-const ProductManageMentTd = styled(Td)`
+const TableData = styled(Td)`
   &.name {
     justify-content: flex-start;
   }

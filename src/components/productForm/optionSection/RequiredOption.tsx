@@ -10,8 +10,8 @@ import Button from "@components/common/Button";
 import OptionInput from "@components/productForm/optionSection/OptionInput";
 import AdaptedOption from "@components/productForm/optionSection/AdaptedOption";
 
-import { HAS_REQUIRED_OPTION } from "@cache/productRegistration/index";
-import { requiredOptionVar } from "@cache/productRegistration/productOptions";
+import { HAS_REQUIRED_OPTION } from "@cache/productForm/index";
+import { requiredOptionVar } from "@cache/productForm/productOptions";
 import { OptionInputType, OptionTypes } from "@models/product/options";
 import { isElementOverflown } from "@utils/index";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import React, { useState, useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { useReactiveVar } from "@apollo/client";
@@ -11,7 +11,7 @@ import { OptionTypes } from "@models/product/options";
 import {
   requiredOptionVar,
   selectiveOptionVar,
-} from "@cache/productRegistration/productOptions";
+} from "@cache/productForm/productOptions";
 
 const OptionInput = ({
   optionType,

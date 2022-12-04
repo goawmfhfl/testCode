@@ -6,7 +6,7 @@ import { CreateShipmentInputType } from "@models/product/shipmentTemplate";
 import {
   shipmentTemplateVar,
   initialState as shipmentTemplateInitialState,
-} from "@cache/productRegistration/shipmentTemplate";
+} from "@cache/productForm/shipmentTemplate";
 
 const CREATE_SHIPMENT_TEMPLATE = gql`
   mutation CreateShipmentTemplate($input: CreateShipmentTemplateInput!) {

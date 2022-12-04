@@ -11,7 +11,7 @@ import {
   PRECAUTION,
   AUTHORIZATION,
   PERSON_IN_CHARGE,
-} from "@cache/productRegistration/index";
+} from "@cache/productForm/index";
 
 const ProductSpecification = () => {
   const { register } = useFormContext();

@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 declare module "styled-components" {
   export interface DefaultTheme {

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import { useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { useReactiveVar } from "@apollo/client";
@@ -9,9 +9,10 @@ import ProductImage from "@components/productForm/imageSection/common/ProductIma
 import AddImageInputWrapper from "@components/productForm/imageSection/common/AddImageInputWrapper";
 import AddImageInput from "@components/productForm/imageSection/common/AddImageInput";
 
-import { ProductImageType, UploadedFileType } from "@models/productImages";
+import { UploadFileType } from "@models/index";
+import { ProductImageType } from "@models/product/productImages";
 
-import { optionalImagesVar } from "@cache/productRegistration/productImages";
+import { optionalImagesVar } from "@cache/productForm/productImages";
 import {
   addImageOnServer,
   removeImageFromServer,
@@ -130,7 +131,7 @@ const ProductImageSection = () => {
 
     optionalImagesVar([
       ...optionalImagesVar(),
-      { id: uuidv4(), url: "", type: UploadedFileType.PRODUCT_OPTIONAL },
+      { id: uuidv4(), url: "", type: UploadFileType.PRODUCT_OPTIONAL },
     ]);
   }, [optionalImages]);
 

@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useReactiveVar } from "@apollo/client";
@@ -7,44 +7,30 @@ import { commonFilterOptionVar, paginationSkipVar } from "@cache/index";
 import { filterOptionVar } from "@cache/productManagement";
 import { Pathnames } from "@constants/index";
 import { ProductStatus } from "@constants/product";
-
 import useLazyAllProductStatus from "@hooks/product/useLazyAllProductStatus";
-
-import questionMarkSrc from "@icons/questionmark.svg";
-import Button from "@components/common/Button";
 import useLazyProducts from "@hooks/product/useLazyProducts";
+import { getProductLength } from "@utils/product/management";
+import questionMarkSrc from "@icons/questionmark.svg";
+
+import Button from "@components/common/Button";
 import FilterBarContainer from "@components/order/FilterBarContainer";
 
 const FilterBar = () => {
   const navigate = useNavigate();
 
-  const {
-    loading,
-    error,
-    data: productStatus,
-    getAllProductStatus,
-  } = useLazyAllProductStatus();
-
+  const { data: productStatus, getAllProductStatus } =
+    useLazyAllProductStatus();
   const { data: productsData, getProducts } = useLazyProducts();
-
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { status } = useReactiveVar(filterOptionVar);
+  const { query } = useReactiveVar(commonFilterOptionVar);
+  const { status: selectedStatus } = useReactiveVar(filterOptionVar);
 
   const products = productStatus?.getAllProductsBySeller.products || [];
+  const productLength = getProductLength(products);
 
   const searchResultLength =
     productsData?.getAllProductsBySeller.totalResults || 0;
-  const productsLength = {
-    allProducts: products.length,
-    onSale: products.filter((list) => list.status === ProductStatus.ON_SALE)
-      .length,
-    stopSale: products.filter((list) => list.status === ProductStatus.STOP_SALE)
-      .length,
-    soldOut: products.filter((list) => list.status === ProductStatus.SOLD_OUT)
-      .length,
-  };
 
-  const { allProducts, onSale, stopSale, soldOut } = productsLength;
+  const { allProducts, onSale, stopSale, soldOut, temporary } = productLength;
 
   const handleFilterOptionNameClick =
     (filterOptionName: ProductStatus) => () => {
@@ -84,7 +70,7 @@ const FilterBar = () => {
           input: {
             page: null,
             skip: null,
-            status,
+            status: selectedStatus,
             query,
           },
         },
@@ -110,28 +96,34 @@ const FilterBar = () => {
       <FilterList>
         <Filter
           onClick={handleFilterOptionNameClick(null)}
-          isActvie={status === null}
+          isActive={selectedStatus === null}
         >
           전체 {allProducts}
         </Filter>
         <Filter
           onClick={handleFilterOptionNameClick(ProductStatus.ON_SALE)}
-          isActvie={status === ProductStatus.ON_SALE}
+          isActive={selectedStatus === ProductStatus.ON_SALE}
         >
           판매중 {onSale}
         </Filter>
         <Filter
           onClick={handleFilterOptionNameClick(ProductStatus.STOP_SALE)}
-          isActvie={status === ProductStatus.STOP_SALE}
+          isActive={selectedStatus === ProductStatus.STOP_SALE}
         >
           숨김 {stopSale}
         </Filter>
         <Filter
           onClick={handleFilterOptionNameClick(ProductStatus.SOLD_OUT)}
-          isActvie={status === ProductStatus.SOLD_OUT}
+          isActive={selectedStatus === ProductStatus.SOLD_OUT}
         >
           <QuestionMarkIcon src={questionMarkSrc} />
           품절 {soldOut}
+        </Filter>
+        <Filter
+          onClick={handleFilterOptionNameClick(ProductStatus.TEMPORARY)}
+          isActive={selectedStatus === ProductStatus.TEMPORARY}
+        >
+          임시저장 {temporary}
         </Filter>
       </FilterList>
     </FilterBarContainer>
@@ -153,15 +145,15 @@ const FilterList = styled.ul`
   text-align: left;
 `;
 
-const Filter = styled.li<{ isActvie: boolean }>`
+const Filter = styled.li<{ isActive: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
 
   padding: 14px 56px;
   border-bottom: 1px solid
-    ${({ theme: { palette }, isActvie }) =>
-      isActvie ? palette.grey500 : "none"};
+    ${({ theme: { palette }, isActive }) =>
+      isActive ? palette.grey500 : "none"};
 
   cursor: pointer;
 `;

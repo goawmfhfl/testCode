@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 import { useReactiveVar } from "@apollo/client";
 
@@ -36,7 +36,7 @@ const Container = styled.div`
   align-items: flex-end;
 
   width: 100%;
-  min-width: 1182px;
+  /* min-width: 1182px; */
 
   margin-bottom: 12px;
 
@@ -73,5 +73,6 @@ const Filter = styled.li<{ isActvie: boolean }>`
 
 const ButtonWrapper = styled.div`
   background-color: ${({ theme: { palette } }) => palette.white};
+  border: ${({ theme }) => `1px solid ${theme.palette.grey500}`};
 `;
 export default FilterBarContainer;

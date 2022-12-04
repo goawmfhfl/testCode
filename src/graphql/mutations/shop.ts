@@ -24,6 +24,7 @@ export const TEMPORARY_SAVE_PRODUCT = gql`
     temporarySaveProduct(input: $input) {
       ok
       error
+      productId
     }
   }
 `;

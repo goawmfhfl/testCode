@@ -10,7 +10,7 @@ import {
   SearchTag as SearchTagType,
 } from "@models/product/searchTag";
 import { systemModalVar } from "@cache/index";
-import { tagListVar } from "@cache/productRegistration/searchTag";
+import { tagListVar } from "@cache/productForm/searchTag";
 
 interface SearchTagProps {
   id?: string;

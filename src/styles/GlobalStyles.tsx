@@ -1,4 +1,4 @@
-import { createGlobalStyle, css } from "styled-components";
+import { createGlobalStyle, css } from "styled-components/macro";
 import { reset } from "styled-reset";
 
 const GlobalStyles = createGlobalStyle<{ isModalVisible: boolean }>`
@@ -98,6 +98,24 @@ const GlobalStyles = createGlobalStyle<{ isModalVisible: boolean }>`
       font-family: "Spoqa Han Sans Neo";
       font-weight: 200;
       src: url("/fonts/SpoqaHanSansNeo/Thin.woff2") format("woff2");
+    }
+
+    .react-datepicker-wrapper,
+    .react-datepicker__input-container,
+    .date-picker {
+      max-width: 112px;
+    }
+
+    .date-picker {
+      border: ${({ theme }) => `1px solid ${theme.palette.grey500}`};
+      padding: 9px 8px;
+      ${({ theme }) => theme.typo.korean.body.primary.basic};
+
+      &:disabled {
+        background-color: ${({ theme }) => theme.palette.grey100};
+        color: ${({ theme }) => theme.palette.grey500};
+        pointer-events: none;
+      }
     }
 `;
 

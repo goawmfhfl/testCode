@@ -18,8 +18,8 @@ import {
   SHIPMENT_DISTANT_PRICE,
   RETURN_PRICE,
   EXCHANGE_PRICE,
-} from "@cache/productRegistration/index";
-import { shipmentTemplatesVar } from "@cache/productRegistration/shipmentTemplate";
+} from "@cache/productForm/index";
+import { shipmentTemplatesVar } from "@cache/productForm/shipmentTemplate";
 
 import {
   CreateShipmentInputType,
@@ -47,7 +47,7 @@ const GET_SHIPMENT_TEMPLATES = gql`
   }
 `;
 
-const ProductShipmentCharge = () => {
+const ShipmentChargeSection = () => {
   const theme = useTheme();
   const { register, setValue, watch } = useFormContext();
 
@@ -94,6 +94,8 @@ const ProductShipmentCharge = () => {
       const {
         getUserShipmentTemplates: { shipmentTemplates },
       } = data || { getUserShipmentTemplates: {} };
+
+      if (!shipmentTemplates) return;
 
       shipmentTemplatesVar([...shipmentTemplates]);
     })();
@@ -364,4 +366,4 @@ export const TextInputWrapper = styled.div<{
   margin-left: ${({ hasLeftMargin }) => (hasLeftMargin ? "8px" : "")};
 `;
 
-export default ProductShipmentCharge;
+export default ShipmentChargeSection;

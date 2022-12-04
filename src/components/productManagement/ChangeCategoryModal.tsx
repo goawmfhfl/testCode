@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useMutation, useReactiveVar } from "@apollo/client";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import {
   checkedProductIdsVar,
   DetailNoticeVar,
@@ -13,7 +13,7 @@ import {
   CATEGORY_FIRST,
   CATEGORY_SECOND,
   CATEGORY_THIRD,
-} from "@cache/productRegistration";
+} from "@cache/productForm";
 
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
 import questionMarkIconSrc from "@icons/questionmark.svg";

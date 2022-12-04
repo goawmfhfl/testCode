@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { UploadedFileType } from "@models/productImages";
+import { UploadFileType } from "@models/index";
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 
 export interface ShopInfo {
@@ -9,7 +9,7 @@ export interface ShopInfo {
   description: string;
   uploadedFileUrls: Array<{
     url: string;
-    type: UploadedFileType;
+    type: UploadFileType;
   }>;
   shipmentPolicy: string;
   returnPolicy: string;

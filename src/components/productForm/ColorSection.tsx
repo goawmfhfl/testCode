@@ -5,7 +5,7 @@ import { useFormContext } from "react-hook-form";
 
 import checkedIconSrc from "@icons/checkbox-checked-white.svg";
 import darkCheckedIconSrc from "@icons/checkbox-checked-grey.svg";
-import { PRODUCT_COLOR } from "@cache/productRegistration/index";
+import { PRODUCT_COLOR } from "@cache/productForm/index";
 import { ColorType, ColorInputType } from "@models/product/index";
 
 const colors: Array<ColorInputType> = [

@@ -2,7 +2,7 @@ import styled from "styled-components/macro";
 import { useFormContext } from "react-hook-form";
 
 import TextInput from "@components/common/input/TextInput";
-import { PRODUCT_PRICE } from "@cache/productRegistration/index";
+import { PRODUCT_PRICE } from "@cache/productForm/index";
 
 const ProductPrice = () => {
   const { register } = useFormContext();

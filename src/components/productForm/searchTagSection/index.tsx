@@ -11,9 +11,9 @@ import SearchTag from "@components/productForm/searchTagSection/SearchTag";
 
 import questionMarkIconSource from "@icons/questionmark.svg";
 import rightArrowIconSource from "@icons/arrow-rightward-small.svg";
-import { tagListVar } from "@cache/productRegistration/searchTag";
+import { tagListVar } from "@cache/productForm/searchTag";
 import { systemModalVar } from "@cache/index";
-import { HAS_TAG_INFOS } from "@cache/productRegistration/index";
+import { HAS_TAG_INFOS } from "@cache/productForm/index";
 import { TagTypes } from "@models/product/searchTag";
 
 const SearchTagSection = () => {

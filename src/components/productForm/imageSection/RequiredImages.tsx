@@ -15,11 +15,11 @@ import {
   validateImageSize,
 } from "@utils/index";
 
-import { ProductImageType } from "@models/productImages";
+import { ProductImageType } from "@models/product/productImages";
 
 import { systemModalVar } from "@cache/index";
 import { useReactiveVar } from "@apollo/client";
-import { requiredImagesVar } from "@cache/productRegistration/productImages";
+import { requiredImagesVar } from "@cache/productForm/productImages";
 
 const RequiredImages = () => {
   const requiredImages = useReactiveVar(requiredImagesVar);

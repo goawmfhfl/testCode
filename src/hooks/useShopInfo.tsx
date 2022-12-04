@@ -10,10 +10,7 @@ export type ShopInfoResult = QueryResult<
 >;
 
 export default function useShopInfo(): ShopInfoResult {
-  const result =
-    useQuery<{
-      getShopInfo: ShopInfo;
-    }>(GET_SHOP_INFO);
-
-  return result;
+  return useQuery<{
+    getShopInfo: ShopInfo;
+  }>(GET_SHOP_INFO);
 }

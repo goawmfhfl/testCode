@@ -1,4 +1,5 @@
-import { UploadedFileType } from "@models/productImages";
+import { ProductStatus } from "@constants/product";
+import { UploadFileType } from "@models/index";
 import { ShipmentChargeType } from "./shipmentTemplate";
 
 export enum CategoryName {
@@ -43,7 +44,7 @@ export enum CategoryName {
 
 export interface UploadedFileInfos {
   url: string;
-  type: UploadedFileType;
+  type: UploadFileType;
 }
 
 export enum ColorType {
@@ -80,6 +81,7 @@ export enum DiscountMethod {
 }
 
 export interface TemporarySaveProductInputType {
+  productId: null | number;
   name: string;
   categoryName: CategoryName;
   uploadedFileInfos: Array<UploadedFileInfos>;
@@ -184,6 +186,9 @@ export interface ProductType {
   colors: Array<{
     name: ColorType;
   }>;
+  status: ProductStatus;
+  createdAt: Date;
+  updatedAt: Date;
 
   originalPrice: number;
   discountAmount: number;
@@ -195,8 +200,6 @@ export interface ProductType {
     min: number;
     max: number;
   };
-
-  uploadedFileInfos: Array<UploadedFileInfos>;
 
   optionCombinations: Array<{
     components: Array<{ name: string; value: string }>;
@@ -222,11 +225,7 @@ export interface ProductType {
   authorization: string;
   personInCharge: string;
 
-  category: {
-    name: string;
-    parent: { name: string };
-    children: { name: string };
-  };
+  category: ProductCategory;
 
   productToTags?: Array<{
     id: number;
@@ -236,18 +235,33 @@ export interface ProductType {
     isExposed: boolean;
     tag: Array<{ id: number; name: string }>;
   }>;
+
+  uploadedFileUrls: Array<{
+    id: number;
+    url: string;
+    type: UploadFileType;
+  }>;
+}
+
+export interface ProductCategory {
+  name: string;
+  parent: ProductCategory;
+  children: Array<ProductCategory>;
 }
 
 export interface ProductFormValues {
   TITLE: string;
+  CATEGORY_FIRST: string;
+  CATEGORY_SECOND: string;
+  CATEGORY_THIRD: string;
   PRODUCT_DESCRIPTION: string;
   PRODUCT_COLOR: Array<string>;
   PRODUCT_PRICE: number;
   IS_DISCOUNTED: boolean;
   DISCOUNT_AMOUNT: number;
   DISCOUNT_OPTION: string;
-  DISCOUNT_STARTS_AT: string;
-  DISCOUNT_ENDS_AT: string;
+  DISCOUNT_STARTS_AT: Date;
+  DISCOUNT_ENDS_AT: Date;
   HAS_DISCOUNT_SPAN: boolean;
   PRODUCT_STOCK: number;
   HAS_REQUIRED_OPTION: boolean;
@@ -263,9 +277,6 @@ export interface ProductFormValues {
   AUTHORIZATION: string;
   PERSON_IN_CHARGE: string;
   HAS_TAG_INFOS: boolean;
-  CATEGORY_FIRST: string;
-  CATEGORY_SECOND: string;
-  CATEGORY_THIRD: string;
 
   productName: string;
   productPrice: string;

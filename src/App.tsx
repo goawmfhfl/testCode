@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "styled-components";
+import { ThemeProvider } from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
 import GlobalStyles from "@styles/GlobalStyles";
@@ -13,6 +13,7 @@ import OAuth from "@pages/OAuth";
 import ShopSetting from "@pages/ShopSetting";
 import ProductManagement from "@pages/product/index";
 import ProductRegistration from "@pages/product/Registration";
+import ProductModification from "@pages/product/Modification";
 import Order from "@pages/Order";
 import Inquiry from "@pages/Inquiry";
 import Settlement from "@pages/Settlement";
@@ -46,7 +47,7 @@ function App() {
           />
           <Route
             path={`${Pathnames.Product}/:productId`}
-            element={<ProductRegistration />}
+            element={<ProductModification />}
           />
           <Route path={Pathnames.Order} element={<Order />} />
           <Route path={Pathnames.Inquiry} element={<Inquiry />} />

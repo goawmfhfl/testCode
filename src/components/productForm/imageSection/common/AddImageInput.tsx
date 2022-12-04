@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 const AddImageInput = styled.input.attrs({
   type: "file",

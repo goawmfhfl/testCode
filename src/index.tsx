@@ -32,35 +32,17 @@ const authLink = setContext((_, { headers }) => {
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (networkError) {
-    loadingSpinnerVisibilityVar(false);
-    systemModalVar({
-      ...systemModalVar(),
-      isVisible: true,
-      description: (
-        <>
-          내부 서버 오류로 인해 요청하신
-          <br />
-          작업을 완료하지 못했습니다.
-          <br />
-          다시 한 번 시도 후
-          <br />
-          같은 문제가 발생할 경우
-          <br />
-          찹스틱스로 문의해주세요
-          <br />
-          <br />
-          code: {networkError.message}
-        </>
-      ),
-      confirmButtonVisibility: true,
-      confirmButtonClickHandler: () => {
-        systemModalVar({
-          ...systemModalVar(),
-          isVisible: false,
-        });
-      },
-      cancelButtonVisibility: false,
-    });
+    console.error(`
+      << GraphQL Errors >>
+      ${JSON.stringify(graphQLErrors, null, 2)}
+    `);
+  }
+
+  if (networkError) {
+    console.error(`
+      << Network Error >>
+      ${JSON.stringify(networkError, null, 2)}
+    `);
   }
 });
 

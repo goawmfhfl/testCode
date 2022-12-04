@@ -1,5 +1,5 @@
 import { TableType } from "@models/index";
-import styled, { css } from "styled-components";
+import styled, { css } from "styled-components/macro";
 
 export const TableContainer = styled.div<{
   type: TableType;

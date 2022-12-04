@@ -117,8 +117,6 @@ const BusinessLicenseModal = () => {
 
       loadingSpinnerVisibilityVar(false);
 
-      console.log(data);
-
       if (typeof data === "string") {
         systemModalVar({
           ...systemModalVar(),

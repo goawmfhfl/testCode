@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 import { useMutation, useReactiveVar } from "@apollo/client";
 import {

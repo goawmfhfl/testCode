@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 import NoticeContainer from "@components/common/NoticeContainer";
 import TextInput from "@components/common/input/TextInput";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
-import { TITLE } from "@cache/productRegistration/index";
+import { TITLE } from "@cache/productForm/index";
 
 const ProductName = () => {
   const { register, watch } = useFormContext();

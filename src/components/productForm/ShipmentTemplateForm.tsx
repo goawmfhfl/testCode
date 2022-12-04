@@ -22,7 +22,7 @@ import downwordArrowMedium from "@icons/arrow-downward-medium.svg";
 import { hasEveryInputFulfilled } from "@utils/index";
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 import { overModalVar } from "@cache/index";
-import { shipmentTemplateVar } from "@cache/productRegistration/shipmentTemplate";
+import { shipmentTemplateVar } from "@cache/productForm/shipmentTemplate";
 
 const ShipmentTemplateForm = ({
   formTitle,

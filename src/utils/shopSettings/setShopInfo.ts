@@ -23,7 +23,7 @@ import {
   HAS_SET_CONDITIONAL_FREE_SHIPMENT,
 } from "@cache/shopSettings";
 import { ShopFormFields } from "@models/shopSettings";
-import { UploadedFileType } from "@models/productImages";
+import { UploadFileType } from "@models/index";
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 import { ConditionalFreeShipmentPolicy } from "@constants/shop";
 
@@ -60,11 +60,11 @@ export default function setShopInfo(
   } = shopInfo;
 
   const mobileImage = uploadedFileUrls.find(
-    (file) => file.type === UploadedFileType.SHOP_MOBILE
+    (file) => file.type === UploadFileType.SHOP_MOBILE
   );
 
   const pcImage = uploadedFileUrls.find(
-    (file) => file.type === UploadedFileType.SHOP_PC
+    (file) => file.type === UploadFileType.SHOP_PC
   );
 
   if (mobileImage) {

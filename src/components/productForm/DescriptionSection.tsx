@@ -1,10 +1,10 @@
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import { useFormContext } from "react-hook-form";
 
 import Textarea from "@components/common/input/Textarea";
 import NoticeContainer from "@components/common/NoticeContainer";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
-import { PRODUCT_DESCRIPTION } from "@cache/productRegistration/index";
+import { PRODUCT_DESCRIPTION } from "@cache/productForm/index";
 
 const ProductDescriptionSection = () => {
   const { register } = useFormContext();

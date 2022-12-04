@@ -28,6 +28,9 @@ export const GET_PRODUCTS_BY_ID = gql`
         colors {
           name
         }
+        createdAt
+        updatedAt
+
         originalPrice
         discountAmount
         discountMethod
@@ -77,6 +80,11 @@ export const GET_PRODUCTS_BY_ID = gql`
             id
             name
           }
+        }
+        uploadedFileUrls {
+          id
+          url
+          type
         }
       }
     }

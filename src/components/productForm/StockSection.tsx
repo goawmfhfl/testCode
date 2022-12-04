@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 import NoticeContainer from "@components/common/NoticeContainer";
 import TextInput from "@components/common/input/TextInput";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
-import { PRODUCT_STOCK } from "@cache/productRegistration/index";
+import { PRODUCT_STOCK } from "@cache/productForm/index";
 
 const ProductStock = () => {
   const { register } = useFormContext();

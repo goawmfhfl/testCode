@@ -5,7 +5,7 @@ import { TailSpin } from "react-loader-spinner";
 import GlobalNavigationBar from "@components/common/GlobalNavigationBar";
 import SideNavigationBar from "@components/common/SideNavigationBar";
 import Footer from "@components/common/Footer";
-// import ProductSaveBar from "@components/productRegistration/SaveBar";
+import ProductSaveBar from "@components/productForm/SaveBar";
 import ShopSaveBar from "@components/shopSetting/SaveBar";
 import {
   modalVar,

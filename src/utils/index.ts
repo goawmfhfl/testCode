@@ -33,7 +33,7 @@ async function removeImageFromServer(url: string): Promise<{
       result: string;
       error: RemoveImageErrorType;
     };
-  } = await axios.delete("https://dev.chopsticks-store.com/upload", {
+  } = await axios.delete(`${process.env.REACT_APP_SERVER_URI}/upload`, {
     data: {
       url,
     },
@@ -339,6 +339,10 @@ function isElementOverflown(element: HTMLDivElement | null): void | boolean {
   return element?.scrollHeight > element?.clientHeight;
 }
 
+function bytesToMegaBytes(bytes: number) {
+  return Number((bytes / (1024 * 1024)).toFixed(2));
+}
+
 export {
   addImageOnServer,
   removeImageFromServer,
@@ -350,4 +354,5 @@ export {
   validatePhoneNumber,
   hasEveryInputFulfilled,
   isElementOverflown,
+  bytesToMegaBytes,
 };

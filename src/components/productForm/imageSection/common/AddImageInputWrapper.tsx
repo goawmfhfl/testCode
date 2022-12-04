@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import addImageButtonBackgroundSource from "@images/add-photo-background.png";
 
 const AddImageInputWrapper = styled.label<{

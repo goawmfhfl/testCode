@@ -11,7 +11,7 @@ import {
 import {
   requiredOptionVar,
   selectiveOptionVar,
-} from "@cache/productRegistration/productOptions";
+} from "@cache/productForm/productOptions";
 import { isNumber } from "@utils/index";
 
 const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {

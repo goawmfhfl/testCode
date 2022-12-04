@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import styled from "styled-components/macro";
 import { useFormContext, UseFormRegisterReturn } from "react-hook-form";
 
@@ -38,9 +37,9 @@ const Dropdown = ({
 }) => {
   return (
     <Select register={register} size={size} width={width} disabled={disabled}>
-      {options.map(({ name, value }) => {
+      {options.map(({ name, value }, index) => {
         return (
-          <Option key={`${name}`} value={value}>
+          <Option key={`${name}-${index}`} value={value}>
             {name}
           </Option>
         );

@@ -1,5 +1,5 @@
 import styled from "styled-components/macro";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 import {
@@ -11,7 +11,7 @@ import {
   CATEGORY_FIRST,
   CATEGORY_SECOND,
   CATEGORY_THIRD,
-} from "@cache/productRegistration";
+} from "@cache/productForm";
 
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
@@ -50,23 +50,11 @@ const CategorySection = () => {
     categories?.secondCategories[selectedSecondCategory] || [];
 
   useEffect(() => {
-    setValue(CATEGORY_SECOND, "");
-    setValue(CATEGORY_THIRD, "");
-  }, [selectedFirstCategory]);
-
-  useEffect(() => {
-    setValue(CATEGORY_THIRD, "");
-  }, [selectedSecondCategory]);
-
-  useEffect(() => {
     const categories: Array<CategoriesType> =
       data?.getAllCategories.categories || [];
     const recontructCategories = contructCategories(categories);
     setCategories(recontructCategories);
   }, [data]);
-
-  if (loading) return <>...loading</>;
-  if (error) return <>...error</>;
 
   return (
     <Container>
@@ -83,7 +71,11 @@ const CategorySection = () => {
             arrowSrc={downwordArrowBig}
             width={"231px"}
             {...register(CATEGORY_FIRST)}
-            value={watch(CATEGORY_FIRST) as string}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              setValue(CATEGORY_FIRST, e.target.value);
+              setValue(CATEGORY_SECOND, "");
+              setValue(CATEGORY_THIRD, "");
+            }}
           >
             {[
               {
@@ -109,6 +101,10 @@ const CategorySection = () => {
             arrowSrc={downwordArrowBig}
             width={"231px"}
             {...register(CATEGORY_SECOND)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              setValue(CATEGORY_SECOND, e.target.value);
+              setValue(CATEGORY_THIRD, "");
+            }}
             disabled={!categoryDepthSecond.length ? true : false}
           >
             {[

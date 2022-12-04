@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import searchDefaultSvg from "@icons/search-default.svg";
 import searchFocusSvg from "@icons/search-focus.svg";
 

@@ -5,7 +5,7 @@ import { overModalVar, systemModalVar } from "@cache/index";
 import {
   shipmentTemplateVar,
   initialState as shipmentTemplateInitialState,
-} from "@cache/productRegistration/shipmentTemplate";
+} from "@cache/productForm/shipmentTemplate";
 import { CreateShipmentInputType } from "@models/product/shipmentTemplate";
 
 interface EditShipmentTemplateModalProps {

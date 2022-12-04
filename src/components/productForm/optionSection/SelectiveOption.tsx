@@ -10,10 +10,10 @@ import Button from "@components/common/Button";
 import OptionInput from "@components/productForm/optionSection/OptionInput";
 import AdaptedOption from "@components/productForm/optionSection/AdaptedOption";
 
-import { selectiveOptionVar } from "@cache/productRegistration/productOptions";
+import { selectiveOptionVar } from "@cache/productForm/productOptions";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import smallDownwardArrowIconSrc from "@icons/arrow-downward-small-red.svg";
-import { HAS_SELECTIVE_OPTION } from "@cache/productRegistration";
+import { HAS_SELECTIVE_OPTION } from "@cache/productForm";
 import { OptionInputType, OptionTypes } from "@models/product/options";
 import { ProductFormValues } from "@models/product";
 

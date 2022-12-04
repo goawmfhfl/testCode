@@ -1,14 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components/macro";
-import {
-  useFormContext,
-  Controller,
-  ControllerRenderProps,
-} from "react-hook-form";
+import { useFormContext, Controller } from "react-hook-form";
+import { format, compareAsc } from "date-fns";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 import TextInput from "@components/common/input/TextInput";
 import Dropdown from "@components/common/input/Dropdown";
-import DateInput from "@components/common/input/DateInput";
 import Checkbox from "@components/common/input/Checkbox";
 
 import {
@@ -19,20 +17,26 @@ import {
   DISCOUNT_ENDS_AT,
   HAS_DISCOUNT_SPAN,
   IS_DISCOUNTED,
-} from "@cache/productRegistration/index";
+} from "@cache/productForm/index";
 import { DiscountMethod } from "@models/product";
-import { getDiscountedPrice } from "@utils/productRegistration";
+import { getDiscountedPrice } from "@utils/product/form/index";
 
 const ProductDiscount = () => {
-  const { register, watch, control, getValues } = useFormContext();
+  const { register, watch, control, setValue } = useFormContext();
 
   const isDiscounted = watch(IS_DISCOUNTED) as boolean;
   const productPrice = watch(PRODUCT_PRICE) as string;
   const discountOption = watch(DISCOUNT_OPTION) as string;
   const discountAmount = watch(DISCOUNT_AMOUNT) as string;
   const hasDiscountSpan = watch(HAS_DISCOUNT_SPAN) as boolean;
-  const discountStartsAt = watch(DISCOUNT_STARTS_AT) as boolean;
-  const discountEndsAt = watch(DISCOUNT_ENDS_AT) as boolean;
+  const discountStartsAt = watch(DISCOUNT_STARTS_AT) as Date;
+  const discountEndsAt = watch(DISCOUNT_ENDS_AT) as Date;
+
+  useEffect(() => {
+    if (!isDiscounted) {
+      setValue(DISCOUNT_AMOUNT, null);
+    }
+  }, [isDiscounted]);
 
   return (
     <Container>
@@ -88,86 +92,78 @@ const ProductDiscount = () => {
       </InputContainer>
 
       <CalendarContainer>
-        {/* TODO: Controller 필요성 검토 */}
+        {/*
+
+          시작일의 규칙
+          - 오늘보다 이전 날짜는 선택할 수 없다
+          - 종료일보다 이후의 날짜는 선택할 수 없다
+
+        */}
         <Controller
           control={control}
           name={DISCOUNT_STARTS_AT}
-          defaultValue={""}
-          render={({
-            field: { onChange, onBlur, value },
-          }: {
-            field: ControllerRenderProps<Record<string, string>>;
-          }) => {
-            return (
-              <StartAt
-                onBlur={onBlur}
-                onChange={(e) => {
-                  const {
-                    target: { value },
-                  } = e;
+          render={() => (
+            <DatePicker
+              className="date-picker"
+              selected={discountStartsAt}
+              placeholderText="할인 시작일을 선택해주세요"
+              onChange={(selectedDate: Date) => {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
 
-                  const startAt = new Date(value).getTime();
-                  const endAt = new Date(
-                    watch(DISCOUNT_ENDS_AT) as string
-                  ).getTime();
-                  const today = new Date().getTime();
+                const isBeforeToday = compareAsc(yesterday, selectedDate) > -1;
 
-                  const isBeforeToday = startAt < today;
+                if (isBeforeToday) {
+                  alert("오늘보다 이른 날짜를 선택할 수 없습니다");
 
-                  if (isBeforeToday) {
-                    return;
-                  }
+                  return;
+                }
 
-                  if (startAt > endAt) return;
+                const result = compareAsc(selectedDate, discountEndsAt) > -1;
 
-                  onChange(e);
-                }}
-                value={value}
-                disabled={!hasDiscountSpan || !isDiscounted}
-              />
-            );
-          }}
+                if (result) {
+                  alert("할인 종료일보다 이른 날짜를 선택해주세요");
+
+                  return;
+                }
+
+                setValue(DISCOUNT_STARTS_AT, selectedDate);
+              }}
+              disabled={!hasDiscountSpan || !isDiscounted}
+            />
+          )}
         />
         ~
+        {/*
+
+          종료일의 규칙
+          - 오늘보다 이전의 날짜는 선택할 수 없다
+          - 시작일보다 이전의 날짜는 선택할 수 없다
+
+        */}
         <Controller
           control={control}
           name={DISCOUNT_ENDS_AT}
-          defaultValue={""}
-          render={({
-            field: { onChange, onBlur, value, ref },
-          }: {
-            field: ControllerRenderProps<Record<string, string>>;
-          }) => {
-            return (
-              <EndAt
-                onBlur={onBlur}
-                onChange={(e) => {
-                  const {
-                    target: { value },
-                  } = e;
+          render={() => (
+            <DatePicker
+              className="date-picker"
+              selected={discountEndsAt}
+              placeholderText="할인 종료일을 선택해주세요"
+              onChange={(selectedDate: Date) => {
+                const isAfterDiscountStarts =
+                  compareAsc(discountStartsAt, selectedDate) > -1;
 
-                  const startAt = new Date(
-                    getValues(DISCOUNT_STARTS_AT) as string
-                  ).getTime();
-                  const endAt = new Date(value).getTime();
-                  const today = new Date().getTime();
+                if (isAfterDiscountStarts) {
+                  alert("할인 시작일보다 늦은 날짜를 선택해주세요");
 
-                  const isBeforeToday = endAt < today;
+                  return;
+                }
 
-                  if (isBeforeToday) {
-                    return;
-                  }
-
-                  if (startAt > endAt) return;
-
-                  onChange(e);
-                }}
-                value={value}
-                disabled={!hasDiscountSpan || !isDiscounted}
-                inputRef={ref}
-              />
-            );
-          }}
+                setValue(DISCOUNT_ENDS_AT, selectedDate);
+              }}
+              disabled={!hasDiscountSpan || !isDiscounted || !discountStartsAt}
+            />
+          )}
         />
       </CalendarContainer>
 
@@ -186,8 +182,18 @@ const ProductDiscount = () => {
         </PriceWrapper>
         {hasDiscountSpan && (
           <DiscountTimespanNotification>
-            ({discountStartsAt ? discountStartsAt : "-"} 부터{" "}
-            {discountEndsAt ? discountEndsAt : "-"} 까지 할인됩니다.)
+            <>
+              {"("}
+              {discountStartsAt
+                ? format(new Date(discountStartsAt), "yyyy-MM-dd")
+                : "-"}{" "}
+              부터{" "}
+              {discountEndsAt
+                ? format(new Date(discountEndsAt), "yyyy-MM-dd")
+                : "-"}{" "}
+              까지 할인됩니다.
+              {")"}
+            </>
           </DiscountTimespanNotification>
         )}
       </DiscountedPrice>
@@ -228,19 +234,17 @@ const DiscountSpanCheckbox = styled(Checkbox)`
 
 const CalendarContainer = styled.div`
   display: flex;
+  justify-content: flex-start;
   align-items: center;
   margin-top: 24px;
-`;
 
-const StartAt = styled(DateInput)`
-  margin-right: 16px;
-  width: 112px;
-`;
-const EndAt = styled(DateInput)<{
-  inputRef: React.RefCallback<HTMLInputElement>;
-}>`
-  margin-left: 16px;
-  width: 112px;
+  & > div.react-datepicker-wrapper {
+    margin-right: 16px;
+  }
+
+  & > div + div.react-datepicker-wrapper {
+    margin-left: 16px;
+  }
 `;
 
 const HorizontalLine = styled.div`

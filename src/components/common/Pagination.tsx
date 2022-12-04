@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import styled, { css } from "styled-components";
+import styled, { css } from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
 import mediumDoubleLeftActiveSvg from "@icons/medium-double-left-active.svg";

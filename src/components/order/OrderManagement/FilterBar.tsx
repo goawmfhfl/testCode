@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
 import { filterOptionVar } from "@cache/order/orderManagement";

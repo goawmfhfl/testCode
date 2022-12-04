@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 

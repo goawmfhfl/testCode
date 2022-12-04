@@ -9,7 +9,7 @@ import {
   HAS_MANUFACTURING_LEAD_TIME,
   LEAD_TIME_MIN,
   LEAD_TIME_MAX,
-} from "@cache/productRegistration/index";
+} from "@cache/productForm/index";
 
 const OrderProduction = () => {
   const { register, watch } = useFormContext();

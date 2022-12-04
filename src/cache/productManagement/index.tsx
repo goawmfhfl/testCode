@@ -28,16 +28,13 @@ export interface ProductsListVarType {
   isChecked?: boolean;
 }
 
-export const showHasServerErrorModal = (
-  error: string,
-  mutationType: string
-) => {
-  return systemModalVar({
+export const showHasServerErrorModal = (error: string, subject: string) => {
+  systemModalVar({
     ...systemModalVar(),
     isVisible: true,
     description: (
       <>
-        {mutationType}을(를) 완료하지 못했습니다.
+        {subject}을(를) 완료하지 못했습니다.
         <br />
         다시 시도 후 같은 문제가 발생할 시
         <br />
@@ -49,7 +46,6 @@ export const showHasServerErrorModal = (
     ),
     confirmButtonVisibility: true,
     cancelButtonVisibility: false,
-
     confirmButtonClickHandler: () => {
       systemModalVar({
         ...systemModalVar(),
