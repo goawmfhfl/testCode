@@ -278,7 +278,7 @@ const ProductTable = () => {
         ))}
       </ThContainer>
 
-      {loading && <Loading />}
+      {loading ? <Loading /> : null}
 
       {!loading && products?.length !== 0 ? (
         <TdContainer>

@@ -319,47 +319,52 @@ const Controller = () => {
       cancelButtonVisibility: true,
 
       confirmButtonClickHandler: () => {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        (async () => {
-          loadingSpinnerVisibilityVar(true);
-          const {
-            data: {
-              deleteProductsBySeller: { ok, error },
-            },
-          } = await deleteProducts({
-            variables: {
-              input: {
-                productIds: checkedProductIds,
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          (async () => {
+            loadingSpinnerVisibilityVar(true);
+            const {
+              data: {
+                deleteProductsBySeller: { ok, error },
               },
-            },
-          });
-
-          if (ok) {
-            loadingSpinnerVisibilityVar(false);
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: true,
-              description: <>상품이 삭제되었습니다.</>,
-              confirmButtonVisibility: true,
-              cancelButtonVisibility: false,
-
-              confirmButtonClickHandler: () => {
-                checkAllBoxStatusVar(false);
-                checkedProductIdsVar([]);
-
-                systemModalVar({
-                  ...systemModalVar(),
-                  isVisible: false,
-                });
+            } = await deleteProducts({
+              variables: {
+                input: {
+                  productIds: checkedProductIds,
+                },
               },
             });
-          }
 
-          if (error) {
-            loadingSpinnerVisibilityVar(false);
-            showHasServerErrorModal(error, "상품 삭제");
-          }
-        })();
+            if (ok) {
+              loadingSpinnerVisibilityVar(false);
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: <>상품이 삭제되었습니다.</>,
+                confirmButtonVisibility: true,
+                cancelButtonVisibility: false,
+
+                confirmButtonClickHandler: () => {
+                  checkAllBoxStatusVar(false);
+                  checkedProductIdsVar([]);
+
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+                },
+              });
+            }
+
+            if (error) {
+              loadingSpinnerVisibilityVar(false);
+              showHasServerErrorModal(error, "상품 삭제");
+            }
+          })();
+        } catch (error) {
+          loadingSpinnerVisibilityVar(false);
+          showHasServerErrorModal(error as string, "상품 삭제");
+        }
       },
     });
   };

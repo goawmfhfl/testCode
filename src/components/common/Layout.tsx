@@ -49,7 +49,8 @@ const Layout = ({
           preventScroll={loadingSpinnerVisibility}
         >
           <ContentsWrapper>{children}</ContentsWrapper>
-          {!loadingSpinnerVisibility && <Footer />}
+
+          <Footer />
         </ContentsContainer>
 
         {hasSaveBar && isShopPage && <ShopSaveBar />}
@@ -95,6 +96,7 @@ const ContentsContainer = styled.div<{
   preventScroll: boolean;
 }>`
   flex: 1;
+  min-height: 100%;
 
   display: flex;
   flex-direction: column;
