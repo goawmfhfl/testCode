@@ -138,56 +138,61 @@ const ChangeDiscountModal = () => {
       confirmButtonVisibility: true,
       cancelButtonVisibility: true,
       confirmButtonClickHandler: () => {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        (async () => {
-          loadingSpinnerVisibilityVar(true);
-          const {
-            data: {
-              changeProductsInfoBySeller: { ok, error },
-            },
-          } = await updateDiscount({
-            variables: {
-              input: {
-                productIds: checkedProductIds,
-                discountAmount,
-                discountMethod: discountOption,
-                startDiscountDate: discountStartsAt ? discountStartsAt : null,
-                endDiscountDate: discountEndsAt ? discountStartsAt : null,
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          (async () => {
+            loadingSpinnerVisibilityVar(true);
+            const {
+              data: {
+                changeProductsInfoBySeller: { ok, error },
               },
-            },
-          });
-
-          if (ok) {
-            loadingSpinnerVisibilityVar(false);
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: true,
-              description: <>할인율이 변경되었습니다</>,
-              confirmButtonVisibility: true,
-              cancelButtonVisibility: false,
-
-              confirmButtonClickHandler: () => {
-                modalVar({
-                  ...modalVar(),
-                  isVisible: false,
-                });
-
-                systemModalVar({
-                  ...systemModalVar(),
-                  isVisible: false,
-                });
-
-                checkedProductIdsVar([]);
-                checkAllBoxStatusVar(false);
+            } = await updateDiscount({
+              variables: {
+                input: {
+                  productIds: checkedProductIds,
+                  discountAmount,
+                  discountMethod: discountOption,
+                  startDiscountDate: discountStartsAt ? discountStartsAt : null,
+                  endDiscountDate: discountEndsAt ? discountStartsAt : null,
+                },
               },
             });
-          }
 
-          if (error) {
-            loadingSpinnerVisibilityVar(false);
-            showHasServerErrorModal(error, "할인율 변경");
-          }
-        })();
+            if (ok) {
+              loadingSpinnerVisibilityVar(false);
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: <>할인율이 변경되었습니다</>,
+                confirmButtonVisibility: true,
+                cancelButtonVisibility: false,
+
+                confirmButtonClickHandler: () => {
+                  modalVar({
+                    ...modalVar(),
+                    isVisible: false,
+                  });
+
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+
+                  checkedProductIdsVar([]);
+                  checkAllBoxStatusVar(false);
+                },
+              });
+            }
+
+            if (error) {
+              loadingSpinnerVisibilityVar(false);
+              showHasServerErrorModal(error, "할인율 변경");
+            }
+          })();
+        } catch (error) {
+          loadingSpinnerVisibilityVar(false);
+          showHasServerErrorModal(error as string, "할인율 변경");
+        }
       },
     });
   };

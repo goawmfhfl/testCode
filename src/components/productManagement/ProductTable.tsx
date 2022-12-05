@@ -159,58 +159,63 @@ const ProductTable = () => {
           </>
         ),
         confirmButtonClickHandler: () => {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          (async () => {
-            loadingSpinnerVisibilityVar(true);
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            (async () => {
+              loadingSpinnerVisibilityVar(true);
 
-            const {
-              data: {
-                changeProductsInfoBySeller: { ok, error },
-              },
-            } = await changeProductStatus({
-              variables: {
-                input: {
-                  productIds: [id],
-                  productStatus: value,
+              const {
+                data: {
+                  changeProductsInfoBySeller: { ok, error },
                 },
-              },
-            });
-
-            if (ok) {
-              loadingSpinnerVisibilityVar(false);
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                confirmButtonVisibility: true,
-                cancelButtonVisibility: false,
-                description: (
-                  <>
-                    {productType[value] === productType.ON_SALE &&
-                      `${productType.ON_SALE}으로 변경되었습니다.`}
-                    {productType[value] === productType.STOP_SALE &&
-                      `${productType.STOP_SALE}으로 변경되었습니다.`}
-                    {productType[value] === productType.SOLD_OUT &&
-                      `${productType.SOLD_OUT}로 변경되었습니다.`}
-                  </>
-                ),
-
-                confirmButtonClickHandler: () => {
-                  checkAllBoxStatusVar(false);
-                  checkedProductIdsVar([]);
-
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
+              } = await changeProductStatus({
+                variables: {
+                  input: {
+                    productIds: [id],
+                    productStatus: value,
+                  },
                 },
               });
-            }
 
-            if (error) {
-              loadingSpinnerVisibilityVar(false);
-              showHasServerErrorModal(error, "판매상태 변경");
-            }
-          })();
+              if (ok) {
+                loadingSpinnerVisibilityVar(false);
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: true,
+                  confirmButtonVisibility: true,
+                  cancelButtonVisibility: false,
+                  description: (
+                    <>
+                      {productType[value] === productType.ON_SALE &&
+                        `${productType.ON_SALE}으로 변경되었습니다.`}
+                      {productType[value] === productType.STOP_SALE &&
+                        `${productType.STOP_SALE}으로 변경되었습니다.`}
+                      {productType[value] === productType.SOLD_OUT &&
+                        `${productType.SOLD_OUT}로 변경되었습니다.`}
+                    </>
+                  ),
+
+                  confirmButtonClickHandler: () => {
+                    checkAllBoxStatusVar(false);
+                    checkedProductIdsVar([]);
+
+                    systemModalVar({
+                      ...systemModalVar(),
+                      isVisible: false,
+                    });
+                  },
+                });
+              }
+
+              if (error) {
+                loadingSpinnerVisibilityVar(false);
+                showHasServerErrorModal(error, "판매상태 변경");
+              }
+            })();
+          } catch (error) {
+            loadingSpinnerVisibilityVar(false);
+            showHasServerErrorModal(error as string, "판매상태 변경");
+          }
         },
         cancelButtonClickHandler: () => {
           systemModalVar({
@@ -222,12 +227,16 @@ const ProductTable = () => {
     };
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
-      await getProducts({
-        variables: { input: { page, skip, status, query } },
-      });
-    })();
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      (async () => {
+        await getProducts({
+          variables: { input: { page, skip, status, query } },
+        });
+      })();
+    } catch (error) {
+      console.log(error);
+    }
   }, [page, skip, status, query]);
 
   useEffect(() => {
@@ -410,7 +419,10 @@ const ProductTable = () => {
                         <Option
                           key={`product-${productId}-status-${label}`}
                           value={value}
-                          hidden={value === ProductStatus.DEFAULT}
+                          hidden={
+                            value === ProductStatus.DEFAULT ||
+                            value === ProductStatus.TEMPORARY
+                          }
                         >
                           {label}
                         </Option>

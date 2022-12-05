@@ -132,55 +132,60 @@ const Controller = () => {
       ),
       cancelButtonVisibility: true,
       confirmButtonClickHandler: () => {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        (async () => {
-          loadingSpinnerVisibilityVar(true);
-          const {
-            data: {
-              changeProductsInfoBySeller: { ok, error },
-            },
-          } = await updateProductsStatus({
-            variables: {
-              input: {
-                productIds: checkedProductIds,
-                productStatus: value,
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          (async () => {
+            loadingSpinnerVisibilityVar(true);
+            const {
+              data: {
+                changeProductsInfoBySeller: { ok, error },
               },
-            },
-          });
-
-          if (ok) {
-            loadingSpinnerVisibilityVar(false);
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: true,
-              description: (
-                <>
-                  {saleStatus[value] === "판매중" &&
-                    "판매중으로 변경되었습니다."}
-                  {saleStatus[value] === "숨김" && "숨김으로 변경되었습니다."}
-                  {saleStatus[value] === "품절" && "품절로 변경되었습니다."}
-                </>
-              ),
-              cancelButtonVisibility: false,
-
-              confirmButtonClickHandler: () => {
-                e.target.value = saleStatus["DEFAULT"];
-                checkAllBoxStatusVar(false);
-                checkedProductIdsVar([]);
-
-                systemModalVar({
-                  ...systemModalVar(),
-                  isVisible: false,
-                });
+            } = await updateProductsStatus({
+              variables: {
+                input: {
+                  productIds: checkedProductIds,
+                  productStatus: value,
+                },
               },
             });
-          }
 
-          if (error) {
-            loadingSpinnerVisibilityVar(false);
-            showHasServerErrorModal(error, "판매상태 변경");
-          }
-        })();
+            if (ok) {
+              loadingSpinnerVisibilityVar(false);
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: (
+                  <>
+                    {saleStatus[value] === "판매중" &&
+                      "판매중으로 변경되었습니다."}
+                    {saleStatus[value] === "숨김" && "숨김으로 변경되었습니다."}
+                    {saleStatus[value] === "품절" && "품절로 변경되었습니다."}
+                  </>
+                ),
+                cancelButtonVisibility: false,
+
+                confirmButtonClickHandler: () => {
+                  e.target.value = saleStatus["DEFAULT"];
+                  checkAllBoxStatusVar(false);
+                  checkedProductIdsVar([]);
+
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+                },
+              });
+            }
+
+            if (error) {
+              loadingSpinnerVisibilityVar(false);
+              showHasServerErrorModal(error, "판매상태 변경");
+            }
+          })();
+        } catch (error) {
+          loadingSpinnerVisibilityVar(false);
+          showHasServerErrorModal(error as string, "판매상태 변경");
+        }
       },
     });
   };
@@ -254,47 +259,52 @@ const Controller = () => {
       cancelButtonVisibility: true,
 
       confirmButtonClickHandler: () => {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        (async () => {
-          loadingSpinnerVisibilityVar(true);
-          const {
-            data: {
-              duplicateProductsBySeller: { ok, error },
-            },
-          } = await duplicateProducts({
-            variables: {
-              input: {
-                productIds: checkedProductIds,
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          (async () => {
+            loadingSpinnerVisibilityVar(true);
+            const {
+              data: {
+                duplicateProductsBySeller: { ok, error },
               },
-            },
-          });
-
-          if (ok) {
-            loadingSpinnerVisibilityVar(false);
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: true,
-              description: <>상품이 복제되었습니다.</>,
-              confirmButtonVisibility: true,
-              cancelButtonVisibility: false,
-
-              confirmButtonClickHandler: () => {
-                checkAllBoxStatusVar(false);
-                checkedProductIdsVar([]);
-
-                systemModalVar({
-                  ...systemModalVar(),
-                  isVisible: false,
-                });
+            } = await duplicateProducts({
+              variables: {
+                input: {
+                  productIds: checkedProductIds,
+                },
               },
             });
-          }
 
-          if (error) {
-            loadingSpinnerVisibilityVar(false);
-            showHasServerErrorModal(error, "상품 복제");
-          }
-        })();
+            if (ok) {
+              loadingSpinnerVisibilityVar(false);
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: <>상품이 복제되었습니다.</>,
+                confirmButtonVisibility: true,
+                cancelButtonVisibility: false,
+
+                confirmButtonClickHandler: () => {
+                  checkAllBoxStatusVar(false);
+                  checkedProductIdsVar([]);
+
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+                },
+              });
+            }
+
+            if (error) {
+              loadingSpinnerVisibilityVar(false);
+              showHasServerErrorModal(error, "상품 복제");
+            }
+          })();
+        } catch (error) {
+          loadingSpinnerVisibilityVar(false);
+          showHasServerErrorModal(error as string, "상품 복제");
+        }
       },
     });
   };

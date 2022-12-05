@@ -39,6 +39,7 @@ const FilterBar = () => {
         page: 1,
       });
       paginationSkipVar(0);
+
       filterOptionVar({ status: filterOptionName });
     };
 
@@ -47,35 +48,43 @@ const FilterBar = () => {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
-      await getAllProductStatus({
-        variables: {
-          input: {
-            page: null,
-            skip: null,
-            status: null,
-            query: null,
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      (async () => {
+        await getAllProductStatus({
+          variables: {
+            input: {
+              page: null,
+              skip: null,
+              status: null,
+              query: null,
+            },
           },
-        },
-      });
-    })();
+        });
+      })();
+    } catch (error) {
+      console.log(error);
+    }
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
-      await getProducts({
-        variables: {
-          input: {
-            page: null,
-            skip: null,
-            status: selectedStatus,
-            query,
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      (async () => {
+        await getProducts({
+          variables: {
+            input: {
+              page: null,
+              skip: null,
+              status: selectedStatus,
+              query,
+            },
           },
-        },
-      });
-    })();
+        });
+      })();
+    } catch (error) {
+      console.log(error);
+    }
   }, [query]);
 
   return (

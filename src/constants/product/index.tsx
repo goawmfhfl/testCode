@@ -23,8 +23,8 @@ export enum ProductStatus {
 
 export const productStatus = [
   { id: 0, label: productType.DEFAULT, value: ProductStatus.DEFAULT },
-  { id: 0, label: productType.TEMPORARY, value: ProductStatus.TEMPORARY },
-  { id: 1, label: productType.ON_SALE, value: ProductStatus.ON_SALE },
-  { id: 2, label: productType.STOP_SALE, value: ProductStatus.STOP_SALE },
-  { id: 3, label: productType.SOLD_OUT, value: ProductStatus.SOLD_OUT },
+  { id: 1, label: productType.TEMPORARY, value: ProductStatus.TEMPORARY },
+  { id: 2, label: productType.ON_SALE, value: ProductStatus.ON_SALE },
+  { id: 3, label: productType.STOP_SALE, value: ProductStatus.STOP_SALE },
+  { id: 4, label: productType.SOLD_OUT, value: ProductStatus.SOLD_OUT },
 ];

@@ -139,54 +139,59 @@ const ChangeCategoryModal = () => {
         cancelButtonVisibility: true,
         confirmButtonVisibility: true,
         confirmButtonClickHandler: () => {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          (async () => {
-            loadingSpinnerVisibilityVar(true);
-            const {
-              data: {
-                changeProductsInfoBySeller: { ok, error },
-              },
-            } = await updateCategory({
-              variables: {
-                input: {
-                  productIds: checkedProductIds,
-                  categoryName: selectedSecondCategory,
-                  isBmarket: isBmarketChecked,
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            (async () => {
+              loadingSpinnerVisibilityVar(true);
+              const {
+                data: {
+                  changeProductsInfoBySeller: { ok, error },
                 },
-              },
-            });
-
-            if (ok) {
-              loadingSpinnerVisibilityVar(false);
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: "카테고리가 변경되었습니다.",
-                confirmButtonVisibility: true,
-                cancelButtonVisibility: false,
-
-                confirmButtonClickHandler: () => {
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-
-                  modalVar({
-                    ...modalVar(),
-                    isVisible: false,
-                  });
-
-                  checkedProductIdsVar([]);
-                  checkAllBoxStatusVar(false);
+              } = await updateCategory({
+                variables: {
+                  input: {
+                    productIds: checkedProductIds,
+                    categoryName: selectedSecondCategory,
+                    isBmarket: isBmarketChecked,
+                  },
                 },
               });
-            }
 
-            if (error) {
-              loadingSpinnerVisibilityVar(false);
-              showHasServerErrorModal(error, "카테고리 변경");
-            }
-          })();
+              if (ok) {
+                loadingSpinnerVisibilityVar(false);
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: true,
+                  description: "카테고리가 변경되었습니다.",
+                  confirmButtonVisibility: true,
+                  cancelButtonVisibility: false,
+
+                  confirmButtonClickHandler: () => {
+                    systemModalVar({
+                      ...systemModalVar(),
+                      isVisible: false,
+                    });
+
+                    modalVar({
+                      ...modalVar(),
+                      isVisible: false,
+                    });
+
+                    checkedProductIdsVar([]);
+                    checkAllBoxStatusVar(false);
+                  },
+                });
+              }
+
+              if (error) {
+                loadingSpinnerVisibilityVar(false);
+                showHasServerErrorModal(error, "카테고리 변경");
+              }
+            })();
+          } catch (error) {
+            loadingSpinnerVisibilityVar(false);
+            showHasServerErrorModal(error as string, "카테고리 변경");
+          }
         },
       });
     }
