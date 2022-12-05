@@ -48,7 +48,7 @@ const DescriptionImage = ({ id, url }: { id: string; url: string }) => {
         return;
       }
 
-      const { data }: { data: Array<string> } = await axios.post(
+      const { data }: { data: Array<{ url: string }> } = await axios.post(
         `${process.env.REACT_APP_SERVER_URI}/upload`,
         formData,
         {
@@ -58,7 +58,7 @@ const DescriptionImage = ({ id, url }: { id: string; url: string }) => {
         }
       );
 
-      const url = data[0];
+      const { url } = data[0];
 
       // 3. 업데이트
       const updated = [...descriptionImagesVar()];

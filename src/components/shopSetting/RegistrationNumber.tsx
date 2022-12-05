@@ -32,7 +32,7 @@ const RegistrationNumber = () => {
     const formData = new FormData();
     formData.append("files", image);
 
-    const { data }: { data: Array<string> } = await axios.post(
+    const { data }: { data: Array<{ url: string }> } = await axios.post(
       `${process.env.REACT_APP_SERVER_URI}/upload`,
       formData,
       {
@@ -42,9 +42,9 @@ const RegistrationNumber = () => {
       }
     );
 
-    const photocopy = data[0];
+    const { url } = data[0];
 
-    setValue(PHOTOCOPY, photocopy);
+    setValue(PHOTOCOPY, url);
   };
 
   const attachedPhotocopy = getValues(PHOTOCOPY) as string;

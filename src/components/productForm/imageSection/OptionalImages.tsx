@@ -98,9 +98,11 @@ const ProductImageSection = () => {
             }
           }
 
-          const addedImageUrl: string = await addImageOnServer(
-            productImageValue[0]
-          );
+          const {
+            url: addedImageUrl,
+          }: {
+            url: string;
+          } = await addImageOnServer(productImageValue[0]);
 
           const newOptionalImages = [...optionalImagesVar()];
 

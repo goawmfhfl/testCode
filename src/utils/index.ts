@@ -6,15 +6,15 @@ export interface RemoveImageErrorType {
   statusCode: string;
 }
 
-async function addImageOnServer(imageFile: File): Promise<string> {
+async function addImageOnServer(
+  imageFile: File
+): Promise<{ url: string; size: number }> {
   try {
     const formData = new FormData();
     formData.append("files", imageFile);
 
-    const response: { data: Array<string> } = await axios.post(
-      `${process.env.REACT_APP_SERVER_URI}/upload`,
-      formData
-    );
+    const response: { data: Array<{ url: string; size: number }> } =
+      await axios.post(`${process.env.REACT_APP_SERVER_URI}/upload`, formData);
 
     return response.data[0];
   } catch (error) {

@@ -97,9 +97,10 @@ const RequiredImages = () => {
             }
           }
 
-          const addedImageUrl: string = await addImageOnServer(
-            productImageValue[0]
-          );
+          const { url: addedImageUrl }: { url: string } =
+            await addImageOnServer(productImageValue[0]);
+
+          console.log("이거..", addedImageUrl);
 
           const newRequiredImages = [...requiredImagesVar()];
           newRequiredImages[index].url = addedImageUrl;

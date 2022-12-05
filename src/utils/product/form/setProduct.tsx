@@ -81,6 +81,8 @@ const setProduct = (
       (uploadedFile) => uploadedFile.type === UploadFileType.PRODUCT_DETAIL_PAGE
     );
 
+    console.log(requiredImages);
+
     if (requiredImages.length) {
       const newRequiredImages = [...requiredImagesVar()];
 
