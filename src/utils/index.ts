@@ -343,6 +343,39 @@ function bytesToMegaBytes(bytes: number) {
   return Number((bytes / (1024 * 1024)).toFixed(2));
 }
 
+function preventNaNValues(e: React.KeyboardEvent<HTMLInputElement>): void {
+  const {
+    nativeEvent: { altKey, metaKey, shiftKey },
+  } = e;
+
+  const hasMetaComposing = altKey || metaKey || shiftKey;
+
+  if (
+    e.key === "Backspace" ||
+    e.key === "Tab" ||
+    e.key === "ArrowRight" ||
+    e.key === "ArrowLeft" ||
+    e.key === "Meta" ||
+    e.key === "Alt" ||
+    hasMetaComposing
+  ) {
+    return;
+  }
+
+  if (!isNumber(e.key)) {
+    e.preventDefault();
+
+    return;
+  }
+}
+
+function validatePassword(password: string) {
+  const regex =
+    /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*()])[a-zA-Z0-9!@#$%^&*]{8,16}$/;
+
+  return regex.test(password);
+}
+
 export {
   addImageOnServer,
   removeImageFromServer,
@@ -355,4 +388,6 @@ export {
   hasEveryInputFulfilled,
   isElementOverflown,
   bytesToMegaBytes,
+  preventNaNValues,
+  validatePassword,
 };

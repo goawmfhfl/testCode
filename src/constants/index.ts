@@ -97,6 +97,7 @@ export const productRegistrationSectionMapper: { [key: string]: string } = {
 export enum Pathnames {
   Home = "/",
   Login = "/login",
+  Password = "/password",
   Product = "/product",
   ProductRegistration = "/product/registration",
   Order = "/order",

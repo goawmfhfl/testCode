@@ -20,9 +20,14 @@ import { Pathnames } from "@constants/index";
 interface LayoutProps {
   children: React.ReactNode;
   hasSaveBar?: boolean;
+  hasSideNavigation?: boolean;
 }
 
-const Layout = ({ children, hasSaveBar }: LayoutProps) => {
+const Layout = ({
+  children,
+  hasSaveBar,
+  hasSideNavigation = true,
+}: LayoutProps) => {
   const modal = useReactiveVar(modalVar);
   const overModal = useReactiveVar(overModalVar);
   const systemModal = useReactiveVar(systemModalVar);
@@ -35,10 +40,11 @@ const Layout = ({ children, hasSaveBar }: LayoutProps) => {
     <>
       <Container>
         <GlobalNavigationBar />
-        <SideNavigationBar />
+        {hasSideNavigation && <SideNavigationBar />}
 
         <ContentsContainer
           hasBottomMargin={hasSaveBar}
+          hasLeftMargin={hasSideNavigation}
           ref={(newRef: HTMLElement) => contentsContainerReferenceVar(newRef)}
           preventScroll={loadingSpinnerVisibility}
         >
@@ -85,17 +91,17 @@ const Container = styled.div`
 
 const ContentsContainer = styled.div<{
   hasBottomMargin: boolean;
+  hasLeftMargin: boolean;
   preventScroll: boolean;
 }>`
+  flex: 1;
+
   display: flex;
   flex-direction: column;
 
-  margin-left: 210px;
+  margin-left: ${({ hasLeftMargin }) => (hasLeftMargin ? "210px" : "0px")};
   margin-top: 56px;
   margin-bottom: ${({ hasBottomMargin }) => (hasBottomMargin ? "72px" : "")};
-
-  min-width: 1182px;
-  min-height: 100%;
 
   ${({ preventScroll }) =>
     preventScroll
@@ -110,6 +116,8 @@ const ContentsContainer = styled.div<{
 
 const ContentsWrapper = styled.div`
   flex: 1;
+
+  display: flex;
 `;
 
 const ModalLayer = styled.div`

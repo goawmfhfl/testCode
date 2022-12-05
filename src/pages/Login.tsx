@@ -3,12 +3,11 @@ import { useState, useEffect } from "react";
 import styled from "styled-components/macro";
 import Layout from "@components/common/Layout";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useMutation, gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { OAuth2Client } from "google-auth-library";
 
 import appleSrc from "@icons/apple.svg";
 import kakaoSrc from "@icons/kakao.svg";
-import googleSrc from "@icons/google.svg";
 import Button from "@components/common/Button";
 
 import { AUTH_TOKEN_KEY } from "@constants/auth";
@@ -43,65 +42,65 @@ const Login = () => {
     reValidateMode: "onSubmit",
   });
 
-  useEffect(() => {
-    if (!google) return;
-    if (!naver) return;
-    if (!Kakao) return;
+  // useEffect(() => {
+  //   if (!google) return;
+  //   if (!naver) return;
+  //   if (!Kakao) return;
 
-    // naver oauth
-    const naverLogin = new naver.LoginWithNaverId({
-      clientId: "CZm3jInQ9yUhzPJCFM_j",
-      callbackUrl:
-        "http://" +
-        window.location.hostname +
-        (location.port == "" || location.port == undefined
-          ? ""
-          : ":" + location.port) +
-        "/oauth/naver",
-      isPopup: true,
-      loginButton: { color: "green", type: 1, height: 44 },
-    });
+  //   // naver oauth
+  //   const naverLogin = new naver.LoginWithNaverId({
+  //     clientId: "CZm3jInQ9yUhzPJCFM_j",
+  //     callbackUrl:
+  //       "http://" +
+  //       window.location.hostname +
+  //       (location.port == "" || location.port == undefined
+  //         ? ""
+  //         : ":" + location.port) +
+  //       "/oauth/naver",
+  //     isPopup: true,
+  //     loginButton: { color: "green", type: 1, height: 44 },
+  //   });
 
-    naverLogin.init();
+  //   naverLogin.init();
 
-    // kakao oauth
-    const isKakaoInitialized = Kakao.isInitialized();
+  //   // kakao oauth
+  //   const isKakaoInitialized = Kakao.isInitialized();
 
-    if (!isKakaoInitialized) {
-      Kakao.init(process.env.REACT_APP_KAKAO_JAVASCRIPT_KEY);
-    }
+  //   if (!isKakaoInitialized) {
+  //     Kakao.init(process.env.REACT_APP_KAKAO_JAVASCRIPT_KEY);
+  //   }
 
-    // google oauth
-    async function handleCredentialResponse(response: { credential: any }) {
-      const googleClient = new OAuth2Client(
-        process.env.REACT_APP_OAUTH_GOOGLE_CLIENT_ID
-      );
+  //   // google oauth
+  //   async function handleCredentialResponse(response: { credential: any }) {
+  //     const googleClient = new OAuth2Client(
+  //       process.env.REACT_APP_OAUTH_GOOGLE_CLIENT_ID
+  //     );
 
-      const verified = await googleClient.verifyIdToken({
-        idToken: response.credential,
-        audience: process.env.REACT_APP_OAUTH_GOOGLE_CLIENT_ID,
-      });
+  //     const verified = await googleClient.verifyIdToken({
+  //       idToken: response.credential,
+  //       audience: process.env.REACT_APP_OAUTH_GOOGLE_CLIENT_ID,
+  //     });
 
-      console.log(verified);
-    }
+  //     console.log(verified);
+  //   }
 
-    google.accounts.id.initialize({
-      client_id: process.env.REACT_APP_OAUTH_GOOGLE_CLIENT_ID,
-      callback: handleCredentialResponse,
-    });
+  //   google.accounts.id.initialize({
+  //     client_id: process.env.REACT_APP_OAUTH_GOOGLE_CLIENT_ID,
+  //     callback: handleCredentialResponse,
+  //   });
 
-    google.accounts.id.renderButton(
-      document.getElementById("google-login-button"),
-      {
-        theme: "filled_blue",
-        size: "large",
-        shape: "circle",
-        type: "icon",
-      }
-    );
+  //   google.accounts.id.renderButton(
+  //     document.getElementById("google-login-button"),
+  //     {
+  //       theme: "filled_blue",
+  //       size: "large",
+  //       shape: "circle",
+  //       type: "icon",
+  //     }
+  //   );
 
-    google.accounts.id.prompt();
-  }, [google]);
+  //   google.accounts.id.prompt();
+  // }, [google, naver, Kakao]);
 
   const onSubmit: SubmitHandler<LoginFormType> = async ({
     id: email,
@@ -163,7 +162,7 @@ const Login = () => {
   const { hasNoId, hasNoPassword, isInvalid } = isValidAuth;
 
   return (
-    <Layout>
+    <Layout hasSideNavigation={false}>
       <Container>
         <LoginContainer>
           <LoginTextWrapper>
@@ -213,7 +212,8 @@ const Login = () => {
             </ButtonWrapper>
           </LoginForm>
         </LoginContainer>
-        <SnsContainer>
+
+        {/* <SnsContainer>
           <SnsTitleWrapper>
             <SnsTitleText>SNS 간편 로그인</SnsTitleText>
           </SnsTitleWrapper>
@@ -232,13 +232,14 @@ const Login = () => {
             ></GoogleLoginButton>
             <img src={appleSrc} />
           </IconList>
-        </SnsContainer>
+        </SnsContainer> */}
+
         <FindUserContainer>
           <Link>
             <FindUserButton>아이디 찾기</FindUserButton>
           </Link>
-          <Link>
-            <FindUserButton>비밀번호 찾기</FindUserButton>
+          <Link href={Pathnames.Password}>
+            <FindUserButton>비밀번호 변경하기</FindUserButton>
           </Link>
         </FindUserContainer>
       </Container>

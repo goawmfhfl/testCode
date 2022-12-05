@@ -19,6 +19,7 @@ import Inquiry from "@pages/Inquiry";
 import Settlement from "@pages/Settlement";
 import Notice from "@pages/Notice";
 import Error from "@pages/Error";
+import Password from "@pages/Password";
 
 function App() {
   const modal = useReactiveVar(modalVar);
@@ -36,6 +37,7 @@ function App() {
         <Routes>
           <Route path={Pathnames.Home} element={<Home />} />
           <Route path={Pathnames.Login} element={<Login />} />
+          <Route path={Pathnames.Password} element={<Password />} />
           <Route path="oauth" element={<OAuth />}>
             <Route path=":oauthProvider" element={<OAuth />} />
           </Route>

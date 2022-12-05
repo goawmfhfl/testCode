@@ -1,8 +1,7 @@
-import React from "react";
 import styled from "styled-components/macro";
-import { UseFormRegisterReturn, useFormContext } from "react-hook-form";
+import { UseFormRegisterReturn } from "react-hook-form";
 
-import { isNumber } from "@utils/index";
+import { preventNaNValues } from "@utils/index";
 
 const TextInput = ({
   register,
@@ -21,34 +20,6 @@ const TextInput = ({
   placeholder?: string;
   numbersOnly?: boolean;
 }) => {
-  const { setValue } = useFormContext();
-
-  const preventNaNValues = (e: React.KeyboardEvent<HTMLInputElement>): void => {
-    const {
-      nativeEvent: { altKey, metaKey, shiftKey },
-    } = e;
-
-    const hasMetaComposing = altKey || metaKey || shiftKey;
-
-    if (
-      e.key === "Backspace" ||
-      e.key === "Tab" ||
-      e.key === "ArrowRight" ||
-      e.key === "ArrowLeft" ||
-      e.key === "Meta" ||
-      e.key === "Alt" ||
-      hasMetaComposing
-    ) {
-      return;
-    }
-
-    if (!isNumber(e.key)) {
-      e.preventDefault();
-
-      return;
-    }
-  };
-
   return (
     <Input
       {...register}

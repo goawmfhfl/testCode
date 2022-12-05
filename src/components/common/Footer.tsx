@@ -26,6 +26,7 @@ const Footer = () => {
           <Info>통신판매번호 : 2020-서울강남-03401</Info>
         </ThirdRow>
       </CompanyInfoContainer>
+
       <CopyRight>
         찹스틱스는 통신판매중개자이며 통신판매의 당사자가 아닙니다. 찹스틱스는
         상품 거래정보 및 거래 등에 대하여 책임을 지지 않습니다.Copyright © 2022
@@ -36,13 +37,14 @@ const Footer = () => {
 };
 
 const Container = styled.footer`
-  font-family: "Spoqa Han Sans Neo";
-  font-weight: 300;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+
   background-color: ${({ theme: { palette } }) => palette.grey500};
-  padding: 63px 112px;
+  padding: 24px 112px;
+
+  word-break: keep-all;
 `;
 
 const LogoWrapper = styled.div`
@@ -58,11 +60,6 @@ const CompanyInfoContainer = styled.div`
   flex-direction: column;
   gap: 16px;
   margin-bottom: 36px;
-
-  font-family: "Spoqa Han Sans Neo";
-  font-weight: 300;
-  font-size: 12px;
-  line-height: 18px;
 `;
 
 const FirstRow = styled.ul`
@@ -86,13 +83,12 @@ const ThirdRow = styled.ul`
   padding: 0px;
   gap: 24px;
 `;
-const Info = styled.li``;
+const Info = styled.li`
+  ${({ theme }) => theme.typo.korean.body.secondary.basic};
+`;
 
 const CopyRight = styled.span`
-  font-weight: 400;
-  font-size: 10px;
-  line-height: 14px;
-  letter-spacing: 0.1px;
+  ${({ theme }) => theme.typo.korean.caption.primary.basic};
   color: ${({ theme: { palette } }) => palette.grey700};
 `;
 

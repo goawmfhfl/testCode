@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import format from "date-fns/format";
-import axios from "axios";
 import styled from "styled-components/macro";
 import { Input as TextInput } from "@components/common/input/TextInput";
 import Button from "@components/common/Button";
@@ -8,46 +7,21 @@ import ValidText from "@components/common/ValidText";
 import { modalVar, systemModalVar } from "@cache/index";
 import { phoneNumberVar } from "@cache/shopSettings";
 import { validatePhoneNumber, isNumber } from "@utils/index";
-
-const bizm = axios.create({
-  baseURL: process.env.REACT_APP_BIZM_PRODUCT_URL,
-  headers: { userid: "chopsticks" },
-});
-
-const formatNumber = (number: string) => {
-  return "+82" + number.slice(1);
-};
+import { sendKakaoMessage } from "@utils/sendKakaoMessage";
 
 const postAuthenticationCode = async (
   phoneNumber: string,
   authenticationCode: string
 ) => {
   try {
-    const data = [
-      {
-        message_type: "AT",
-        phn: formatNumber(phoneNumber),
-        profile: process.env.REACT_APP_BIZM_PROFILE,
-        reserveDt: "00000000000000",
-        tmplId: "chopsticks_05",
-        msg: `[${authenticationCode}] 인증번호를 입력하시면 인증이 완료됩니다.`,
-      },
-    ];
-
-    const {
-      data: bizmResponseData,
-    }: {
-      data: Array<{
-        code: string;
-        data: string;
-        message: string;
-        originMessage: string | null;
-      }>;
-    } = await bizm.post(`/v2/sender/send`, data);
+    const { data } = await sendKakaoMessage(
+      phoneNumber,
+      `[${authenticationCode}] 인증번호를 입력하시면 인증이 완료됩니다.`
+    );
 
     if (
-      bizmResponseData[0].code === "fail" &&
-      /InvalidPhoneNumber/gi.test(bizmResponseData[0].message)
+      data[0].code === "fail" &&
+      /InvalidPhoneNumber/gi.test(data[0].message)
     ) {
       systemModalVar({
         ...systemModalVar(),
@@ -58,7 +32,7 @@ const postAuthenticationCode = async (
       return false;
     }
 
-    if (bizmResponseData[0].code === "fail") {
+    if (data[0].code === "fail") {
       systemModalVar({
         ...systemModalVar(),
         isVisible: true,
