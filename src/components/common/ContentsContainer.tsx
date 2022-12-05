@@ -28,6 +28,7 @@ const ContentsContainer = ({ isForm, children }: ContentsContainerProps) => {
 const containerStyles = css`
   background-color: ${({ theme: { palette } }) => palette.grey100};
   padding: 16px 24px;
+  width: 100%;
   height: 100%;
 `;
 
@@ -37,6 +38,8 @@ const Form = styled.form`
 
 const Container = styled.div`
   ${containerStyles}
+
+  flex: 1;
 `;
 
 export default ContentsContainer;

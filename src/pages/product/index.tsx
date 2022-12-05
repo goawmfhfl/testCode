@@ -27,6 +27,7 @@ const Product = () => {
 
 const ProductContainer = styled.div`
   min-width: 1182px;
+  width: 100%;
 `;
 
 export default Product;
