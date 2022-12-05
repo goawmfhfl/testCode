@@ -133,7 +133,7 @@ const ShopInfo = () => {
 
         shopImagesVar({
           ...shopImagesVar(),
-          pcImage: data[0],
+          pcImage: data[0].url,
         });
       }
     } catch (error) {
