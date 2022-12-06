@@ -227,16 +227,12 @@ const ProductTable = () => {
     };
 
   useEffect(() => {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      (async () => {
-        await getProducts({
-          variables: { input: { page, skip, status, query } },
-        });
-      })();
-    } catch (error) {
-      console.log(error);
-    }
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    (async () => {
+      await getProducts({
+        variables: { input: { page, skip, status, query } },
+      });
+    })();
   }, [page, skip, status, query]);
 
   useEffect(() => {
@@ -269,6 +265,39 @@ const ProductTable = () => {
   useEffect(() => {
     commonFilterOptionVar({ ...commonFilterOptionVar(), page: 1 });
   }, [query]);
+
+  useEffect(() => {
+    if (error) {
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: (
+          <>
+            내부 서버 오류로 인해 요청하신
+            <br />
+            작업을 완료하지 못했습니다.
+            <br />
+            다시 한 번 시도 후 같은 문제가 발생할 경우
+            <br />
+            찹스틱스로 문의해주세요.
+            <br />
+            <br />
+            (전화 문의 070-4187-3848)
+            <br />
+            <br />
+            code:
+            {error.message}
+          </>
+        ),
+        confirmButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
+      });
+    }
+  }, [error]);
 
   return (
     <TableContainer type={TableType.FIX}>
