@@ -1,21 +1,25 @@
-import { CategoriesType, CategoryType, CategoryName } from "@models/index";
+import { CategoriesType, CategoryType } from "@models/index";
+import { CategoryNames } from "@constants/category";
 
 const contructCategories = (categories: Array<CategoriesType>) => {
-  const firstCategoriesInitialValue: Array<CategoryName> = [];
+  const firstCategoriesInitialValue: Array<CategoryNames> = [];
   const secondCategoriesInitialValue: {
-    [key: string]: Array<CategoryName>;
+    [key: string]: Array<CategoryNames>;
   } = {};
 
   const thirdCategoriesInitialValue: Array<{
-    [key: string]: Array<CategoryName>;
+    [key: string]: Array<CategoryNames>;
   }> = [];
 
-  const firstCategories: Array<CategoryName> = categories.reduce((acc, cur) => {
-    if (cur.parent === null && cur.type === CategoryType.NORMAL) {
-      acc.push(cur.name);
-    }
-    return acc;
-  }, firstCategoriesInitialValue);
+  const firstCategories: Array<CategoryNames> = categories.reduce(
+    (acc, cur) => {
+      if (cur.parent === null && cur.type === CategoryType.NORMAL) {
+        acc.push(cur.name);
+      }
+      return acc;
+    },
+    firstCategoriesInitialValue
+  );
 
   const secondCategories = firstCategories.reduce((acc, cur) => {
     const foundCategory: CategoriesType = categories.find(

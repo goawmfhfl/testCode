@@ -43,19 +43,20 @@ import { checkAllBoxStatusVar } from "@cache/index";
 import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
 import useCategories from "@hooks/useCategories";
 import contructCategories from "@utils/contructCategories";
-import { CategoriesType, CategoryName } from "@models/index";
+import { CategoriesType } from "@models/index";
+import { CategoryNames } from "@constants/category";
 
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
   const { loading, error, data } = useCategories();
   const [categories, setCategories] =
     useState<{
-      firstCategories: Array<CategoryName>;
+      firstCategories: Array<CategoryNames>;
       secondCategories: {
-        [key: string]: Array<CategoryName>;
+        [key: string]: Array<CategoryNames>;
       };
       thirdCategories: {
-        [key: string]: Array<CategoryName>;
+        [key: string]: Array<CategoryNames>;
       }[];
     }>();
 
@@ -63,20 +64,20 @@ const ChangeCategoryModal = () => {
   const checkedProductIds = useReactiveVar(checkedProductIdsVar);
   const [isBmarketChecked, setIsBmarketChecked] = useState<boolean>(false);
 
-  const selectedFirstCategory: CategoryName = watch(
+  const selectedFirstCategory: CategoryNames = watch(
     CATEGORY_FIRST
-  ) as CategoryName;
-  const selectedSecondCategory: CategoryName = watch(
+  ) as CategoryNames;
+  const selectedSecondCategory: CategoryNames = watch(
     CATEGORY_SECOND
-  ) as CategoryName;
+  ) as CategoryNames;
 
-  const categoryDepthFirst: Array<CategoryName> =
+  const categoryDepthFirst: Array<CategoryNames> =
     categories?.firstCategories || [];
 
-  const categoryDepthSecond: Array<CategoryName> =
+  const categoryDepthSecond: Array<CategoryNames> =
     categories?.secondCategories[selectedFirstCategory] || [];
 
-  const categoryDepthThird: Array<CategoryName> =
+  const categoryDepthThird: Array<CategoryNames> =
     categories?.secondCategories[selectedSecondCategory] || [];
 
   const detailNotice = useReactiveVar(DetailNoticeVar);

@@ -1,60 +1,82 @@
 import styled from "styled-components/macro";
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { compareAsc } from "date-fns";
 
 import {
   SelectInput as Dropdown,
   OptionInput as Option,
 } from "@components/common/input/Dropdown";
 import NoticeContainer from "@components/common/NoticeContainer";
+
 import {
   CATEGORY_FIRST,
   CATEGORY_SECOND,
   CATEGORY_THIRD,
 } from "@cache/productForm";
-
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import useCategories from "@hooks/useCategories";
 import contructCategories from "@utils/contructCategories";
-import { CategoriesType, CategoryName } from "@models/index";
+import { CategoriesType } from "@models/index";
+import { loadingSpinnerVisibilityVar, systemModalVar } from "@cache/index";
+import useShopInfo from "@hooks/useShopInfo";
+import { CategoryNames, CATEGORY_NAMES } from "@constants/category";
 
 const CategorySection = () => {
   const { watch, register, setValue } = useFormContext();
-  const { loading, error, data } = useCategories();
+  const { loading: isCategoryLoading, data: categoryData } = useCategories();
+  const { loading: isShopLoading, data: shopInfoData } = useShopInfo();
+
   const [categories, setCategories] =
     useState<{
-      firstCategories: Array<CategoryName>;
+      firstCategories: Array<CategoryNames>;
       secondCategories: {
-        [key: string]: Array<CategoryName>;
+        [key: string]: Array<CategoryNames>;
       };
       thirdCategories: {
-        [key: string]: Array<CategoryName>;
+        [key: string]: Array<CategoryNames>;
       }[];
     }>();
 
-  const selectedFirstCategory: CategoryName = watch(
+  const selectedFirstCategory: CategoryNames = watch(
     CATEGORY_FIRST
-  ) as CategoryName;
-  const selectedSecondCategory: CategoryName = watch(
+  ) as CategoryNames;
+  const selectedSecondCategory: CategoryNames = watch(
     CATEGORY_SECOND
-  ) as CategoryName;
+  ) as CategoryNames;
 
-  const categoryDepthFirst: Array<CategoryName> =
+  const categoryDepthFirst: Array<CategoryNames> =
     categories?.firstCategories || [];
 
-  const categoryDepthSecond: Array<CategoryName> =
+  const categoryDepthSecond: Array<CategoryNames> =
     categories?.secondCategories[selectedFirstCategory] || [];
 
-  const categoryDepthThird: Array<CategoryName> =
+  const categoryDepthThird: Array<CategoryNames> =
     categories?.secondCategories[selectedSecondCategory] || [];
 
   useEffect(() => {
     const categories: Array<CategoriesType> =
-      data?.getAllCategories.categories || [];
+      categoryData?.getAllCategories.categories || [];
     const recontructCategories = contructCategories(categories);
     setCategories(recontructCategories);
-  }, [data]);
+  }, [categoryData]);
+
+  useEffect(() => {
+    const isLoading = isCategoryLoading || isShopLoading;
+
+    loadingSpinnerVisibilityVar(isLoading);
+  }, [isCategoryLoading || isShopLoading]);
+
+  if (!shopInfoData) return <></>;
+
+  const { safetyAuthentication, safetyAuthenticationExpiredDate } =
+    shopInfoData.getShopInfo;
+
+  const isSafetyAuthenticated =
+    safetyAuthentication &&
+    safetyAuthenticationExpiredDate &&
+    compareAsc(new Date(safetyAuthenticationExpiredDate), new Date()) < 1;
 
   return (
     <Container>
@@ -86,11 +108,13 @@ const CategorySection = () => {
                 name: value,
                 value,
               })),
-            ].map((option) => (
-              <Option key={option.value} value={option.value}>
-                {option.name}
-              </Option>
-            ))}
+            ].map((option) => {
+              return (
+                <Option key={option.value} value={option.value}>
+                  {option.value ? CATEGORY_NAMES[option.value] : option.name}
+                </Option>
+              );
+            })}
           </Dropdown>
         </DropdownWrapper>
 
@@ -100,10 +124,36 @@ const CategorySection = () => {
             sizing={"big"}
             arrowSrc={downwordArrowBig}
             width={"231px"}
-            {...register(CATEGORY_SECOND)}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              setValue(CATEGORY_SECOND, e.target.value);
-              setValue(CATEGORY_THIRD, "");
+            {...{
+              ...register(CATEGORY_SECOND),
+              onChange: (e: React.ChangeEvent<HTMLSelectElement>) => {
+                e.preventDefault();
+
+                const isChemicalProduct =
+                  e.target.value === CategoryNames.DIFFUSER_ROOMSPRAY ||
+                  e.target.value === CategoryNames.CANDLE;
+
+                if (isChemicalProduct && !isSafetyAuthenticated) {
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: true,
+                    description: (
+                      <>
+                        샵 설정에서 안전기준 적합 확인검사를 <br />
+                        인증 후 선택하실 수 있습니다.
+                      </>
+                    ),
+                  });
+
+                  setValue(CATEGORY_SECOND, "");
+                  setValue(CATEGORY_THIRD, "");
+
+                  return;
+                }
+
+                setValue(CATEGORY_SECOND, e.target.value);
+                setValue(CATEGORY_THIRD, "");
+              },
             }}
             disabled={!categoryDepthSecond.length ? true : false}
           >
@@ -113,11 +163,13 @@ const CategorySection = () => {
                 name: value,
                 value,
               })),
-            ].map((option) => (
-              <Option key={option.value} value={option.value}>
-                {option.name}
-              </Option>
-            ))}
+            ].map((option) => {
+              return (
+                <Option key={option.value} value={option.value}>
+                  {option.value ? CATEGORY_NAMES[option.value] : option.name}
+                </Option>
+              );
+            })}
           </Dropdown>
         </DropdownWrapper>
 

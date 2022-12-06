@@ -53,11 +53,7 @@ import {
 import { shipmentTemplatesVar } from "@cache/productForm/shipmentTemplate";
 import { tagListVar } from "@cache/productForm/searchTag";
 
-import {
-  CategoryName,
-  ColorType,
-  UploadedFileInfos,
-} from "@models/product/index";
+import { ColorType, UploadedFileInfos } from "@models/product/index";
 import { TagTypes } from "@models/product/searchTag";
 import {
   ShipmentChargeType,
@@ -67,6 +63,7 @@ import {
   descriptionImagesInitialValue,
   descriptionImagesVar,
 } from "@cache/productForm/descriptionImages";
+import { CategoryNames } from "@constants/category";
 
 export function restructureProductRegistrationStates(
   formContext: UseFormReturn
@@ -187,17 +184,17 @@ function combineProductFormImages(): Array<UploadedFileInfos> {
   );
 }
 
-function getCategoryName(formContext: UseFormReturn): CategoryName {
+function getCategoryName(formContext: UseFormReturn): CategoryNames {
   const { getValues } = formContext;
 
-  const categories: Array<CategoryName> = getValues([
+  const categories: Array<CategoryNames> = getValues([
     CATEGORY_FIRST,
     CATEGORY_SECOND,
     CATEGORY_THIRD,
   ]);
 
   for (let i = 0; i < categories.length; i++) {
-    const previousCategoryName: CategoryName | undefined = categories[i - 1];
+    const previousCategoryName: CategoryNames | undefined = categories[i - 1];
     const categoryName = categories[i];
 
     if (!categoryName) {
