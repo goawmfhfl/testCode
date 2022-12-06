@@ -1,5 +1,5 @@
 import styled from "styled-components/macro";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useReactiveVar } from "@apollo/client";
 
@@ -27,10 +27,12 @@ const FilterBar = () => {
   const products = productStatus?.getAllProductsBySeller.products || [];
   const productLength = getProductLength(products);
 
+  const [showNotice, setShowNotice] = useState<boolean>(false);
+
   const searchResultLength =
     productsData?.getAllProductsBySeller.totalResults || 0;
 
-  const { allProducts, onSale, stopSale, soldOut, temporary } = productLength;
+  const { all, onSale, stopSale, soldOut, temporary } = productLength;
 
   const handleFilterOptionNameClick =
     (filterOptionName: ProductStatus) => () => {
@@ -107,7 +109,7 @@ const FilterBar = () => {
           onClick={handleFilterOptionNameClick(null)}
           isActive={selectedStatus === null}
         >
-          전체 {allProducts}
+          전체 {all}
         </Filter>
         <Filter
           onClick={handleFilterOptionNameClick(ProductStatus.ON_SALE)}
@@ -125,8 +127,20 @@ const FilterBar = () => {
           onClick={handleFilterOptionNameClick(ProductStatus.SOLD_OUT)}
           isActive={selectedStatus === ProductStatus.SOLD_OUT}
         >
-          <QuestionMarkIcon src={questionMarkSrc} />
+          <QuestionMarkIcon
+            src={questionMarkSrc}
+            onMouseOver={() => setShowNotice(true)}
+            onMouseLeave={() => setShowNotice(false)}
+          />
           품절 {soldOut}
+          {showNotice && (
+            <SoldOutNoticeContainer>
+              <NoticeIcon src={questionMarkSrc} />
+              <NoticeText>
+                품절된 상품을 숨김처리시 ‘숨김'메뉴에서 확인 가능합니다.
+              </NoticeText>
+            </SoldOutNoticeContainer>
+          )}
         </Filter>
         <Filter
           onClick={handleFilterOptionNameClick(ProductStatus.TEMPORARY)}
@@ -155,6 +169,8 @@ const FilterList = styled.ul`
 `;
 
 const Filter = styled.li<{ isActive: boolean }>`
+  position: relative;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -170,6 +186,43 @@ const Filter = styled.li<{ isActive: boolean }>`
 const QuestionMarkIcon = styled.img`
   width: 24px;
   height: 24px;
+`;
+
+const SoldOutNoticeContainer = styled.div`
+  position: absolute;
+  left: 35%;
+  top: -25%;
+
+  transform: translateY(-50%);
+
+  z-index: 10;
+
+  display: flex;
+  width: 350px;
+  padding: 8px 16px 8px 8px;
+  border-radius: 7px;
+  background: ${({ theme: { palette } }) => palette.grey400};
+`;
+
+const NoticeText = styled.span`
+  flex: 1;
+  display: flex;
+  align-items: center;
+
+  font-family: "Spoqa Han Sans Neo";
+  font-weight: 300;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+`;
+
+const NoticeIcon = styled.img`
+  width: 24px;
+  height: 24px;
+  margin-right: 15px;
+
+  user-select: none;
 `;
 
 export default FilterBar;
