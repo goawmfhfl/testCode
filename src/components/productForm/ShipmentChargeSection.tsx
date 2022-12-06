@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { useEffect, useState } from "react";
 import styled, { useTheme } from "styled-components/macro";
 import { useFormContext } from "react-hook-form";
@@ -11,13 +12,14 @@ import ShipmentChargeTemplateModal from "@components/productForm/ShipmentChargeT
 
 import { modalVar } from "@cache/index";
 import {
-  SHIPMENT_TEMPLATE,
+  SHIPMENT_TEMPLATE_ID,
+  SHIPMENT_TEMPLATE_NAME,
   IS_BUNDLE_SHIPMENT,
   SHIPMENT_PRICE_TYPE,
   SHIPMENT_PRICE,
   SHIPMENT_DISTANT_PRICE,
-  RETURN_PRICE,
-  EXCHANGE_PRICE,
+  SHIPMENT_RETURN_PRICE,
+  SHIPMENT_EXCHANGE_PRICE,
 } from "@cache/productForm/index";
 import { shipmentTemplatesVar } from "@cache/productForm/shipmentTemplate";
 
@@ -101,49 +103,72 @@ const ShipmentChargeSection = () => {
     })();
   }, [modal.isVisible]);
 
-  const selectedTemplateName = watch(SHIPMENT_TEMPLATE) as string;
+  const shipmentTemplateId = watch(SHIPMENT_TEMPLATE_ID) as number;
+  const shipmentTemplateName = watch(SHIPMENT_TEMPLATE_NAME) as string;
 
   useEffect(() => {
-    const selectedTemplate: CreateShipmentInputType = shipmentTemplates.find(
-      (template) => template.name === selectedTemplateName
-    );
+    // eslint-disable-next-line
+    (async () => {
+      const {
+        data: {
+          getUserShipmentTemplates: { shipmentTemplates },
+        },
+      } = await getShipmentTemplates();
 
-    if (!selectedTemplate) {
-      setValue(IS_BUNDLE_SHIPMENT, "불가능");
-      setValue(SHIPMENT_PRICE_TYPE, ShipmentChargeType.Free);
-      setValue(SHIPMENT_PRICE, 0);
-      setValue(SHIPMENT_DISTANT_PRICE, 0);
-      setValue(RETURN_PRICE, 0);
-      setValue(EXCHANGE_PRICE, 0);
+      const selectedTemplate: CreateShipmentInputType = shipmentTemplates.find(
+        (template) => template.id === shipmentTemplateId
+      );
 
-      setHasTemplateSelected(false);
+      if (!selectedTemplate) return;
 
-      return;
-    }
+      setValue(SHIPMENT_TEMPLATE_NAME, selectedTemplate.name);
+    })();
+  }, [shipmentTemplateId]);
 
-    const {
-      type,
-      price,
-      isBundleShipment,
-      distantPrice,
-      returnPrice,
-      exchangePrice,
-    } = selectedTemplate;
+  useEffect(() => {
+    // eslint-disable-next-line
+    (async () => {
+      const {
+        data: {
+          getUserShipmentTemplates: { shipmentTemplates },
+        },
+      } = await getShipmentTemplates();
 
-    setValue(IS_BUNDLE_SHIPMENT, isBundleShipment ? "가능" : "불가능");
-    setValue(
-      SHIPMENT_PRICE_TYPE,
-      type === ShipmentChargeType.Free
-        ? ShipmentChargeType.Free
-        : ShipmentChargeType.Charged
-    );
-    setValue(SHIPMENT_PRICE, price);
-    setValue(SHIPMENT_DISTANT_PRICE, distantPrice);
-    setValue(RETURN_PRICE, returnPrice);
-    setValue(EXCHANGE_PRICE, exchangePrice);
+      const selectedTemplate: CreateShipmentInputType = shipmentTemplates.find(
+        (template) => template.name === shipmentTemplateName
+      );
 
-    setHasTemplateSelected(true);
-  }, [selectedTemplateName]);
+      if (!selectedTemplate) {
+        setHasTemplateSelected(false);
+        return;
+      }
+
+      const {
+        id,
+        type,
+        price,
+        isBundleShipment,
+        distantPrice,
+        returnPrice,
+        exchangePrice,
+      } = selectedTemplate;
+
+      setValue(SHIPMENT_TEMPLATE_ID, id);
+      setValue(IS_BUNDLE_SHIPMENT, isBundleShipment ? "가능" : "불가능");
+      setValue(
+        SHIPMENT_PRICE_TYPE,
+        type === ShipmentChargeType.Free
+          ? ShipmentChargeType.Free
+          : ShipmentChargeType.Charged
+      );
+      setValue(SHIPMENT_PRICE, price);
+      setValue(SHIPMENT_DISTANT_PRICE, distantPrice);
+      setValue(SHIPMENT_RETURN_PRICE, returnPrice);
+      setValue(SHIPMENT_EXCHANGE_PRICE, exchangePrice);
+
+      setHasTemplateSelected(true);
+    })();
+  }, [shipmentTemplateName]);
 
   const isShipmentChargeFree =
     watch(SHIPMENT_PRICE_TYPE) === ShipmentChargeType.Free;
@@ -161,10 +186,31 @@ const ShipmentChargeSection = () => {
 
         <DropdownWrapper>
           <Dropdown
-            register={register(SHIPMENT_TEMPLATE)}
+            register={{
+              ...register(SHIPMENT_TEMPLATE_NAME),
+              // eslint-disable-next-line
+              onChange: async (e: React.ChangeEvent<HTMLSelectElement>) => {
+                setValue(SHIPMENT_TEMPLATE_NAME, e.target.value);
+
+                const selectedTemplate: CreateShipmentInputType =
+                  shipmentTemplates.find(
+                    (template) => template.name === e.target.value
+                  );
+                setValue(SHIPMENT_TEMPLATE_ID, selectedTemplate.id);
+
+                if (!selectedTemplate) {
+                  setValue(SHIPMENT_TEMPLATE_ID, null);
+                  setValue(SHIPMENT_PRICE_TYPE, ShipmentChargeType.Charged);
+                  setValue(SHIPMENT_PRICE, null);
+                  setValue(SHIPMENT_DISTANT_PRICE, null);
+                  setValue(SHIPMENT_RETURN_PRICE, null);
+                  setValue(SHIPMENT_EXCHANGE_PRICE, null);
+                }
+              },
+            }}
             size="medium"
             options={[
-              { name: "템플릿 선택 안함", value: null },
+              { name: "템플릿 선택 안함", value: "" },
               ...shipmentTemplates.map(({ name }) => ({
                 name,
                 value: name,
@@ -196,7 +242,6 @@ const ShipmentChargeSection = () => {
             id="bundling-enabled"
             value="가능"
             disabled={hasTemplateSelected}
-            checked
           />
 
           <label htmlFor="bundling-disabled">불가능</label>
@@ -269,7 +314,7 @@ const ShipmentChargeSection = () => {
             반품배송비(편도)
             <TextInputWrapper hasLeftMargin={true}>
               <TextInput
-                register={register(RETURN_PRICE)}
+                register={register(SHIPMENT_RETURN_PRICE)}
                 placeholder={"숫자만 입력"}
                 disabled={hasTemplateSelected}
                 numbersOnly={true}
@@ -282,7 +327,7 @@ const ShipmentChargeSection = () => {
             교환배송비(왕복)
             <TextInputWrapper hasLeftMargin={true}>
               <TextInput
-                register={register(EXCHANGE_PRICE)}
+                register={register(SHIPMENT_EXCHANGE_PRICE)}
                 placeholder={"숫자만 입력"}
                 disabled={hasTemplateSelected}
                 numbersOnly={true}

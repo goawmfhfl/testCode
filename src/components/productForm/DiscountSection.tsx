@@ -107,6 +107,7 @@ const ProductDiscount = () => {
               className="date-picker"
               selected={discountStartsAt}
               placeholderText="할인 시작일을 선택해주세요"
+              dateFormat="yyyy-MM-dd"
               onChange={(selectedDate: Date) => {
                 const yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
@@ -149,6 +150,7 @@ const ProductDiscount = () => {
               className="date-picker"
               selected={discountEndsAt}
               placeholderText="할인 종료일을 선택해주세요"
+              dateFormat="yyyy-MM-dd"
               onChange={(selectedDate: Date) => {
                 const isAfterDiscountStarts =
                   compareAsc(discountStartsAt, selectedDate) > -1;

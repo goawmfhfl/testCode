@@ -7,6 +7,7 @@ import {
   shipmentTemplateVar,
   initialState as shipmentTemplateInitialState,
 } from "@cache/productForm/shipmentTemplate";
+import { GET_SHIPMENT_TEMPLATES } from "@graphql/queries/getShipmentTemplates";
 
 const CREATE_SHIPMENT_TEMPLATE = gql`
   mutation CreateShipmentTemplate($input: CreateShipmentTemplateInput!) {
@@ -18,10 +19,18 @@ const CREATE_SHIPMENT_TEMPLATE = gql`
 `;
 
 const ShipmentTemplateModal = () => {
-  const [createShipmentTemplate] = useMutation<
-    { createShipmentTemplate: { ok: boolean; error: string } },
-    { input: CreateShipmentInputType }
-  >(CREATE_SHIPMENT_TEMPLATE);
+  const [createShipmentTemplate, { loading: isCreateShipmentTemplateLoading }] =
+    useMutation<
+      { createShipmentTemplate: { ok: boolean; error: string } },
+      { input: CreateShipmentInputType }
+    >(CREATE_SHIPMENT_TEMPLATE, {
+      refetchQueries: [
+        {
+          query: GET_SHIPMENT_TEMPLATES,
+        },
+        "GetShipmentTemplates",
+      ],
+    });
 
   const handleRegisterButtonClick = () => {
     try {
@@ -37,21 +46,23 @@ const ShipmentTemplateModal = () => {
           exchangeCharge,
         } = shipmentTemplateVar();
 
+        const input = {
+          name,
+          isBundleShipment: isBundlingEnabled,
+          type: shipmentChargeType,
+          price: Number(shipmentCharge),
+          distantPrice: Number(additionalCharge),
+          returnPrice: Number(returnCharge),
+          exchangePrice: Number(exchangeCharge),
+        };
+
         const {
           data: {
             createShipmentTemplate: { ok, error },
           },
         } = await createShipmentTemplate({
           variables: {
-            input: {
-              name,
-              isBundleShipment: isBundlingEnabled,
-              type: shipmentChargeType,
-              price: shipmentCharge,
-              distantPrice: additionalCharge,
-              returnPrice: returnCharge,
-              exchangePrice: exchangeCharge,
-            },
+            input,
           },
         });
 
@@ -102,6 +113,7 @@ const ShipmentTemplateModal = () => {
       formTitle={"배송 템플릿 만들기"}
       handleRegisterButtonClick={handleRegisterButtonClick}
       handleCancelButtonClick={handleCancelButtonClick}
+      isRegistering={isCreateShipmentTemplateLoading}
     />
   );
 };

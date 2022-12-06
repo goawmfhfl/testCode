@@ -24,14 +24,12 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
   const [lastRowRef, setLastRowRef] = useState<HTMLElement | null>(null);
 
   return (
-    <AdaptedOptionTableContainer
-      hasManyColumns={adaptedOption.optionHeaders.length > 3}
-    >
+    <TableContainer hasManyColumns={adaptedOption.optionHeaders.length > 3}>
       {/* tr */}
       <tbody>
-        <AdaptedOptionTableHeaderRow className="header--sticky-top">
+        <TableHeaderRow className="header--sticky-top">
           {/* th */}
-          <AdaptedOptionTableHeader
+          <TableHeader
             className={"header--container"}
             colSpan={
               adaptedOption.optionHeaders.length < 2
@@ -42,27 +40,23 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
             {/* tr */}
             <Table>
               <tbody>
-                <AdaptedOptionTableHeaderRow>
+                <TableHeaderRow>
                   {optionType === OptionTypes.Required && (
-                    <AdaptedOptionTableHeader>옵션명</AdaptedOptionTableHeader>
+                    <TableHeader>옵션명</TableHeader>
                   )}
 
                   {!adaptedOption.optionHeaders.length &&
                     optionType === OptionTypes.Selective && (
                       <>
-                        <AdaptedOptionTableHeader>
-                          추가 옵션명
-                        </AdaptedOptionTableHeader>
-                        <AdaptedOptionTableHeader>
-                          추가 옵션값
-                        </AdaptedOptionTableHeader>
+                        <TableHeader>추가 옵션명</TableHeader>
+                        <TableHeader>추가 옵션값</TableHeader>
                       </>
                     )}
-                </AdaptedOptionTableHeaderRow>
+                </TableHeaderRow>
 
                 {adaptedOption.optionHeaders.length ? (
                   // tr
-                  <AdaptedOptionTableHeaderRow>
+                  <TableHeaderRow>
                     {adaptedOption.optionHeaders.map(
                       ({ key, header }, headerIndex) => {
                         const optionValueCell = lastRowRef?.children[
@@ -72,31 +66,31 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
                         const width = optionValueCell?.offsetWidth;
 
                         return (
-                          <AdaptedOptionTableHeader
+                          <TableHeader
                             key={key}
                             width={width ? `${width}px` : ""}
                           >
                             {header}
-                          </AdaptedOptionTableHeader>
+                          </TableHeader>
                         );
                       }
                     )}
-                  </AdaptedOptionTableHeaderRow>
+                  </TableHeaderRow>
                 ) : (
                   <></>
                 )}
               </tbody>
             </Table>
-          </AdaptedOptionTableHeader>
+          </TableHeader>
 
-          <AdaptedOptionTableHeader className={"header--top-end header--price"}>
+          <TableHeader className={"header--top-end header--price"}>
             옵션가
-          </AdaptedOptionTableHeader>
+          </TableHeader>
 
-          <AdaptedOptionTableHeader className={"header--top-end header--stock"}>
+          <TableHeader className={"header--top-end header--stock"}>
             재고
-          </AdaptedOptionTableHeader>
-        </AdaptedOptionTableHeaderRow>
+          </TableHeader>
+        </TableHeaderRow>
 
         {adaptedOption.optionRows.length ? (
           adaptedOption.optionRows.map(
@@ -104,23 +98,23 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
               const isLastRow = index + 1 === optionRows.length;
 
               return (
-                <AdaptedOptionTableRow
+                <TableRow
                   key={id}
                   ref={isLastRow ? (ref) => setLastRowRef(ref) : null}
                 >
                   {option.map((el, index) => (
-                    <AdaptedOptionTableData
+                    <TableData
                       key={`${el}-${index}`}
                       colSpan={adaptedOption.optionHeaders.length === 1 ? 2 : 1}
                       className={isLastRow ? "cell--low-end" : ""}
                       width={`${100 / adaptedOption.optionHeaders.length}%`}
                     >
                       {el}
-                    </AdaptedOptionTableData>
+                    </TableData>
                   ))}
 
                   {/* 옵션가 */}
-                  <AdaptedOptionTableData
+                  <TableData
                     className={isLastRow ? "cell--low-end" : ""}
                     width={"80px"}
                   >
@@ -157,14 +151,14 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
                         }
                       }}
                     />
-                  </AdaptedOptionTableData>
+                  </TableData>
 
                   {/* 재고 */}
-                  <AdaptedOptionTableData
+                  <TableData
                     className={isLastRow ? "cell--low-end" : ""}
                     width={"64px"}
                   >
-                    <AdaptedOptionStockInput
+                    <StockInput
                       {...register(`optionStock-${id}`, {
                         valueAsNumber: true,
                       })}
@@ -194,8 +188,8 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
                         }
                       }}
                     />
-                  </AdaptedOptionTableData>
-                </AdaptedOptionTableRow>
+                  </TableData>
+                </TableRow>
               );
             }
           )
@@ -208,7 +202,7 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
           </EmptyTableRow>
         )}
       </tbody>
-    </AdaptedOptionTableContainer>
+    </TableContainer>
   );
 };
 
@@ -216,13 +210,13 @@ const Table = styled.table`
   width: 100%;
 `;
 
-const AdaptedOptionTableContainer = styled.table<{ hasManyColumns: boolean }>`
+const TableContainer = styled.table<{ hasManyColumns: boolean }>`
   width: ${({ hasManyColumns }) => (hasManyColumns ? "892px" : "757px")};
 
   border-collapse: collapse;
 `;
 
-const AdaptedOptionTableHeaderRow = styled.tr`
+const TableHeaderRow = styled.tr`
   background-color: ${({ theme: { palette } }) => palette.grey400};
 
   &.header--sticky-top {
@@ -231,7 +225,7 @@ const AdaptedOptionTableHeaderRow = styled.tr`
   }
 `;
 
-const AdaptedOptionTableHeader = styled.th<{
+const TableHeader = styled.th<{
   width?: string;
   borderTop?: boolean;
   borderBottom?: boolean;
@@ -281,9 +275,9 @@ const AdaptedOptionTableHeader = styled.th<{
   }
 `;
 
-const AdaptedOptionTableRow = styled.tr``;
+const TableRow = styled.tr``;
 
-const AdaptedOptionTableData = styled.td<{ width: string }>`
+const TableData = styled.td<{ width: string }>`
   width: ${({ width }) => width};
   padding: 10px;
   padding-right: 0px;
@@ -307,7 +301,7 @@ const AdaptedOptionPriceInput = styled(NumberInput)`
   ime-mode: disabled;
 `;
 
-const AdaptedOptionStockInput = styled(NumberInput)``;
+const StockInput = styled(NumberInput)``;
 
 const EmptyTableRow = styled.tr`
   color: ${({ theme: { palette } }) => palette.grey500};

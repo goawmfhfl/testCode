@@ -3,6 +3,7 @@ export enum ShipmentChargeType {
   Free = "FREE",
 }
 
+// 내부적으로 관리되는 template
 export interface ShipmentTemplateType {
   name: string;
   isBundlingEnabled: boolean;
@@ -13,6 +14,7 @@ export interface ShipmentTemplateType {
   exchangeCharge: number;
 }
 
+// 서버에 저장될, 혹은 저장되었던 template
 // TODO: 네이밍 재검토
 export interface CreateShipmentInputType {
   id?: number;

@@ -22,13 +22,13 @@ import {
   HAS_MANUFACTURING_LEAD_TIME,
   LEAD_TIME_MIN,
   LEAD_TIME_MAX,
-  SHIPMENT_TEMPLATE,
+  SHIPMENT_TEMPLATE_ID,
   IS_BUNDLE_SHIPMENT,
   SHIPMENT_PRICE_TYPE,
   SHIPMENT_PRICE,
   SHIPMENT_DISTANT_PRICE,
-  RETURN_PRICE,
-  EXCHANGE_PRICE,
+  SHIPMENT_RETURN_PRICE,
+  SHIPMENT_EXCHANGE_PRICE,
   SPEC_NAME,
   MATERIAL,
   WEIGHT,
@@ -38,6 +38,7 @@ import {
   AUTHORIZATION,
   PERSON_IN_CHARGE,
   HAS_TAG_INFOS,
+  HAS_DISCOUNT_SPAN,
 } from "@cache/productForm";
 import {
   requiredImagesVar,
@@ -80,6 +81,8 @@ export function restructureProductRegistrationStates(
   const isDiscounted = watch(IS_DISCOUNTED) as boolean;
   const discountAmount = watch(DISCOUNT_AMOUNT) as string;
   const discountMethod = watch(DISCOUNT_OPTION) as string;
+
+  const hasDiscountSpan = watch(HAS_DISCOUNT_SPAN) as boolean;
   const startDiscountDate = watch(DISCOUNT_STARTS_AT) as string;
   const endDiscountDate = watch(DISCOUNT_ENDS_AT) as string;
 
@@ -101,17 +104,13 @@ export function restructureProductRegistrationStates(
     max: Number(leadTimeMax),
   };
 
-  const shipmentTemplateName = watch(SHIPMENT_TEMPLATE) as string;
-  const shipmentTemplate: CreateShipmentInputType = shipmentTemplatesVar().find(
-    (template) => template.name === shipmentTemplateName
-  );
-  const shipmentId = shipmentTemplate?.id;
+  const shipmentId = watch(SHIPMENT_TEMPLATE_ID) as string;
   const isBundleShipment = watch(IS_BUNDLE_SHIPMENT) as string;
   const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
   const shipmentPrice = watch(SHIPMENT_PRICE) as string;
   const shipmentDistantPrice = watch(SHIPMENT_DISTANT_PRICE) as string;
-  const shipmentReturnPrice = watch(RETURN_PRICE) as string;
-  const shipmentExchangePrice = watch(EXCHANGE_PRICE) as string;
+  const shipmentReturnPrice = watch(SHIPMENT_RETURN_PRICE) as string;
+  const shipmentExchangePrice = watch(SHIPMENT_EXCHANGE_PRICE) as string;
   const specName = watch(SPEC_NAME) as string;
   const material = watch(MATERIAL) as string;
   const weight = watch(WEIGHT) as string;
@@ -129,22 +128,32 @@ export function restructureProductRegistrationStates(
     uploadedFileInfos: combineProductFormImages(),
     description,
     colors: colors.map((color) => ({ name: color })),
-    originalPrice: Number(originalPrice),
+    originalPrice: originalPrice ? Number(originalPrice) : null,
     discountAmount: isDiscounted ? Number(discountAmount) : null,
     discountMethod: isDiscounted ? discountMethod : null,
-    startDiscountDate: isDiscounted ? new Date(startDiscountDate) : null,
-    endDiscountDate: isDiscounted ? new Date(endDiscountDate) : null,
-    quantity: Number(quantity),
+    startDiscountDate: hasDiscountSpan ? new Date(startDiscountDate) : null,
+    endDiscountDate: hasDiscountSpan ? new Date(endDiscountDate) : null,
+    quantity: quantity ? Number(quantity) : null,
     optionCombinations:
       !hasRequiredOption && !hasSelectiveOption ? null : productOptions,
     manufacturingLeadTime: isCustomProduct ? manufacturingLeadTime : null,
-    shipmentId,
+    shipmentId: shipmentId ? Number(shipmentId) : null,
     isBundleShipment: shipmentId ? null : isBundleShipment === "가능",
     shipmentType: shipmentId ? null : shipmentType,
-    shipmentPrice: shipmentId ? null : Number(shipmentPrice),
-    shipmentDistantPrice: shipmentId ? null : Number(shipmentDistantPrice),
-    shipmentReturnPrice: shipmentId ? null : Number(shipmentReturnPrice),
-    shipmentExchangePrice: shipmentId ? null : Number(shipmentExchangePrice),
+    shipmentPrice:
+      shipmentId || shipmentPrice === null ? null : Number(shipmentPrice),
+    shipmentDistantPrice:
+      shipmentId || shipmentDistantPrice === null
+        ? null
+        : Number(shipmentDistantPrice),
+    shipmentReturnPrice:
+      shipmentId || shipmentReturnPrice === null
+        ? null
+        : Number(shipmentReturnPrice),
+    shipmentExchangePrice:
+      shipmentId || shipmentExchangePrice === null
+        ? null
+        : Number(shipmentExchangePrice),
     specName,
     material,
     weight,
@@ -208,19 +217,19 @@ function getRequiredOptions(formContext: UseFormReturn) {
 
   const { optionHeaders, optionRows } = requiredOptionVar().adaptedOption;
 
-  const requiredOptions = optionRows.map((row) => {
-    const components = row.option.map((value, index) => ({
+  const requiredOptions = optionRows.map(({ id, option }) => {
+    const components = option.map((value, index) => ({
       name: optionHeaders[index].header,
       value,
     }));
 
-    const optionStock = watch(`optionStock-${row.id}`) as string;
-    const optionPrice = watch(`optionPrice-${row.id}`) as string;
+    const optionStock = watch(`optionStock-${id}`) as number;
+    const optionPrice = watch(`optionPrice-${id}`) as number;
 
     return {
       components,
-      price: Number(optionPrice),
-      quantity: Number(optionStock),
+      quantity: optionStock,
+      price: optionPrice,
       isRequired: true,
     };
   });
@@ -231,18 +240,21 @@ function getRequiredOptions(formContext: UseFormReturn) {
 function getSelectiveOptions(formContext: UseFormReturn) {
   const { watch } = formContext;
 
-  const { optionRows } = selectiveOptionVar().adaptedOption;
+  const { optionHeaders, optionRows } = selectiveOptionVar().adaptedOption;
 
   const selectiveOptions = optionRows.map(({ id, option }) => {
-    const [name, value] = option;
+    const components = option.map((value, index) => ({
+      name: optionHeaders[index].header,
+      value,
+    }));
 
-    const optionStock = watch(`optionStock-${id}`) as string;
-    const optionPrice = watch(`optionPrice-${id}`) as string;
+    const optionStock = watch(`optionStock-${id}`) as number;
+    const optionPrice = watch(`optionPrice-${id}`) as number;
 
     return {
-      components: [{ name, value }],
-      price: Number(optionPrice),
-      quantity: Number(optionStock),
+      components,
+      quantity: optionStock,
+      price: optionPrice,
       isRequired: false,
     };
   });

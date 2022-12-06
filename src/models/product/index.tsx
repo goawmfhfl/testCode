@@ -180,6 +180,13 @@ export interface CreateProductInputType {
   }>;
 }
 
+export interface OptionCombination {
+  components: Array<{ name: string; value: string }>;
+  price: number;
+  quantity: number;
+  isRequired: boolean;
+}
+
 export interface ProductType {
   name: string;
   description: string;
@@ -196,19 +203,17 @@ export interface ProductType {
   startDiscountDate: Date;
   endDiscountDate: Date;
   quantity: number;
+
+  options: Array<OptionCombination>;
+
   manufacturingLeadTime: {
     min: number;
     max: number;
   };
 
-  optionCombinations: Array<{
-    components: Array<{ name: string; value: string }>;
-    price: number;
-    quantity: number;
-    isRequired: boolean;
-  }>;
-
-  shipmentId?: number;
+  shipment: {
+    id: number;
+  };
   isBundleShipment?: boolean;
   shipmentType?: ShipmentChargeType;
   shipmentPrice?: number;
@@ -268,6 +273,14 @@ export interface ProductFormValues {
   HAS_MANUFACTURING_LEAD_TIME: boolean;
   LEAD_TIME_MAX: number;
   LEAD_TIME_MIN: number;
+  IS_BUNDLE_SHIPMENT: string;
+  SHIPMENT_TEMPLATE_ID: number;
+  SHIPMENT_TEMPLATE_NAME: string;
+  SHIPMENT_PRICE_TYPE: ShipmentChargeType;
+  SHIPMENT_PRICE: number;
+  SHIPMENT_DISTANT_PRICE: number;
+  SHIPMENT_RETURN_PRICE: number;
+  SHIPMENT_EXCHANGE_PRICE: number;
   SPEC_NAME: string;
   MATERIAL: string;
   SIZE: string;
@@ -277,20 +290,5 @@ export interface ProductFormValues {
   AUTHORIZATION: string;
   PERSON_IN_CHARGE: string;
   HAS_TAG_INFOS: boolean;
-
-  productName: string;
-  productPrice: string;
-  productDescription: string;
-  productStock: string;
-  productNameSpec: string;
-  productTextileSpec: string;
-  discountValue: string;
-  minLeadTime: string;
-  maxLeadTime: string;
-  optionValues: string;
-  cautionsSpec: string;
-  certifiedMattersSpec: string;
-  countrysideAdditionalShipmentCharge: string;
-  contactInformationSpec: string;
-  deliveryFee: string;
+  [key: string]: unknown; // hmm..
 }

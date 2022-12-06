@@ -2,6 +2,8 @@ import styled from "styled-components/macro";
 
 import changeImageIconSrc from "@icons/changeImage.svg";
 import removeImageIconSrc from "@icons/removeImage.svg";
+import { descriptionImagesVar } from "@cache/productForm/descriptionImages";
+import deleteImageUrl from "@utils/shopSettings/deleteImageUrl";
 
 interface ProductImageProps {
   src: string;
@@ -11,10 +13,23 @@ interface ProductImageProps {
 }
 
 const ProductImage = ({ src, handleChangeButtonClick }: ProductImageProps) => {
+  const handleRemoveImageButton =
+    (url: string) => async (e: React.MouseEvent<HTMLElement>) => {
+      descriptionImagesVar([
+        ...descriptionImagesVar().filter((img) => img.url !== url),
+      ]);
+
+      await deleteImageUrl(url);
+    };
+
   return (
     <Container backgroundSource={src}>
       {/* <ThumbnailTag>썸네일</ThumbnailTag> */}
-      <RemoveImageButton src={removeImageIconSrc} />
+      <RemoveImageButton
+        src={removeImageIconSrc}
+        // eslint-disable-next-line
+        onClick={handleRemoveImageButton(src)}
+      />
       <ChangeImageButtonWrapper backgroundSource={changeImageIconSrc}>
         {/* eslint-disable-next-line */}
         <ChangeImageButton onChange={handleChangeButtonClick} />

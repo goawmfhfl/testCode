@@ -13,27 +13,7 @@ import closeIconSource from "@icons/delete.svg";
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 import { isElementOverflown } from "@utils/index";
 import { tableScrollbarStyles } from "@styles/GlobalStyles";
-
-const GET_SHIPMENT_TEMPLATES = gql`
-  query GetAllShipmentTemplates {
-    getUserShipmentTemplates {
-      ok
-      error
-      shipmentTemplates {
-        id
-        name
-        createdAt
-        updatedAt
-        type
-        price
-        distantPrice
-        returnPrice
-        exchangePrice
-        isBundleShipment
-      }
-    }
-  }
-`;
+import { GET_SHIPMENT_TEMPLATES } from "@graphql/queries/getShipmentTemplates";
 
 const DELETE_SHIPMENT_TEMPLATE = gql`
   mutation DeleteShipmentTemplate($input: DeleteShipmentTemplateInput!) {

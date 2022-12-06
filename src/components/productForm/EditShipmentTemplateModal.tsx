@@ -7,6 +7,7 @@ import {
   initialState as shipmentTemplateInitialState,
 } from "@cache/productForm/shipmentTemplate";
 import { CreateShipmentInputType } from "@models/product/shipmentTemplate";
+import { GET_SHIPMENT_TEMPLATES } from "@graphql/queries/getShipmentTemplates";
 
 interface EditShipmentTemplateModalProps {
   templateId: number;
@@ -47,7 +48,15 @@ const EditShipmentTemplateModal = ({
 }: EditShipmentTemplateModalProps) => {
   const client = useApolloClient();
 
-  const [editShipmentTemplate] = useMutation(EDIT_SHIPMENT_TEMPLATE);
+  const [editShipmentTemplate, { loading: isEditShipmentLoading }] =
+    useMutation(EDIT_SHIPMENT_TEMPLATE, {
+      refetchQueries: [
+        {
+          query: GET_SHIPMENT_TEMPLATES,
+        },
+        "GetShipmentTemplates",
+      ],
+    });
 
   useEffect(() => {
     const {
@@ -110,12 +119,12 @@ const EditShipmentTemplateModal = ({
             input: {
               shipmentId: templateId,
               name,
-              price: shipmentCharge,
+              price: Number(shipmentCharge),
               type: shipmentChargeType,
               isBundleShipment: isBundlingEnabled,
-              distantPrice: additionalCharge,
-              exchangePrice: exchangeCharge,
-              returnPrice: returnCharge,
+              distantPrice: Number(additionalCharge),
+              exchangePrice: Number(exchangeCharge),
+              returnPrice: Number(returnCharge),
             },
           },
         })) as {
@@ -165,6 +174,7 @@ const EditShipmentTemplateModal = ({
       formTitle={"배송 템플릿 수정하기"}
       handleRegisterButtonClick={handleRegisterButtonClick}
       handleCancelButtonClick={handleCancelButtonClick}
+      isRegistering={isEditShipmentLoading}
     />
   );
 };

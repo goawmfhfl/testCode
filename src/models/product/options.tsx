@@ -11,6 +11,8 @@ export interface OptionHeaderType {
 export interface OptionRowType {
   id: string;
   option: Array<string>;
+  price?: number;
+  stock?: number;
 }
 
 interface AdaptedOptionType {

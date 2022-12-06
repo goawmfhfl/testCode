@@ -39,7 +39,6 @@ const UserAuthentication = () => {
 
   const handleAuthenticationButtonClick = async () => {
     const { phoneNumber } = input;
-    // 이메일로 가져온 유저정보에 있는 핸드폰번호와 비교해서 다르다면 발송을 막고 모달로 알려준다
 
     const result = await getUserByEmail({
       variables: {
@@ -48,8 +47,6 @@ const UserAuthentication = () => {
         },
       },
     });
-
-    console.log("이메일로 가져온 유저정보", result);
 
     const { ok, user } = result.data.getUserByEmail;
 

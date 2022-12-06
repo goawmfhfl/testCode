@@ -7,7 +7,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import Button from "@components/common/Button";
 
 import {
-  systemModalVar,
   contentsContainerReferenceVar,
   GNBReferenceVar,
   sectionReferenceVar,
@@ -18,7 +17,7 @@ import { SHIPMENT_PRICE_TYPE } from "@cache/shopSettings";
 import {
   HAS_REQUIRED_OPTION,
   HAS_MANUFACTURING_LEAD_TIME,
-  SHIPMENT_TEMPLATE,
+  SHIPMENT_TEMPLATE_NAME,
   IS_DISCOUNTED,
   HAS_SELECTIVE_OPTION,
   HAS_TAG_INFOS,
@@ -132,7 +131,7 @@ const SaveBar = () => {
 
     const isDiscounted = watch(IS_DISCOUNTED) as boolean;
     const hasTemplateSelected = shipmentTemplatesVar().find(
-      (template) => template.name === watch(SHIPMENT_TEMPLATE)
+      (template) => template.name === watch(SHIPMENT_TEMPLATE_NAME)
     );
     const hasRequiredOption = watch(HAS_REQUIRED_OPTION) as boolean;
     const hasSelectiveOption = watch(HAS_SELECTIVE_OPTION) as boolean;
@@ -277,11 +276,17 @@ const SaveBar = () => {
           form="hook-form"
           // eslint-disable-next-line
           onClick={handleSubmitButtonClick}
+          disabled={isLoadingTemporarySave}
         >
           {hasRegistered ? "저장" : "등록"}
         </SubmitButton>
 
-        <Button size="big" width="126px" onClick={handleCancelButtonClick}>
+        <Button
+          size="big"
+          width="126px"
+          onClick={handleCancelButtonClick}
+          disabled={isLoadingTemporarySave}
+        >
           취소
         </Button>
       </ButtonContainer>

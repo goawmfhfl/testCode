@@ -4,6 +4,7 @@ export default styled.div`
   position: fixed;
   bottom: 0;
   left: 0;
+  z-index: 9999;
 
   width: 100vw;
   height: 72px;

@@ -120,6 +120,7 @@ const ColorCheckbox = styled.input.attrs({
   darkCheckedIcon: boolean | undefined;
 }>`
   appearance: none;
+  cursor: pointer;
 
   &:after {
     content: "";

@@ -21,17 +21,19 @@ import closeIconSource from "@icons/delete.svg";
 import downwordArrowMedium from "@icons/arrow-downward-medium.svg";
 import { hasEveryInputFulfilled } from "@utils/index";
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
-import { overModalVar } from "@cache/index";
+import { loadingSpinnerVisibilityVar, overModalVar } from "@cache/index";
 import { shipmentTemplateVar } from "@cache/productForm/shipmentTemplate";
 
 const ShipmentTemplateForm = ({
   formTitle,
   handleRegisterButtonClick,
   handleCancelButtonClick,
+  isRegistering,
 }: {
   formTitle: string;
   handleRegisterButtonClick: () => void;
   handleCancelButtonClick: () => void;
+  isRegistering: boolean;
 }) => {
   const theme = useTheme();
   const shipmentTemplate = useReactiveVar(shipmentTemplateVar);
@@ -56,6 +58,14 @@ const ShipmentTemplateForm = ({
       setHasRegisterReady(false);
     }
   }, [shipmentTemplate]);
+
+  useEffect(() => {
+    if (isRegistering) {
+      loadingSpinnerVisibilityVar(true);
+    } else {
+      loadingSpinnerVisibilityVar(false);
+    }
+  }, [isRegistering]);
 
   const handleCloseButtonClick = () => {
     overModalVar({

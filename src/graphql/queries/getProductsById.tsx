@@ -38,6 +38,17 @@ export const GET_PRODUCTS_BY_ID = gql`
         endDiscountDate
         quantity
 
+        options {
+          id
+          isRequired
+          components {
+            name
+            value
+          }
+          price
+          quantity
+        }
+
         manufacturingLeadTime {
           min
           max
@@ -54,6 +65,9 @@ export const GET_PRODUCTS_BY_ID = gql`
         isExclusive
         isBmarket
         isMdPick
+        shipment {
+          id
+        }
         shipmentPrice
         shipmentDistantPrice
         shipmentReturnPrice
@@ -72,9 +86,6 @@ export const GET_PRODUCTS_BY_ID = gql`
         }
         productToTags {
           id
-          createdAt
-          updatedAt
-          deletedAt
           isExposed
           tag {
             id

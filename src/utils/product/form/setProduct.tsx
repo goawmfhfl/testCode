@@ -11,6 +11,11 @@ import {
   CATEGORY_FIRST,
   CATEGORY_SECOND,
   CATEGORY_THIRD,
+  HAS_MANUFACTURING_LEAD_TIME,
+  LEAD_TIME_MIN,
+  LEAD_TIME_MAX,
+  HAS_REQUIRED_OPTION,
+  HAS_SELECTIVE_OPTION,
 } from "@cache/productForm";
 import { UploadFileType } from "@models/index";
 import {
@@ -18,6 +23,11 @@ import {
   requiredImagesVar,
 } from "@cache/productForm/productImages";
 import { descriptionImagesVar } from "@cache/productForm/descriptionImages";
+import {
+  requiredOptionVar,
+  selectiveOptionVar,
+} from "@cache/productForm/productOptions";
+import { restructureOptions } from "./options";
 
 const setProduct = (
   product: ProductType,
@@ -35,10 +45,27 @@ const setProduct = (
     startDiscountDate,
     endDiscountDate,
     quantity,
+    options,
     uploadedFileUrls,
+    manufacturingLeadTime,
+    shipment,
+    isBundleShipment,
+    shipmentType,
+    shipmentPrice,
+    shipmentDistantPrice,
+    shipmentReturnPrice,
+    shipmentExchangePrice,
+    specName,
+    material,
+    weight,
+    size,
+    manufacturer,
+    precaution,
+    authorization,
+    personInCharge,
   } = product;
 
-  const isSetDiscountSpan = startDiscountDate && endDiscountDate;
+  const isSetDiscountSpan = startDiscountDate || endDiscountDate;
 
   reset({
     TITLE: name,
@@ -49,10 +76,97 @@ const setProduct = (
     DISCOUNT_AMOUNT: discountAmount,
     DISCOUNT_OPTION: discountMethod,
     HAS_DISCOUNT_SPAN: !!isSetDiscountSpan,
-    DISCOUNT_STARTS_AT: new Date(startDiscountDate),
-    DISCOUNT_ENDS_AT: new Date(endDiscountDate),
+    DISCOUNT_STARTS_AT: startDiscountDate ? new Date(startDiscountDate) : null,
+    DISCOUNT_ENDS_AT: endDiscountDate ? new Date(endDiscountDate) : null,
     PRODUCT_STOCK: quantity,
+    IS_BUNDLE_SHIPMENT: isBundleShipment ? "가능" : "불가능",
+    SHIPMENT_TEMPLATE_ID: shipment.id ? Number(shipment.id) : null,
+    SHIPMENT_PRICE_TYPE: shipmentType,
+    SHIPMENT_PRICE: shipmentPrice,
+    SHIPMENT_DISTANT_PRICE: shipmentDistantPrice,
+    SHIPMENT_RETURN_PRICE: shipmentReturnPrice,
+    SHIPMENT_EXCHANGE_PRICE: shipmentExchangePrice,
+    SPEC_NAME: specName,
+    MATERIAL: material,
+    SIZE: weight,
+    WEIGHT: size,
+    MANUFACTURER: manufacturer,
+    PRECAUTION: precaution,
+    AUTHORIZATION: authorization,
+    PERSON_IN_CHARGE: personInCharge,
   });
+
+  if (options && options.length) {
+    const requiredOptions = options.filter((ops) => ops.isRequired);
+
+    if (requiredOptions.length) {
+      setValue(HAS_REQUIRED_OPTION, true);
+
+      const { optionInputList, adaptedOption } =
+        restructureOptions(requiredOptions);
+
+      requiredOptionVar({
+        optionInputList,
+        adaptedOption,
+      });
+
+      optionInputList.forEach(({ id: optionInputId }, index) => {
+        const optionName = adaptedOption.optionHeaders[index].header;
+
+        const optionValue = [
+          ...new Set(
+            adaptedOption.optionRows.map(({ option }) => option[index])
+          ),
+        ].join(", ");
+
+        setValue(`requiredOptionName-${optionInputId}`, optionName);
+        setValue(`requiredOptionValue-${optionInputId}`, optionValue);
+      });
+
+      adaptedOption.optionRows.forEach((row) => {
+        setValue(`optionStock-${row.id}`, row.stock);
+        setValue(`optionPrice-${row.id}`, row.price);
+      });
+    }
+
+    const selectiveOptions = options.filter((ops) => !ops.isRequired);
+
+    if (selectiveOptions.length) {
+      setValue(HAS_SELECTIVE_OPTION, true);
+
+      const { optionInputList, adaptedOption } =
+        restructureOptions(selectiveOptions);
+
+      selectiveOptionVar({
+        optionInputList,
+        adaptedOption,
+      });
+
+      optionInputList.forEach(({ id }, index) => {
+        const optionName = adaptedOption.optionHeaders[index].header;
+
+        const optionValue = [
+          ...new Set(
+            adaptedOption.optionRows.map(({ option }) => option[index])
+          ),
+        ].join(", ");
+
+        setValue(`selectiveOptionName-${id}`, optionName);
+        setValue(`selectiveOptionValue-${id}`, optionValue);
+      });
+
+      adaptedOption.optionRows.forEach((row) => {
+        setValue(`optionStock-${row.id}`, row.stock);
+        setValue(`optionPrice-${row.id}`, row.price);
+      });
+    }
+  }
+
+  if (manufacturingLeadTime) {
+    setValue(HAS_MANUFACTURING_LEAD_TIME, true);
+    setValue(LEAD_TIME_MIN, manufacturingLeadTime.min);
+    setValue(LEAD_TIME_MAX, manufacturingLeadTime.max);
+  }
 
   if (category) {
     const categoryLength = getCategoryLength(category);
@@ -81,12 +195,10 @@ const setProduct = (
       (uploadedFile) => uploadedFile.type === UploadFileType.PRODUCT_DETAIL_PAGE
     );
 
-    console.log(requiredImages);
-
     if (requiredImages.length) {
       const newRequiredImages = [...requiredImagesVar()];
 
-      newRequiredImages[0].url = thumbnail.url;
+      newRequiredImages[0].url = thumbnail?.url || "";
       newRequiredImages[1].url = requiredImages[0]?.url || "";
       newRequiredImages[2].url = requiredImages[1]?.url || "";
       newRequiredImages[3].url = requiredImages[2]?.url || "";
@@ -117,10 +229,6 @@ const setProduct = (
     }
   }
 
-  // TODO: 옵션 (필수, 추가)
-  // TODO: 제작기간
-  // TODO: 배송정보
-  // TODO: 스펙 (무게, 크기, ..)
   // TODO: 태그
 };
 
