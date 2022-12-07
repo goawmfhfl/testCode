@@ -13,7 +13,7 @@ export interface ProductsType {
   originalPrice: number;
   discountAmount?: number;
   discountMethod?: string;
-  status: string;
+  status: ProductStatus;
   thumbnail: string;
   quantity: number;
 }
@@ -32,7 +32,7 @@ export interface GetAllProductsBySellerInputType {
   input: {
     page?: number;
     skip?: number;
-    status?: string;
+    status?: ProductStatus;
     query?: string;
   };
 }

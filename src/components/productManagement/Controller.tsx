@@ -19,7 +19,6 @@ import {
 } from "@graphql/mutations/duplicateProductsBySeller";
 
 import {
-  checkedProductIdsVar,
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
   modalVar,
@@ -33,6 +32,7 @@ import {
 import {
   showHasServerErrorModal,
   filterOptionVar,
+  checkedProductsVar,
 } from "@cache/productManagement";
 
 import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
@@ -46,12 +46,19 @@ import {
 
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
+import { CaculatedProductsType } from "@models/product/management";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { status } = useReactiveVar(filterOptionVar);
 
-  const checkedProductIds = useReactiveVar(checkedProductIdsVar);
+  const checkedProducts: Array<CaculatedProductsType> =
+    useReactiveVar(checkedProductsVar);
+
+  const checkedProductIds: Array<number> = checkedProducts?.map(
+    ({ productId }) => productId
+  );
+
   const temporaryQuery = useReactiveVar(temporaryQueryVar);
 
   const [updateProductsStatus] = useMutation<
@@ -167,7 +174,7 @@ const Controller = () => {
                 confirmButtonClickHandler: () => {
                   e.target.value = saleStatus["DEFAULT"];
                   checkAllBoxStatusVar(false);
-                  checkedProductIdsVar([]);
+                  checkedProductsVar([]);
 
                   systemModalVar({
                     ...systemModalVar(),
@@ -286,7 +293,7 @@ const Controller = () => {
 
                 confirmButtonClickHandler: () => {
                   checkAllBoxStatusVar(false);
-                  checkedProductIdsVar([]);
+                  checkedProductsVar([]);
 
                   systemModalVar({
                     ...systemModalVar(),
@@ -356,7 +363,7 @@ const Controller = () => {
 
                 confirmButtonClickHandler: () => {
                   checkAllBoxStatusVar(false);
-                  checkedProductIdsVar([]);
+                  checkedProductsVar([]);
 
                   systemModalVar({
                     ...systemModalVar(),

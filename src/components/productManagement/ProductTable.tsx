@@ -5,12 +5,12 @@ import { useMutation, useReactiveVar } from "@apollo/client";
 
 import { tableData } from "@cache/productManagement/table";
 import {
+  checkedProductsVar,
   filterOptionVar,
   showHasServerErrorModal,
 } from "@cache/productManagement";
 import {
   checkAllBoxStatusVar,
-  checkedProductIdsVar,
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
   systemModalVar,
@@ -30,7 +30,6 @@ import {
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 import { TableType } from "@models/index";
 import useLazyProducts from "@hooks/product/useLazyProducts";
-import { getDiscountedPrice } from "@utils/product/form/index";
 import {
   ThContainer,
   Th,
@@ -46,19 +45,23 @@ import {
 import Checkbox from "@components/common/input/Checkbox";
 import NoDataContainer from "@components/common/table/NoDataContainer";
 import Loading from "@components/common/table/Loading";
+import contructProducts from "@utils/product/management/constructProducts";
+import {
+  NormalizedType,
+  CaculatedProductsType,
+} from "@models/product/management";
+import { caculateProducts } from "@utils/product/management/caculateProducts";
 
 const ProductTable = () => {
   const { loading, error, data, getProducts } = useLazyProducts();
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { status } = useReactiveVar(filterOptionVar);
 
-  const checkedProductIds: Array<number> = useReactiveVar(checkedProductIdsVar);
   const checkAllBoxStatus: boolean = useReactiveVar(checkAllBoxStatusVar);
+  const checkedProducts: Array<CaculatedProductsType> =
+    useReactiveVar(checkedProductsVar);
 
-  const [products, setProducts] = useState<Array<ProductsType>>([]);
-  const [isCheckedList, setIsCheckedList] = useState<{
-    [key: string]: { isChecked: boolean };
-  }>({});
+  const [products, setProducts] = useState<Array<CaculatedProductsType>>([]);
 
   const [changeProductStatus] = useMutation<
     ChangeProductsInfoBySellerType,
@@ -76,64 +79,67 @@ const ProductTable = () => {
   });
 
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newIsCheckedList = JSON.parse(JSON.stringify(isCheckedList)) as {
-      [key: string]: { isChecked: boolean };
-    };
+    const newProducts = [...products];
     checkAllBoxStatusVar(e.target.checked);
 
     if (e.target.checked) {
-      Object.keys(newIsCheckedList).forEach((key) => {
-        newIsCheckedList[key] = { isChecked: true };
-      });
+      const checkAllProductList = newProducts.map((product) => ({
+        ...product,
+        isChecked: true,
+      }));
 
-      const checkedProductIds = Object.keys(newIsCheckedList).map((id) =>
-        Number(id)
-      );
-
-      checkedProductIdsVar(checkedProductIds);
-      setIsCheckedList(newIsCheckedList);
+      setProducts(checkAllProductList);
+      checkedProductsVar(checkAllProductList);
     }
 
     if (!e.target.checked) {
-      Object.keys(newIsCheckedList).forEach((key) => {
-        newIsCheckedList[key] = { isChecked: false };
-      });
+      const checkAllProductList = newProducts.map((product) => ({
+        ...product,
+        isChecked: false,
+      }));
 
-      checkedProductIdsVar([]);
-      setIsCheckedList(newIsCheckedList);
+      setProducts(checkAllProductList);
+      checkedProductsVar([]);
+      checkAllBoxStatusVar(false);
     }
   };
 
   const changeSingleCheckBoxHandler =
-    (id: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newIsCheckedList = JSON.parse(JSON.stringify(isCheckedList)) as {
-        [key: string]: { isChecked: boolean };
-      };
+    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newProducts = [...products];
 
       if (e.target.checked) {
-        newIsCheckedList[id].isChecked = true;
-        setIsCheckedList(newIsCheckedList);
-        checkedProductIdsVar([...checkedProductIds, id]);
+        const checkedProductList = { ...newProducts[index], isChecked: true };
+        checkedProductsVar([...checkedProducts, checkedProductList]);
+
+        newProducts[index].isChecked = true;
+        setProducts(newProducts);
       }
 
       if (!e.target.checked) {
-        newIsCheckedList[id].isChecked = false;
-        setIsCheckedList(newIsCheckedList);
-
-        const isCheckedList = checkedProductIds.filter(
-          (selectedId) => selectedId === id
+        const hasCheckedList = checkedProducts.filter(
+          (product) => product.productId === newProducts[index].productId
         );
 
-        if (isCheckedList) {
-          const checkedListIndex = checkedProductIds.findIndex(
-            (selectedId) => selectedId === id
+        if (hasCheckedList) {
+          const checkedListIndex = checkedProducts.findIndex(
+            (product) => product.productId === newProducts[index].productId
           );
 
-          checkedProductIdsVar([
-            ...checkedProductIds.slice(0, checkedListIndex),
-            ...checkedProductIds.slice(checkedListIndex + 1),
-          ]);
+          const deletedCheckedList = [
+            ...checkedProducts.slice(0, checkedListIndex),
+            ...checkedProducts.slice(checkedListIndex + 1),
+          ];
+
+          checkedProductsVar(deletedCheckedList);
+
+          newProducts[index].isChecked = false;
+
+          setProducts(newProducts);
         }
+
+        newProducts[index].isChecked = false;
+        setProducts(newProducts);
       }
     };
 
@@ -197,7 +203,7 @@ const ProductTable = () => {
 
                   confirmButtonClickHandler: () => {
                     checkAllBoxStatusVar(false);
-                    checkedProductIdsVar([]);
+                    checkedProductsVar([]);
 
                     systemModalVar({
                       ...systemModalVar(),
@@ -238,13 +244,6 @@ const ProductTable = () => {
   useEffect(() => {
     const totalPages: number = data?.getAllProductsBySeller.totalPages;
     const products: Array<ProductsType> = data?.getAllProductsBySeller.products;
-    const checkedList: {
-      [key: string]: { isChecked: boolean };
-    } =
-      products?.reduce((acc, cur) => {
-        acc[cur.id] = { isChecked: false };
-        return acc;
-      }, {}) || {};
 
     pageNumberListVar(
       Array(totalPages)
@@ -252,9 +251,14 @@ const ProductTable = () => {
         .map((_, index) => index + 1)
     );
 
-    setProducts(products);
-    setIsCheckedList(checkedList);
-    checkedProductIdsVar([]);
+    if (products) {
+      const recontructProducts: NormalizedType = contructProducts(products);
+      const caculatedProducts: Array<CaculatedProductsType> =
+        caculateProducts(recontructProducts);
+      setProducts(caculatedProducts);
+    }
+
+    checkedProductsVar([]);
     checkAllBoxStatusVar(false);
   }, [data]);
 
@@ -321,47 +325,23 @@ const ProductTable = () => {
       {!loading && products?.length !== 0 ? (
         <TdContainer>
           {products?.map(
-            ({
-              id: productId,
-              name,
-              category,
-              originalPrice,
-              discountAmount,
-              discountMethod,
-              quantity,
-              status,
-              thumbnail,
-            }) => {
-              const discountAppliedPrice =
-                discountAmount && discountMethod
-                  ? Number(
-                      getDiscountedPrice(
-                        originalPrice,
-                        discountAmount,
-                        discountMethod
-                      )
-                    ).toLocaleString("ko-KR") + " ₩"
-                  : "-";
-
-              const firstCategory = category?.parent?.name
-                ? category.parent.name
-                : "-";
-              const secondCategory = category?.name ? category.name : "-";
-              const thirdCategory = category?.children?.name
-                ? category.children.name
-                : "-";
-
-              const rateOfDiscount =
-                discountMethod && discountAmount
-                  ? `${discountAmount.toLocaleString("ko-KR")} ${
-                      discountMethod === "PERCENT" ? "%" : "₩"
-                    }`
-                  : "-";
-
-              const originalPriceToWonSign = `${originalPrice.toLocaleString(
-                "ko-KR"
-              )} ₩`;
-
+            (
+              {
+                productId,
+                thumbnail,
+                productName,
+                firstCategory,
+                secondCategory,
+                thirdCategory,
+                originalPriceToWonSign,
+                discountedRate,
+                discountAppliedPrice,
+                quantity,
+                status,
+                isChecked,
+              },
+              index
+            ) => {
               return (
                 <Tr key={`product-${productId}-row`}>
                   <TableData
@@ -369,8 +349,8 @@ const ProductTable = () => {
                     className={tableData[0].className}
                   >
                     <Checkbox
-                      onChange={changeSingleCheckBoxHandler(productId)}
-                      checked={isCheckedList[productId]?.isChecked || false}
+                      onChange={changeSingleCheckBoxHandler(index)}
+                      checked={isChecked}
                     />
                   </TableData>
                   <TableData
@@ -387,7 +367,7 @@ const ProductTable = () => {
                       <ProductThumbNail src={thumbnail} />
                     </ProductThumbNailWrapper>
                     <ProductName>
-                      <Link to={`/product/${productId}`}>{name}</Link>
+                      <Link to={`/product/${productId}`}>{productName}</Link>
                     </ProductName>
                   </TableData>
                   <TableData
@@ -418,7 +398,7 @@ const ProductTable = () => {
                     width={tableData[7].width}
                     className={tableData[7].className}
                   >
-                    {rateOfDiscount}
+                    {discountedRate}
                   </TableData>
                   <TableData
                     width={tableData[8].width}

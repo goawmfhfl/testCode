@@ -20,8 +20,11 @@ const FilterBar = () => {
 
   const { data: productStatus, getAllProductStatus } =
     useLazyAllProductStatus();
+
   const { data: productsData, getProducts } = useLazyProducts();
+
   const { query } = useReactiveVar(commonFilterOptionVar);
+
   const { status: selectedStatus } = useReactiveVar(filterOptionVar);
 
   const products = productStatus?.getAllProductsBySeller.products || [];
@@ -50,43 +53,35 @@ const FilterBar = () => {
   };
 
   useEffect(() => {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      (async () => {
-        await getAllProductStatus({
-          variables: {
-            input: {
-              page: null,
-              skip: null,
-              status: null,
-              query: null,
-            },
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    (async () => {
+      await getAllProductStatus({
+        variables: {
+          input: {
+            page: null,
+            skip: null,
+            status: null,
+            query: null,
           },
-        });
-      })();
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
+        },
+      });
+    })();
+  }, [productsData]);
 
   useEffect(() => {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      (async () => {
-        await getProducts({
-          variables: {
-            input: {
-              page: null,
-              skip: null,
-              status: selectedStatus,
-              query,
-            },
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    (async () => {
+      await getProducts({
+        variables: {
+          input: {
+            page: null,
+            skip: null,
+            status: selectedStatus,
+            query,
           },
-        });
-      })();
-    } catch (error) {
-      console.log(error);
-    }
+        },
+      });
+    })();
   }, [query]);
 
   return (

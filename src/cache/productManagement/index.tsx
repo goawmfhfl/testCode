@@ -1,9 +1,10 @@
 import { makeVar } from "@apollo/client";
-
 import { systemModalVar } from "@cache/index";
 import { ProductStatus } from "@constants/product";
+import { CaculatedProductsType } from "@models/product/management";
 
-// TABLE: 테이블 필터
+export const checkedProductsVar = makeVar<Array<CaculatedProductsType>>([]);
+
 export const filterOptionVar = makeVar<{
   status?: ProductStatus;
 }>({

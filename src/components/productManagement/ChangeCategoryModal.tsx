@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useMutation, useReactiveVar } from "@apollo/client";
 import styled from "styled-components/macro";
 import {
-  checkedProductIdsVar,
   DetailNoticeVar,
   loadingSpinnerVisibilityVar,
   modalVar,
@@ -36,6 +35,7 @@ import {
 import {
   showHasServerErrorModal,
   filterOptionVar,
+  checkedProductsVar,
 } from "@cache/productManagement";
 
 import { checkAllBoxStatusVar } from "@cache/index";
@@ -43,8 +43,9 @@ import { checkAllBoxStatusVar } from "@cache/index";
 import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
 import useCategories from "@hooks/useCategories";
 import contructCategories from "@utils/contructCategories";
-import { CategoriesType } from "@models/index";
 import { CategoryNames } from "@constants/category";
+import { CategoriesType } from "@models/index";
+import { CaculatedProductsType } from "@models/product/management";
 
 const ChangeCategoryModal = () => {
   const { watch, register } = useForm();
@@ -61,7 +62,14 @@ const ChangeCategoryModal = () => {
     }>();
 
   const filterOption = useReactiveVar(filterOptionVar);
-  const checkedProductIds = useReactiveVar(checkedProductIdsVar);
+
+  const checkedProducts: Array<CaculatedProductsType> =
+    useReactiveVar(checkedProductsVar);
+
+  const checkedProductIds: Array<number> = checkedProducts?.map(
+    ({ productId }) => productId
+  );
+
   const [isBmarketChecked, setIsBmarketChecked] = useState<boolean>(false);
 
   const selectedFirstCategory: CategoryNames = watch(
@@ -178,7 +186,7 @@ const ChangeCategoryModal = () => {
                       isVisible: false,
                     });
 
-                    checkedProductIdsVar([]);
+                    checkedProductsVar([]);
                     checkAllBoxStatusVar(false);
                   },
                 });

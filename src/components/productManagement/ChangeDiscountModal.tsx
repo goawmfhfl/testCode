@@ -13,11 +13,12 @@ import {
   systemModalVar,
   checkAllBoxStatusVar,
   loadingSpinnerVisibilityVar,
-  checkedProductIdsVar,
 } from "@cache/index";
+
 import {
   showHasServerErrorModal,
   filterOptionVar,
+  checkedProductsVar,
 } from "@cache/productManagement";
 
 import {
@@ -47,6 +48,7 @@ import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 
 import { getTodayTimeValue } from "@utils/date";
+import { CaculatedProductsType } from "@models/product/management";
 
 const ChangeDiscountModal = () => {
   const method = useForm({
@@ -56,7 +58,13 @@ const ChangeDiscountModal = () => {
   const { register, watch, control, getValues } = method;
 
   const filterOption = useReactiveVar(filterOptionVar);
-  const checkedProductIds = useReactiveVar(checkedProductIdsVar);
+
+  const checkedProducts: Array<CaculatedProductsType> =
+    useReactiveVar(checkedProductsVar);
+
+  const checkedProductIds: Array<number> = checkedProducts?.map(
+    ({ productId }) => productId
+  );
 
   const discountAmount: number | string = Number(
     watch(DISCOUNT_AMOUNT) as string
@@ -178,7 +186,7 @@ const ChangeDiscountModal = () => {
                     isVisible: false,
                   });
 
-                  checkedProductIdsVar([]);
+                  checkedProductsVar([]);
                   checkAllBoxStatusVar(false);
                 },
               });
