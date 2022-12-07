@@ -24,7 +24,7 @@ import {
   modalVar,
   paginationSkipVar,
   systemModalVar,
-  showHasCheckedAnyCheckBoxModal,
+  showHasAnyProblemModal,
   temporaryQueryVar,
   checkAllBoxStatusVar,
 } from "@cache/index";
@@ -47,6 +47,7 @@ import {
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
 import { CaculatedProductsType } from "@models/product/management";
+import { ProductStatus } from "@constants/product";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -198,8 +199,8 @@ const Controller = () => {
   };
 
   const handleSaleStatusClick = () => {
-    if (!checkedProductIds.length) {
-      showHasCheckedAnyCheckBoxModal(
+    if (!checkedProducts.length) {
+      showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다
           <br />
@@ -208,11 +209,28 @@ const Controller = () => {
       );
       return;
     }
+
+    const hasTemporarySaveProduct = checkedProducts.findIndex(
+      ({ status }) => status === ProductStatus.TEMPORARY
+    );
+
+    if (hasTemporarySaveProduct !== -1) {
+      showHasAnyProblemModal(
+        <>
+          임시저장 상태의 상품은
+          <br />
+          상품이 등록된 후부터
+          <br />
+          판매상태 변경이 가능합니다.
+        </>
+      );
+      return;
+    }
   };
 
   const handleChangeCategoryModalButtonClick = () => {
-    if (!checkedProductIds.length) {
-      showHasCheckedAnyCheckBoxModal(
+    if (!checkedProducts.length) {
+      showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다
           <br />
@@ -229,12 +247,29 @@ const Controller = () => {
   };
 
   const handleChangeDiscountModalButtonClick = () => {
-    if (!checkedProductIds.length) {
-      showHasCheckedAnyCheckBoxModal(
+    if (!checkedProducts.length) {
+      showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다
           <br />
           주문건을 선택해주세요
+        </>
+      );
+      return;
+    }
+
+    const hasTemporarySaveProduct = checkedProducts.findIndex(
+      ({ status }) => status === ProductStatus.TEMPORARY
+    );
+
+    if (hasTemporarySaveProduct !== -1) {
+      showHasAnyProblemModal(
+        <>
+          임시저장 상태의 상품은
+          <br />
+          상품 수정페이지에서
+          <br />
+          할인율을 변경해주시기 바랍니다.
         </>
       );
       return;
@@ -247,8 +282,8 @@ const Controller = () => {
   };
 
   const handleDuplicateButtonClick = () => {
-    if (!checkedProductIds.length) {
-      showHasCheckedAnyCheckBoxModal(
+    if (!checkedProducts.length) {
+      showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다
           <br />
@@ -318,7 +353,7 @@ const Controller = () => {
 
   const handleDeleteButtonClick = () => {
     if (!checkedProductIds.length) {
-      showHasCheckedAnyCheckBoxModal(
+      showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다
           <br />

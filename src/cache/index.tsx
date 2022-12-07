@@ -145,9 +145,7 @@ export const SkipQuantityCache: Array<SkipQuantityCacheType> = [
 export const SkipQuantityCacheVar =
   makeVar<Array<SkipQuantityCacheType>>(SkipQuantityCache);
 
-export const showHasCheckedAnyCheckBoxModal = (
-  description: React.ReactNode
-) => {
+export const showHasAnyProblemModal = (description: React.ReactNode) => {
   return systemModalVar({
     ...systemModalVar(),
     isVisible: true,

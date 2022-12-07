@@ -14,7 +14,7 @@ import ControllerContainer from "@components/order/ControllerContainer";
 import {
   commonFilterOptionVar,
   paginationSkipVar,
-  showHasCheckedAnyCheckBoxModal,
+  showHasAnyProblemModal,
   SkipQuantityCache,
 } from "@cache/index";
 import {
@@ -33,7 +33,7 @@ const Controller = () => {
   // 주문확인
   const handleConfirmOrderButtonClick = () => {
     if (!checkedOrderIds.length) {
-      showHasCheckedAnyCheckBoxModal(
+      showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다
           <br />
@@ -47,7 +47,7 @@ const Controller = () => {
   //발송처리
   const handleSendButtonClick = () => {
     if (!checkedOrderIds.length) {
-      showHasCheckedAnyCheckBoxModal(
+      showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다
           <br />
@@ -61,7 +61,7 @@ const Controller = () => {
   //주문취소
   const handleCancelOrderClick = () => {
     if (!checkedOrderIds.length) {
-      showHasCheckedAnyCheckBoxModal(
+      showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다
           <br />
@@ -75,7 +75,7 @@ const Controller = () => {
   //반품처리
   const handleReturnButtonClick = () => {
     if (!checkedOrderIds.length) {
-      showHasCheckedAnyCheckBoxModal(
+      showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다
           <br />
@@ -89,7 +89,7 @@ const Controller = () => {
   //교환처리
   const handleExchangeButtonClick = () => {
     if (!checkedOrderIds.length) {
-      showHasCheckedAnyCheckBoxModal(
+      showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다
           <br />
