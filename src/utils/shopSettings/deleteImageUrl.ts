@@ -3,7 +3,7 @@ import axios from "axios";
 const deleteImageUrl = async (imageUrl: string) => {
   try {
     const response: { data: { result: boolean } } = await axios.delete(
-      "https://dev.chopsticks-store.com/upload",
+      `${process.env.REACT_APP_SERVER_URI}/upload`,
       {
         data: {
           url: imageUrl.toString(),

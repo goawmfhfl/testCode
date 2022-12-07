@@ -32,6 +32,7 @@ const Button = styled.button<{
   size: string;
   color?: string;
   backgroundColor?: string;
+  borderColor?: string;
   disabled?: boolean;
 }>`
   display: flex;
@@ -46,6 +47,7 @@ const Button = styled.button<{
   border: 1px solid
     ${({ backgroundColor, theme: { palette } }) =>
       backgroundColor ? backgroundColor : palette.grey500};
+  border-color: ${({ borderColor }) => (borderColor ? borderColor : "")};
   color: ${({ color }) => (color ? color : "black")};
 
   background-color: ${({ backgroundColor }) =>

@@ -33,6 +33,7 @@ import BusinessLicense from "@components/shopSetting/BusinessLicense";
 import PhoneNumber from "@components/shopSetting/PhoneNumber";
 import SettlementAccount from "@components/shopSetting/SettlementAccount";
 import RegistrationNumber from "@components/shopSetting/RegistrationNumber";
+import { showHasServerErrorModal } from "@cache/productManagement";
 
 const ShopSetting = () => {
   const navagate = useNavigate();
@@ -42,12 +43,18 @@ const ShopSetting = () => {
     reValidateMode: "onSubmit",
   });
 
-  const [getUserInfo, { data: userInfo, loading: isUserLoading }] =
-    useLazyQuery<GetUserInfoType>(GET_USER_INFO);
+  const [
+    getUserInfo,
+    { data: userInfo, loading: isUserLoading, error: userError },
+  ] = useLazyQuery<GetUserInfoType>(GET_USER_INFO);
 
   const hasUserLoggedIn = false; // TODO: session storage에서 가져온 토큰정보로 판단
 
-  const { data: shopData, loading: isShopLoading } = useShopInfo();
+  const {
+    data: shopData,
+    loading: isShopLoading,
+    error: shopError,
+  } = useShopInfo();
 
   const hasSetStoredSettings = useRef(false);
 
@@ -94,7 +101,6 @@ const ShopSetting = () => {
 
   useEffect(() => {
     if (hasSetStoredSettings.current) return;
-
     if (!shopData || isShopLoading) return;
 
     const hasShopSettingUpdated =
@@ -151,7 +157,15 @@ const ShopSetting = () => {
     const isLoading = isShopLoading || isUserLoading;
 
     loadingSpinnerVisibilityVar(isLoading);
-  }, [isShopLoading, isUserLoading]);
+
+    if (userError) {
+      showHasServerErrorModal(userError.message, "유저 불러오기");
+    }
+
+    if (shopError) {
+      showHasServerErrorModal(shopError.message, "샵 설정 불러오기");
+    }
+  }, [isShopLoading, isUserLoading, userError, shopError]);
 
   return (
     <FormProvider {...methods}>

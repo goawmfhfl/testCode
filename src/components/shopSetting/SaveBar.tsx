@@ -64,12 +64,12 @@ const SaveBar = () => {
         query: GET_SHOP_INFO,
       });
 
+      if (!shopInfo) return;
+
       const update = {
         ...shopInfo.getShopInfo,
         ...restructureShopSettingStates(watch),
       };
-
-      console.log(update);
 
       cache.writeQuery({
         query: GET_SHOP_INFO,
@@ -80,18 +80,24 @@ const SaveBar = () => {
     },
   });
 
-  const [submitShopSettings, { loading: isLoadingSubmission }] =
-    useMutation<
+  const [submitShopSettings, { loading: isLoadingSubmission }] = useMutation<
+    {
+      registerShop: {
+        ok: boolean;
+        error: string;
+      };
+    },
+    {
+      input: SaveShopSettingsInputType;
+    }
+  >(SAVE_SHOP_SETTINGS, {
+    refetchQueries: [
       {
-        registerShop: {
-          ok: boolean;
-          error: string;
-        };
+        query: GET_SHOP_INFO,
       },
-      {
-        input: SaveShopSettingsInputType;
-      }
-    >(SAVE_SHOP_SETTINGS);
+      "GetShopInfo",
+    ],
+  });
 
   const { data: shopData } = useShopInfo();
 
@@ -125,6 +131,8 @@ const SaveBar = () => {
       });
 
       console.log(error);
+
+      loadingSpinnerVisibilityVar(false);
 
       return;
     }

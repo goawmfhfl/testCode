@@ -101,7 +101,7 @@ const ShopInfo = () => {
 
       // 확인이 끝난 이미지들은 업로드 이후 상태로 세팅
       const { data }: { data: Array<{ url: string }> } = await axios.post(
-        "https://dev.chopsticks-store.com/upload",
+        `${process.env.REACT_APP_SERVER_URI}/upload`,
         formData
       );
 
