@@ -34,14 +34,17 @@ export const showHasServerErrorModal = (error: string, subject: string) => {
     isVisible: true,
     description: (
       <>
-        {subject}을(를) 완료하지 못했습니다.
+        {subject}을(를) <br />
+        완료하지 못했습니다.
         <br />
         다시 시도 후 같은 문제가 발생할 시
         <br />
         찹스틱스에 문의해주세요
         <br />
         <br />
-        에러메시지: {error}
+        에러메시지:
+        <br />
+        {error}
       </>
     ),
     confirmButtonVisibility: true,

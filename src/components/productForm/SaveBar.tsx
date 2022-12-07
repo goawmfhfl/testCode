@@ -12,6 +12,7 @@ import {
   sectionReferenceVar,
   sectionFulfillmentVar,
   loadingSpinnerVisibilityVar,
+  systemModalVar,
 } from "@cache/index";
 import { SHIPMENT_PRICE_TYPE } from "@cache/shopSettings";
 import {
@@ -96,20 +97,75 @@ const SaveBar = () => {
     loadingSpinnerVisibilityVar(true);
 
     try {
-      const input = restructureProductRegistrationStates(formContext);
-
-      console.log("임시저장 인풋", input);
+      const product = restructureProductRegistrationStates(formContext);
 
       const result = await temporarySaveProduct({
         variables: {
           input: {
-            ...input,
+            ...product,
             productId: Number(productId) || null,
           },
         },
       });
 
-      console.log("임시저장 결과", result);
+      if (result.data.temporarySaveProduct.error) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: <>임시저장에 실패하였습니다. 다시 시도해주세요.</>,
+          confirmButtonText: "확인",
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+            });
+          },
+          cancelButtonVisibility: false,
+        });
+
+        return;
+      }
+
+      const isRegistration = !productId;
+
+      if (isRegistration) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: (
+            <>
+              상품명 {product.name}이 <br />
+              새로 임시저장 되었습니다.
+            </>
+          ),
+          confirmButtonText: "확인",
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+            });
+
+            navigate(`/product/${result.data.temporarySaveProduct.productId}`);
+          },
+          cancelButtonVisibility: false,
+        });
+
+        return;
+      }
+
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: <>임시저장 되었습니다.</>,
+        confirmButtonText: "확인",
+        confirmButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
+        cancelButtonVisibility: false,
+      });
     } catch (error) {
       console.log("임시저장 중 에러발생", error);
 
