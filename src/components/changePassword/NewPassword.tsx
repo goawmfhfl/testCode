@@ -13,9 +13,12 @@ import {
   ChangePasswordInput,
 } from "@graphql/mutations/changePassword";
 import { systemModalVar } from "@cache/index";
+import { useNavigate } from "react-router-dom";
+import { Pathnames } from "@constants/index";
 
 const NewPassword = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const [changePassword] =
     useMutation<ChangePasswordResult, ChangePasswordInput>(CHANGE_PASSWORD);
@@ -54,6 +57,14 @@ const NewPassword = () => {
             완료되었습니다.
           </>
         ),
+        confirmButtonClickHandler: () => {
+          navigate(Pathnames.Login);
+
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
       });
 
       return;

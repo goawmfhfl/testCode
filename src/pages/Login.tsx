@@ -235,7 +235,7 @@ const Login = () => {
         </SnsContainer> */}
 
         <FindUserContainer>
-          <Link>
+          <Link onClick={() => alert("준비중입니다.")}>
             <FindUserButton>아이디 찾기</FindUserButton>
           </Link>
           <Link href={Pathnames.Password}>
