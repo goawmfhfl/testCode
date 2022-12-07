@@ -33,7 +33,9 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
       ? category.children.name
       : "-";
     // 판매가
-    const originalPriceToWonSign = `${originalPrice.toLocaleString("ko-KR")} ₩`;
+    const originalPriceToWonSign = originalPrice
+      ? `${originalPrice.toLocaleString("ko-KR")} ₩`
+      : "-";
     // 할인율
     const discountedRate =
       discountMethod && discountAmount
@@ -61,7 +63,7 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
       originalPriceToWonSign,
       discountedRate,
       discountAppliedPrice,
-      quantity,
+      quantity: quantity ? quantity : 0,
       status,
       isChecked,
     };

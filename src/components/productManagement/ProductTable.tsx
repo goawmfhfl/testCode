@@ -322,7 +322,7 @@ const ProductTable = () => {
 
       {loading ? <Loading /> : null}
 
-      {!loading && products?.length !== 0 ? (
+      {!loading && !!products.length ? (
         <TdContainer>
           {products?.map(
             (
