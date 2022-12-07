@@ -92,8 +92,6 @@ const BusinessLicenseModal = () => {
         },
       };
 
-      // 사업자등록번호 : 882-87-01829
-      // 통신판매업신고번호 : 2020-서울송파-3260
       const response = await axios.get(
         "http://apis.data.go.kr/1130000/MllBsDtlService/getMllBsInfoDetail",
         parameter
@@ -103,7 +101,7 @@ const BusinessLicenseModal = () => {
         data:
           | {
               items: Array<{
-                rprsvNm: string;
+                coNm: string;
                 bizrno: string;
                 crno: string;
                 simTxtnTrgtYnDesc: string;
@@ -205,18 +203,12 @@ const BusinessLicenseModal = () => {
 
           const businessLicense = data.items[0];
 
-          const {
-            rprsvNm,
-            bizrno,
-            crno,
-            simTxtnTrgtYnDesc,
-            rdnAddr,
-            prmsnMgtNo,
-          } = businessLicense;
+          const { coNm, bizrno, crno, simTxtnTrgtYnDesc, rdnAddr, prmsnMgtNo } =
+            businessLicense;
 
           businessLicenseVar({
             isConfirmed: true,
-            representativeName: rprsvNm,
+            representativeName: coNm,
             businessRegistrationNumber: bizrno,
             corporateRegistrationNumber: crno,
             isSimpleTaxpayers: simTxtnTrgtYnDesc,

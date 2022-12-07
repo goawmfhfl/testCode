@@ -1,4 +1,4 @@
-import styled from "styled-components/macro";
+import styled, { useTheme } from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
 import Button from "@components/common/Button";
@@ -9,7 +9,7 @@ import { BusinessLicenseVariables } from "@models/shopSettings";
 import { businessLicenseVar } from "@cache/shopSettings";
 
 export interface BusinessLicenseInfoType {
-  rprsvNm: string; // 대표자명
+  coNm: string; // 대표자명
   bizrno: string; // 사업자 등록번호
   crno: string; // 법인 등록번호
   simTxtnTrgtYnDesc: string; // 간이과세대상자
@@ -18,6 +18,8 @@ export interface BusinessLicenseInfoType {
 }
 
 const BusinessLicense = () => {
+  const theme = useTheme();
+
   const businessLicense: BusinessLicenseVariables =
     useReactiveVar(businessLicenseVar);
 
@@ -57,7 +59,7 @@ const BusinessLicense = () => {
         <HasInfoContainer>
           <InfoList>
             <Info>
-              <Text>대표자명</Text>
+              <Text>법인명(상호명)</Text>
               <Text>{representativeName}</Text>
             </Info>
             <Info>
@@ -81,6 +83,16 @@ const BusinessLicense = () => {
               <Text>{onlineSalesLicense}</Text>
             </Info>
           </InfoList>
+
+          <Button
+            size="small"
+            full={false}
+            onClick={handleRegisterButtonClick}
+            backgroundColor="#fff"
+            borderColor={theme.palette.grey500}
+          >
+            등록하기
+          </Button>
         </HasInfoContainer>
       )}
     </Container>
@@ -131,6 +143,7 @@ const HasInfoContainer = styled(InfoContainer)`
 const InfoList = styled.ul`
   display: flex;
   flex-direction: column;
+  margin-bottom: 12px;
 `;
 
 const Info = styled.li`
