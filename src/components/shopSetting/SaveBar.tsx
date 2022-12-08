@@ -19,7 +19,7 @@ import {
   SHIPMENT_PRICE_TYPE,
   unfulfilledInputNamesVar,
 } from "@cache/shopSettings";
-import { shopSettingsSectionMapper } from "@constants/index";
+import { Pathnames, shopSettingsSectionMapper } from "@constants/index";
 import { ConditionalFreeShipmentPolicy } from "@constants/shop";
 import {
   TemporarySaveShopSettingsInputType,
@@ -186,7 +186,8 @@ const SaveBar = () => {
           hasIdentificationCardAuthenticated && "onlineSalesLicense",
           isConditionalFreeShipmentUnset && "shipmentConditionalPrice",
         ],
-        [isShipmentPriceFree && "shipmentPrice"].filter(Boolean)
+        [isShipmentPriceFree && "shipmentPrice"].filter(Boolean),
+        Pathnames.Shop
       );
 
       if (!isFulfilled) {
@@ -233,6 +234,8 @@ const SaveBar = () => {
           input,
         },
       });
+
+      console.log("요청 결과", result);
 
       const {
         data: {

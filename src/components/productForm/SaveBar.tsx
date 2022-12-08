@@ -231,7 +231,8 @@ const SaveBar = () => {
           !isDiscounted && "discountAmount",
           hasRequiredOption && "quantity",
           isShipmentPriceFree && "shipmentPrice",
-        ]
+        ],
+        Pathnames.ProductRegistration
       );
 
       if (!isFulfilled) {

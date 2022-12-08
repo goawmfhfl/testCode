@@ -10,7 +10,7 @@ export enum SHOP_SETTING_SECTIONS {
 }
 
 export const shopSettingsSectionMapper: { [key: string]: string } = {
-  uploadedFileInfos: SHOP_SETTING_SECTIONS.SHOP_INFO,
+  shopInfo: SHOP_SETTING_SECTIONS.SHOP_INFO,
   description: SHOP_SETTING_SECTIONS.SHOP_INFO,
   shipmentPolicy: SHOP_SETTING_SECTIONS.SHOP_POLICY,
   returnPolicy: SHOP_SETTING_SECTIONS.SHOP_POLICY,

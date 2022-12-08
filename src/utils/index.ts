@@ -1,3 +1,4 @@
+import { Pathnames } from "@constants/index";
 import { UploadFileType } from "@models/index";
 import axios from "axios";
 
@@ -114,7 +115,8 @@ function validatePhoneNumber(input: string) {
 function hasEveryInputFulfilled(
   inputFields: object,
   optionalInputNames?: Array<string>, // null 또는 undefined 허용
-  allowsZeroInputNames?: Array<string> // 0 허용
+  allowsZeroInputNames?: Array<string>, // 0 허용
+  formType?: Pathnames.Shop | Pathnames.ProductRegistration
 ): {
   isFulfilled: boolean;
   unfulfilledInputNames: Array<string>;
@@ -136,8 +138,39 @@ function hasEveryInputFulfilled(
         return acc;
       }
 
-      // Array - images (uploadedFileInfos)
-      if (inputValue instanceof Array && inputName === "uploadedFileInfos") {
+      // Array - Shop Images
+      if (
+        formType === Pathnames.Shop &&
+        inputValue instanceof Array &&
+        inputName === "uploadedFileInfos"
+      ) {
+        const uploadedUrls = inputValue as Array<{
+          url: string;
+          type: UploadFileType;
+        }>;
+
+        const shopImagePC = uploadedUrls.find(
+          ({ type }) => type === UploadFileType.SHOP_PC
+        );
+        const shopImageMobile = uploadedUrls.find(
+          ({ type }) => type === UploadFileType.SHOP_MOBILE
+        );
+
+        if (!shopImagePC || !shopImageMobile) {
+          unfulfilledInputNames.push("shopInfo");
+
+          return false;
+        }
+
+        return acc;
+      }
+
+      // Array - Product Images
+      if (
+        formType === Pathnames.ProductRegistration &&
+        inputValue instanceof Array &&
+        inputName === "uploadedFileInfos"
+      ) {
         const uploadedUrls = inputValue as Array<{
           url: string;
           type: UploadFileType;
