@@ -25,7 +25,7 @@ import {
   TITLE,
 } from "@cache/productForm";
 import { shipmentTemplatesVar } from "@cache/productForm/shipmentTemplate";
-import { productRegistrationSectionMapper } from "@constants/index";
+import { Pathnames, productRegistrationSectionMapper } from "@constants/index";
 
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 import {
@@ -77,7 +77,7 @@ const SaveBar = () => {
       }
     >(TEMPORARY_SAVE_PRODUCT);
 
-  const [createProduct] =
+  const [createProduct, { loading: isLoadingCreateProduct }] =
     useMutation<
       {
         createProduct: {
@@ -109,10 +109,17 @@ const SaveBar = () => {
       });
 
       if (result.data.temporarySaveProduct.error) {
+        loadingSpinnerVisibilityVar(false);
+
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
-          description: <>임시저장에 실패하였습니다. 다시 시도해주세요.</>,
+          description: (
+            <>
+              임시저장에 실패하였습니다. <br /> 다시 시도해주세요. <br />
+              에러메시지: {result.data.temporarySaveProduct.error}
+            </>
+          ),
           confirmButtonText: "확인",
           confirmButtonClickHandler: () => {
             systemModalVar({
@@ -150,22 +157,28 @@ const SaveBar = () => {
           cancelButtonVisibility: false,
         });
 
+        loadingSpinnerVisibilityVar(false);
+
         return;
       }
 
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        description: <>임시저장 되었습니다.</>,
-        confirmButtonText: "확인",
-        confirmButtonClickHandler: () => {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: false,
-          });
-        },
-        cancelButtonVisibility: false,
-      });
+      loadingSpinnerVisibilityVar(false);
+
+      if (result.data.temporarySaveProduct.ok) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: <>임시저장 되었습니다.</>,
+          confirmButtonText: "확인",
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+            });
+          },
+          cancelButtonVisibility: false,
+        });
+      }
     } catch (error) {
       console.log("임시저장 중 에러발생", error);
 
@@ -173,101 +186,156 @@ const SaveBar = () => {
 
       showHasServerErrorModal("통신 에러", "임시저장");
     }
-
-    loadingSpinnerVisibilityVar(false);
   };
 
   const handleSubmitButtonClick = async (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
-    e.preventDefault();
-    loadingSpinnerVisibilityVar(true);
+    try {
+      e.preventDefault();
+      const input = restructureProductRegistrationStates(formContext);
 
-    const input = restructureProductRegistrationStates(formContext);
+      const isDiscounted = watch(IS_DISCOUNTED) as boolean;
+      const hasTemplateSelected = shipmentTemplatesVar().find(
+        (template) => template.name === watch(SHIPMENT_TEMPLATE_NAME)
+      );
+      const hasRequiredOption = watch(HAS_REQUIRED_OPTION) as boolean;
+      const hasSelectiveOption = watch(HAS_SELECTIVE_OPTION) as boolean;
+      const hasLeadtime = watch(HAS_MANUFACTURING_LEAD_TIME) as boolean;
+      const isShipmentPriceFree =
+        watch(SHIPMENT_PRICE_TYPE) === ShipmentChargeType.Free;
+      const hasTagInfo = watch(HAS_TAG_INFOS) as boolean;
 
-    const isDiscounted = watch(IS_DISCOUNTED) as boolean;
-    const hasTemplateSelected = shipmentTemplatesVar().find(
-      (template) => template.name === watch(SHIPMENT_TEMPLATE_NAME)
-    );
-    const hasRequiredOption = watch(HAS_REQUIRED_OPTION) as boolean;
-    const hasSelectiveOption = watch(HAS_SELECTIVE_OPTION) as boolean;
-    const hasLeadtime = watch(HAS_MANUFACTURING_LEAD_TIME) as boolean;
-    const isShipmentPriceFree =
-      watch(SHIPMENT_PRICE_TYPE) === ShipmentChargeType.Free;
-    const hasTagInfo = watch(HAS_TAG_INFOS) as boolean;
+      const { isFulfilled, unfulfilledInputNames } = hasEveryInputFulfilled(
+        input,
+        [
+          !isDiscounted && "discountAmount",
+          !isDiscounted && "discountMethod",
+          !isDiscounted && "startDiscountDate",
+          !isDiscounted && "endDiscountDate",
+          !hasRequiredOption && !hasSelectiveOption && "optionCombinations",
+          !hasRequiredOption && "requiredOptions",
+          !hasSelectiveOption && "selectiveOptions",
+          !hasLeadtime && "manufacturingLeadTime",
+          "shipmentId",
+          hasTemplateSelected && "isBundleShipment",
+          hasTemplateSelected && "shipmentType",
+          hasTemplateSelected && "shipmentPrice",
+          hasTemplateSelected && "shipmentDistantPrice",
+          hasTemplateSelected && "shipmentReturnPrice",
+          hasTemplateSelected && "shipmentExchangePrice",
+          "authorization",
+          !hasTagInfo && "tagInfos",
+        ],
+        [
+          !isDiscounted && "discountAmount",
+          hasRequiredOption && "quantity",
+          isShipmentPriceFree && "shipmentPrice",
+        ]
+      );
 
-    const { isFulfilled, unfulfilledInputNames } = hasEveryInputFulfilled(
-      input,
-      [
-        !isDiscounted && "discountAmount",
-        !isDiscounted && "discountMethod",
-        !isDiscounted && "startDiscountDate",
-        !isDiscounted && "endDiscountDate",
-        !hasRequiredOption && !hasSelectiveOption && "optionCombinations",
-        !hasRequiredOption && "requiredOptions",
-        !hasSelectiveOption && "selectiveOptions",
-        !hasLeadtime && "manufacturingLeadTime",
-        "shipmentId",
-        hasTemplateSelected && "isBundleShipment",
-        hasTemplateSelected && "shipmentType",
-        hasTemplateSelected && "shipmentPrice",
-        hasTemplateSelected && "shipmentDistantPrice",
-        hasTemplateSelected && "shipmentReturnPrice",
-        hasTemplateSelected && "shipmentExchangePrice",
-        "authorization",
-        !hasTagInfo && "tagInfos",
-      ],
-      [
-        !isDiscounted && "discountAmount",
-        hasRequiredOption && "quantity",
-        isShipmentPriceFree && "shipmentPrice",
-      ]
-    );
+      if (!isFulfilled) {
+        const unfulfilledSectionNames = [
+          ...new Set(
+            unfulfilledInputNames.map((inputName: string): string => {
+              return productRegistrationSectionMapper[inputName];
+            })
+          ),
+        ];
 
-    if (!isFulfilled) {
-      const unfulfilledSectionNames = [
-        ...new Set(
-          unfulfilledInputNames.map((inputName: string): string => {
-            return productRegistrationSectionMapper[inputName];
-          })
-        ),
-      ];
-
-      unfulfilledSectionNames.forEach((sectionName) => {
-        sectionFulfillmentVar({
-          ...sectionFulfillmentVar(),
-          [sectionName]: false,
+        unfulfilledSectionNames.forEach((sectionName) => {
+          sectionFulfillmentVar({
+            ...sectionFulfillmentVar(),
+            [sectionName]: false,
+          });
         });
+
+        // const targetSection = unfulfilledSectionNames[0];
+        // const sectionReferenceList = sectionReferenceVar();
+        // const targetSectionReference = sectionReferenceList[targetSection];
+
+        // const GNBReference: HTMLElement = GNBReferenceVar();
+        // const SECTION_TOP_MARGIN = 88;
+
+        // const scrollTo =
+        //   targetSectionReference.offsetTop -
+        //   GNBReference.offsetHeight -
+        //   SECTION_TOP_MARGIN;
+
+        // contentsContainerReferenceVar().scrollTo(0, scrollTo);
+
+        return;
+      }
+
+      const result = await createProduct({
+        variables: {
+          input: {
+            ...input,
+            productId: Number(productId) || null,
+          },
+        },
       });
 
-      const targetSection = unfulfilledSectionNames[0];
-      const sectionReferenceList = sectionReferenceVar();
-      const targetSectionReference = sectionReferenceList[targetSection];
+      console.log("상품등록 결과", result);
 
-      const GNBReference: HTMLElement = GNBReferenceVar();
-      const SECTION_TOP_MARGIN = 88;
+      if (result.data.createProduct.error) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: (
+            <>
+              상품 생성에 실패하였습니다. <br />
+              에러: {result.data.createProduct.error}
+            </>
+          ),
+        });
 
-      const scrollTo =
-        targetSectionReference.offsetTop -
-        GNBReference.offsetHeight -
-        SECTION_TOP_MARGIN;
+        return;
+      }
 
-      contentsContainerReferenceVar().scrollTo(0, scrollTo);
+      if (result.data.createProduct.error) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: "상품이 등록되었습니다.",
+          confirmButtonVisibility: true,
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+            });
 
-      loadingSpinnerVisibilityVar(false);
+            navigate(Pathnames.Product);
+          },
+          confirmButtonText: "확인",
+          cancelButtonVisibility: false,
+        });
+      }
+    } catch (error) {
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: (
+          <>
+            네트워크 에러로 <br />
+            상품 생성에 실패하였습니다. <br />
+            다시 시도해보시고 <br />
+            찹스틱스에 문의해주세요!
+          </>
+        ),
+        confirmButtonVisibility: true,
+        confirmButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
+        confirmButtonText: "확인",
+        cancelButtonVisibility: false,
+      });
 
-      return;
+      console.log(error);
     }
-
-    const result = await createProduct({
-      variables: {
-        input,
-      },
-    });
-
-    console.log("상품등록 결과", result);
-
-    loadingSpinnerVisibilityVar(false);
   };
 
   const handleCancelButtonClick = () => {
@@ -275,15 +343,13 @@ const SaveBar = () => {
   };
 
   useEffect(() => {
-    if (isLoadingProduct) {
-      loadingSpinnerVisibilityVar(true);
-    } else {
-      loadingSpinnerVisibilityVar(false);
-    }
-  }, [isLoadingProduct]);
+    const isLoading = isLoadingProduct || isLoadingCreateProduct;
+
+    loadingSpinnerVisibilityVar(isLoading);
+  }, [isLoadingProduct, isLoadingCreateProduct]);
 
   useEffect(() => {
-    if (!productData) return;
+    if (!productData || productData.getProductById.error) return;
 
     const { status, createdAt, updatedAt } = productData.getProductById.product;
 

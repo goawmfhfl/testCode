@@ -1,3 +1,4 @@
+import { UploadFileType } from "@models/index";
 import axios from "axios";
 
 export interface RemoveImageErrorType {
@@ -135,17 +136,36 @@ function hasEveryInputFulfilled(
         return acc;
       }
 
-      // Array - shop images (uploadedFileInfos)
+      // Array - images (uploadedFileInfos)
       if (inputValue instanceof Array && inputName === "uploadedFileInfos") {
-        const hasFulfilled = inputValue.reduce(
-          (acc: boolean, cur: { url: string; type: string }) =>
-            acc && Boolean(cur.url) && Boolean(cur.type),
-          true
-        ) as boolean;
+        const uploadedUrls = inputValue as Array<{
+          url: string;
+          type: UploadFileType;
+        }>;
 
-        if (!hasFulfilled) {
-          unfulfilledInputNames.push(inputName);
+        const thumbnail = uploadedUrls.find(
+          (file) => file.type === UploadFileType.PRODUCT_THUMBNAIL
+        );
+        const requiredImages = uploadedUrls.filter(
+          (file) => file.type === UploadFileType.PRODUCT_REQUIRED
+        );
+        const descriptionImages = uploadedUrls.filter(
+          (file) => file.type === UploadFileType.PRODUCT_DETAIL_PAGE
+        );
 
+        const isRequiredImagesUnfulfilled =
+          !thumbnail || requiredImages.length < 4;
+        const isDescriptionImagesUnfulfilled = !descriptionImages.length;
+
+        if (isRequiredImagesUnfulfilled) {
+          unfulfilledInputNames.push("requiredImages");
+        }
+
+        if (isDescriptionImagesUnfulfilled) {
+          unfulfilledInputNames.push("descriptionImages");
+        }
+
+        if (isRequiredImagesUnfulfilled || isDescriptionImagesUnfulfilled) {
           return false;
         }
 

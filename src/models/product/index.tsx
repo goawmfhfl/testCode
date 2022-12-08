@@ -42,7 +42,7 @@ export enum DiscountMethod {
 }
 
 export interface TemporarySaveProductInputType {
-  productId: null | number;
+  productId?: null | number;
   name: string;
   categoryName: CategoryNames;
   uploadedFileInfos: Array<UploadedFileInfos>;
@@ -94,6 +94,7 @@ export interface TemporarySaveProductInputType {
 }
 
 export interface CreateProductInputType {
+  productId?: number;
   name: string;
   categoryName: CategoryNames;
   uploadedFileInfos: Array<UploadedFileInfos>;
@@ -199,7 +200,7 @@ export interface ProductType {
     updatedAt: Date;
     deletedAt: Date;
     isExposed: boolean;
-    tag: Array<{ id: number; name: string }>;
+    tag: { id: number; name: string };
   }>;
 
   uploadedFileUrls: Array<{

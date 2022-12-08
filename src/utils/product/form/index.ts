@@ -160,6 +160,7 @@ export function restructureProductRegistrationStates(
     authorization,
     personInCharge,
     tagInfos: hasTagInfos ? getTagInfos() : null,
+    isBmarket: false,
   };
 }
 

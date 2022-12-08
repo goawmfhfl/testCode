@@ -16,6 +16,7 @@ import {
   LEAD_TIME_MAX,
   HAS_REQUIRED_OPTION,
   HAS_SELECTIVE_OPTION,
+  HAS_TAG_INFOS,
 } from "@cache/productForm";
 import { UploadFileType } from "@models/index";
 import {
@@ -28,6 +29,8 @@ import {
   selectiveOptionVar,
 } from "@cache/productForm/productOptions";
 import { restructureOptions } from "./options";
+import { tagListVar } from "@cache/productForm/searchTag";
+import { SearchTag, TagTypes } from "@models/product/searchTag";
 
 const setProduct = (
   product: ProductType,
@@ -63,6 +66,7 @@ const setProduct = (
     precaution,
     authorization,
     personInCharge,
+    productToTags,
   } = product;
 
   const isSetDiscountSpan = startDiscountDate || endDiscountDate;
@@ -80,7 +84,7 @@ const setProduct = (
     DISCOUNT_ENDS_AT: endDiscountDate ? new Date(endDiscountDate) : null,
     PRODUCT_STOCK: quantity,
     IS_BUNDLE_SHIPMENT: isBundleShipment ? "가능" : "불가능",
-    SHIPMENT_TEMPLATE_ID: shipment.id ? Number(shipment.id) : null,
+    SHIPMENT_TEMPLATE_ID: shipment && shipment.id ? Number(shipment.id) : null,
     SHIPMENT_PRICE_TYPE: shipmentType,
     SHIPMENT_PRICE: shipmentPrice,
     SHIPMENT_DISTANT_PRICE: shipmentDistantPrice,
@@ -95,6 +99,20 @@ const setProduct = (
     AUTHORIZATION: authorization,
     PERSON_IN_CHARGE: personInCharge,
   });
+
+  if (productToTags && productToTags.length) {
+    setValue(HAS_TAG_INFOS, true);
+
+    tagListVar(
+      productToTags.map(({ isExposed, tag }) => {
+        return {
+          id: uuidv4(),
+          tagName: tag.name,
+          type: isExposed ? TagTypes.Exposed : TagTypes.SearchOnly,
+        } as SearchTag;
+      })
+    );
+  }
 
   if (options && options.length) {
     const requiredOptions = options.filter((ops) => ops.isRequired);
@@ -185,6 +203,7 @@ const setProduct = (
     const thumbnail = uploadedFileUrls.find(
       (uploadedFile) => uploadedFile.type === UploadFileType.PRODUCT_THUMBNAIL
     );
+
     const requiredImages = uploadedFileUrls.filter(
       (uploadedFile) => uploadedFile.type === UploadFileType.PRODUCT_REQUIRED
     );
@@ -195,7 +214,7 @@ const setProduct = (
       (uploadedFile) => uploadedFile.type === UploadFileType.PRODUCT_DETAIL_PAGE
     );
 
-    if (requiredImages.length) {
+    if (thumbnail || requiredImages.length) {
       const newRequiredImages = [...requiredImagesVar()];
 
       newRequiredImages[0].url = thumbnail?.url || "";
@@ -228,8 +247,6 @@ const setProduct = (
       );
     }
   }
-
-  // TODO: 태그
 };
 
 const evaluateCategory = (() => {
@@ -262,7 +279,7 @@ const evaluateCategory = (() => {
     if (!category.parent) {
       result.firstCategory = category.name;
 
-      return;
+      return result;
     }
 
     evaluateCategory(category.parent, categoryLength);
