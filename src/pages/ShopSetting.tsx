@@ -115,6 +115,33 @@ const ShopSetting = () => {
       setShopInfo(shopData.getShopInfo.shop, methods.setValue);
     }
 
+    if (!registered && !hasShopSettingUpdated) {
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: (
+          <>
+            샵/판매자 정보 설정을 완료하시면
+            <br />
+            판매 활동을 시작할 수 있습니다.
+          </>
+        ),
+        confirmButtonVisibility: true,
+        cancelButtonVisibility: false,
+        confirmButtonText: "확인",
+        confirmButtonClickHandler: () => {
+          hasSetStoredSettings.current = true;
+
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
+      });
+
+      return;
+    }
+
     if (!registered && hasShopSettingUpdated && !hasSetStoredSettings.current) {
       systemModalVar({
         isVisible: true,
