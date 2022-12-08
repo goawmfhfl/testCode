@@ -32,6 +32,31 @@ const postAuthenticationCode = async (
       return false;
     }
 
+    if (data[0].code === "fail" && data[0].message.includes("K101")) {
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: (
+          <>
+            카카오 톡에서 chopsticks 알림톡 <br />
+            차단을 해제해 주신 후 다시
+            <br />
+            '인증번호 전송' 버튼을 눌러주세요.
+          </>
+        ),
+        confirmButtonVisibility: true,
+        confirmButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
+        cancelButtonVisibility: false,
+      });
+
+      return false;
+    }
+
     if (data[0].code === "fail") {
       systemModalVar({
         ...systemModalVar(),

@@ -156,137 +156,144 @@ const SaveBar = () => {
   const handleSubmitButtonClick = async (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
-    e.preventDefault();
-    loadingSpinnerVisibilityVar(true);
+    try {
+      e.preventDefault();
+      loadingSpinnerVisibilityVar(true);
 
-    const input = restructureShopSettingStates(watch);
+      const input = restructureShopSettingStates(watch);
 
-    const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
-    const isShipmentPriceFree = shipmentType === ShipmentChargeType.Free;
-    const hasIdentificationCardAuthenticated =
-      Boolean(input.identificationCardNumber) &&
-      Boolean(input.identificationCardCopyPhoto);
-    const isConditionalFreeShipmentUnset =
-      watch(HAS_SET_CONDITIONAL_FREE_SHIPMENT) ===
-      ConditionalFreeShipmentPolicy.Unset;
+      const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
+      const isShipmentPriceFree = shipmentType === ShipmentChargeType.Free;
+      const hasIdentificationCardAuthenticated =
+        Boolean(input.identificationCardNumber) &&
+        Boolean(input.identificationCardCopyPhoto);
+      const isConditionalFreeShipmentUnset =
+        watch(HAS_SET_CONDITIONAL_FREE_SHIPMENT) ===
+        ConditionalFreeShipmentPolicy.Unset;
 
-    const { isFulfilled, unfulfilledInputNames } = hasEveryInputFulfilled(
-      input,
-      [
-        "safetyAuthentication",
-        "safetyAuthenticationExpiredDate",
-        "identificationCardNumber",
-        "identificationCardCopyPhoto",
-        hasIdentificationCardAuthenticated && "representativeName",
-        hasIdentificationCardAuthenticated && "businessRegistrationNumber",
-        hasIdentificationCardAuthenticated && "isSimpleTaxpayers",
-        hasIdentificationCardAuthenticated && "companyLocation",
-        hasIdentificationCardAuthenticated && "onlineSalesLicense",
-        isConditionalFreeShipmentUnset && "shipmentConditionalPrice",
-      ],
-      [isShipmentPriceFree && "shipmentPrice"].filter(Boolean)
-    );
-
-    if (!isFulfilled) {
-      unfulfilledInputNamesVar(unfulfilledInputNames);
-
-      const unfulfilledSectionNames = [
-        ...new Set(
-          unfulfilledInputNames.map(
-            (inputName: string): string => shopSettingsSectionMapper[inputName]
-          )
-        ),
-      ];
-
-      const targetSection = shopSettingsSectionMapper[unfulfilledInputNames[0]];
-      const sectionReferenceList = sectionReferenceVar();
-      const targetSectionReference = sectionReferenceList[targetSection];
-
-      unfulfilledSectionNames.forEach((sectionName) => {
-        sectionFulfillmentVar({
-          ...sectionFulfillmentVar(),
-          [sectionName]: false,
-        });
-      });
-
-      const GNBReference: HTMLElement = GNBReferenceVar();
-      const SECTION_TOP_MARGIN = 88;
-
-      const scrollTo =
-        targetSectionReference.offsetTop -
-        GNBReference.offsetHeight -
-        SECTION_TOP_MARGIN;
-
-      contentsContainerReferenceVar().scrollTo(0, scrollTo);
-
-      loadingSpinnerVisibilityVar(false);
-
-      return;
-    }
-
-    const result = await submitShopSettings({
-      variables: {
+      const { isFulfilled, unfulfilledInputNames } = hasEveryInputFulfilled(
         input,
-      },
-    });
+        [
+          "safetyAuthentication",
+          "safetyAuthenticationExpiredDate",
+          "identificationCardNumber",
+          "identificationCardCopyPhoto",
+          hasIdentificationCardAuthenticated && "representativeName",
+          hasIdentificationCardAuthenticated && "businessRegistrationNumber",
+          hasIdentificationCardAuthenticated && "corporateRegistrationNumber",
+          hasIdentificationCardAuthenticated && "isSimpleTaxpayers",
+          hasIdentificationCardAuthenticated && "companyLocation",
+          hasIdentificationCardAuthenticated && "onlineSalesLicense",
+          isConditionalFreeShipmentUnset && "shipmentConditionalPrice",
+        ],
+        [isShipmentPriceFree && "shipmentPrice"].filter(Boolean)
+      );
 
-    const {
-      data: {
-        registerShop: { ok, error },
-      },
-    } = result;
+      if (!isFulfilled) {
+        unfulfilledInputNamesVar(unfulfilledInputNames);
 
-    if (!ok) {
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        description: <>샵 설정 등록 중 통신 에러</>,
-        cancelButtonVisibility: false,
+        const unfulfilledSectionNames = [
+          ...new Set(
+            unfulfilledInputNames.map(
+              (inputName: string): string =>
+                shopSettingsSectionMapper[inputName]
+            )
+          ),
+        ];
+
+        const targetSection =
+          shopSettingsSectionMapper[unfulfilledInputNames[0]];
+        const sectionReferenceList = sectionReferenceVar();
+        const targetSectionReference = sectionReferenceList[targetSection];
+
+        unfulfilledSectionNames.forEach((sectionName) => {
+          sectionFulfillmentVar({
+            ...sectionFulfillmentVar(),
+            [sectionName]: false,
+          });
+        });
+
+        // const GNBReference: HTMLElement = GNBReferenceVar();
+        // const SECTION_TOP_MARGIN = 88;
+
+        // const scrollTo =
+        //   targetSectionReference.offsetTop -
+        //   GNBReference.offsetHeight -
+        //   SECTION_TOP_MARGIN;
+
+        // contentsContainerReferenceVar().scrollTo(0, scrollTo);
+
+        loadingSpinnerVisibilityVar(false);
+
+        return;
+      }
+
+      const result = await submitShopSettings({
+        variables: {
+          input,
+        },
       });
 
-      console.log(error);
+      const {
+        data: {
+          registerShop: { ok, error },
+        },
+      } = result;
+
+      if (!ok) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: <>샵 설정 등록 중 통신 에러</>,
+          cancelButtonVisibility: false,
+        });
+
+        console.log(error);
+
+        loadingSpinnerVisibilityVar(false);
+
+        return;
+      }
+
+      if (!shopData.getShopInfo.registered) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: (
+            <>
+              샵 설정 등록이 완료되었습니다. <br />
+              지금부터 상품 등록 및 판매가 가능합니다.
+            </>
+          ),
+          cancelButtonVisibility: false,
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+            });
+          },
+        });
+
+        navigate("/product");
+      } else {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: <>저장 되었습니다.</>,
+          cancelButtonVisibility: false,
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+            });
+          },
+        });
+      }
 
       loadingSpinnerVisibilityVar(false);
-
-      return;
+    } catch (error) {
+      loadingSpinnerVisibilityVar(false);
     }
-
-    if (!shopData.getShopInfo.registered) {
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        description: (
-          <>
-            샵 설정 등록이 완료되었습니다. <br />
-            지금부터 상품 등록 및 판매가 가능합니다.
-          </>
-        ),
-        cancelButtonVisibility: false,
-        confirmButtonClickHandler: () => {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: false,
-          });
-        },
-      });
-
-      navigate("/product");
-    } else {
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        description: <>저장 되었습니다.</>,
-        cancelButtonVisibility: false,
-        confirmButtonClickHandler: () => {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: false,
-          });
-        },
-      });
-    }
-
-    loadingSpinnerVisibilityVar(false);
   };
 
   const hasShopRegistered = shopData?.getShopInfo.registered;

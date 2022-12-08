@@ -37,7 +37,7 @@ const SectionWrapper = ({
           [referenceKey]: newRef,
         });
       }}
-      onFocus={() => {
+      onMouseDown={() => {
         sectionFulfillmentVar({
           ...sectionFulfillmentVar(),
           [referenceKey]: true,

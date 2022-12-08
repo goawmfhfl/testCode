@@ -58,9 +58,11 @@ const Layout = ({
       </Container>
 
       {modal.isVisible && <ModalLayer>{modal.component}</ModalLayer>}
+
       {overModal.isVisible && (
         <OverModalLayer>{overModal.component}</OverModalLayer>
       )}
+
       {systemModal.isVisible && (
         <SystemModalLayer
           hasOtherModal={modal.isVisible || overModal.isVisible}
@@ -68,6 +70,7 @@ const Layout = ({
           {<SystemModal />}
         </SystemModalLayer>
       )}
+
       {loadingSpinnerVisibility && (
         <LoaderSpinnerLayer>
           <TailSpin
@@ -149,7 +152,7 @@ const OverModalLayer = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1000;
+  z-index: 5000;
 
   width: 100vw;
   height: 100vh;
@@ -171,7 +174,7 @@ const SystemModalLayer = styled.div<{ hasOtherModal: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1000;
+  z-index: 8000;
 
   width: 100vw;
   height: 100vh;
@@ -193,7 +196,7 @@ const LoaderSpinnerLayer = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 2000;
+  z-index: 9999;
 
   width: 100vw;
   height: 100vh;
