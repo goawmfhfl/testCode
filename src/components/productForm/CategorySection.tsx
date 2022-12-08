@@ -68,10 +68,10 @@ const CategorySection = () => {
     loadingSpinnerVisibilityVar(isLoading);
   }, [isCategoryLoading || isShopLoading]);
 
-  if (!shopInfoData) return <></>;
+  if (!shopInfoData || !shopInfoData.getShopInfo.shop) return <></>;
 
   const { safetyAuthentication, safetyAuthenticationExpiredDate } =
-    shopInfoData.getShopInfo;
+    shopInfoData.getShopInfo.shop;
 
   const isSafetyAuthenticated =
     safetyAuthentication &&

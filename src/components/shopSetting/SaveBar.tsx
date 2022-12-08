@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTheme } from "styled-components/macro";
 import { useMutation } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
@@ -13,6 +13,7 @@ import {
   sectionReferenceVar,
   sectionFulfillmentVar,
   loadingSpinnerVisibilityVar,
+  showHasAnyProblemModal,
 } from "@cache/index";
 import {
   HAS_SET_CONDITIONAL_FREE_SHIPMENT,
@@ -39,6 +40,7 @@ import Container from "@components/common/saveBar/Container";
 import ButtonContainer from "@components/common/saveBar/ButtonContainer";
 import TemporarySaveButton from "@components/common/saveBar/TemporarySaveButton";
 import SubmitButton from "@components/common/saveBar/SubmitButton";
+import { showHasServerErrorModal } from "@cache/productManagement";
 
 const SaveBar = () => {
   const navigate = useNavigate();
@@ -47,7 +49,10 @@ const SaveBar = () => {
   const formContext = useFormContext();
   const { watch } = formContext;
 
-  const [temporarySaveShopSettings] = useMutation<
+  const [
+    temporarySaveShopSettings,
+    { loading: isTemporarySaveShopLoading, error: isTemporarySaveShopError },
+  ] = useMutation<
     {
       temporarySaveShop: {
         ok: boolean;
@@ -99,14 +104,32 @@ const SaveBar = () => {
     ],
   });
 
-  const { data: shopData } = useShopInfo();
+  const {
+    data: shopData,
+    loading: isShopLoading,
+    error: isShopError,
+  } = useShopInfo();
+
+  useEffect(() => {
+    const isLoading = isShopLoading || isTemporarySaveShopLoading;
+
+    loadingSpinnerVisibilityVar(isLoading);
+  }, [isShopLoading, isTemporarySaveShopLoading]);
+
+  useEffect(() => {
+    if (isShopError) {
+      showHasServerErrorModal("", "샵 정보 가져오기");
+    }
+
+    if (isTemporarySaveShopError) {
+      showHasServerErrorModal("", "샵 정보 임시저장");
+    }
+  }, [isShopError, isTemporarySaveShopError]);
 
   const handleTemporarySaveButtonClick = async (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
     e.preventDefault();
-
-    loadingSpinnerVisibilityVar(true);
 
     const temporarySaveShopInput = restructureShopSettingStates(watch);
 
@@ -132,8 +155,6 @@ const SaveBar = () => {
 
       console.log(error);
 
-      loadingSpinnerVisibilityVar(false);
-
       return;
     }
 
@@ -149,8 +170,6 @@ const SaveBar = () => {
         });
       },
     });
-
-    loadingSpinnerVisibilityVar(false);
   };
 
   const handleSubmitButtonClick = async (
@@ -258,7 +277,7 @@ const SaveBar = () => {
         return;
       }
 
-      if (!shopData.getShopInfo.registered) {
+      if (!shopData.getShopInfo.shop.registered) {
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
@@ -299,7 +318,7 @@ const SaveBar = () => {
     }
   };
 
-  const hasShopRegistered = shopData?.getShopInfo.registered;
+  const hasShopRegistered = shopData?.getShopInfo.shop.registered;
 
   return (
     <Container>

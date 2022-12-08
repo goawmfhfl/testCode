@@ -56,13 +56,16 @@ const ShopSetting = () => {
     error: shopError,
   } = useShopInfo();
 
+  console.log("샵데타", shopData);
+
   const hasSetStoredSettings = useRef(false);
 
   useEffect(() => {
-    if (!shopData) return;
+    if (!shopData || !shopData.getShopInfo.shop) return;
 
     const hasShopSettingUpdated =
-      shopData.getShopInfo.createdAt !== shopData.getShopInfo.updatedAt;
+      shopData.getShopInfo.shop.createdAt !==
+      shopData.getShopInfo.shop.updatedAt;
 
     // eslint-disable-next-line
     (async () => {
@@ -73,7 +76,7 @@ const ShopSetting = () => {
       }
 
       const result = await getUserInfo();
-      const userRole = result.data.getUserInfo.role;
+      const { role: userRole } = result.data.getUserInfo;
 
       if (userRole === UserRole.PRE_SELLER && !hasShopSettingUpdated) {
         systemModalVar({
@@ -101,21 +104,18 @@ const ShopSetting = () => {
 
   useEffect(() => {
     if (hasSetStoredSettings.current) return;
-    if (!shopData || isShopLoading) return;
+    if (!shopData || isShopLoading || !shopData.getShopInfo.shop) return;
 
-    const hasShopSettingUpdated =
-      shopData.getShopInfo.createdAt !== shopData.getShopInfo.updatedAt;
+    const { createdAt, updatedAt, registered } = shopData.getShopInfo.shop;
 
-    if (shopData.getShopInfo.registered) {
+    const hasShopSettingUpdated = createdAt !== updatedAt;
+
+    if (registered) {
       hasSetStoredSettings.current = true;
-      setShopInfo(shopData.getShopInfo, methods.setValue);
+      setShopInfo(shopData.getShopInfo.shop, methods.setValue);
     }
 
-    if (
-      !shopData.getShopInfo.registered &&
-      hasShopSettingUpdated &&
-      !hasSetStoredSettings.current
-    ) {
+    if (!registered && hasShopSettingUpdated && !hasSetStoredSettings.current) {
       systemModalVar({
         isVisible: true,
         description: (
@@ -130,7 +130,7 @@ const ShopSetting = () => {
         cancelButtonText: "취소",
         confirmButtonClickHandler: () => {
           hasSetStoredSettings.current = true;
-          setShopInfo(shopData.getShopInfo, methods.setValue);
+          setShopInfo(shopData.getShopInfo.shop, methods.setValue);
 
           systemModalVar({
             ...systemModalVar(),
@@ -149,7 +149,7 @@ const ShopSetting = () => {
 
   useEffect(() => {
     if (hasSetStoredSettings.current && shopData) {
-      setShopInfo(shopData.getShopInfo, methods.setValue);
+      setShopInfo(shopData.getShopInfo.shop, methods.setValue);
     }
   }, [shopData, hasSetStoredSettings.current]);
 

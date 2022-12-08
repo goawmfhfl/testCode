@@ -42,40 +42,44 @@ export interface ShopInfo {
 export const GET_SHOP_INFO = gql`
   query GetShopInfo {
     getShopInfo {
-      id
-      koreanName
-      englishName
-      description
-      uploadedFileUrls {
-        url
-        type
+      ok
+      error
+      shop {
+        id
+        koreanName
+        englishName
+        description
+        uploadedFileUrls {
+          url
+          type
+        }
+        shipmentPolicy
+        returnPolicy
+        safetyAuthentication
+        safetyAuthenticationExpiredDate
+        isBundleShipment
+        shipmentPrice
+        shipmentDistantPrice
+        shipmentConditionalPrice
+        shipmentReturnPrice
+        shipmentExchangePrice
+        shipmentType
+        representativeName
+        businessRegistrationNumber
+        corporateRegistrationNumber
+        isSimpleTaxpayers
+        companyLocation
+        onlineSalesLicense
+        identificationCardNumber
+        identificationCardCopyPhoto
+        phoneNumber
+        bankName
+        bankAccountNumber
+        bankAccountHolder
+        createdAt
+        updatedAt
+        registered
       }
-      shipmentPolicy
-      returnPolicy
-      safetyAuthentication
-      safetyAuthenticationExpiredDate
-      isBundleShipment
-      shipmentPrice
-      shipmentDistantPrice
-      shipmentConditionalPrice
-      shipmentReturnPrice
-      shipmentExchangePrice
-      shipmentType
-      representativeName
-      businessRegistrationNumber
-      corporateRegistrationNumber
-      isSimpleTaxpayers
-      companyLocation
-      onlineSalesLicense
-      identificationCardNumber
-      identificationCardCopyPhoto
-      phoneNumber
-      bankName
-      bankAccountNumber
-      bankAccountHolder
-      createdAt
-      updatedAt
-      registered
     }
   }
 `;

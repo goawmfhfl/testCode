@@ -1,12 +1,24 @@
+import { useEffect } from "react";
 import styled from "styled-components/macro";
 import { Link } from "react-router-dom";
 import { Pathnames } from "@constants/index";
 import useShopInfo from "@hooks/useShopInfo";
+import { loadingSpinnerVisibilityVar } from "@cache/index";
+import { showHasServerErrorModal } from "@cache/productManagement";
 
 const SideNavigationBar = () => {
-  const { data } = useShopInfo();
+  const { data, loading, error } = useShopInfo();
 
-  const isRegisteredShop = data?.getShopInfo.registered;
+  useEffect(() => {
+    loadingSpinnerVisibilityVar(loading);
+
+    if (error) {
+      showHasServerErrorModal("", "샵 정보 가져오기");
+      console.error(error);
+    }
+  }, [loading, error]);
+
+  const isRegisteredShop = data?.getShopInfo.shop.registered;
 
   return (
     <Container>

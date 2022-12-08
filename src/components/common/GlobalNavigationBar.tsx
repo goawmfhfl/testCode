@@ -24,7 +24,8 @@ const GlobalNavigationBar = () => {
     sessionStorage.removeItem(AUTH_TOKEN_KEY);
   };
 
-  const isLogin = data?.getShopInfo?.englishName;
+  const isLogin = data?.getShopInfo?.shop.englishName;
+
   return (
     <Container
       // eslint-disable-next-line
@@ -37,7 +38,7 @@ const GlobalNavigationBar = () => {
         {isLogin ? (
           <>
             <NavItem>
-              <UserName>{data?.getShopInfo?.englishName}</UserName>
+              <UserName>{data?.getShopInfo?.shop.englishName}</UserName>
             </NavItem>
             <NavItem onClick={handleLogoutButtonClick}>
               <Icon src={logoutSrc} />
