@@ -294,7 +294,7 @@ const SaveBar = () => {
         return;
       }
 
-      if (result.data.createProduct.error) {
+      if (result.data.createProduct.ok) {
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
