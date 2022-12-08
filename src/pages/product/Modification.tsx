@@ -29,6 +29,7 @@ const ProductRegistration = () => {
         productId: Number(productId),
       },
     },
+    fetchPolicy: "no-cache",
   });
 
   useEffect(() => {
