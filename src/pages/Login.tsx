@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import styled from "styled-components/macro";
 import Layout from "@components/common/Layout";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useMutation } from "@apollo/client";
+import { useMutation, useLazyQuery } from "@apollo/client";
 import { OAuth2Client } from "google-auth-library";
 
 import appleSrc from "@icons/apple.svg";
@@ -18,6 +18,9 @@ import {
 } from "@graphql/mutations/sellerLogin";
 import { useNavigate } from "react-router-dom";
 import { Pathnames } from "@constants/index";
+import { GET_SHOP_INFO } from "@graphql/queries/getShopInfo";
+import { showHasServerErrorModal } from "@cache/productManagement";
+import { loadingSpinnerVisibilityVar } from "@cache/index";
 
 interface LoginFormType {
   id: string;
@@ -34,8 +37,13 @@ const Login = () => {
     isInvalid: false,
   });
 
-  const [loginFunction] =
+  const [loginFunction, { loading: isLoginLoading, error: isLoginError }] =
     useMutation<SellerLoginType, SellerLoginInputType>(SELLER_LOGIN);
+
+  const [getShopInfo, { loading: isShopLoading, error: isShopError }] =
+    useLazyQuery(GET_SHOP_INFO, {
+      fetchPolicy: "no-cache",
+    });
 
   const { register, handleSubmit } = useForm<LoginFormType>({
     mode: "onSubmit",
@@ -129,6 +137,21 @@ const Login = () => {
         loginData?.sellerLogin.token
       );
 
+      const result = await getShopInfo();
+
+      if (result.data.getShopInfo.error) {
+        showHasServerErrorModal("", "샵 정보 가져오기");
+        console.log(result);
+
+        return;
+      }
+
+      if (result.data.getShopInfo.shop.registered) {
+        navigate(Pathnames.Product);
+
+        return;
+      }
+
       navigate(Pathnames.Shop);
     }
 
@@ -158,6 +181,25 @@ const Login = () => {
       },
     });
   };
+
+  useEffect(() => {
+    const isLoading = isLoginLoading || isShopLoading;
+
+    loadingSpinnerVisibilityVar(isLoading);
+  }, [isLoginLoading, isShopLoading]);
+
+  useEffect(() => {
+    if (isLoginError) {
+      showHasServerErrorModal("", "로그인");
+      console.log(isLoginError);
+      return;
+    }
+
+    if (isShopError) {
+      showHasServerErrorModal("", "샵 가져오기");
+      console.log(isShopError);
+    }
+  }, [isLoginError, isShopError]);
 
   const { hasNoId, hasNoPassword, isInvalid } = isValidAuth;
 
