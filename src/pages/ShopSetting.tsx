@@ -34,8 +34,10 @@ import PhoneNumber from "@components/shopSetting/PhoneNumber";
 import SettlementAccount from "@components/shopSetting/SettlementAccount";
 import RegistrationNumber from "@components/shopSetting/RegistrationNumber";
 import { showHasServerErrorModal } from "@cache/productManagement";
+import useAuthGuard from "@hooks/useAuthGuard";
 
 const ShopSetting = () => {
+  useAuthGuard();
   const navagate = useNavigate();
 
   const methods = useForm<ShopFormFields>({

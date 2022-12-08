@@ -8,8 +8,11 @@ import FilterBar from "@components/productManagement/FilterBar";
 import Controller from "@components/productManagement/Controller";
 import ProductTable from "@components/productManagement/ProductTable";
 import Pagination from "@components/common/Pagination";
+import useAuthGuard from "@hooks/useAuthGuard";
 
 const Product = () => {
+  useAuthGuard();
+
   return (
     <Layout>
       <ContentsContainer>

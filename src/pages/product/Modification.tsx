@@ -14,10 +14,11 @@ import { ProductFormValues } from "@models/product/index";
 import ProductForm from "@components/productForm/index";
 import setProduct from "@utils/product/form/setProduct";
 import { loadingSpinnerVisibilityVar, systemModalVar } from "@cache/index";
+import useAuthGuard from "@hooks/useAuthGuard";
 
 const ProductRegistration = () => {
+  useAuthGuard();
   const { productId } = useParams();
-
   const methods = useForm<ProductFormValues>();
 
   const [getProduct] = useLazyQuery<
