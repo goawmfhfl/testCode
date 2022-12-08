@@ -60,6 +60,10 @@ const Controller = () => {
     ({ productId }) => productId
   );
 
+  const hasTemporarySaveProduct = checkedProducts.findIndex(
+    ({ status }) => status === ProductStatus.TEMPORARY
+  );
+
   const temporaryQuery = useReactiveVar(temporaryQueryVar);
 
   const [updateProductsStatus] = useMutation<
@@ -210,10 +214,6 @@ const Controller = () => {
       return;
     }
 
-    const hasTemporarySaveProduct = checkedProducts.findIndex(
-      ({ status }) => status === ProductStatus.TEMPORARY
-    );
-
     if (hasTemporarySaveProduct !== -1) {
       showHasAnyProblemModal(
         <>
@@ -258,10 +258,6 @@ const Controller = () => {
       return;
     }
 
-    const hasTemporarySaveProduct = checkedProducts.findIndex(
-      ({ status }) => status === ProductStatus.TEMPORARY
-    );
-
     if (hasTemporarySaveProduct !== -1) {
       showHasAnyProblemModal(
         <>
@@ -288,6 +284,19 @@ const Controller = () => {
           선택된 주문건이 없습니다
           <br />
           주문건을 선택해주세요
+        </>
+      );
+      return;
+    }
+
+    if (hasTemporarySaveProduct !== -1) {
+      showHasAnyProblemModal(
+        <>
+          임시저장 상태의 상품은
+          <br />
+          상품이 등록된 후부터
+          <br />
+          복제가 가능합니다.
         </>
       );
       return;
