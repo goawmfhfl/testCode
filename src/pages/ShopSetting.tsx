@@ -3,7 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useLazyQuery } from "@apollo/client";
 import { FormProvider, useForm } from "react-hook-form";
 
-import { loadingSpinnerVisibilityVar, systemModalVar } from "@cache/index";
+import {
+  loadingSpinnerVisibilityVar,
+  sectionFulfillmentInitialValue,
+  sectionFulfillmentVar,
+  systemModalVar,
+} from "@cache/index";
 import {
   HeaderNames,
   Pathnames,
@@ -35,6 +40,7 @@ import SettlementAccount from "@components/shopSetting/SettlementAccount";
 import RegistrationNumber from "@components/shopSetting/RegistrationNumber";
 import { showHasServerErrorModal } from "@cache/productManagement";
 import useAuthGuard from "@hooks/useAuthGuard";
+import { unfulfilledInputNamesVar } from "@cache/shopSettings";
 
 const ShopSetting = () => {
   useAuthGuard();
@@ -195,6 +201,15 @@ const ShopSetting = () => {
       showHasServerErrorModal(shopError.message, "샵 설정 불러오기");
     }
   }, [isShopLoading, isUserLoading, userError, shopError]);
+
+  useEffect(() => {
+    initializeFormStatus();
+  }, []);
+
+  const initializeFormStatus = () => {
+    unfulfilledInputNamesVar([]);
+    sectionFulfillmentVar(sectionFulfillmentInitialValue);
+  };
 
   return (
     <FormProvider {...methods}>

@@ -110,7 +110,7 @@ export const sectionReferenceVar = makeVar<{
   [PRODUCT_REGISTRATION_SECTIONS.SEARCH_TAG]: null,
 });
 
-export const sectionFulfillmentVar = makeVar<{ [key: string]: boolean }>({
+export const sectionFulfillmentInitialValue = {
   SHOP_INFO: true,
   SHOP_POLICY: true,
   SAFETY_CERTIFICATION: true,
@@ -134,7 +134,11 @@ export const sectionFulfillmentVar = makeVar<{ [key: string]: boolean }>({
   PRODUCT_SHIPMENT_SETTINGS: true,
   SPECIFICATION: true,
   SEARCH_TAG: true,
-});
+};
+
+export const sectionFulfillmentVar = makeVar<{ [key: string]: boolean }>(
+  sectionFulfillmentInitialValue
+);
 
 export const SkipQuantityCache: Array<SkipQuantityCacheType> = [
   { id: 0, label: "20개씩 보기", value: 20 },
