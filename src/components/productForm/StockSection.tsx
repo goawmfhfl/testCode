@@ -4,10 +4,12 @@ import { useFormContext } from "react-hook-form";
 import NoticeContainer from "@components/common/NoticeContainer";
 import TextInput from "@components/common/input/TextInput";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
-import { PRODUCT_STOCK } from "@cache/productForm/index";
+import { PRODUCT_STOCK, HAS_REQUIRED_OPTION } from "@cache/productForm/index";
 
 const ProductStock = () => {
-  const { register } = useFormContext();
+  const { register, watch } = useFormContext();
+
+  const isSetRequiredOption = watch(HAS_REQUIRED_OPTION) as boolean;
 
   return (
     <Container>
@@ -15,6 +17,7 @@ const ProductStock = () => {
         register={register(PRODUCT_STOCK)}
         numbersOnly={true}
         placeholder={"숫자만 입력"}
+        disabled={isSetRequiredOption}
       />{" "}
       개
       <NoticeContainerWrapper>

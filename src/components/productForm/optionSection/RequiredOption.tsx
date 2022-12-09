@@ -10,7 +10,7 @@ import Button from "@components/common/Button";
 import OptionInput from "@components/productForm/optionSection/OptionInput";
 import AdaptedOption from "@components/productForm/optionSection/AdaptedOption";
 
-import { HAS_REQUIRED_OPTION } from "@cache/productForm/index";
+import { HAS_REQUIRED_OPTION, PRODUCT_STOCK } from "@cache/productForm/index";
 import { requiredOptionVar } from "@cache/productForm/productOptions";
 import { OptionInputType, OptionTypes } from "@models/product/options";
 import { isElementOverflown } from "@utils/index";
@@ -21,7 +21,7 @@ import { ProductFormValues } from "@models/product";
 
 const RequiredOption = () => {
   const theme = useTheme();
-  const { register, getValues } = useFormContext();
+  const { register, getValues, setValue } = useFormContext();
   const productRegistrationInputs = useWatch<ProductFormValues>();
   const { optionInputList, adaptedOption } = useReactiveVar(requiredOptionVar);
 
@@ -108,8 +108,21 @@ const RequiredOption = () => {
   return (
     <Container>
       <CheckboxContainer>
-        <PurchaseOptionCheckbox {...register(HAS_REQUIRED_OPTION)} /> 옵션
-        설정하기
+        <PurchaseOptionCheckbox
+          {...{
+            ...register(HAS_REQUIRED_OPTION),
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              console.log(e.target.checked);
+
+              if (e.target.checked) {
+                setValue(PRODUCT_STOCK, 0);
+              }
+
+              setValue(HAS_REQUIRED_OPTION, e.target.checked);
+            },
+          }}
+        />{" "}
+        옵션 설정하기
       </CheckboxContainer>
 
       <NoticeContainer icon={exclamationMarkSrc}>
