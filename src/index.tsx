@@ -11,7 +11,7 @@ import {
   from,
 } from "@apollo/client";
 import App from "./App";
-import { loadingSpinnerVisibilityVar, systemModalVar } from "@cache/index";
+
 import { AUTH_TOKEN_KEY } from "@constants/auth";
 
 const httpLink = createHttpLink({

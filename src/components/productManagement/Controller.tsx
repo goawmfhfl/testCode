@@ -240,6 +240,19 @@ const Controller = () => {
       return;
     }
 
+    if (hasTemporarySaveProduct !== -1) {
+      showHasAnyProblemModal(
+        <>
+          임시저장 상태의 상품은
+          <br />
+          상품이 등록된 후부터
+          <br />
+          복제가 가능합니다.
+        </>
+      );
+      return;
+    }
+
     modalVar({
       isVisible: true,
       component: <ChangeCategoryModal />,
