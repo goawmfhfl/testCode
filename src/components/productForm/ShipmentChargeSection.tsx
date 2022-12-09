@@ -196,7 +196,6 @@ const ShipmentChargeSection = () => {
                   shipmentTemplates.find(
                     (template) => template.name === e.target.value
                   );
-                setValue(SHIPMENT_TEMPLATE_ID, selectedTemplate.id);
 
                 if (!selectedTemplate) {
                   setValue(SHIPMENT_TEMPLATE_ID, null);
@@ -205,7 +204,11 @@ const ShipmentChargeSection = () => {
                   setValue(SHIPMENT_DISTANT_PRICE, null);
                   setValue(SHIPMENT_RETURN_PRICE, null);
                   setValue(SHIPMENT_EXCHANGE_PRICE, null);
+
+                  return;
                 }
+
+                setValue(SHIPMENT_TEMPLATE_ID, selectedTemplate.id);
               },
             }}
             size="medium"
