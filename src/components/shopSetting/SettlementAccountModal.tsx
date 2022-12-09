@@ -13,6 +13,7 @@ import { settlementAccountVar } from "@cache/shopSettings";
 import { isNumber } from "@utils/index";
 import AuthenticationLoader from "@components/shopSetting/AuthenticationLoader";
 import { AUTH_TOKEN_KEY } from "@constants/auth";
+import { showHasServerErrorModal } from "@cache/productManagement";
 
 const SettlementAccountModal = () => {
   const [accountInformation, setAccountInformation] = useState<{
@@ -26,15 +27,14 @@ const SettlementAccountModal = () => {
     bankCode: "",
     bankName: "",
   });
-  const [hasTriedAuthentication, setHasTriedAuthentication] =
-    useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [hasTried, setHasTried] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleAuthenticationButtonClick = async () => {
-    if (!hasTriedAuthentication) setHasTriedAuthentication(true);
-
     try {
+      setIsLoading(true);
+
       const token = sessionStorage.getItem(AUTH_TOKEN_KEY);
 
       const result: {
@@ -55,13 +55,17 @@ const SettlementAccountModal = () => {
         },
       });
 
+      setIsLoading(false);
+      setHasTried(true);
+
       if (result.data.response.bank_holder) {
         setIsAuthenticated(true);
       }
     } catch (error) {
-      console.log(error);
+      showHasServerErrorModal("", "계좌정보조회");
 
       setIsAuthenticated(false);
+      setIsLoading(false);
     }
   };
 
@@ -184,34 +188,33 @@ const SettlementAccountModal = () => {
             full={false}
             // eslint-disable-next-line
             onClick={async () => {
+              setHasTried(false);
               await handleAuthenticationButtonClick();
-              setIsLoading(false);
             }}
             disabled={isLoading || !hasAccountInformationFulfilled}
           >
             인증
           </Button>
 
-          {isLoading ? (
-            <AuthenticationLoader />
-          ) : (
-            <>
-              {hasTriedAuthentication && isAuthenticated && (
-                <ValidText valid={true}>인증되었습니다.</ValidText>
-              )}
-              {hasTriedAuthentication && !isAuthenticated && (
-                <ValidText valid={false}>인증 실패하였습니다.</ValidText>
-              )}
-            </>
-          )}
+          {isLoading && <AuthenticationLoader />}
         </UserAccountContainer>
 
-        {!isLoading && hasTriedAuthentication && !isAuthenticated && (
-          <ValidText valid={true}>
-            입력하신 계좌 정보가 실제 계좌 정보와 일치하지 않습니다.
-            <br />
-            입력하신 은행, 예금주, 계좌번호를 다시 한번 확인해주세요.
-          </ValidText>
+        {hasTried ? (
+          <>
+            {!isLoading && isAuthenticated && (
+              <ValidText valid={true}>인증되었습니다.</ValidText>
+            )}
+
+            {!isLoading && !isAuthenticated && (
+              <ValidText valid={true}>
+                입력하신 계좌 정보가 실제 계좌 정보와 일치하지 않습니다.
+                <br />
+                입력하신 은행, 예금주, 계좌번호를 다시 한번 확인해주세요.
+              </ValidText>
+            )}
+          </>
+        ) : (
+          <></>
         )}
       </InfoContainer>
 
