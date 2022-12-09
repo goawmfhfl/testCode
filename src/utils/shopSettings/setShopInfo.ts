@@ -67,17 +67,17 @@ export default function setShopInfo(
     (file) => file.type === UploadFileType.SHOP_PC
   );
 
-  if (mobileImage) {
-    shopImagesVar({
-      ...shopImagesVar(),
-      pcImage: pcImage.url,
-    });
-  }
-
-  if (pcImage) {
+  if (mobileImage && mobileImage.url) {
     shopImagesVar({
       ...shopImagesVar(),
       mobileImage: mobileImage.url,
+    });
+  }
+
+  if (pcImage && pcImage.url) {
+    shopImagesVar({
+      ...shopImagesVar(),
+      pcImage: pcImage.url,
     });
   }
 

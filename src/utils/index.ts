@@ -144,7 +144,7 @@ function hasEveryInputFulfilled(
         inputValue instanceof Array &&
         inputName === "uploadedFileInfos"
       ) {
-        const uploadedUrls = inputValue as Array<{
+        const uploadedUrls = inputValue.filter(({ url }) => url) as Array<{
           url: string;
           type: UploadFileType;
         }>;
@@ -171,7 +171,7 @@ function hasEveryInputFulfilled(
         inputValue instanceof Array &&
         inputName === "uploadedFileInfos"
       ) {
-        const uploadedUrls = inputValue as Array<{
+        const uploadedUrls = inputValue.filter(({ url }) => url) as Array<{
           url: string;
           type: UploadFileType;
         }>;
