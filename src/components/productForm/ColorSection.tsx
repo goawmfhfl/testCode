@@ -64,11 +64,14 @@ const ProductColor = () => {
   return (
     <Container>
       {mappedColorList.map(({ key, name, hex, value, darkCheckedIcon }) => {
+        const isWhite = value === ColorType.WHITE;
+
         return (
           <ColorContainer key={key}>
             <ColorCheckbox
               hex={hex}
-              darkCheckedIcon={darkCheckedIcon}
+              darkCheckedIcon={isWhite}
+              hasDefaultBorder={isWhite}
               value={value}
               {...register(PRODUCT_COLOR)}
             />
@@ -84,7 +87,7 @@ const Container = styled.div`
   display: flex;
   flex-wrap: wrap;
 
-  width: 656px;
+  width: 700px;
 `;
 
 const ColorContainer = styled.div`
@@ -118,6 +121,7 @@ const ColorCheckbox = styled.input.attrs({
 })<{
   hex: string;
   darkCheckedIcon: boolean | undefined;
+  hasDefaultBorder: boolean | undefined;
 }>`
   appearance: none;
   cursor: pointer;
@@ -125,13 +129,15 @@ const ColorCheckbox = styled.input.attrs({
   &:after {
     content: "";
     background-color: ${({ hex }) => (hex ? hex : "")};
+    box-shadow: ${({ theme, hasDefaultBorder }) =>
+      hasDefaultBorder ? `0 0 0 2px ${theme.palette.grey500} inset` : ""};
     width: 24px;
     height: 24px;
     border-radius: 50%;
 
     position: absolute;
     top: 0;
-    left: 48%;
+    left: 50%;
     transform: translateX(-50%);
   }
 
@@ -150,15 +156,22 @@ const ColorCheckbox = styled.input.attrs({
 
     &:before {
       content: "";
-      width: 27px;
-      height: 27px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       background-color: transparent;
-      border: 1px solid ${({ hex }) => (hex ? hex : "")};
+      border: 1.5px solid
+        ${({
+          hex,
+          darkCheckedIcon,
+          theme: {
+            palette: { grey500 },
+          },
+        }) => (darkCheckedIcon ? grey500 : hex)};
 
       position: absolute;
       top: 0;
-      left: 50%;
+      left: calc(50% - 0.01px);
       transform: translate(-50%, -2.5px);
     }
   }
