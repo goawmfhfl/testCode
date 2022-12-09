@@ -211,8 +211,8 @@ const SaveBar = () => {
         [
           !isDiscounted && "discountAmount",
           !isDiscounted && "discountMethod",
-          !isDiscounted && "startDiscountDate",
-          !isDiscounted && "endDiscountDate",
+          "startDiscountDate",
+          "endDiscountDate",
           !hasRequiredOption && !hasSelectiveOption && "optionCombinations",
           !hasRequiredOption && "requiredOptions",
           !hasSelectiveOption && "selectiveOptions",
@@ -277,8 +277,6 @@ const SaveBar = () => {
         },
       });
 
-      console.log("상품등록 결과", result);
-
       if (result.data.createProduct.error) {
         systemModalVar({
           ...systemModalVar(),
@@ -298,7 +296,13 @@ const SaveBar = () => {
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
-          description: "상품이 등록되었습니다.",
+          description: (
+            <>
+              상품이 등록되었습니다. <br />
+              상품관리에서 판매중 처리로 <br />
+              변경해주세요.
+            </>
+          ),
           confirmButtonVisibility: true,
           confirmButtonClickHandler: () => {
             systemModalVar({

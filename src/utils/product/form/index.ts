@@ -1,7 +1,7 @@
 import { last } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { UseFormReturn, UseFormReset } from "react-hook-form";
-import { ProductFormValues } from "@models/product/index";
+import { DiscountMethod, ProductFormValues } from "@models/product/index";
 
 import {
   TITLE,
@@ -127,9 +127,15 @@ export function restructureProductRegistrationStates(
     colors: colors.map((color) => ({ name: color })),
     originalPrice: originalPrice ? Number(originalPrice) : null,
     discountAmount: isDiscounted ? Number(discountAmount) : null,
-    discountMethod: isDiscounted ? discountMethod : null,
-    startDiscountDate: hasDiscountSpan ? new Date(startDiscountDate) : null,
-    endDiscountDate: hasDiscountSpan ? new Date(endDiscountDate) : null,
+    discountMethod: discountMethod ? discountMethod : DiscountMethod.PERCENT,
+    startDiscountDate:
+      isDiscounted && hasDiscountSpan && startDiscountDate
+        ? new Date(startDiscountDate)
+        : null,
+    endDiscountDate:
+      isDiscounted && hasDiscountSpan && endDiscountDate
+        ? new Date(endDiscountDate)
+        : null,
     quantity: quantity ? Number(quantity) : null,
     optionCombinations:
       !hasRequiredOption && !hasSelectiveOption ? null : productOptions,

@@ -32,12 +32,6 @@ const ProductDiscount = () => {
   const discountStartsAt = watch(DISCOUNT_STARTS_AT) as Date;
   const discountEndsAt = watch(DISCOUNT_ENDS_AT) as Date;
 
-  useEffect(() => {
-    if (!isDiscounted) {
-      setValue(DISCOUNT_AMOUNT, null);
-    }
-  }, [isDiscounted]);
-
   return (
     <Container>
       <InputContainer>
@@ -174,13 +168,18 @@ const ProductDiscount = () => {
       <DiscountedPrice>
         최종 가격
         <PriceWrapper>
-          {isDiscounted &&
-            discountAmount &&
-            `${getDiscountedPrice(
-              Number(productPrice),
-              Number(discountAmount),
-              discountOption
-            ).toLocaleString()}원`}
+          {isDiscounted ? (
+            <>
+              {discountAmount &&
+                `${getDiscountedPrice(
+                  Number(productPrice),
+                  Number(discountAmount),
+                  discountOption
+                ).toLocaleString()}원`}
+            </>
+          ) : (
+            <>{`${productPrice?.toLocaleString() || ""}원`}</>
+          )}
         </PriceWrapper>
         {hasDiscountSpan && (
           <DiscountTimespanNotification>
