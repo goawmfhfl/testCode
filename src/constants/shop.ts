@@ -12,3 +12,8 @@ export enum ConditionalFreeShipmentPolicy {
   Set = "Set",
   Unset = "Unset",
 }
+
+export enum SubmissionType {
+  Create = "CREATE",
+  Update = "UPDATE",
+}

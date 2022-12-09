@@ -41,6 +41,8 @@ import ButtonContainer from "@components/common/saveBar/ButtonContainer";
 import TemporarySaveButton from "@components/common/saveBar/TemporarySaveButton";
 import SubmitButton from "@components/common/saveBar/SubmitButton";
 import { showHasServerErrorModal } from "@cache/productManagement";
+import { SubmissionType } from "@constants/shop";
+import { EDIT_SHOP } from "@graphql/mutations/editShop";
 
 const SaveBar = () => {
   const navigate = useNavigate();
@@ -85,7 +87,10 @@ const SaveBar = () => {
     },
   });
 
-  const [submitShopSettings, { loading: isLoadingSubmission }] = useMutation<
+  const [
+    submitShopSettings,
+    { loading: isLoadingSubmission, error: isSubmissionError },
+  ] = useMutation<
     {
       registerShop: {
         ok: boolean;
@@ -104,6 +109,21 @@ const SaveBar = () => {
     ],
   });
 
+  const [editShopSettings, { loading: isShopEditing, error: isEditingError }] =
+    useMutation<{
+      editShop: {
+        ok: boolean;
+        error: string | null;
+      };
+    }>(EDIT_SHOP, {
+      refetchQueries: [
+        {
+          query: GET_SHOP_INFO,
+        },
+        "GetShopInfo",
+      ],
+    });
+
   const {
     data: shopData,
     loading: isShopLoading,
@@ -111,10 +131,19 @@ const SaveBar = () => {
   } = useShopInfo();
 
   useEffect(() => {
-    const isLoading = isShopLoading || isTemporarySaveShopLoading;
+    const isLoading =
+      isShopLoading ||
+      isTemporarySaveShopLoading ||
+      isShopEditing ||
+      isLoadingSubmission;
 
     loadingSpinnerVisibilityVar(isLoading);
-  }, [isShopLoading, isTemporarySaveShopLoading]);
+  }, [
+    isShopLoading,
+    isTemporarySaveShopLoading,
+    isShopEditing,
+    isLoadingSubmission,
+  ]);
 
   useEffect(() => {
     if (isShopError) {
@@ -124,7 +153,20 @@ const SaveBar = () => {
     if (isTemporarySaveShopError) {
       showHasServerErrorModal("", "샵 정보 임시저장");
     }
-  }, [isShopError, isTemporarySaveShopError]);
+
+    if (isSubmissionError) {
+      showHasServerErrorModal("", "샵 정보 설정");
+    }
+
+    if (isEditingError) {
+      showHasServerErrorModal("", "샵 정보 설정");
+    }
+  }, [
+    isShopError,
+    isTemporarySaveShopError,
+    isSubmissionError,
+    isEditingError,
+  ]);
 
   const handleTemporarySaveButtonClick = async (
     e: React.MouseEvent<HTMLButtonElement>
@@ -172,153 +214,204 @@ const SaveBar = () => {
     });
   };
 
-  const handleSubmitButtonClick = async (
-    e: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    try {
-      e.preventDefault();
-      loadingSpinnerVisibilityVar(true);
+  const handleSubmitButtonClick =
+    (type: SubmissionType) =>
+    async (e: React.MouseEvent<HTMLButtonElement>) => {
+      try {
+        e.preventDefault();
+        loadingSpinnerVisibilityVar(true);
 
-      const input = restructureShopSettingStates(watch);
+        const input = restructureShopSettingStates(watch);
 
-      const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
-      const isShipmentPriceFree = shipmentType === ShipmentChargeType.Free;
-      const hasIdentificationCardAuthenticated =
-        Boolean(input.identificationCardNumber) &&
-        Boolean(input.identificationCardCopyPhoto);
-      const isConditionalFreeShipmentUnset =
-        watch(HAS_SET_CONDITIONAL_FREE_SHIPMENT) ===
-        ConditionalFreeShipmentPolicy.Unset;
+        const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
+        const isShipmentPriceFree = shipmentType === ShipmentChargeType.Free;
+        const hasIdentificationCardAuthenticated =
+          Boolean(
+            input.identificationCardNumber &&
+              input.identificationCardNumber.length > 10
+          ) && Boolean(input.identificationCardCopyPhoto);
+        const isConditionalFreeShipmentUnset =
+          watch(HAS_SET_CONDITIONAL_FREE_SHIPMENT) ===
+          ConditionalFreeShipmentPolicy.Unset;
 
-      const { isFulfilled, unfulfilledInputNames } = hasEveryInputFulfilled(
-        input,
-        [
-          "safetyAuthentication",
-          "safetyAuthenticationExpiredDate",
-          "identificationCardNumber",
-          "identificationCardCopyPhoto",
-          hasIdentificationCardAuthenticated && "representativeName",
-          hasIdentificationCardAuthenticated && "businessRegistrationNumber",
-          hasIdentificationCardAuthenticated && "corporateRegistrationNumber",
-          hasIdentificationCardAuthenticated && "isSimpleTaxpayers",
-          hasIdentificationCardAuthenticated && "companyLocation",
-          hasIdentificationCardAuthenticated && "onlineSalesLicense",
-          isConditionalFreeShipmentUnset && "shipmentConditionalPrice",
-        ],
-        [isShipmentPriceFree && "shipmentPrice"].filter(Boolean),
-        Pathnames.Shop
-      );
-
-      if (!isFulfilled) {
-        unfulfilledInputNamesVar(unfulfilledInputNames);
-
-        const unfulfilledSectionNames = [
-          ...new Set(
-            unfulfilledInputNames.map(
-              (inputName: string): string =>
-                shopSettingsSectionMapper[inputName]
-            )
-          ),
-        ];
-
-        const targetSection =
-          shopSettingsSectionMapper[unfulfilledInputNames[0]];
-        const sectionReferenceList = sectionReferenceVar();
-        const targetSectionReference = sectionReferenceList[targetSection];
-
-        unfulfilledSectionNames.forEach((sectionName) => {
-          sectionFulfillmentVar({
-            ...sectionFulfillmentVar(),
-            [sectionName]: false,
-          });
-        });
-
-        // const GNBReference: HTMLElement = GNBReferenceVar();
-        // const SECTION_TOP_MARGIN = 88;
-
-        // const scrollTo =
-        //   targetSectionReference.offsetTop -
-        //   GNBReference.offsetHeight -
-        //   SECTION_TOP_MARGIN;
-
-        // contentsContainerReferenceVar().scrollTo(0, scrollTo);
-
-        loadingSpinnerVisibilityVar(false);
-
-        return;
-      }
-
-      const result = await submitShopSettings({
-        variables: {
+        const { isFulfilled, unfulfilledInputNames } = hasEveryInputFulfilled(
           input,
-        },
-      });
+          [
+            "safetyAuthentication",
+            "safetyAuthenticationExpiredDate",
+            "identificationCardNumber",
+            "identificationCardCopyPhoto",
+            hasIdentificationCardAuthenticated && "representativeName",
+            hasIdentificationCardAuthenticated && "businessRegistrationNumber",
+            hasIdentificationCardAuthenticated && "corporateRegistrationNumber",
+            hasIdentificationCardAuthenticated && "isSimpleTaxpayers",
+            hasIdentificationCardAuthenticated && "companyLocation",
+            hasIdentificationCardAuthenticated && "onlineSalesLicense",
+            isConditionalFreeShipmentUnset && "shipmentConditionalPrice",
+          ],
+          [isShipmentPriceFree && "shipmentPrice"].filter(Boolean),
+          Pathnames.Shop
+        );
 
-      console.log("요청 결과", result);
+        if (!isFulfilled) {
+          unfulfilledInputNamesVar(unfulfilledInputNames);
 
-      const {
-        data: {
-          registerShop: { ok, error },
-        },
-      } = result;
+          const unfulfilledSectionNames = [
+            ...new Set(
+              unfulfilledInputNames.map(
+                (inputName: string): string =>
+                  shopSettingsSectionMapper[inputName]
+              )
+            ),
+          ];
 
-      if (!ok) {
-        systemModalVar({
-          ...systemModalVar(),
-          isVisible: true,
-          description: <>샵 설정 등록 중 통신 에러</>,
-          cancelButtonVisibility: false,
+          const targetSection =
+            shopSettingsSectionMapper[unfulfilledInputNames[0]];
+          const sectionReferenceList = sectionReferenceVar();
+          const targetSectionReference = sectionReferenceList[targetSection];
+
+          unfulfilledSectionNames.forEach((sectionName) => {
+            sectionFulfillmentVar({
+              ...sectionFulfillmentVar(),
+              [sectionName]: false,
+            });
+          });
+
+          // const GNBReference: HTMLElement = GNBReferenceVar();
+          // const SECTION_TOP_MARGIN = 88;
+
+          // const scrollTo =
+          //   targetSectionReference.offsetTop -
+          //   GNBReference.offsetHeight -
+          //   SECTION_TOP_MARGIN;
+
+          // contentsContainerReferenceVar().scrollTo(0, scrollTo);
+
+          loadingSpinnerVisibilityVar(false);
+
+          return;
+        }
+
+        if (type === SubmissionType.Update) {
+          const {
+            data: {
+              editShop: { ok, error },
+            },
+          } = await editShopSettings({
+            variables: {
+              input,
+            },
+          });
+
+          if (!ok && error) {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: true,
+              description: <>샵 정보 저장에 실패하였습니다.</>,
+              confirmButtonVisibility: true,
+              cancelButtonVisibility: false,
+              confirmButtonClickHandler: () => {
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: false,
+                });
+              },
+            });
+
+            console.log(error);
+
+            return;
+          }
+
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: <>저장되었습니다.</>,
+            confirmButtonVisibility: true,
+            cancelButtonVisibility: false,
+            confirmButtonClickHandler: () => {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+            },
+          });
+
+          return;
+        }
+
+        const result = await submitShopSettings({
+          variables: {
+            input,
+          },
         });
 
-        console.log(error);
+        const {
+          data: {
+            registerShop: { ok, error },
+          },
+        } = result;
+
+        if (!ok) {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: <>샵 설정 등록 중 통신 에러</>,
+            cancelButtonVisibility: false,
+          });
+
+          console.log(error);
+
+          loadingSpinnerVisibilityVar(false);
+
+          return;
+        }
+
+        if (!shopData.getShopInfo.shop.registered) {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: (
+              <>
+                샵 설정 등록이 완료되었습니다. <br />
+                지금부터 상품 등록 및 판매가 가능합니다.
+              </>
+            ),
+            cancelButtonVisibility: false,
+            confirmButtonClickHandler: () => {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+            },
+          });
+
+          navigate("/product");
+        } else {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: <>저장 되었습니다.</>,
+            cancelButtonVisibility: false,
+            confirmButtonClickHandler: () => {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+            },
+          });
+        }
 
         loadingSpinnerVisibilityVar(false);
-
-        return;
+      } catch (error) {
+        loadingSpinnerVisibilityVar(false);
       }
-
-      if (!shopData.getShopInfo.shop.registered) {
-        systemModalVar({
-          ...systemModalVar(),
-          isVisible: true,
-          description: (
-            <>
-              샵 설정 등록이 완료되었습니다. <br />
-              지금부터 상품 등록 및 판매가 가능합니다.
-            </>
-          ),
-          cancelButtonVisibility: false,
-          confirmButtonClickHandler: () => {
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: false,
-            });
-          },
-        });
-
-        navigate("/product");
-      } else {
-        systemModalVar({
-          ...systemModalVar(),
-          isVisible: true,
-          description: <>저장 되었습니다.</>,
-          cancelButtonVisibility: false,
-          confirmButtonClickHandler: () => {
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: false,
-            });
-          },
-        });
-      }
-
-      loadingSpinnerVisibilityVar(false);
-    } catch (error) {
-      loadingSpinnerVisibilityVar(false);
-    }
-  };
+    };
 
   const hasShopRegistered = shopData?.getShopInfo.shop.registered;
+  const submissionType = hasShopRegistered
+    ? SubmissionType.Update
+    : SubmissionType.Create;
 
   return (
     <Container>
@@ -343,7 +436,7 @@ const SaveBar = () => {
           backgroundColor={theme.palette.red900}
           form="hook-form"
           // eslint-disable-next-line
-          onClick={handleSubmitButtonClick}
+          onClick={handleSubmitButtonClick(submissionType)}
           disabled={isLoadingSubmission}
         >
           {hasShopRegistered ? "저장" : "등록"}
