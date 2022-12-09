@@ -8,22 +8,39 @@ const Footer = () => {
       <LogoWrapper>
         <Logo src={logoSrc} />
       </LogoWrapper>
+
       <CompanyInfoContainer>
         <FirstRow>
           <Info>상호 : (주)클라이머스</Info>
           <Info>대표 : 서강석</Info>
-          <Info>개인정보관리책임자 : 서강석</Info>
+          <Info>개인정보관리책임자 : 설지우</Info>
+
+          <Info>
+            <a href="https://www.notion.so/chopsticks/8e49eba3c6034bdd8791ebaca63f067d">
+              공지사항
+            </a>
+          </Info>
         </FirstRow>
+
         <SecondRow>
-          <Info>문의 : 070-4879-3425 (10:00 ~ 06:00)</Info>
+          <Info>문의 : 070-4187-3848 (10:00 ~ 17:00)</Info>
           <Info>이메일 : service@chopsticks.market</Info>
+
+          <Info>
+            <a href="/documents/service-policy-20221130.pdf">이용약관</a>
+          </Info>
         </SecondRow>
+
         <ThirdRow>
           <Info>
             주소 : 서울특별시 종로구 새문안로3길 3,내일빌딩 5층 종로청년창업센터
           </Info>
           <Info>사업자등록번호 : 882-87-01829</Info>
-          <Info>통신판매번호 : 2020-서울강남-03401</Info>
+          <Info>통신판매번호 : 제2022-서울종로-0138호</Info>
+
+          <Info>
+            <a href="/documents/privacy-policy-221208.pdf">개인정보처리방침</a>
+          </Info>
         </ThirdRow>
       </CompanyInfoContainer>
 
@@ -56,10 +73,16 @@ const Logo = styled.img`
 `;
 
 const CompanyInfoContainer = styled.div`
+  width: 100%;
+
   display: flex;
   flex-direction: column;
   gap: 16px;
   margin-bottom: 36px;
+
+  & ul > li:last-child {
+    margin-left: auto;
+  }
 `;
 
 const FirstRow = styled.ul`
