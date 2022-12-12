@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { makeVar } from "@apollo/client";
 import { OptionType } from "@models/product/options";
 
-const requiredOptionInitialState: OptionType = {
+export const requiredOptionInitialState: OptionType = {
   optionInputList: [{ id: uuidv4() }],
   adaptedOption: {
     optionHeaders: [],
@@ -10,7 +10,7 @@ const requiredOptionInitialState: OptionType = {
   },
 };
 
-const selectiveOptionInitialState: OptionType = {
+export const selectiveOptionInitialState: OptionType = {
   optionInputList: [{ id: uuidv4() }],
   adaptedOption: {
     optionHeaders: [],

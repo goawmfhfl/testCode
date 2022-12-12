@@ -12,14 +12,22 @@ import {
   descriptionImagesInitialValue,
   descriptionImagesVar,
 } from "@cache/productForm/descriptionImages";
+import {
+  requiredOptionInitialState,
+  requiredOptionVar,
+  selectiveOptionInitialState,
+  selectiveOptionVar,
+} from "@cache/productForm/productOptions";
+import { tagListVar } from "@cache/productForm/searchTag";
 
 export default function resetForm(reset: UseFormReset<ProductFormValues>) {
   reset();
 
-  // TODO: reactive var로 관리되는 인풋상태들을 모두 초기화
   initializeProductImages();
   initializeOptionalImages();
   initializeDescriptionImages();
+  initializeOptions();
+  initializeTags();
 }
 
 function initializeProductImages() {
@@ -50,4 +58,21 @@ function initializeDescriptionImages() {
       url: "",
     })),
   ]);
+}
+
+function initializeOptions() {
+  initializeRequiredOptions();
+  initializeSelectiveOptions();
+}
+
+function initializeRequiredOptions() {
+  requiredOptionVar(requiredOptionInitialState);
+}
+
+function initializeSelectiveOptions() {
+  selectiveOptionVar(selectiveOptionInitialState);
+}
+
+function initializeTags() {
+  tagListVar([]);
 }
