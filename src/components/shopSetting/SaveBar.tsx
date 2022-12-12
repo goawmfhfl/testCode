@@ -41,7 +41,7 @@ import ButtonContainer from "@components/common/saveBar/ButtonContainer";
 import TemporarySaveButton from "@components/common/saveBar/TemporarySaveButton";
 import SubmitButton from "@components/common/saveBar/SubmitButton";
 import { showHasServerErrorModal } from "@cache/productManagement";
-import { SubmissionType } from "@constants/shop";
+import { SubmissionType } from "@constants/index";
 import { EDIT_SHOP } from "@graphql/mutations/editShop";
 
 const SaveBar = () => {

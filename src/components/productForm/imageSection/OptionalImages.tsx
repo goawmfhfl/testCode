@@ -51,6 +51,8 @@ const ProductImageSection = () => {
 
     optionalImageValues.map(
       async (productImageValue: FileList, index: number) => {
+        if (!productImageValue?.length) return;
+
         try {
           const previousImageValue: FileList | null =
             previousProductImageValuesRef.current[index];

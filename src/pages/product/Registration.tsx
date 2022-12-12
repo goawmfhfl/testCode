@@ -3,7 +3,7 @@ import { useForm, FormProvider } from "react-hook-form";
 
 import ProductForm from "@components/productForm";
 import { ProductFormValues } from "@models/product";
-import { resetForm } from "@utils/product/form";
+import resetForm from "@utils/product/form/resetForm";
 
 const ProductRegistration = () => {
   const methods = useForm<ProductFormValues>();

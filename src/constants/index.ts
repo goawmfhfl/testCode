@@ -117,3 +117,8 @@ export enum HeaderNames {
   Product = "상품 관리",
   ProductRegistration = "상품 등록",
 }
+
+export enum SubmissionType {
+  Create = "CREATE",
+  Update = "UPDATE",
+}

@@ -1,3 +1,4 @@
+import { compareAsc } from "date-fns";
 import React, { useEffect, useState } from "react";
 import { useTheme } from "styled-components/macro";
 import { useMutation } from "@apollo/client";
@@ -34,7 +35,7 @@ import {
 } from "@models/product/index";
 
 import { hasEveryInputFulfilled } from "@utils/index";
-import { restructureProductRegistrationStates } from "@utils/product/form/index";
+import constructProductInput from "@utils/product/form/constructProductInput";
 import {
   TEMPORARY_SAVE_PRODUCT,
   CREATE_PRODUCT,
@@ -46,9 +47,10 @@ import TemporarySaveButton from "@components/common/saveBar/TemporarySaveButton"
 import SubmitButton from "@components/common/saveBar/SubmitButton";
 import useProduct from "@hooks/product/useProduct";
 import { ProductStatus, RegistrationStatus } from "@constants/product";
-import { compareAsc } from "date-fns";
 import { QueryResponse } from "@models/index";
 import { showHasServerErrorModal } from "@cache/productManagement";
+import { SubmissionType } from "@constants/index";
+import { EDIT_PRODUCT } from "@graphql/mutations/editProduct";
 
 const SaveBar = () => {
   const navigate = useNavigate();
@@ -77,6 +79,14 @@ const SaveBar = () => {
       }
     >(TEMPORARY_SAVE_PRODUCT);
 
+  const [
+    editProduct,
+    { loading: isEditingProduct, error: isEditingProductError },
+  ] =
+    useMutation<{
+      editProduct: QueryResponse<Record<string, unknown>>;
+    }>(EDIT_PRODUCT);
+
   const [createProduct, { loading: isLoadingCreateProduct }] =
     useMutation<
       {
@@ -97,12 +107,12 @@ const SaveBar = () => {
     loadingSpinnerVisibilityVar(true);
 
     try {
-      const product = restructureProductRegistrationStates(formContext);
+      const input = constructProductInput(formContext);
 
       const result = await temporarySaveProduct({
         variables: {
           input: {
-            ...product,
+            ...input,
             productId: Number(productId) || null,
           },
         },
@@ -141,7 +151,7 @@ const SaveBar = () => {
           isVisible: true,
           description: (
             <>
-              상품명 {product.name}이 <br />
+              상품명 {input.name}이 <br />
               새로 임시저장 되었습니다.
             </>
           ),
@@ -188,111 +198,166 @@ const SaveBar = () => {
     }
   };
 
-  const handleSubmitButtonClick = async (
-    e: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    try {
-      e.preventDefault();
-      const input = restructureProductRegistrationStates(formContext);
+  const handleSubmitButtonClick =
+    (type: SubmissionType) =>
+    async (e: React.MouseEvent<HTMLButtonElement>) => {
+      try {
+        e.preventDefault();
+        const input = constructProductInput(formContext);
 
-      const isDiscounted = watch(IS_DISCOUNTED) as boolean;
-      const hasTemplateSelected = shipmentTemplatesVar().find(
-        (template) => template.name === watch(SHIPMENT_TEMPLATE_NAME)
-      );
-      const hasRequiredOption = watch(HAS_REQUIRED_OPTION) as boolean;
-      const hasSelectiveOption = watch(HAS_SELECTIVE_OPTION) as boolean;
-      const hasLeadtime = watch(HAS_MANUFACTURING_LEAD_TIME) as boolean;
-      const isShipmentPriceFree =
-        watch(SHIPMENT_PRICE_TYPE) === ShipmentChargeType.Free;
-      const hasTagInfo = watch(HAS_TAG_INFOS) as boolean;
+        const isDiscounted = watch(IS_DISCOUNTED) as boolean;
+        const hasTemplateSelected = shipmentTemplatesVar().find(
+          (template) => template.name === watch(SHIPMENT_TEMPLATE_NAME)
+        );
+        const hasRequiredOption = watch(HAS_REQUIRED_OPTION) as boolean;
+        const hasSelectiveOption = watch(HAS_SELECTIVE_OPTION) as boolean;
+        const hasLeadtime = watch(HAS_MANUFACTURING_LEAD_TIME) as boolean;
+        const isShipmentPriceFree =
+          watch(SHIPMENT_PRICE_TYPE) === ShipmentChargeType.Free;
+        const hasTagInfo = watch(HAS_TAG_INFOS) as boolean;
 
-      const { isFulfilled, unfulfilledInputNames } = hasEveryInputFulfilled(
-        input,
-        [
-          !isDiscounted && "discountAmount",
-          !isDiscounted && "discountMethod",
-          "startDiscountDate",
-          "endDiscountDate",
-          !hasRequiredOption && !hasSelectiveOption && "optionCombinations",
-          !hasRequiredOption && "requiredOptions",
-          !hasSelectiveOption && "selectiveOptions",
-          !hasLeadtime && "manufacturingLeadTime",
-          "shipmentId",
-          hasTemplateSelected && "isBundleShipment",
-          hasTemplateSelected && "shipmentType",
-          hasTemplateSelected && "shipmentPrice",
-          hasTemplateSelected && "shipmentDistantPrice",
-          hasTemplateSelected && "shipmentReturnPrice",
-          hasTemplateSelected && "shipmentExchangePrice",
-          "authorization",
-          !hasTagInfo && "tagInfos",
-        ],
-        [
-          !isDiscounted && "discountAmount",
-          hasRequiredOption && "quantity",
-          isShipmentPriceFree && "shipmentPrice",
-        ],
-        Pathnames.ProductRegistration
-      );
+        const { isFulfilled, unfulfilledInputNames } = hasEveryInputFulfilled(
+          input,
+          [
+            !isDiscounted && "discountAmount",
+            !isDiscounted && "discountMethod",
+            "startDiscountDate",
+            "endDiscountDate",
+            !hasRequiredOption && !hasSelectiveOption && "optionCombinations",
+            !hasRequiredOption && "requiredOptions",
+            !hasSelectiveOption && "selectiveOptions",
+            !hasLeadtime && "manufacturingLeadTime",
+            "shipmentId",
+            hasTemplateSelected && "isBundleShipment",
+            hasTemplateSelected && "shipmentType",
+            hasTemplateSelected && "shipmentPrice",
+            hasTemplateSelected && "shipmentDistantPrice",
+            hasTemplateSelected && "shipmentReturnPrice",
+            hasTemplateSelected && "shipmentExchangePrice",
+            "authorization",
+            !hasTagInfo && "tagInfos",
+          ],
+          [
+            !isDiscounted && "discountAmount",
+            hasRequiredOption && "quantity",
+            isShipmentPriceFree && "shipmentPrice",
+          ],
+          Pathnames.ProductRegistration
+        );
 
-      if (!isFulfilled) {
-        const unfulfilledSectionNames = [
-          ...new Set(
-            unfulfilledInputNames.map((inputName: string): string => {
-              return productRegistrationSectionMapper[inputName];
-            })
-          ),
-        ];
+        if (!isFulfilled) {
+          const unfulfilledSectionNames = [
+            ...new Set(
+              unfulfilledInputNames.map((inputName: string): string => {
+                return productRegistrationSectionMapper[inputName];
+              })
+            ),
+          ];
 
-        unfulfilledSectionNames.forEach((sectionName) => {
-          sectionFulfillmentVar({
-            ...sectionFulfillmentVar(),
-            [sectionName]: false,
+          unfulfilledSectionNames.forEach((sectionName) => {
+            sectionFulfillmentVar({
+              ...sectionFulfillmentVar(),
+              [sectionName]: false,
+            });
           });
-        });
 
-        // const targetSection = unfulfilledSectionNames[0];
-        // const sectionReferenceList = sectionReferenceVar();
-        // const targetSectionReference = sectionReferenceList[targetSection];
+          // const targetSection = unfulfilledSectionNames[0];
+          // const sectionReferenceList = sectionReferenceVar();
+          // const targetSectionReference = sectionReferenceList[targetSection];
 
-        // const GNBReference: HTMLElement = GNBReferenceVar();
-        // const SECTION_TOP_MARGIN = 88;
+          // const GNBReference: HTMLElement = GNBReferenceVar();
+          // const SECTION_TOP_MARGIN = 88;
 
-        // const scrollTo =
-        //   targetSectionReference.offsetTop -
-        //   GNBReference.offsetHeight -
-        //   SECTION_TOP_MARGIN;
+          // const scrollTo =
+          //   targetSectionReference.offsetTop -
+          //   GNBReference.offsetHeight -
+          //   SECTION_TOP_MARGIN;
 
-        // contentsContainerReferenceVar().scrollTo(0, scrollTo);
+          // contentsContainerReferenceVar().scrollTo(0, scrollTo);
 
-        return;
-      }
+          return;
+        }
 
-      const result = await createProduct({
-        variables: {
-          input: {
-            ...input,
-            productId: Number(productId) || null,
+        // when is update
+        if (type === SubmissionType.Update) {
+          const result = await editProduct({
+            variables: {
+              input: {
+                ...input,
+                productId: Number(productId),
+              },
+            },
+          });
+
+          console.log("상품 수정 결과", result);
+
+          if (result.data.editProduct.error) {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: true,
+              description: (
+                <>
+                  상품을 수정하던 중 <br />
+                  에러가 발생하였습니다.
+                </>
+              ),
+              confirmButtonVisibility: true,
+              confirmButtonText: "확인",
+              confirmButtonClickHandler: () => {
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: false,
+                });
+              },
+              cancelButtonVisibility: false,
+            });
+          }
+
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: <>저장되었습니다.</>,
+            confirmButtonVisibility: true,
+            confirmButtonText: "확인",
+            confirmButtonClickHandler: () => {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+
+              navigate(Pathnames.Product);
+            },
+            cancelButtonVisibility: false,
+          });
+
+          return;
+        }
+
+        const {
+          data: {
+            createProduct: { ok, error },
           },
-        },
-      });
-
-      if (result.data.createProduct.error) {
-        systemModalVar({
-          ...systemModalVar(),
-          isVisible: true,
-          description: (
-            <>
-              상품 생성에 실패하였습니다. <br />
-              에러: {result.data.createProduct.error}
-            </>
-          ),
+        } = await createProduct({
+          variables: {
+            input: {
+              ...input,
+              productId: Number(productId) || null,
+            },
+          },
         });
 
-        return;
-      }
+        if (!ok && error) {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: <>상품 생성에 실패하였습니다.</>,
+          });
 
-      if (result.data.createProduct.ok) {
+          console.log(error);
+
+          return;
+        }
+
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
@@ -315,57 +380,48 @@ const SaveBar = () => {
           confirmButtonText: "확인",
           cancelButtonVisibility: false,
         });
-      }
-    } catch (error) {
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        description: (
-          <>
-            네트워크 에러로 <br />
-            상품 생성에 실패하였습니다. <br />
-            다시 시도해보시고 <br />
-            찹스틱스에 문의해주세요!
-          </>
-        ),
-        confirmButtonVisibility: true,
-        confirmButtonClickHandler: () => {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: false,
-          });
-        },
-        confirmButtonText: "확인",
-        cancelButtonVisibility: false,
-      });
+      } catch (error) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: (
+            <>
+              네트워크 에러로 <br />
+              상품 생성에 실패하였습니다. <br />
+              다시 시도해보시고 <br />
+              찹스틱스에 문의해주세요!
+            </>
+          ),
+        });
 
-      console.log(error);
-    }
-  };
+        return;
+      }
+    };
 
   const handleCancelButtonClick = () => {
     navigate(-1);
   };
 
   useEffect(() => {
-    const isLoading = isLoadingProduct || isLoadingCreateProduct;
+    const isLoading =
+      isLoadingProduct || isLoadingCreateProduct || isEditingProduct;
 
     loadingSpinnerVisibilityVar(isLoading);
-  }, [isLoadingProduct, isLoadingCreateProduct]);
+  }, [isLoadingProduct, isLoadingCreateProduct, isEditingProduct]);
+
+  useEffect(() => {
+    if (isEditingProductError) {
+      // showHasServerErrorModal
+    }
+  }, [isEditingProductError]);
 
   useEffect(() => {
     if (!productData || productData.getProductById.error) return;
 
-    const { status, createdAt, updatedAt } = productData.getProductById.product;
+    const { status } = productData.getProductById.product;
 
-    const isCreating =
-      compareAsc(new Date(createdAt), new Date(updatedAt)) === 0;
     const hasTemporarilySaved = status === ProductStatus.TEMPORARY;
     const hasProductRegistered = status !== ProductStatus.TEMPORARY;
-
-    if (isCreating) {
-      return;
-    }
 
     if (hasTemporarilySaved) {
       setRegistrationStatus(RegistrationStatus.TemporarilySaved);
@@ -376,12 +432,16 @@ const SaveBar = () => {
     }
   }, [productData]);
 
-  const hasRegistered = registrationStatus === RegistrationStatus.Registered;
+  const hasProductRegistered =
+    registrationStatus === RegistrationStatus.Registered;
+  const submissionType = hasProductRegistered
+    ? SubmissionType.Update
+    : SubmissionType.Create;
 
   return (
     <Container>
       <ButtonContainer>
-        {!hasRegistered && (
+        {!hasProductRegistered && (
           <TemporarySaveButton
             size="big"
             width="126px"
@@ -402,10 +462,10 @@ const SaveBar = () => {
           backgroundColor={theme.palette.red900}
           form="hook-form"
           // eslint-disable-next-line
-          onClick={handleSubmitButtonClick}
+          onClick={handleSubmitButtonClick(submissionType)}
           disabled={isLoadingTemporarySave}
         >
-          {hasRegistered ? "저장" : "등록"}
+          {hasProductRegistered ? "저장" : "등록"}
         </SubmitButton>
 
         <Button

@@ -50,6 +50,8 @@ const RequiredImages = () => {
 
     productImageValues.map(
       async (productImageValue: FileList, index: number) => {
+        if (!productImageValue?.length) return;
+
         try {
           const previousImageValue: FileList | null =
             previousProductImageValuesRef.current[index];
@@ -99,8 +101,6 @@ const RequiredImages = () => {
 
           const { url: addedImageUrl }: { url: string } =
             await addImageOnServer(productImageValue[0]);
-
-          console.log("이거..", addedImageUrl);
 
           const newRequiredImages = [...requiredImagesVar()];
           newRequiredImages[index].url = addedImageUrl;
