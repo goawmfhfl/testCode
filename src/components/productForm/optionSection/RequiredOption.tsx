@@ -30,7 +30,7 @@ const RequiredOption = () => {
 
     const optionHeaders = optionInputList.map(({ id }) => {
       return {
-        key: uuidv4(),
+        id: uuidv4(),
         header: productRegistrationInputs[`requiredOptionName-${id}`] as string,
       };
     });

@@ -4,7 +4,7 @@ export interface OptionInputType {
 }
 
 export interface OptionHeaderType {
-  key: string;
+  id: string;
   header: string;
 }
 

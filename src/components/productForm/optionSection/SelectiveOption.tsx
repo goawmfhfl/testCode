@@ -28,7 +28,7 @@ const SelectiveOption = () => {
 
     const optionHeaders = ["추가 옵션명", "추가 옵션값"].map((header) => {
       return {
-        key: uuidv4(),
+        id: uuidv4(),
         header,
       };
     });

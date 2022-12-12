@@ -58,7 +58,7 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
                   // tr
                   <TableHeaderRow>
                     {adaptedOption.optionHeaders.map(
-                      ({ key, header }, headerIndex) => {
+                      ({ id, header }, headerIndex) => {
                         const optionValueCell = lastRowRef?.children[
                           headerIndex
                         ] as HTMLElement | null;
@@ -67,7 +67,7 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
 
                         return (
                           <TableHeader
-                            key={key}
+                            key={id}
                             width={width ? `${width}px` : ""}
                           >
                             {header}
