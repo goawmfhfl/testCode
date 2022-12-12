@@ -24,6 +24,7 @@ export const GET_PRODUCTS_BY_ID = gql`
       error
       product {
         name
+        isBmarket
         description
         colors {
           name

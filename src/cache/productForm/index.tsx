@@ -1,4 +1,5 @@
 export const TITLE = "TITLE";
+export const IS_B_MARKET_PRODUCT = "IS_B_MARKET_PRODUCT";
 export const CATEGORY_FIRST = "CATEGORY_FIRST";
 export const CATEGORY_SECOND = "CATEGORY_SECOND";
 export const CATEGORY_THIRD = "CATEGORY_THIRD";

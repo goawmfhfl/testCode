@@ -151,6 +151,7 @@ export interface OptionCombination {
 
 export interface ProductType {
   name: string;
+  isBmarket: boolean;
   description: string;
   colors: Array<{
     name: ColorType;

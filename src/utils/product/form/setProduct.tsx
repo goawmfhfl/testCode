@@ -39,6 +39,7 @@ const setProduct = (
 ) => {
   const {
     name,
+    isBmarket,
     description,
     category,
     colors,
@@ -73,8 +74,9 @@ const setProduct = (
 
   reset({
     TITLE: name,
+    IS_B_MARKET_PRODUCT: isBmarket,
     PRODUCT_DESCRIPTION: description,
-    PRODUCT_COLOR: colors.map(({ name }) => name),
+    PRODUCT_COLOR: colors?.length ? colors.map(({ name }) => name) : [],
     PRODUCT_PRICE: originalPrice,
     IS_DISCOUNTED: !!discountAmount,
     DISCOUNT_AMOUNT: discountAmount,

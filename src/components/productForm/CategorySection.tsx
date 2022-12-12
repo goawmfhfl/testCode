@@ -13,6 +13,7 @@ import {
   CATEGORY_FIRST,
   CATEGORY_SECOND,
   CATEGORY_THIRD,
+  IS_B_MARKET_PRODUCT,
 } from "@cache/productForm";
 import downwordArrowBig from "@icons/arrow-downward-big.svg";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
@@ -22,6 +23,8 @@ import { CategoriesType } from "@models/index";
 import { loadingSpinnerVisibilityVar, systemModalVar } from "@cache/index";
 import useShopInfo from "@hooks/useShopInfo";
 import { CategoryNames, CATEGORY_NAMES } from "@constants/category";
+import Checkbox from "@components/common/input/Checkbox";
+import questionMarkIconSource from "@icons/questionmark.svg";
 
 const CategorySection = () => {
   const { watch, register, setValue } = useFormContext();
@@ -84,6 +87,20 @@ const CategorySection = () => {
         카테고리는 하나만 설정 가능합니다. <br /> 상품과 맞지 않는 카테고리에
         등록할 경우 강제 이동되거나 판매보류 될 수 있습니다.
       </NoticeContainer>
+
+      <BMarket>
+        <Checkbox {...register(IS_B_MARKET_PRODUCT)} />이 상품은 B-MARKET
+        상품입니다. <QuestionMark src={questionMarkIconSource} />
+        <NoticeContainer icon={questionMarkIconSource}>
+          B-MARKET은 작업과정에서 발생하는 작은 흠으로 파기되는 B급 상품을
+          <br />
+          할인된 가격에 판매할 수 있는 카테고리 입니다.
+          <br />
+          B급 상품 설정에 체크시 해당 상품은 B-MARKET 카테고리에 등록됩니다.
+          <br />
+          B급 상품은 정상 상품의 가격보다 할인된 가격으로 책정해주세요.
+        </NoticeContainer>
+      </BMarket>
 
       <DropdownContainer>
         <DropdownWrapper>
@@ -205,10 +222,41 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
+const BMarket = styled.div`
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  ${({ theme }) => theme.typo.korean.subHeadline.basic};
+
+  margin-top: 11px;
+`;
+
+const QuestionMark = styled.img`
+  margin-left: 7px;
+
+  & + div {
+    width: 418px;
+
+    position: absolute;
+    top: calc(30px);
+    left: 220px;
+    z-index: 500;
+
+    display: none;
+  }
+
+  &:hover {
+    & + div {
+      display: flex;
+    }
+  }
+`;
+
 const DropdownContainer = styled.div`
   display: flex;
 
-  margin-top: 16px;
+  margin-top: 19px;
 
   & > select {
     margin-right: 16px;
