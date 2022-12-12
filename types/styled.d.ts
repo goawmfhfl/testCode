@@ -44,6 +44,10 @@ declare module "styled-components" {
           basic: string;
           emphasized: string;
         };
+        subHeadline: {
+          basic: string;
+          emphasized: string;
+        };
         body: {
           primary: {
             basic: string;

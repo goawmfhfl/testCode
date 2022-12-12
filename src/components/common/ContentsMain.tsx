@@ -7,6 +7,7 @@ const ContentsMain = ({ children }: { children: React.ReactNode }) => {
 
 const Container = styled.div`
   background-color: #fff;
+  overflow: scroll;
 
   margin: 12px 0px;
 
