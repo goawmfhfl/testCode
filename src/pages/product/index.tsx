@@ -2,7 +2,6 @@ import styled from "styled-components";
 import { HeaderNames } from "@constants/index";
 
 import Layout from "@components/common/Layout";
-import ContentsContainer from "@components/common/ContentsContainer";
 import ContentsHeader from "@components/common/ContentsHeader";
 import FilterBar from "@components/productManagement/FilterBar";
 import Controller from "@components/productManagement/Controller";
@@ -15,22 +14,23 @@ const Product = () => {
 
   return (
     <Layout>
-      <ContentsContainer>
-        <ProductContainer>
-          <ContentsHeader headerName={HeaderNames.Product as HeaderNames} />
-          <FilterBar />
-          <Controller />
-          <ProductTable />
-          <Pagination />
-        </ProductContainer>
-      </ContentsContainer>
+      <Container>
+        <ContentsHeader headerName={HeaderNames.Product as HeaderNames} />
+        <FilterBar />
+        <Controller />
+        <ProductTable />
+        <Pagination />
+      </Container>
     </Layout>
   );
 };
 
-const ProductContainer = styled.div`
-  min-width: 1182px;
+const Container = styled.div`
   width: 100%;
+  min-width: 1182px;
+  padding: 12px 20px;
+
+  background-color: ${({ theme: { palette } }) => palette.grey100};
 `;
 
 export default Product;

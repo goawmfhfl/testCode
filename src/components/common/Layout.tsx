@@ -35,6 +35,9 @@ const Layout = ({
 
   const isShopPage = location.pathname === Pathnames.Shop;
   const isProductPage = location.pathname.includes(Pathnames.Product);
+  const isTablePage =
+    location.pathname === Pathnames.Product ||
+    location.pathname === Pathnames.Order;
 
   return (
     <>
@@ -45,6 +48,7 @@ const Layout = ({
         <ContentsContainer
           hasBottomMargin={hasSaveBar}
           hasLeftMargin={hasSideNavigation}
+          isTablePage={isTablePage}
           ref={(newRef: HTMLElement) => contentsContainerReferenceVar(newRef)}
           preventScroll={loadingSpinnerVisibility}
         >
@@ -97,12 +101,15 @@ const ContentsContainer = styled.div<{
   hasBottomMargin: boolean;
   hasLeftMargin: boolean;
   preventScroll: boolean;
+  isTablePage: boolean;
 }>`
   flex: 1;
   min-height: 100%;
 
   display: flex;
   flex-direction: column;
+
+  min-width: ${({ isTablePage }) => (isTablePage ? "1182px" : "none")};
 
   margin-left: ${({ hasLeftMargin }) => (hasLeftMargin ? "210px" : "0px")};
   margin-top: 56px;
