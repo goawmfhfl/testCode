@@ -301,16 +301,36 @@ function hasEveryInputFulfilled(
           return false;
         }
 
-        const hasValidMinProperty = Object.prototype.hasOwnProperty.call(
+        const hasMinProperty = Object.prototype.hasOwnProperty.call(
           inputValue,
           "min"
         ) as boolean;
-        const hasValidMaxProperty = Object.prototype.hasOwnProperty.call(
+        const hasMaxProperty = Object.prototype.hasOwnProperty.call(
           inputValue,
           "max"
         ) as boolean;
 
-        return acc && hasValidMinProperty && hasValidMaxProperty;
+        if (!hasMinProperty || !hasMaxProperty) {
+          unfulfilledInputNames.push(inputName);
+
+          return false;
+        }
+
+        const manufacturingLeadTime = inputValue as {
+          min: number;
+          max: number;
+        };
+
+        if (
+          isNaN(manufacturingLeadTime["min"]) ||
+          isNaN(manufacturingLeadTime["max"])
+        ) {
+          unfulfilledInputNames.push(inputName);
+
+          return false;
+        }
+
+        return acc;
       }
 
       // Array - tagInfos
