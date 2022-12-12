@@ -242,8 +242,26 @@ const ProductTable = () => {
   }, [page, skip, status, query]);
 
   useEffect(() => {
-    const totalPages: number = data?.getAllProductsBySeller.totalPages;
-    const products: Array<ProductsType> = data?.getAllProductsBySeller.products;
+    if (!data || !data.getAllProductsBySeller) return;
+
+    const {
+      totalPages,
+      products,
+    }: {
+      totalPages: number;
+      products: Array<ProductsType>;
+    } = data.getAllProductsBySeller;
+
+    const isLastPageChanged = totalPages < page;
+
+    if (isLastPageChanged) {
+      commonFilterOptionVar({
+        ...commonFilterOptionVar(),
+        page: totalPages,
+      });
+
+      return;
+    }
 
     pageNumberListVar(
       Array(totalPages)
