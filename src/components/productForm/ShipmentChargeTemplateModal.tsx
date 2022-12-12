@@ -76,7 +76,14 @@ const ShipmentChargeTemplateModal = () => {
     {
       input: { id: number };
     }
-  >(DELETE_SHIPMENT_TEMPLATE);
+  >(DELETE_SHIPMENT_TEMPLATE, {
+    refetchQueries: [
+      {
+        query: GET_SHIPMENT_TEMPLATES,
+      },
+      "GetShipmentTemplates",
+    ],
+  });
 
   const [lastRowRef, setLastRowRef] = useState<HTMLElement>(null);
 
