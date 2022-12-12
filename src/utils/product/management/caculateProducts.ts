@@ -46,10 +46,8 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
     // 최종가
     const discountAppliedPrice =
       discountAmount && discountMethod
-        ? getDiscountedPrice(
-            originalPrice,
-            discountAmount,
-            discountMethod
+        ? Number(
+            getDiscountedPrice(originalPrice, discountAmount, discountMethod)
           ).toLocaleString("ko-KR") + " ₩"
         : "-";
 
