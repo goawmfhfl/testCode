@@ -75,11 +75,13 @@ const CategorySection = () => {
 
   const { safetyAuthentication, safetyAuthenticationExpiredDate } =
     shopInfoData.getShopInfo.shop;
+  const isValidAuthentication =
+    compareAsc(new Date(safetyAuthenticationExpiredDate), new Date()) > -1;
 
   const isSafetyAuthenticated =
     safetyAuthentication &&
     safetyAuthenticationExpiredDate &&
-    compareAsc(new Date(safetyAuthenticationExpiredDate), new Date()) < 1;
+    isValidAuthentication;
 
   return (
     <Container>
@@ -149,6 +151,8 @@ const CategorySection = () => {
                 const isChemicalProduct =
                   e.target.value === CategoryNames.DIFFUSER_ROOMSPRAY ||
                   e.target.value === CategoryNames.CANDLE;
+
+                console.log("인증된 샵인가?", isSafetyAuthenticated);
 
                 if (isChemicalProduct && !isSafetyAuthenticated) {
                   systemModalVar({
