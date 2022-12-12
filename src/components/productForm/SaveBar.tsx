@@ -223,6 +223,7 @@ const SaveBar = () => {
             !isDiscounted && "discountMethod",
             "startDiscountDate",
             "endDiscountDate",
+            hasRequiredOption && "quantity",
             !hasRequiredOption && !hasSelectiveOption && "optionCombinations",
             !hasRequiredOption && "requiredOptions",
             !hasSelectiveOption && "selectiveOptions",
