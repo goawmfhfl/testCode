@@ -19,7 +19,7 @@ import {
   IS_DISCOUNTED,
 } from "@cache/productForm/index";
 import { DiscountMethod } from "@models/product";
-import { getDiscountedPrice } from "@utils/product/form/index";
+import { getDiscountedPrice } from "@utils/calculator";
 
 const ProductDiscount = () => {
   const { register, watch, control, setValue } = useFormContext();
