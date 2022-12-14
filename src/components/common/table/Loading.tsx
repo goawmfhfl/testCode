@@ -1,10 +1,15 @@
 import React from "react";
-import styled from "styled-components/macro";
+import styled, { css } from "styled-components";
 import { TailSpin } from "react-loader-spinner";
+import { TableType } from "@models/index";
 
-const Loading = () => {
+interface LoadingProps {
+  type: TableType;
+}
+
+const Loading = ({ type }: LoadingProps) => {
   return (
-    <LoadingContainer>
+    <LoadingContainer type={type}>
       <TailSpin
         height="56"
         width="56"
@@ -16,13 +21,22 @@ const Loading = () => {
   );
 };
 
-const LoadingContainer = styled.div`
+const LoadingContainer = styled.div<{ type: TableType }>`
   display: flex;
   justify-content: center;
   align-items: center;
 
   height: 460px;
+  width: 100%;
   background-color: ${({ theme: { palette } }) => palette.white};
+
+  ${({ type }) =>
+    type === TableType.SCROLL &&
+    css`
+      position: absolute;
+      top: 40px;
+      left: 0;
+    `}
 `;
 
 export default Loading;

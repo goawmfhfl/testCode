@@ -3,7 +3,7 @@ import styled, { css } from "styled-components/macro";
 
 export const TableContainer = styled.div<{
   type: TableType;
-  hasNoData?: boolean;
+  hasData?: boolean;
 }>`
   display: flex;
   position: relative;
@@ -15,8 +15,8 @@ export const TableContainer = styled.div<{
       flex-direction: column;
     `}
 
-  ${({ type, hasNoData }) =>
-    type === TableType.SCROLL && hasNoData
+  ${({ type, hasData }) =>
+    type === TableType.SCROLL && hasData
       ? css`
           height: 500px;
         `

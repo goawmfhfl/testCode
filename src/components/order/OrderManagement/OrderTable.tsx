@@ -15,13 +15,6 @@ import {
   tableWidth,
 } from "@constants/order/orderManagement";
 
-import {
-  OrderSearchType,
-  OrderStatusGroup,
-  OrderStatusName,
-  OrderStatusType,
-} from "@models/order/orderManagement";
-
 import useLazyOrders from "@hooks/order/useLazyOrders";
 
 import {
@@ -37,7 +30,7 @@ import {
 import Checkbox from "@components/common/input/Checkbox";
 import NoDataContainer from "@components/common/table/NoDataContainer";
 import { filterOptionVar } from "@cache/order/orderManagement";
-import { commonFilterOptionVar } from "@cache/index";
+import { commonFilterOptionVar, systemModalVar } from "@cache/index";
 
 import {
   NormalizedListType,
@@ -52,42 +45,18 @@ import {
   paginationVisibilityVar,
 } from "@cache/index";
 import { checkedOrderIdsVar } from "@cache/order";
+import { OrderItemsType } from "@graphql/queries/getOrdersBySeller";
+import Loading from "@components/common/table/Loading";
 
 const OrderTable = () => {
   const { getOrderItem, error, loading, data } = useLazyOrders();
-
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
-  const [totalOrderItems, setTotalOrderItems] = useState<
-    Array<caculatedOrderItemType>
-  >([]);
-
-  useEffect(() => {
-    // need Check Because totalPages get null from Server GraphQl
-    const totalPages: number = data?.getOrdersBySeller.totalPages || 1;
-    const orderItems = data?.getOrdersBySeller.totalOrderItems || [];
-    const nomalizedOrderItem: NormalizedListType =
-      contructOrderItem(orderItems);
-
-    const caculatedOrderItem: Array<caculatedOrderItemType> =
-      caculateOrderItem(nomalizedOrderItem);
-
-    pageNumberListVar(
-      Array(totalPages)
-        .fill(null)
-        .map((_, index) => index + 1)
-    );
-
-    setTotalOrderItems(caculatedOrderItem);
-    checkedOrderIdsVar([]);
-    checkAllBoxStatusVar(false);
-  }, [data]);
-
-  useEffect(() => {
-    paginationVisibilityVar(loading || error);
-  }, [loading]);
+  const [orderItems, setOrderItems] = useState<Array<caculatedOrderItemType>>(
+    []
+  );
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -95,10 +64,10 @@ const OrderTable = () => {
       await getOrderItem({
         variables: {
           input: {
-            page: 1,
-            skip: null,
-            query: null,
-            type: null,
+            page,
+            skip,
+            query,
+            type,
             statusName,
             statusType,
             statusGroup,
@@ -108,14 +77,84 @@ const OrderTable = () => {
     })();
   }, [page, skip, query, type, statusName, statusType, statusGroup]);
 
-  if (loading) return <>loading...</>;
-  if (error) return <>error!</>;
+  useEffect(() => {
+    if (!data || !data.getOrdersBySeller) return;
+
+    const {
+      totalPages,
+      totalOrderItems,
+    }: { totalPages: number; totalOrderItems: Array<OrderItemsType> } =
+      data.getOrdersBySeller;
+
+    const isLastPageChanged = totalPages < page;
+
+    if (isLastPageChanged && totalPages !== 0) {
+      commonFilterOptionVar({
+        ...commonFilterOptionVar(),
+        page: totalPages,
+      });
+
+      return;
+    }
+
+    pageNumberListVar(
+      Array(totalPages)
+        .fill(null)
+        .map((_, index) => index + 1)
+    );
+
+    const nomalizedOrderItem: NormalizedListType =
+      contructOrderItem(totalOrderItems);
+
+    const caculatedOrderItem: Array<caculatedOrderItemType> =
+      caculateOrderItem(nomalizedOrderItem);
+    setOrderItems(caculatedOrderItem);
+
+    checkedOrderIdsVar([]);
+    checkAllBoxStatusVar(false);
+  }, [data]);
+
+  useEffect(() => {
+    paginationVisibilityVar(loading || error);
+  }, [loading]);
+
+  useEffect(() => {
+    if (error) {
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: (
+          <>
+            내부 서버 오류로 인해 요청하신
+            <br />
+            작업을 완료하지 못했습니다.
+            <br />
+            다시 한 번 시도 후 같은 문제가 발생할 경우
+            <br />
+            찹스틱스로 문의해주세요.
+            <br />
+            <br />
+            (전화 문의 070-4187-3848)
+            <br />
+            <br />
+            code:
+            {error.message}
+          </>
+        ),
+        confirmButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
+      });
+    }
+  }, [error]);
+
+  const hasOrderItems = !loading && !error && !!orderItems?.length;
 
   return (
-    <TableContainer
-      type={TableType.SCROLL}
-      hasNoData={totalOrderItems?.length === 0}
-    >
+    <TableContainer type={TableType.SCROLL} hasData={hasOrderItems}>
       <FixedTable width={tableWidth.left}>
         <ThContainer>
           <Th width={fixedTableType[0].width}>
@@ -132,27 +171,28 @@ const OrderTable = () => {
           <Th width={fixedTableType[5].width}>{orderStatusType.ORDER}</Th>
         </ThContainer>
         <TdContainer>
-          {totalOrderItems.map(
-            ({
-              orderId,
-              merchantitemUid,
-              productCode,
-              orderProduct,
-              sellerName,
-              orderState,
-            }) => (
-              <Tr key={orderId}>
-                <Td width={fixedTableType[0].width}>
-                  <Checkbox />
-                </Td>
-                <Td width={fixedTableType[1].width}>{merchantitemUid}</Td>
-                <Td width={fixedTableType[2].width}>{productCode}</Td>
-                <Td width={fixedTableType[3].width}>{orderProduct}</Td>
-                <Td width={fixedTableType[4].width}>{sellerName}</Td>
-                <Td width={fixedTableType[5].width}>{orderState}</Td>
-              </Tr>
-            )
-          )}
+          {hasOrderItems &&
+            orderItems.map(
+              ({
+                orderId,
+                merchantitemUid,
+                productCode,
+                orderProduct,
+                sellerName,
+                orderState,
+              }) => (
+                <Tr key={orderId}>
+                  <Td width={fixedTableType[0].width}>
+                    <Checkbox />
+                  </Td>
+                  <Td width={fixedTableType[1].width}>{merchantitemUid}</Td>
+                  <Td width={fixedTableType[2].width}>{productCode}</Td>
+                  <Td width={fixedTableType[3].width}>{orderProduct}</Td>
+                  <Td width={fixedTableType[4].width}>{sellerName}</Td>
+                  <Td width={fixedTableType[5].width}>{orderState}</Td>
+                </Tr>
+              )
+            )}
         </TdContainer>
       </FixedTable>
       <ScrollTable width={tableWidth.right}>
@@ -193,61 +233,79 @@ const OrderTable = () => {
         </ThContainer>
 
         <TdContainer>
-          {totalOrderItems.map(
-            ({
-              orderId,
-              claimState,
-              courier,
-              invoiceNumber,
-              paymentDay,
-              recipientName,
-              recipientPhoneNumber,
-              address,
-              postCode,
-              shipmentMemo,
-              sellerId,
-              sellerPhoneNumber,
-              option,
-              quantity,
-              price,
-              optionPrice,
-              totalPrice,
-              shipmentPrice,
-              shipmentDistantPrice,
-            }) => (
-              <Tr key={orderId}>
-                <Td width={scrollTableType[0].width}>{claimState}</Td>
-                <Td width={scrollTableType[1].width}>{courier}</Td>
-                <Td width={scrollTableType[2].width}>{invoiceNumber}</Td>
-                <Td width={scrollTableType[3].width}>{paymentDay}</Td>
-                <Td width={scrollTableType[4].width}>{recipientName}</Td>
-                <Td width={scrollTableType[5].width}>{recipientPhoneNumber}</Td>
-                <Td width={scrollTableType[6].width}>{address}</Td>
-                <Td width={scrollTableType[7].width}>{postCode}</Td>
-                <Td width={scrollTableType[8].width}>{shipmentMemo}</Td>
-                <Td width={scrollTableType[9].width}>{sellerId}</Td>
-                <Td width={scrollTableType[10].width}>{sellerPhoneNumber}</Td>
-                <Td width={scrollTableType[11].width}>{option}</Td>
-                <Td width={scrollTableType[12].width}>{quantity}</Td>
-                <Td width={scrollTableType[13].width}>{price}</Td>
-                <Td width={scrollTableType[14].width}>{optionPrice}</Td>
-                <Td width={scrollTableType[15].width}>{totalPrice}</Td>
-                <Td width={scrollTableType[16].width}>{shipmentPrice}</Td>
-                <Td width={scrollTableType[17].width}>
-                  {shipmentDistantPrice}
-                </Td>
-              </Tr>
-            )
-          )}
+          {hasOrderItems &&
+            orderItems.map(
+              ({
+                orderId,
+                claimState,
+                courier,
+                invoiceNumber,
+                paymentDay,
+                recipientName,
+                recipientPhoneNumber,
+                address,
+                postCode,
+                shipmentMemo,
+                sellerId,
+                sellerPhoneNumber,
+                option,
+                quantity,
+                price,
+                optionPrice,
+                totalPrice,
+                shipmentPrice,
+                shipmentDistantPrice,
+              }) => (
+                <Tr key={orderId}>
+                  <Td width={scrollTableType[0].width}>{claimState}</Td>
+                  <Td width={scrollTableType[1].width}>{courier}</Td>
+                  <Td width={scrollTableType[2].width}>{invoiceNumber}</Td>
+                  <Td width={scrollTableType[3].width}>{paymentDay}</Td>
+                  <Td width={scrollTableType[4].width}>{recipientName}</Td>
+                  <Td width={scrollTableType[5].width}>
+                    {recipientPhoneNumber}
+                  </Td>
+                  <Td width={scrollTableType[6].width}>{address}</Td>
+                  <Td width={scrollTableType[7].width}>{postCode}</Td>
+                  <Td width={scrollTableType[8].width}>{shipmentMemo}</Td>
+                  <Td width={scrollTableType[9].width}>{sellerId}</Td>
+                  <Td width={scrollTableType[10].width}>{sellerPhoneNumber}</Td>
+                  <Td width={scrollTableType[11].width}>{option}</Td>
+                  <Td width={scrollTableType[12].width}>{quantity}</Td>
+                  <Td width={scrollTableType[13].width}>{price}</Td>
+                  <Td width={scrollTableType[14].width}>{optionPrice}</Td>
+                  <Td width={scrollTableType[15].width}>{totalPrice}</Td>
+                  <Td width={scrollTableType[16].width}>{shipmentPrice}</Td>
+                  <Td width={scrollTableType[17].width}>
+                    {shipmentDistantPrice}
+                  </Td>
+                </Tr>
+              )
+            )}
         </TdContainer>
       </ScrollTable>
-      {!totalOrderItems.length && (
+
+      {orderItems?.length === 0 && !loading && (
         <NoDataContainer type={TableType.SCROLL}>
-          아직 들어온
-          <br />
-          주문이 없습니다
+          {query && (
+            <>
+              검색어와 일치하는
+              <br />
+              주문이 없습니다.
+            </>
+          )}
+
+          {!query && (
+            <>
+              아직 들어온
+              <br />
+              주문이 없습니다.
+            </>
+          )}
         </NoDataContainer>
       )}
+
+      {loading && <Loading type={TableType.SCROLL} />}
     </TableContainer>
   );
 };
