@@ -3,7 +3,11 @@ import styled from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
 import { filterOptionVar } from "@cache/order/orderManagement";
-import { commonFilterOptionVar, paginationSkipVar } from "@cache/index";
+import {
+  commonFilterOptionVar,
+  paginationSkipVar,
+  totalPageLengthVar,
+} from "@cache/index";
 
 import { orderStatusType } from "@constants/order/index";
 
@@ -20,14 +24,15 @@ import FilterBarContainer from "@components/order/FilterBarContainer";
 import Button from "@components/common/Button";
 
 const FilterBar = () => {
-  const { loading, error, data, getAllOrderStatus } = useLazyAllOrderStatus();
+  const { data, getAllOrderStatus } = useLazyAllOrderStatus();
   const { statusName } = useReactiveVar(filterOptionVar);
+  const totalPageLength = useReactiveVar(totalPageLengthVar);
 
   const orders = data?.getOrdersBySeller.totalOrderItems || [];
 
   const ordersLength = {
     allOrders: orders.length,
-    paymentCompleted: orders?.filter(
+    paymentCompleted: orders.filter(
       (list) => list.orderStatus.name === OrderStatusName.PAYMENT_COMPLETED
     ).length,
     preparing: orders.filter(
@@ -86,6 +91,7 @@ const FilterBar = () => {
   return (
     <FilterBarContainer
       button={<Button size={"small"}>전체 내역 내보내기</Button>}
+      searchResultLength={totalPageLength}
     >
       <Filter
         isActvie={statusName === null}

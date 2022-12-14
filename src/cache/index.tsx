@@ -21,6 +21,7 @@ export const commonFilterOptionVar = makeVar<CommonFilterOptionType>({
 });
 export const pageNumberListVar = makeVar<Array<number>>([]);
 export const paginationSkipVar = makeVar<number>(0);
+export const totalPageLengthVar = makeVar<number>(0);
 
 // TABLE: 기타
 export const temporaryQueryVar = makeVar<string>("");

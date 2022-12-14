@@ -66,7 +66,7 @@ const FilterBar = () => {
         },
       });
     })();
-  }, [productsData]);
+  }, []);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

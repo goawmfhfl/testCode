@@ -30,7 +30,11 @@ import {
 import Checkbox from "@components/common/input/Checkbox";
 import NoDataContainer from "@components/common/table/NoDataContainer";
 import { filterOptionVar } from "@cache/order/orderManagement";
-import { commonFilterOptionVar, systemModalVar } from "@cache/index";
+import {
+  commonFilterOptionVar,
+  systemModalVar,
+  totalPageLengthVar,
+} from "@cache/index";
 
 import {
   NormalizedListType,
@@ -82,9 +86,13 @@ const OrderTable = () => {
 
     const {
       totalPages,
+      totalResults,
       totalOrderItems,
-    }: { totalPages: number; totalOrderItems: Array<OrderItemsType> } =
-      data.getOrdersBySeller;
+    }: {
+      totalPages: number;
+      totalResults: number;
+      totalOrderItems: Array<OrderItemsType>;
+    } = data.getOrdersBySeller;
 
     const isLastPageChanged = totalPages < page;
 
@@ -102,6 +110,8 @@ const OrderTable = () => {
         .fill(null)
         .map((_, index) => index + 1)
     );
+
+    totalPageLengthVar(totalResults);
 
     const nomalizedOrderItem: NormalizedListType =
       contructOrderItem(totalOrderItems);
