@@ -70,7 +70,7 @@ const FilterBar = () => {
       await getAllOrderStatus({
         variables: {
           input: {
-            page: null,
+            page: 1,
             skip: null,
             query: null,
             type: null,

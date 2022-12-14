@@ -254,7 +254,7 @@ const ProductTable = () => {
 
     const isLastPageChanged = totalPages < page;
 
-    if (isLastPageChanged) {
+    if (isLastPageChanged && totalPages !== 0) {
       commonFilterOptionVar({
         ...commonFilterOptionVar(),
         page: totalPages,
@@ -269,12 +269,10 @@ const ProductTable = () => {
         .map((_, index) => index + 1)
     );
 
-    if (products) {
-      const recontructProducts: NormalizedType = contructProducts(products);
-      const caculatedProducts: Array<CaculatedProductsType> =
-        caculateProducts(recontructProducts);
-      setProducts(caculatedProducts);
-    }
+    const recontructProducts: NormalizedType = contructProducts(products);
+    const caculatedProducts: Array<CaculatedProductsType> =
+      caculateProducts(recontructProducts);
+    setProducts(caculatedProducts);
 
     checkedProductsVar([]);
     checkAllBoxStatusVar(false);

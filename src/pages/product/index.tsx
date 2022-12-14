@@ -15,7 +15,7 @@ const Product = () => {
   return (
     <Layout>
       <Container>
-        <ContentsHeader headerName={HeaderNames.Product as HeaderNames} />
+        <ContentsHeader headerName={HeaderNames.Product} />
         <FilterBar />
         <Controller />
         <ProductTable />

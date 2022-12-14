@@ -30,7 +30,7 @@ export interface GetAllProductsBySellerType {
 
 export interface GetAllProductsBySellerInputType {
   input: {
-    page?: number;
+    page: number;
     skip?: number;
     status?: ProductStatus;
     query?: string;
@@ -86,7 +86,7 @@ export interface GetAllProductStatusBySellerType {
 
 export interface GetAllProductStatusBySellerInPutType {
   input: {
-    page?: number;
+    page: number;
     skip?: number;
     status?: ProductStatus;
     query?: string;
