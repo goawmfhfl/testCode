@@ -3,12 +3,15 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useReactiveVar } from "@apollo/client";
 
-import { commonFilterOptionVar, paginationSkipVar } from "@cache/index";
+import {
+  commonFilterOptionVar,
+  paginationSkipVar,
+  totalPageLengthVar,
+} from "@cache/index";
 import { filterOptionVar } from "@cache/productManagement";
 import { Pathnames } from "@constants/index";
 import { ProductStatus } from "@constants/product";
 import useLazyAllProductStatus from "@hooks/product/useLazyAllProductStatus";
-import useLazyProducts from "@hooks/product/useLazyProducts";
 import { getProductLength } from "@utils/product/management";
 import questionMarkSrc from "@icons/questionmark.svg";
 
@@ -21,19 +24,14 @@ const FilterBar = () => {
   const { data: productStatus, getAllProductStatus } =
     useLazyAllProductStatus();
 
-  const { data: productsData, getProducts } = useLazyProducts();
-
-  const { query } = useReactiveVar(commonFilterOptionVar);
-
   const { status: selectedStatus } = useReactiveVar(filterOptionVar);
+
+  const totalPageLength = useReactiveVar(totalPageLengthVar);
 
   const products = productStatus?.getAllProductsBySeller.products || [];
   const productLength = getProductLength(products);
 
   const [showNotice, setShowNotice] = useState<boolean>(false);
-
-  const searchResultLength =
-    productsData?.getAllProductsBySeller.totalResults || 0;
 
   const { all, onSale, stopSale, soldOut, temporary } = productLength;
 
@@ -68,22 +66,6 @@ const FilterBar = () => {
     })();
   }, []);
 
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
-      await getProducts({
-        variables: {
-          input: {
-            page: 1,
-            skip: null,
-            status: selectedStatus,
-            query,
-          },
-        },
-      });
-    })();
-  }, [query]);
-
   return (
     <FilterBarContainer
       button={
@@ -97,7 +79,7 @@ const FilterBar = () => {
           상품 등록
         </Button>
       }
-      searchResultLength={searchResultLength}
+      searchResultLength={totalPageLength}
     >
       <FilterList>
         <Filter

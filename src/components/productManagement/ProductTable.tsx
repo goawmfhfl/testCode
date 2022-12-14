@@ -16,6 +16,7 @@ import {
   systemModalVar,
   pageNumberListVar,
   paginationVisibilityVar,
+  totalPageLengthVar,
 } from "@cache/index";
 import { ProductStatus, productStatus, productType } from "@constants/product";
 import {
@@ -246,9 +247,11 @@ const ProductTable = () => {
 
     const {
       totalPages,
+      totalResults,
       products,
     }: {
       totalPages: number;
+      totalResults: number;
       products: Array<ProductsType>;
     } = data.getAllProductsBySeller;
 
@@ -268,6 +271,8 @@ const ProductTable = () => {
         .fill(null)
         .map((_, index) => index + 1)
     );
+
+    totalPageLengthVar(totalResults);
 
     const recontructProducts: NormalizedType = contructProducts(products);
     const caculatedProducts: Array<CaculatedProductsType> =
