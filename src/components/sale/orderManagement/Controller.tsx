@@ -13,22 +13,64 @@ import ControllerContainer from "@components/sale/ControllerContainer";
 
 import {
   commonFilterOptionVar,
+  loadingSpinnerVisibilityVar,
   paginationSkipVar,
   showHasAnyProblemModal,
   SkipQuantityCache,
+  systemModalVar,
 } from "@cache/index";
 import {
   searchQueryType,
   OrderSearchType,
   OrderStatusType,
 } from "@constants/sale";
-import { useReactiveVar } from "@apollo/client";
+import { useMutation, useReactiveVar } from "@apollo/client";
 import { checkedOrderItemsVar } from "@cache/sale";
 import { filterOptionVar } from "@cache/sale/orderManagement";
+import { CONFIRM_ORDERITMES_BY_SELLER } from "@graphql/mutations/confirmOrderItemsBySeller";
+import {
+  ConfirmOrderItemsBySellerInputType,
+  ConfirmOrderItemsBySellerType,
+} from "@models/sale";
+import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+import { showHasServerErrorModal } from "@cache/productManagement";
 
 const Controller = () => {
+  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
+  const { type, statusName, statusType, statusGroup } =
+    useReactiveVar(filterOptionVar);
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
+  const checkedOrderItemIds = checkedOrderItems.map(
+    (orderItem) => orderItem.id
+  );
   const [temporaryQuery, setTemporaryQuery] = useState("");
+
+  const [confirmOrderItems] = useMutation<
+    ConfirmOrderItemsBySellerType,
+    {
+      input: ConfirmOrderItemsBySellerInputType;
+    }
+  >(CONFIRM_ORDERITMES_BY_SELLER, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    refetchQueries: [
+      {
+        query: GET_ORDERS_BY_SELLER,
+        variables: {
+          input: {
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
+          },
+        },
+      },
+      "GetOrdersBySeller",
+    ],
+  });
 
   // 주문확인
   const handleConfirmOrderButtonClick = () => {
@@ -42,6 +84,67 @@ const Controller = () => {
       );
       return;
     }
+
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: (
+        <>
+          선택하신 주문을 <br /> 확인처리 하시겠습니까?{" "}
+        </>
+      ),
+      confirmButtonVisibility: true,
+      cancelButtonVisibility: true,
+      confirmButtonClickHandler: () => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          (async () => {
+            loadingSpinnerVisibilityVar(true);
+            const {
+              data: {
+                confirmOrderItemsBySeller: { ok, error },
+              },
+            } = await confirmOrderItems({
+              variables: {
+                input: {
+                  orderItemIds: checkedOrderItemIds,
+                },
+              },
+            });
+
+            if (ok) {
+              loadingSpinnerVisibilityVar(false);
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: (
+                  <>
+                    주문이 확인되었습니다.
+                    <br />
+                    (상품준비중에서 처리 가능)
+                  </>
+                ),
+                confirmButtonVisibility: true,
+                cancelButtonVisibility: false,
+                confirmButtonClickHandler: () => {
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+                },
+              });
+            }
+            if (error) {
+              loadingSpinnerVisibilityVar(false);
+              showHasServerErrorModal(error, "주문 확인");
+            }
+          })();
+        } catch (error) {
+          loadingSpinnerVisibilityVar(false);
+          showHasServerErrorModal(error as string, "주문 확인");
+        }
+      },
+    });
   };
 
   //발송처리

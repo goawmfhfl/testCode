@@ -25,7 +25,6 @@ const FilterBar = () => {
     useLazyAllProductStatus();
 
   const { status: selectedStatus } = useReactiveVar(filterOptionVar);
-
   const totalPageLength = useReactiveVar(totalPageLengthVar);
 
   const products = productStatus?.getAllProductsBySeller.products || [];

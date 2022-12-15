@@ -6,6 +6,17 @@ import {
 } from "@constants/sale";
 import { OrderItemsType } from "@graphql/queries/getOrdersBySeller";
 
+export interface ConfirmOrderItemsBySellerInputType {
+  orderItemIds: Array<number>;
+}
+
+export interface ConfirmOrderItemsBySellerType {
+  confirmOrderItemsBySeller: {
+    ok: boolean;
+    error?: string;
+  };
+}
+
 export interface SkipQuantityType {
   id: number;
   label: string;
