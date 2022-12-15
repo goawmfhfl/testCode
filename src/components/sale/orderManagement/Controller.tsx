@@ -23,16 +23,16 @@ import {
   OrderStatusType,
 } from "@constants/sale";
 import { useReactiveVar } from "@apollo/client";
-import { checkedOrderIdsVar } from "@cache/sale";
+import { checkedOrderItemsVar } from "@cache/sale";
 import { filterOptionVar } from "@cache/sale/orderManagement";
 
 const Controller = () => {
-  const checkedOrderIds = useReactiveVar(checkedOrderIdsVar);
+  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const [temporaryQuery, setTemporaryQuery] = useState("");
 
   // 주문확인
   const handleConfirmOrderButtonClick = () => {
-    if (!checkedOrderIds.length) {
+    if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다
@@ -46,7 +46,7 @@ const Controller = () => {
 
   //발송처리
   const handleSendButtonClick = () => {
-    if (!checkedOrderIds.length) {
+    if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다
@@ -60,7 +60,7 @@ const Controller = () => {
 
   //주문취소
   const handleCancelOrderClick = () => {
-    if (!checkedOrderIds.length) {
+    if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다
@@ -74,7 +74,7 @@ const Controller = () => {
 
   //반품처리
   const handleReturnButtonClick = () => {
-    if (!checkedOrderIds.length) {
+    if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다
@@ -88,7 +88,7 @@ const Controller = () => {
 
   //교환처리
   const handleExchangeButtonClick = () => {
-    if (!checkedOrderIds.length) {
+    if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
         <>
           선택된 주문건이 없습니다

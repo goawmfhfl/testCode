@@ -112,6 +112,8 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       ? shipmentDistantPrice
       : 0;
 
+    const isChecked = false;
+
     return {
       id,
       // 주문번호
@@ -161,6 +163,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       shipmentPrice: resetShipmentPrice,
       // 제주/도서 추가배송비
       shipmentDistantPrice: resetShipmentDistantPrice,
+      isChecked,
     };
   });
   return result;

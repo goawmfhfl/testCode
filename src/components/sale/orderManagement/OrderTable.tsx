@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useReactiveVar } from "@apollo/client";
+import { cloneDeep } from "lodash";
 import { TableType } from "@models/index";
 
 import {
@@ -38,9 +39,9 @@ import {
   pageNumberListVar,
   paginationVisibilityVar,
 } from "@cache/index";
-import { checkedOrderIdsVar } from "@cache/sale";
 import { OrderItemsType } from "@graphql/queries/getOrdersBySeller";
 import Loading from "@components/common/table/Loading";
+import { checkedOrderItemsVar } from "@cache/sale";
 
 const OrderTable = () => {
   const { getOrderItem, error, loading, data } = useLazyOrders();
@@ -49,6 +50,72 @@ const OrderTable = () => {
     useReactiveVar(filterOptionVar);
 
   const [orderItems, setOrderItems] = useState<Array<ResetOrderItemType>>([]);
+  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
+  const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
+
+  const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newOrderItems = cloneDeep(orderItems);
+    checkAllBoxStatusVar(e.target.checked);
+
+    if (e.target.checked) {
+      const checkAllOrderItem = newOrderItems.map((orderItem) => ({
+        ...orderItem,
+        isChecked: true,
+      }));
+
+      setOrderItems(checkAllOrderItem);
+      checkedOrderItemsVar(checkAllOrderItem);
+    }
+
+    if (!e.target.checked) {
+      const checkAllOrderItem = newOrderItems.map((orderItem) => ({
+        ...orderItem,
+        isChecked: false,
+      }));
+
+      setOrderItems(checkAllOrderItem);
+      checkedOrderItemsVar([]);
+    }
+  };
+
+  const changeSingleCheckBoxHandler =
+    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newOrderItems = cloneDeep(orderItems);
+
+      if (e.target.checked) {
+        const checkedOrderItem = { ...newOrderItems[index], isChecked: true };
+        checkedOrderItemsVar([...checkedOrderItems, checkedOrderItem]);
+
+        newOrderItems[index].isChecked = true;
+        setOrderItems(newOrderItems);
+      }
+
+      if (!e.target.checked) {
+        const hasCheckedList = checkedOrderItems.filter(
+          (orderItem) => orderItem.id === newOrderItems[index].id
+        );
+
+        if (hasCheckedList) {
+          const checkedListIndex = checkedOrderItems.findIndex(
+            (orderItem) => orderItem.id === newOrderItems[index].id
+          );
+
+          const deletedCheckedList = [
+            ...checkedOrderItems.slice(0, checkedListIndex),
+            ...checkedOrderItems.slice(checkedListIndex + 1),
+          ];
+
+          checkedOrderItemsVar(deletedCheckedList);
+
+          newOrderItems[index].isChecked = false;
+
+          setOrderItems(newOrderItems);
+        }
+
+        newOrderItems[index].isChecked = false;
+        setOrderItems(newOrderItems);
+      }
+    };
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -109,7 +176,7 @@ const OrderTable = () => {
 
     setOrderItems(orderItems);
 
-    checkedOrderIdsVar([]);
+    checkedOrderItemsVar([]);
     checkAllBoxStatusVar(false);
   }, [data]);
 
@@ -157,7 +224,10 @@ const OrderTable = () => {
       <FixedTable width={tableWidth.left}>
         <ThContainer>
           <Th width={fixTableType[0].width}>
-            <Checkbox />
+            <Checkbox
+              onChange={changeAllCheckBoxHandler}
+              checked={checkAllBoxStatus}
+            />
           </Th>
           <Th width={fixTableType[1].width}>{fixTableType[1].label}</Th>
           <Th width={fixTableType[2].width}>{fixTableType[2].label}</Th>
@@ -168,17 +238,24 @@ const OrderTable = () => {
         <TdContainer>
           {hasOrderItems &&
             orderItems.map(
-              ({
-                id,
-                merchantItemUid,
-                productCode,
-                orderProduct,
-                userName,
-                orderStatus,
-              }) => (
+              (
+                {
+                  id,
+                  merchantItemUid,
+                  productCode,
+                  orderProduct,
+                  userName,
+                  orderStatus,
+                  isChecked,
+                },
+                index
+              ) => (
                 <Tr key={id}>
                   <Td width={fixTableType[0].width}>
-                    <Checkbox />
+                    <Checkbox
+                      onChange={changeSingleCheckBoxHandler(index)}
+                      checked={isChecked}
+                    />
                   </Td>
                   <Td width={fixTableType[1].width}>{merchantItemUid}</Td>
                   <Td width={fixTableType[2].width}>{productCode}</Td>

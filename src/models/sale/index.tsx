@@ -82,4 +82,5 @@ export interface ResetOrderItemType {
   shipmentPrice: number;
   // 제주/도서 추가배송비
   shipmentDistantPrice: number;
+  isChecked: boolean;
 }
