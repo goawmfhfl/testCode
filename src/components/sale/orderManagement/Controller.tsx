@@ -25,6 +25,7 @@ import {
   searchQueryType,
   OrderSearchType,
   OrderStatusType,
+  OrderStatusName,
 } from "@constants/sale";
 import { useMutation, useReactiveVar } from "@apollo/client";
 import { checkedOrderItemsVar, reasonVar } from "@cache/sale";
@@ -477,19 +478,56 @@ const Controller = () => {
   return (
     <ControllerContainer>
       <ActiveButtonContainer>
-        <ControllerButton size="small" onClick={handleConfirmOrderButtonClick}>
+        <ControllerButton
+          size="small"
+          onClick={handleConfirmOrderButtonClick}
+          disabled={
+            statusName === OrderStatusName.PREPARING ||
+            statusName === OrderStatusName.SHIPPING ||
+            statusName === OrderStatusName.SHIPPING_COMPLETED
+          }
+        >
           주문확인
         </ControllerButton>
-        <ControllerButton size="small" onClick={handleSendButtonClick}>
+        <ControllerButton
+          size="small"
+          onClick={handleSendButtonClick}
+          disabled={
+            statusName === OrderStatusName.PAYMENT_COMPLETED ||
+            statusName === OrderStatusName.SHIPPING ||
+            statusName === OrderStatusName.SHIPPING_COMPLETED
+          }
+        >
           발송 처리
         </ControllerButton>
-        <ControllerButton size="small" onClick={handleCancelOrderClick}>
+        <ControllerButton
+          size="small"
+          onClick={handleCancelOrderClick}
+          disabled={
+            statusName === OrderStatusName.SHIPPING ||
+            statusName === OrderStatusName.SHIPPING_COMPLETED
+          }
+        >
           주문 취소
         </ControllerButton>
-        <ControllerButton size="small" onClick={handleReturnButtonClick}>
+        <ControllerButton
+          size="small"
+          onClick={handleReturnButtonClick}
+          disabled={
+            statusName === OrderStatusName.PAYMENT_COMPLETED ||
+            statusName === OrderStatusName.PREPARING
+          }
+        >
           반품 처리
         </ControllerButton>
-        <ControllerButton size="small" onClick={handleExchangeButtonClick}>
+        <ControllerButton
+          size="small"
+          onClick={handleExchangeButtonClick}
+          disabled={
+            statusName === OrderStatusName.PAYMENT_COMPLETED ||
+            statusName === OrderStatusName.PREPARING
+          }
+        >
           교환 처리
         </ControllerButton>
       </ActiveButtonContainer>

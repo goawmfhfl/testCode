@@ -57,7 +57,9 @@ const FilterBar = () => {
         ...commonFilterOptionVar(),
         page: 1,
       });
+
       paginationSkipVar(0);
+
       filterOptionVar({
         ...filterOptionVar(),
         statusName: filterOptionName,
