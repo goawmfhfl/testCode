@@ -168,16 +168,15 @@ const ProductDiscount = () => {
       <DiscountedPrice>
         최종 가격
         <PriceWrapper>
-          {isDiscounted ? (
+          {isDiscounted && discountAmount ? (
             <>
-              {discountAmount &&
-                `${Number(
-                  getDiscountedPrice(
-                    Number(productPrice),
-                    Number(discountAmount),
-                    discountOption
-                  )
-                ).toLocaleString()}원`}
+              {`${Number(
+                getDiscountedPrice(
+                  Number(productPrice),
+                  Number(discountAmount),
+                  discountOption
+                )
+              ).toLocaleString()}원`}
             </>
           ) : (
             <>{`${Number(productPrice ?? 0)?.toLocaleString() || ""}원`}</>

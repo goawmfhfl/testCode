@@ -3,17 +3,19 @@ export function getDiscountedPrice(
   discountAmount: number,
   discountOption: string
 ) {
-  if (!discountAmount) {
-    return "-";
-  }
+  let discountedPrice: number = originalPrice;
 
   if (discountOption === "PERCENT") {
-    return originalPrice - originalPrice * discountAmount * 0.01;
+    discountedPrice = originalPrice - originalPrice * discountAmount * 0.01;
   }
 
   if (discountOption === "WON") {
-    return originalPrice - discountAmount;
+    discountedPrice = originalPrice - discountAmount;
   }
 
-  return originalPrice;
+  if (discountedPrice < 0) {
+    return 0;
+  }
+
+  return discountedPrice;
 }
