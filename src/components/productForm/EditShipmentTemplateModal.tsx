@@ -54,7 +54,7 @@ const EditShipmentTemplateModal = ({
         {
           query: GET_SHIPMENT_TEMPLATES,
         },
-        "GetShipmentTemplates",
+        "GetAllShipmentTemplates",
       ],
     });
 

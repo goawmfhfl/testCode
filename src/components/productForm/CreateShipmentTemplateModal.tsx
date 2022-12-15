@@ -28,7 +28,7 @@ const ShipmentTemplateModal = () => {
         {
           query: GET_SHIPMENT_TEMPLATES,
         },
-        "GetShipmentTemplates",
+        "GetAllShipmentTemplates",
       ],
     });
 

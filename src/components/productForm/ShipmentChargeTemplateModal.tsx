@@ -81,7 +81,7 @@ const ShipmentChargeTemplateModal = () => {
       {
         query: GET_SHIPMENT_TEMPLATES,
       },
-      "GetShipmentTemplates",
+      "GetAllShipmentTemplates",
     ],
   });
 
