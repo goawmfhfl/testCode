@@ -11,7 +11,10 @@ import {
 
 import useLazyOrders from "@hooks/order/useLazyOrders";
 
-import { filterOptionVar } from "@cache/sale/orderManagement";
+import {
+  filterOptionVar,
+  shipmentInformationVar,
+} from "@cache/sale/orderManagement";
 import {
   commonFilterOptionVar,
   systemModalVar,
@@ -125,6 +128,21 @@ const OrderTable = () => {
         newOrderItems[index].isChecked = false;
         setOrderItems(newOrderItems);
       }
+    };
+
+  const changeShipmentNumberHandler =
+    () => (e: React.ChangeEvent<HTMLInputElement>) => {
+      shipmentInformationVar({
+        ...shipmentInformationVar(),
+        shipmentNumber: Number(e.target.value),
+      });
+    };
+  const changeShipmentCompanyHandler =
+    () => (e: React.ChangeEvent<HTMLSelectElement>) => {
+      shipmentInformationVar({
+        ...shipmentInformationVar(),
+        shipmentCompany: e.target.value,
+      });
     };
 
   useEffect(() => {
@@ -327,6 +345,7 @@ const OrderTable = () => {
                   <Td width={scrollTableType[0].width}>{claimStatus}</Td>
                   <Td width={scrollTableType[1].width}>
                     <Dropdown
+                      onChange={changeShipmentCompanyHandler}
                       arrowSrc={triangleArrowSvg}
                       value={"default"}
                       sizing={"medium"}
@@ -345,7 +364,11 @@ const OrderTable = () => {
                       invoiceNumber
                     ) : (
                       <>
-                        <InvoiceNumberInput disabled={true} width={"145px"} />
+                        <InvoiceNumberInput
+                          onChange={changeShipmentNumberHandler}
+                          disabled={true}
+                          width={"145px"}
+                        />
                         <Button size="small" disabled={true} width={"55px"}>
                           발송
                         </Button>

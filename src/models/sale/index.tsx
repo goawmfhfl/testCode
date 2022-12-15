@@ -6,7 +6,28 @@ import {
 } from "@constants/sale";
 import { OrderItemsType } from "@graphql/queries/getOrdersBySeller";
 
-export interface ConfirmOrderItemsBySellerInputType {
+export interface CancelOrderItemsBySellerType {
+  cancelOrderItemsBySeller: {
+    ok: boolean;
+    error?: string;
+  };
+}
+
+export interface CancelOrderItemsBySellerInputType {
+  orderItemIds: Array<number>;
+  reason: string;
+}
+
+export interface SendOrderItemsType {
+  sendOrderItems: {
+    ok: boolean;
+    error?: string;
+  };
+}
+
+export interface SendOrderItemsInputType {
+  shipmentCompany: string;
+  shipmentNumber: number;
   orderItemIds: Array<number>;
 }
 
@@ -15,6 +36,10 @@ export interface ConfirmOrderItemsBySellerType {
     ok: boolean;
     error?: string;
   };
+}
+
+export interface ConfirmOrderItemsBySellerInputType {
+  orderItemIds: Array<number>;
 }
 
 export interface SkipQuantityType {

@@ -27,19 +27,33 @@ import {
 } from "@constants/sale";
 import { useMutation, useReactiveVar } from "@apollo/client";
 import { checkedOrderItemsVar } from "@cache/sale";
-import { filterOptionVar } from "@cache/sale/orderManagement";
+import {
+  filterOptionVar,
+  shipmentInformationVar,
+} from "@cache/sale/orderManagement";
 import { CONFIRM_ORDERITMES_BY_SELLER } from "@graphql/mutations/confirmOrderItemsBySeller";
 import {
+  CancelOrderItemsBySellerInputType,
+  CancelOrderItemsBySellerType,
   ConfirmOrderItemsBySellerInputType,
   ConfirmOrderItemsBySellerType,
+  SendOrderItemsInputType,
+  SendOrderItemsType,
 } from "@models/sale";
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import { showHasServerErrorModal } from "@cache/productManagement";
+import { SEND_ORDERITEMS } from "@graphql/mutations/sendOrderItems";
+import { CANCEL_ORDERITEMS_BY_SELLER } from "@graphql/mutations/cancelOrderItemsBySeller";
+
+import exclamationmarkSrc from "@icons/exclamationmark.svg";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
+  const { shipmentCompany, shipmentNumber } = useReactiveVar(
+    shipmentInformationVar
+  );
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const checkedOrderItemIds = checkedOrderItems.map(
     (orderItem) => orderItem.id
@@ -53,6 +67,60 @@ const Controller = () => {
       input: ConfirmOrderItemsBySellerInputType;
     }
   >(CONFIRM_ORDERITMES_BY_SELLER, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    refetchQueries: [
+      {
+        query: GET_ORDERS_BY_SELLER,
+        variables: {
+          input: {
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
+          },
+        },
+      },
+      "GetOrdersBySeller",
+    ],
+  });
+
+  const [sendOrderItems] = useMutation<
+    SendOrderItemsType,
+    {
+      input: SendOrderItemsInputType;
+    }
+  >(SEND_ORDERITEMS, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    refetchQueries: [
+      {
+        query: GET_ORDERS_BY_SELLER,
+        variables: {
+          input: {
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
+          },
+        },
+      },
+      "GetOrdersBySeller",
+    ],
+  });
+
+  const [cancelOrderItems] = useMutation<
+    CancelOrderItemsBySellerType,
+    {
+      input: CancelOrderItemsBySellerInputType;
+    }
+  >(CANCEL_ORDERITEMS_BY_SELLER, {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
@@ -92,7 +160,7 @@ const Controller = () => {
       isVisible: true,
       description: (
         <>
-          선택하신 주문을 <br /> 확인처리 하시겠습니까?{" "}
+          선택하신 주문을 <br /> 확인처리 하시겠습니까?
         </>
       ),
       confirmButtonVisibility: true,
@@ -164,6 +232,93 @@ const Controller = () => {
       );
       return;
     }
+
+    if (!shipmentCompany || !shipmentNumber) {
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        icon: exclamationmarkSrc,
+        description: <>송장정보를 기입해주세요</>,
+        cancelButtonVisibility: false,
+        confirmButtonVisibility: true,
+        confirmButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+            icon: "",
+          });
+        },
+      });
+
+      return;
+    }
+
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: (
+        <>
+          해당 주문을 <br />
+          발송처리 하시겠습니까?
+        </>
+      ),
+      cancelButtonVisibility: true,
+      confirmButtonVisibility: true,
+      confirmButtonClickHandler: () => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          (async () => {
+            loadingSpinnerVisibilityVar(true);
+            const {
+              data: {
+                sendOrderItems: { ok, error },
+              },
+            } = await sendOrderItems({
+              variables: {
+                input: {
+                  shipmentCompany,
+                  shipmentNumber,
+                  orderItemIds: checkedOrderItemIds,
+                },
+              },
+            });
+
+            if (ok) {
+              loadingSpinnerVisibilityVar(false);
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: (
+                  <>
+                    발송이 처리되었습니다
+                    <br />
+                    (배송중에서 확인 가능)
+                  </>
+                ),
+                confirmButtonVisibility: true,
+                cancelButtonVisibility: false,
+                confirmButtonClickHandler: () => {
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+
+                  checkedOrderItemsVar([]);
+                  checkAllBoxStatusVar(false);
+                },
+              });
+            }
+            if (error) {
+              loadingSpinnerVisibilityVar(false);
+              showHasServerErrorModal(error, "발송 처리");
+            }
+          })();
+        } catch (error) {
+          loadingSpinnerVisibilityVar(false);
+          showHasServerErrorModal(error as string, "발송 처리");
+        }
+      },
+    });
   };
 
   //주문취소
