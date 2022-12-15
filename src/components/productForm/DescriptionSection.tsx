@@ -28,8 +28,9 @@ const ProductDescriptionSection = () => {
         height={"120px"}
         register={register(PRODUCT_DESCRIPTION)}
         placeholder={
-          "상품에 관한 상세 설명을 작성해주세요. ‘- (대쉬)’는 ‘・(글머리 기호)’로 나옵니다."
+          "최소 100 바이트 이상 입력해주세요. ‘- (대쉬)’는 ‘・(글머리 기호)’로 나옵니다."
         }
+        maxLength={100}
       />
     </div>
   );
