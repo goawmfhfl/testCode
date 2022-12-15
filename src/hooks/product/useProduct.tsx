@@ -20,6 +20,10 @@ const useProduct = (productId: string): ProductResult => {
         productId: Number(productId),
       },
     },
+    skip: !productId,
+    onError(error) {
+      console.log("Error occurred on fetching product", error);
+    },
   });
 };
 
