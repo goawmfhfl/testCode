@@ -64,8 +64,6 @@ const ShopSetting = () => {
     error: shopError,
   } = useShopInfo();
 
-  console.log("샵데타", shopData);
-
   const hasSetStoredSettings = useRef(false);
 
   useEffect(() => {

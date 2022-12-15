@@ -290,8 +290,6 @@ const SaveBar = () => {
             },
           });
 
-          console.log("상품 수정 결과", result);
-
           if (result.data.editProduct.error) {
             systemModalVar({
               ...systemModalVar(),

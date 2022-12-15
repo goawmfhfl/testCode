@@ -152,8 +152,6 @@ const CategorySection = () => {
                   e.target.value === CategoryNames.DIFFUSER_ROOMSPRAY ||
                   e.target.value === CategoryNames.CANDLE;
 
-                console.log("인증된 샵인가?", isSafetyAuthenticated);
-
                 if (isChemicalProduct && !isSafetyAuthenticated) {
                   systemModalVar({
                     ...systemModalVar(),

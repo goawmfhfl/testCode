@@ -82,9 +82,7 @@ const RegistrationNumber = () => {
         <RegistrationPhotocopy>
           <Label>주민등록증사본</Label>
           <Attach>
-            <Label htmlFor="photocopy" onClick={() => console.log(watch())}>
-              첨부하기
-            </Label>
+            <Label htmlFor="photocopy">첨부하기</Label>
             <PhotocopyInput
               id="photocopy"
               type="file"
