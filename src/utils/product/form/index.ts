@@ -71,7 +71,7 @@ export function getRequiredOptions(formContext: UseFormReturn) {
 
   const { optionHeaders, optionRows } = requiredOptionVar().adaptedOption;
 
-  const requiredOptions = optionRows.map(({ id, option }) => {
+  const requiredOptions = optionRows.map(({ id, option }, index) => {
     const components = option.map((value, index) => ({
       name: optionHeaders[index].header,
       value,
@@ -81,6 +81,7 @@ export function getRequiredOptions(formContext: UseFormReturn) {
     const optionPrice = watch(`optionPrice-${id}`) as number;
 
     return {
+      index,
       components,
       quantity: optionStock,
       price: optionPrice,
@@ -96,7 +97,7 @@ export function getSelectiveOptions(formContext: UseFormReturn) {
 
   const { optionHeaders, optionRows } = selectiveOptionVar().adaptedOption;
 
-  const selectiveOptions = optionRows.map(({ id, option }) => {
+  const selectiveOptions = optionRows.map(({ id, option }, index) => {
     const components = option.map((value, index) => ({
       name: optionHeaders[index].header,
       value,
@@ -106,6 +107,7 @@ export function getSelectiveOptions(formContext: UseFormReturn) {
     const optionPrice = watch(`optionPrice-${id}`) as number;
 
     return {
+      index,
       components,
       quantity: optionStock,
       price: optionPrice,
@@ -119,8 +121,9 @@ export function getSelectiveOptions(formContext: UseFormReturn) {
 export function getTagInfos(): Array<{ name: string; isExposed: boolean }> {
   const tagList = tagListVar();
 
-  const tagInfos = tagList.map(({ tagName, type }) => {
+  const tagInfos = tagList.map(({ tagName, type }, index) => {
     return {
+      index,
       name: tagName,
       isExposed: type === TagTypes.Exposed ? true : false,
     };

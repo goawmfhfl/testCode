@@ -41,6 +41,7 @@ export const GET_PRODUCTS_BY_ID = gql`
 
         options {
           id
+          index
           isRequired
           components {
             name
@@ -87,6 +88,7 @@ export const GET_PRODUCTS_BY_ID = gql`
         }
         productToTags {
           id
+          index
           isExposed
           tag {
             id

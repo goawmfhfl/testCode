@@ -106,18 +106,22 @@ const setProduct = (
     setValue(HAS_TAG_INFOS, true);
 
     tagListVar(
-      productToTags.map(({ isExposed, tag }) => {
-        return {
-          id: uuidv4(),
-          tagName: tag.name,
-          type: isExposed ? TagTypes.Exposed : TagTypes.SearchOnly,
-        } as SearchTag;
-      })
+      productToTags
+        .sort((a, b) => a.index - b.index)
+        .map(({ isExposed, tag }) => {
+          return {
+            id: uuidv4(),
+            tagName: tag.name,
+            type: isExposed ? TagTypes.Exposed : TagTypes.SearchOnly,
+          } as SearchTag;
+        })
     );
   }
 
   if (options && options.length) {
-    const requiredOptions = options.filter((ops) => ops.isRequired);
+    const sortedOptions = options.sort((a, b) => a.index - b.index);
+
+    const requiredOptions = sortedOptions.filter((ops) => ops.isRequired);
 
     if (requiredOptions.length) {
       setValue(HAS_REQUIRED_OPTION, true);
@@ -149,7 +153,7 @@ const setProduct = (
       });
     }
 
-    const selectiveOptions = options.filter((ops) => !ops.isRequired);
+    const selectiveOptions = sortedOptions.filter((ops) => !ops.isRequired);
 
     if (selectiveOptions.length) {
       setValue(HAS_SELECTIVE_OPTION, true);

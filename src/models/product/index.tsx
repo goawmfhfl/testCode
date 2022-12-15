@@ -143,6 +143,7 @@ export interface CreateProductInputType {
 }
 
 export interface OptionCombination {
+  index: number;
   components: Array<{ name: string; value: string }>;
   price: number;
   quantity: number;
@@ -197,6 +198,7 @@ export interface ProductType {
 
   productToTags?: Array<{
     id: number;
+    index: number;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date;
