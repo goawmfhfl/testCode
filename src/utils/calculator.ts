@@ -19,3 +19,12 @@ export function getDiscountedPrice(
 
   return discountedPrice;
 }
+
+export function getAverageWidth(
+  columnWidth: number,
+  tableWidth: number
+): number {
+  const result = Number(String((columnWidth / tableWidth) * 100).slice(0, 5));
+
+  return result;
+}

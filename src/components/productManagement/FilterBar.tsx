@@ -16,7 +16,7 @@ import { getProductLength } from "@utils/product/management";
 import questionMarkSrc from "@icons/questionmark.svg";
 
 import Button from "@components/common/Button";
-import FilterBarContainer from "@components/order/FilterBarContainer";
+import FilterBarContainer from "@components/sale/FilterBarContainer";
 
 const FilterBar = () => {
   const navigate = useNavigate();

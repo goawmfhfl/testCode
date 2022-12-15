@@ -1,6 +1,6 @@
 import React from "react";
 import { ApolloError, makeVar } from "@apollo/client";
-import { SkipQuantityCacheType } from "@models/order/index";
+import { SkipQuantityCacheType } from "@models/sale/index";
 import { CommonFilterOptionType } from "@models/index";
 
 import {

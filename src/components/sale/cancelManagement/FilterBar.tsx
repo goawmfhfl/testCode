@@ -2,32 +2,27 @@ import { useEffect } from "react";
 import styled from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
-import { filterOptionVar } from "@cache/order/orderManagement";
+import { filterOptionVar } from "@cache/sale/orderManagement";
 import {
   commonFilterOptionVar,
   paginationSkipVar,
   totalPageLengthVar,
 } from "@cache/index";
 
-import { orderStatusType } from "@constants/order/index";
-
 import useLazyAllOrderStatus from "@hooks/order/useLazyAllOrderStatus";
 
-import {
-  OrderStatusGroup,
-  OrderStatusName,
-} from "@models/order/orderManagement";
+import { OrderStatusGroup, OrderStatusName } from "@models/sale";
 
-import { OrderStatusType } from "@models/order/orderManagement";
+import { OrderStatusType } from "@models/sale";
 
-import FilterBarContainer from "@components/order/FilterBarContainer";
+import FilterBarContainer from "@components/sale/FilterBarContainer";
 import Button from "@components/common/Button";
 
 const FilterBar = () => {
   const { data, getAllOrderStatus } = useLazyAllOrderStatus();
+
   const { statusName } = useReactiveVar(filterOptionVar);
   const totalPageLength = useReactiveVar(totalPageLengthVar);
-
   const orders = data?.getOrdersBySeller.totalOrderItems || [];
 
   const ordersLength = {
@@ -97,33 +92,19 @@ const FilterBar = () => {
         isActvie={statusName === null}
         onClick={handleFilterOptionNameClick(null)}
       >
-        {orderStatusType.ALL} {allOrders}
+        전체 {allOrders}
       </Filter>
       <Filter
         isActvie={statusName === OrderStatusName.PAYMENT_COMPLETED}
         onClick={handleFilterOptionNameClick(OrderStatusName.PAYMENT_COMPLETED)}
       >
-        {orderStatusType.NEW} {paymentCompleted}
+        취소요청 {paymentCompleted}
       </Filter>
       <Filter
         isActvie={statusName === OrderStatusName.PREPARING}
         onClick={handleFilterOptionNameClick(OrderStatusName.PREPARING)}
       >
-        {orderStatusType.PREPARING} {preparing}
-      </Filter>
-      <Filter
-        isActvie={statusName === OrderStatusName.SHIPPING}
-        onClick={handleFilterOptionNameClick(OrderStatusName.SHIPPING)}
-      >
-        {orderStatusType.SHIPPING} {shipping}
-      </Filter>
-      <Filter
-        isActvie={statusName === OrderStatusName.SHIPPING_COMPLETED}
-        onClick={handleFilterOptionNameClick(
-          OrderStatusName.SHIPPING_COMPLETED
-        )}
-      >
-        {orderStatusType.SHIPPING_COMPLETED} {shippingCompleted}
+        취소완료 {preparing}
       </Filter>
     </FilterBarContainer>
   );

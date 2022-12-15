@@ -4,7 +4,7 @@ import {
   OrderStatusGroup,
   OrderStatusName,
   OrderStatusType,
-} from "@models/order/orderManagement";
+} from "@models/sale";
 
 export interface GetOrdersBySellerInputType {
   input: {

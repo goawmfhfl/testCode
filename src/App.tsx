@@ -14,7 +14,7 @@ import ShopSetting from "@pages/ShopSetting";
 import ProductManagement from "@pages/product/index";
 import ProductRegistration from "@pages/product/Registration";
 import ProductModification from "@pages/product/Modification";
-import Order from "@pages/Order";
+import Sale from "@pages/Sale";
 import Inquiry from "@pages/Inquiry";
 import Settlement from "@pages/Settlement";
 import Notice from "@pages/Notice";
@@ -51,7 +51,7 @@ function App() {
             path={`${Pathnames.Product}/:productId`}
             element={<ProductModification />}
           />
-          <Route path={Pathnames.Order} element={<Order />} />
+          <Route path={Pathnames.Order} element={<Sale />} />
           <Route path={Pathnames.Inquiry} element={<Inquiry />} />
           <Route path={Pathnames.Settlement} element={<Settlement />} />
           <Route path={Pathnames.Notice} element={<Notice />} />

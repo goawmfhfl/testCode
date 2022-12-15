@@ -1,20 +1,12 @@
 export const SEND_EXCEL = "내보내기";
 export const SEND_ALL_EXCEL = "전체 내역 내보내기";
 
-export enum OrderStatusType {
-  NEW = "NEW",
-  PREPARING = "PREPARING",
-  SHIPPING = "SHIPPING",
-  SHIPPING_COMPLETED = "SHIPPING_COMPLETED",
+export enum SaleMenuStatusType {
+  ORDER = "ORDER",
+  CANCEL = "CANCEL",
+  EXCHANGE = "EXCHANGE",
+  REFUND = "REFUND",
 }
-
-export const orderStatusType = {
-  ALL: "전체",
-  NEW: "새주문",
-  PREPARING: "상품준비중",
-  SHIPPING: "배송중",
-  SHIPPING_COMPLETED: "배송완료",
-};
 
 export const claimStatusType = {
   CONFIRM_PURCHASE: "구매 확인",

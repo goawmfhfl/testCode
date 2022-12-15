@@ -9,7 +9,7 @@ import {
   OptionInput as Option,
 } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
-import ControllerContainer from "@components/order/ControllerContainer";
+import ControllerContainer from "@components/sale/ControllerContainer";
 
 import {
   commonFilterOptionVar,
@@ -21,10 +21,10 @@ import {
   searchQueryType,
   OrderSearchType,
   OrderStatusType,
-} from "@models/order/orderManagement";
+} from "@models/sale";
 import { useReactiveVar } from "@apollo/client";
-import { checkedOrderIdsVar } from "@cache/order";
-import { filterOptionVar } from "@cache/order/orderManagement";
+import { checkedOrderIdsVar } from "@cache/sale";
+import { filterOptionVar } from "@cache/sale/orderManagement";
 
 const Controller = () => {
   const checkedOrderIds = useReactiveVar(checkedOrderIdsVar);

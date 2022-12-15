@@ -3,17 +3,10 @@ import { useReactiveVar } from "@apollo/client";
 import { TableType } from "@models/index";
 
 import {
-  fixedTableType,
+  fixTableType,
   scrollTableType,
-  orderCodeType,
-  orderProductType,
-  orderStatusType,
-  PAYMENT_DAY,
-  recipientType,
-  sellerType,
-  shipmentType,
   tableWidth,
-} from "@constants/order/orderManagement";
+} from "@constants/sale/orderManagement/table";
 
 import useLazyOrders from "@hooks/order/useLazyOrders";
 
@@ -29,26 +22,23 @@ import {
 } from "@components/common/table/Table";
 import Checkbox from "@components/common/input/Checkbox";
 import NoDataContainer from "@components/common/table/NoDataContainer";
-import { filterOptionVar } from "@cache/order/orderManagement";
+import { filterOptionVar } from "@cache/sale/orderManagement";
 import {
   commonFilterOptionVar,
   systemModalVar,
   totalPageLengthVar,
 } from "@cache/index";
 
-import {
-  NormalizedListType,
-  caculatedOrderItemType,
-} from "@models/order/orderManagement";
+import { NormalizedListType, ResetOrderItemType } from "@models/sale";
 
-import caculateOrderItem from "@utils/order/caculateOrderItem";
-import contructOrderItem from "@utils/order/contructOrderItem";
+import resetOrderItems from "@utils/sale/resetOrderItems";
+import contructOrderItem from "@utils/sale/contructOrderItem";
 import {
   checkAllBoxStatusVar,
   pageNumberListVar,
   paginationVisibilityVar,
 } from "@cache/index";
-import { checkedOrderIdsVar } from "@cache/order";
+import { checkedOrderIdsVar } from "@cache/sale";
 import { OrderItemsType } from "@graphql/queries/getOrdersBySeller";
 import Loading from "@components/common/table/Loading";
 
@@ -58,9 +48,7 @@ const OrderTable = () => {
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
-  const [orderItems, setOrderItems] = useState<Array<caculatedOrderItemType>>(
-    []
-  );
+  const [orderItems, setOrderItems] = useState<Array<ResetOrderItemType>>([]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -116,9 +104,10 @@ const OrderTable = () => {
     const nomalizedOrderItem: NormalizedListType =
       contructOrderItem(totalOrderItems);
 
-    const caculatedOrderItem: Array<caculatedOrderItemType> =
-      caculateOrderItem(nomalizedOrderItem);
-    setOrderItems(caculatedOrderItem);
+    const orderItems: Array<ResetOrderItemType> =
+      resetOrderItems(nomalizedOrderItem);
+
+    setOrderItems(orderItems);
 
     checkedOrderIdsVar([]);
     checkAllBoxStatusVar(false);
@@ -167,39 +156,35 @@ const OrderTable = () => {
     <TableContainer type={TableType.SCROLL} hasData={hasOrderItems}>
       <FixedTable width={tableWidth.left}>
         <ThContainer>
-          <Th width={fixedTableType[0].width}>
+          <Th width={fixTableType[0].width}>
             <Checkbox />
           </Th>
-          <Th width={fixedTableType[1].width}>
-            {orderCodeType.MERCHANTITEM_UID}
-          </Th>
-          <Th width={fixedTableType[2].width}>{orderCodeType.PRODUCT_CODE}</Th>
-          <Th width={fixedTableType[3].width}>
-            {orderProductType.ORDER_PRODUCT}
-          </Th>
-          <Th width={fixedTableType[4].width}>{sellerType.NAME}</Th>
-          <Th width={fixedTableType[5].width}>{orderStatusType.ORDER}</Th>
+          <Th width={fixTableType[1].width}>{fixTableType[1].label}</Th>
+          <Th width={fixTableType[2].width}>{fixTableType[2].label}</Th>
+          <Th width={fixTableType[3].width}>{fixTableType[3].label}</Th>
+          <Th width={fixTableType[4].width}>{fixTableType[4].label}</Th>
+          <Th width={fixTableType[5].width}>{fixTableType[5].label}</Th>
         </ThContainer>
         <TdContainer>
           {hasOrderItems &&
             orderItems.map(
               ({
-                orderId,
-                merchantitemUid,
+                id,
+                merchantItemUid,
                 productCode,
                 orderProduct,
-                sellerName,
-                orderState,
+                userName,
+                orderStatus,
               }) => (
-                <Tr key={orderId}>
-                  <Td width={fixedTableType[0].width}>
+                <Tr key={id}>
+                  <Td width={fixTableType[0].width}>
                     <Checkbox />
                   </Td>
-                  <Td width={fixedTableType[1].width}>{merchantitemUid}</Td>
-                  <Td width={fixedTableType[2].width}>{productCode}</Td>
-                  <Td width={fixedTableType[3].width}>{orderProduct}</Td>
-                  <Td width={fixedTableType[4].width}>{sellerName}</Td>
-                  <Td width={fixedTableType[5].width}>{orderState}</Td>
+                  <Td width={fixTableType[1].width}>{merchantItemUid}</Td>
+                  <Td width={fixTableType[2].width}>{productCode}</Td>
+                  <Td width={fixTableType[3].width}>{orderProduct}</Td>
+                  <Td width={fixTableType[4].width}>{userName}</Td>
+                  <Td width={fixTableType[5].width}>{orderStatus}</Td>
                 </Tr>
               )
             )}
@@ -207,57 +192,42 @@ const OrderTable = () => {
       </FixedTable>
       <ScrollTable width={tableWidth.right}>
         <ThContainer>
-          <Th width={scrollTableType[0].width}>{orderStatusType.CLAIM}</Th>
-          <Th width={scrollTableType[1].width}>{shipmentType.COURIER}</Th>
-          <Th width={scrollTableType[2].width}>
-            {shipmentType.INVOICE_NUMBER}
-          </Th>
-          <Th width={scrollTableType[3].width}>{PAYMENT_DAY}</Th>
-          <Th width={scrollTableType[4].width}>{recipientType.NAME}</Th>
-          <Th width={scrollTableType[5].width}>{recipientType.PHONE_NUMBER}</Th>
-
-          <Th width={scrollTableType[6].width}>{recipientType.ADDRESS}</Th>
-
-          <Th width={scrollTableType[7].width}>{recipientType.POST_CODE}</Th>
-
-          <Th width={scrollTableType[8].width}>
-            {recipientType.SHIPMENT_MEMO}
-          </Th>
-          <Th width={scrollTableType[9].width}>{sellerType.ID}</Th>
-          <Th width={scrollTableType[10].width}>{sellerType.PHONE_NUMBER}</Th>
-          <Th width={scrollTableType[11].width}>{orderProductType.OPTION}</Th>
-          <Th width={scrollTableType[12].width}>{orderProductType.QUANTITY}</Th>
-          <Th width={scrollTableType[13].width}>{orderProductType.PRICE}</Th>
-          <Th width={scrollTableType[14].width}>
-            {orderProductType.OPTION_PRICE}
-          </Th>
-          <Th width={scrollTableType[15].width}>
-            {orderProductType.TOTAL_PRICE}
-          </Th>
-          <Th width={scrollTableType[16].width}>
-            {shipmentType.SHIPMENT_PRICE}
-          </Th>
-          <Th width={scrollTableType[17].width}>
-            {shipmentType.SHIPMENT_DISTANT_PRICE}
-          </Th>
+          <Th width={scrollTableType[0].width}>{scrollTableType[0].label}</Th>
+          <Th width={scrollTableType[1].width}>{scrollTableType[1].label}</Th>
+          <Th width={scrollTableType[2].width}>{scrollTableType[2].label}</Th>
+          <Th width={scrollTableType[3].width}>{scrollTableType[3].label}</Th>
+          <Th width={scrollTableType[4].width}>{scrollTableType[4].label}</Th>
+          <Th width={scrollTableType[5].width}>{scrollTableType[5].label}</Th>
+          <Th width={scrollTableType[6].width}>{scrollTableType[6].label}</Th>
+          <Th width={scrollTableType[7].width}>{scrollTableType[7].label}</Th>
+          <Th width={scrollTableType[8].width}>{scrollTableType[8].label}</Th>
+          <Th width={scrollTableType[9].width}>{scrollTableType[9].label}</Th>
+          <Th width={scrollTableType[10].width}>{scrollTableType[10].label}</Th>
+          <Th width={scrollTableType[11].width}>{scrollTableType[11].label}</Th>
+          <Th width={scrollTableType[12].width}>{scrollTableType[12].label}</Th>
+          <Th width={scrollTableType[13].width}>{scrollTableType[13].label}</Th>
+          <Th width={scrollTableType[14].width}>{scrollTableType[14].label}</Th>
+          <Th width={scrollTableType[15].width}>{scrollTableType[15].label}</Th>
+          <Th width={scrollTableType[16].width}>{scrollTableType[16].label}</Th>
+          <Th width={scrollTableType[17].width}>{scrollTableType[17].label}</Th>
         </ThContainer>
 
         <TdContainer>
           {hasOrderItems &&
             orderItems.map(
               ({
-                orderId,
-                claimState,
+                id,
+                claimStatus,
                 courier,
                 invoiceNumber,
-                paymentDay,
+                payments,
                 recipientName,
                 recipientPhoneNumber,
-                address,
+                recipientAddress,
                 postCode,
                 shipmentMemo,
-                sellerId,
-                sellerPhoneNumber,
+                userEmail,
+                userPhoneNumber,
                 option,
                 quantity,
                 price,
@@ -266,20 +236,20 @@ const OrderTable = () => {
                 shipmentPrice,
                 shipmentDistantPrice,
               }) => (
-                <Tr key={orderId}>
-                  <Td width={scrollTableType[0].width}>{claimState}</Td>
+                <Tr key={id}>
+                  <Td width={scrollTableType[0].width}>{claimStatus}</Td>
                   <Td width={scrollTableType[1].width}>{courier}</Td>
                   <Td width={scrollTableType[2].width}>{invoiceNumber}</Td>
-                  <Td width={scrollTableType[3].width}>{paymentDay}</Td>
+                  <Td width={scrollTableType[3].width}>{payments}</Td>
                   <Td width={scrollTableType[4].width}>{recipientName}</Td>
                   <Td width={scrollTableType[5].width}>
                     {recipientPhoneNumber}
                   </Td>
-                  <Td width={scrollTableType[6].width}>{address}</Td>
+                  <Td width={scrollTableType[6].width}>{recipientAddress}</Td>
                   <Td width={scrollTableType[7].width}>{postCode}</Td>
                   <Td width={scrollTableType[8].width}>{shipmentMemo}</Td>
-                  <Td width={scrollTableType[9].width}>{sellerId}</Td>
-                  <Td width={scrollTableType[10].width}>{sellerPhoneNumber}</Td>
+                  <Td width={scrollTableType[9].width}>{userEmail}</Td>
+                  <Td width={scrollTableType[10].width}>{userPhoneNumber}</Td>
                   <Td width={scrollTableType[11].width}>{option}</Td>
                   <Td width={scrollTableType[12].width}>{quantity}</Td>
                   <Td width={scrollTableType[13].width}>{price}</Td>

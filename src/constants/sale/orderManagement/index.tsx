@@ -1,0 +1,6 @@
+export enum OrderStatusType {
+  NEW = "NEW",
+  PREPARING = "PREPARING",
+  SHIPPING = "SHIPPING",
+  SHIPPING_COMPLETED = "SHIPPING_COMPLETED",
+}
