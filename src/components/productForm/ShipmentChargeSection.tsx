@@ -280,9 +280,7 @@ const ShipmentChargeSection = () => {
             <TextInputWrapper>
               <TextInput
                 width="138px"
-                register={register(SHIPMENT_PRICE, {
-                  valueAsNumber: true,
-                })}
+                register={register(SHIPMENT_PRICE)}
                 placeholder={"숫자만 입력"}
                 numbersOnly={true}
                 disabled={hasTemplateSelected || isShipmentChargeFree}
