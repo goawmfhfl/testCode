@@ -15,6 +15,7 @@ import {
   checkAllBoxStatusVar,
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
+  modalVar,
   paginationSkipVar,
   showHasAnyProblemModal,
   SkipQuantityCache,
@@ -26,7 +27,7 @@ import {
   OrderStatusType,
 } from "@constants/sale";
 import { useMutation, useReactiveVar } from "@apollo/client";
-import { checkedOrderItemsVar } from "@cache/sale";
+import { checkedOrderItemsVar, reasonVar } from "@cache/sale";
 import {
   filterOptionVar,
   shipmentInformationVar,
@@ -41,11 +42,13 @@ import {
   SendOrderItemsType,
 } from "@models/sale";
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
-import { showHasServerErrorModal } from "@cache/productManagement";
 import { SEND_ORDERITEMS } from "@graphql/mutations/sendOrderItems";
 import { CANCEL_ORDERITEMS_BY_SELLER } from "@graphql/mutations/cancelOrderItemsBySeller";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
+import { showHasServerErrorModal } from "@cache/productManagement";
+import AskReasonModal from "@components/common/AskReasonModal";
+import { optionListType } from "@constants/sale/orderManagement";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -54,6 +57,8 @@ const Controller = () => {
   const { shipmentCompany, shipmentNumber } = useReactiveVar(
     shipmentInformationVar
   );
+  const reason = useReactiveVar(reasonVar);
+
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const checkedOrderItemIds = checkedOrderItems.map(
     (orderItem) => orderItem.id
@@ -142,7 +147,7 @@ const Controller = () => {
     ],
   });
 
-  // 주문확인
+  //주문확인
   const handleConfirmOrderButtonClick = () => {
     if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
@@ -333,6 +338,79 @@ const Controller = () => {
       );
       return;
     }
+
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: <>취소처리 하시겠습니까?</>,
+      confirmButtonVisibility: true,
+      cancelButtonVisibility: true,
+      confirmButtonClickHandler: () => {
+        modalVar({
+          isVisible: true,
+          component: (
+            <AskReasonModal
+              option={optionListType}
+              handleSubmitButtonClick={() => {
+                try {
+                  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                  (async () => {
+                    loadingSpinnerVisibilityVar(true);
+                    const {
+                      data: {
+                        cancelOrderItemsBySeller: { ok, error },
+                      },
+                    } = await cancelOrderItems({
+                      variables: {
+                        input: {
+                          reason,
+                          orderItemIds: checkedOrderItemIds,
+                        },
+                      },
+                    });
+
+                    if (ok) {
+                      loadingSpinnerVisibilityVar(false);
+                      systemModalVar({
+                        ...systemModalVar(),
+                        isVisible: true,
+                        description: (
+                          <>
+                            선택하신 주문이
+                            <br />
+                            취소 완료되었습니다.
+                            <br />
+                            (취소관리 - 취소완료에서 확인 가능)
+                          </>
+                        ),
+                        confirmButtonVisibility: true,
+                        cancelButtonVisibility: false,
+                        confirmButtonClickHandler: () => {
+                          systemModalVar({
+                            ...systemModalVar(),
+                            isVisible: false,
+                          });
+
+                          checkedOrderItemsVar([]);
+                          checkAllBoxStatusVar(false);
+                        },
+                      });
+                    }
+                    if (error) {
+                      loadingSpinnerVisibilityVar(false);
+                      showHasServerErrorModal(error, "주문 취소");
+                    }
+                  })();
+                } catch (error) {
+                  loadingSpinnerVisibilityVar(false);
+                  showHasServerErrorModal(error as string, "주문 취소");
+                }
+              }}
+            />
+          ),
+        });
+      },
+    });
   };
 
   //반품처리

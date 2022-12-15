@@ -7,3 +7,4 @@ export const saleMenuStatusVar = makeVar<SaleMenuStatusType>(
 );
 
 export const checkedOrderItemsVar = makeVar<Array<ResetOrderItemType>>([]);
+export const reasonVar = makeVar<string>("");
