@@ -2,12 +2,12 @@ import styled from "styled-components/macro";
 import { useFormContext } from "react-hook-form";
 
 import NoticeContainer from "@components/common/NoticeContainer";
-import TextInput from "@components/common/input/TextInput";
+import { Input as TextInput } from "@components/common/input/TextInput";
 import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import { TITLE } from "@cache/productForm/index";
 
 const ProductName = () => {
-  const { register, watch } = useFormContext();
+  const { register, watch, setValue } = useFormContext();
 
   const title = watch(TITLE) as string;
 
@@ -22,7 +22,31 @@ const ProductName = () => {
       </NoticeContainer>
 
       <TextInputWrapper>
-        <TextInput register={register(TITLE)} width={"689px"} maxLength={100} />
+        <TextInput
+          {...register(TITLE)}
+          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+            const regex = /[{}[\]/?.,;:|)*~`!^\-_+<>@#$%&\\=('"]/g;
+
+            const hasSpecialChars = regex.test(e.key);
+
+            if (hasSpecialChars) {
+              e.preventDefault();
+
+              return;
+            }
+          }}
+          onCompositionEnd={(e: React.CompositionEvent<HTMLInputElement>) => {
+            const previousValue = watch(TITLE) as string;
+
+            const regex = /[{}[\]/?.,;:|)*~`!^\-_+<>@#$%&\\=('"]/g;
+
+            if (regex.test(e.data)) {
+              setValue(TITLE, previousValue.slice(0, previousValue.length - 1));
+            }
+          }}
+          width={"689px"}
+          maxLength={100}
+        />
         <TextLength>{title?.length}/100</TextLength>
       </TextInputWrapper>
     </Container>
