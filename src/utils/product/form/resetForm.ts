@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { UseFormReset } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import { ProductFormValues } from "@models/product/index";
 
 import {
@@ -19,9 +19,26 @@ import {
   selectiveOptionVar,
 } from "@cache/productForm/productOptions";
 import { tagListVar } from "@cache/productForm/searchTag";
+import {
+  IS_BUNDLE_SHIPMENT,
+  LEAD_TIME_MAX,
+  LEAD_TIME_MIN,
+  PRODUCT_PRICE,
+  PRODUCT_STOCK,
+  SHIPMENT_TEMPLATE_ID,
+} from "@cache/productForm";
 
-export default function resetForm(reset: UseFormReset<ProductFormValues>) {
+export default function resetForm({
+  reset,
+  setValue,
+}: UseFormReturn<ProductFormValues, any>) {
   reset();
+  setValue(IS_BUNDLE_SHIPMENT, "가능");
+  setValue(SHIPMENT_TEMPLATE_ID, null);
+  setValue(LEAD_TIME_MIN, null);
+  setValue(LEAD_TIME_MAX, null);
+  setValue(PRODUCT_PRICE, null);
+  setValue(PRODUCT_STOCK, null);
 
   initializeProductImages();
   initializeOptionalImages();

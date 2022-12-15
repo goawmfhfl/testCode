@@ -9,7 +9,7 @@ const ProductRegistration = () => {
   const methods = useForm<ProductFormValues>();
 
   useEffect(() => {
-    resetForm(methods.reset);
+    resetForm(methods);
   }, []);
 
   return (

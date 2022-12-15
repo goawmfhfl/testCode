@@ -84,7 +84,7 @@ export default function restructureProductRegistrationStates(
     max: Number(leadTimeMax),
   };
 
-  const shipmentId = watch(SHIPMENT_TEMPLATE_ID) as string;
+  const shipmentId = watch(SHIPMENT_TEMPLATE_ID) as number;
   const isBundleShipment = watch(IS_BUNDLE_SHIPMENT) as string;
   const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
   const shipmentPrice = watch(SHIPMENT_PRICE) as string;
