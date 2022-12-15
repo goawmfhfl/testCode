@@ -1,15 +1,11 @@
 import { makeVar } from "@apollo/client";
-import { OrderStatusType } from "@models/sale";
+import { OrderStatusType, OrderStatusGroup } from "@constants/sale";
 
-import {
-  OrderStatusGroup,
-  FilterOptionVarType,
-  OrderStatusName,
-} from "@models/sale";
+import { FilterOptionVarType } from "@models/sale";
 
 export const filterOptionVar = makeVar<FilterOptionVarType>({
   type: null,
-  statusName: OrderStatusName.PAYMENT_COMPLETED,
+  statusName: null,
   statusType: OrderStatusType.ORDER,
   statusGroup: OrderStatusGroup.ORDER,
 });

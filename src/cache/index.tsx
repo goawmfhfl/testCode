@@ -1,6 +1,6 @@
 import React from "react";
 import { ApolloError, makeVar } from "@apollo/client";
-import { SkipQuantityCacheType } from "@models/sale/index";
+import { SkipQuantityType } from "@models/sale/index";
 import { CommonFilterOptionType } from "@models/index";
 
 import {
@@ -141,14 +141,14 @@ export const sectionFulfillmentVar = makeVar<{ [key: string]: boolean }>(
   sectionFulfillmentInitialValue
 );
 
-export const SkipQuantityCache: Array<SkipQuantityCacheType> = [
+export const SkipQuantityCache: Array<SkipQuantityType> = [
   { id: 0, label: "20개씩 보기", value: 20 },
   { id: 1, label: "50개씩 보기", value: 50 },
   { id: 2, label: "100개씩 보기", value: 100 },
 ];
 
 export const SkipQuantityCacheVar =
-  makeVar<Array<SkipQuantityCacheType>>(SkipQuantityCache);
+  makeVar<Array<SkipQuantityType>>(SkipQuantityCache);
 
 export const showHasAnyProblemModal = (description: React.ReactNode) => {
   return systemModalVar({

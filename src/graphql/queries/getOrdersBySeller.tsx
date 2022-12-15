@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
 import {
-  OrderSearchType,
   OrderStatusGroup,
   OrderStatusName,
   OrderStatusType,
-} from "@models/sale";
+} from "@constants/sale";
+import { OrderSearchType } from "@constants/sale";
 
 export interface GetOrdersBySellerInputType {
   input: {

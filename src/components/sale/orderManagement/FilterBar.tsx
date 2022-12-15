@@ -11,9 +11,11 @@ import {
 
 import useLazyAllOrderStatus from "@hooks/order/useLazyAllOrderStatus";
 
-import { OrderStatusGroup, OrderStatusName } from "@models/sale";
-
-import { OrderStatusType } from "@models/sale";
+import {
+  OrderStatusType,
+  OrderStatusGroup,
+  OrderStatusName,
+} from "@constants/sale";
 
 import FilterBarContainer from "@components/sale/FilterBarContainer";
 import Button from "@components/common/Button";

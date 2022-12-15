@@ -21,7 +21,7 @@ import {
   searchQueryType,
   OrderSearchType,
   OrderStatusType,
-} from "@models/sale";
+} from "@constants/sale";
 import { useReactiveVar } from "@apollo/client";
 import { checkedOrderIdsVar } from "@cache/sale";
 import { filterOptionVar } from "@cache/sale/orderManagement";

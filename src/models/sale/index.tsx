@@ -1,31 +1,15 @@
+import {
+  OrderSearchType,
+  OrderStatusGroup,
+  OrderStatusName,
+  OrderStatusType,
+} from "@constants/sale";
 import { OrderItemsType } from "@graphql/queries/getOrdersBySeller";
 
-export interface SkipQuantityCacheType {
+export interface SkipQuantityType {
   id: number;
   label: string;
   value: number;
-}
-
-export enum OrderStatus {
-  NEW = "NEW",
-  PREPARING = "PREPARING",
-  SHIPPING = "SHIPPING",
-  SHIPPING_COMPLETED = "SHIPPING_COMPLETED",
-  CONFIRM_PURCHASE = "CONFIRM_PURCHASE",
-  CANCEL_REQUEST = "CANCEL_REQUEST",
-  CANCEL_REFUSAL = "CANCEL_REFUSAL",
-  CANCEL_COMPLETED = "CANCEL_COMPLETED",
-  REFUND_REQUEST = "REFUND_REQUEST",
-  REFUND_REFUSAL = "REFUND_REFUSAL",
-  REFUND_COMPLETED = "REFUND_COMPLETED",
-  REFUND_PICK_UP_ING = "REFUND_PICK_UP_ING",
-  REFUND_PICK_UP_COMPLETED = "REFUND_PICK_UP_COMPLETED",
-  EXCHANGE_REQUEST = "EXCHANGE_REQUEST",
-  EXCHANGE_REFUSAL = "EXCHANGE_REFUSAL",
-  EXCHANGE_COMPLETED = "EXCHANGE_COMPLETED",
-  EXCHANGE_PICK_UP_ING = "EXCHANGE_PICK_UP_ING",
-  EXCHANGE_PICK_UP_COMPLETED = "EXCHANGE_PICK_UP_COMPLETED",
-  EXCHANGE_ING = "EXCHANGE_ING",
 }
 
 export interface FilterOptionVarType {
@@ -35,66 +19,11 @@ export interface FilterOptionVarType {
   statusGroup: OrderStatusGroup;
 }
 
-export enum OrderStatusGroup {
-  ORDER = "ORDER",
-  CANCEL = "CANCEL",
-  REFUND = "REFUND",
-  EXCHANGE = "EXCHANGE",
-}
-
-export enum OrderStatusType {
-  ORDER = "ORDER",
-  CLAIM = "CLAIM",
-}
-
-export enum OrderSearchType {
-  RECIPIENT_NAME = "RECIPIENT_NAME",
-  RECIPIENT_PHONE_NUMBER = "RECIPIENT_PHONE_NUMBER",
-  MERCHANT_UID = "MERCHANT_UID",
-}
-
-export enum OrderStatusName {
-  PAYMENT_COMPLETED = "PAYMENT_COMPLETED",
-  PREPARING = "PREPARING",
-  SHIPPING = "SHIPPING",
-  SHIPPING_COMPLETED = "SHIPPING_COMPLETED",
-  CANCEL_REQUEST = "CANCEL_REQUEST",
-  CANCEL_COMPLETED = "CANCEL_COMPLETED",
-  CANCEL_ERROR = "CANCEL_ERROR",
-  CANCEL_REFUSAL = "CANCEL_REFUSAL",
-  REFUND_REQUEST = "REFUND_REQUEST",
-  REFUND_PICK_UP_IN_PROGRESS = "REFUND_PICK_UP_IN_PROGRESS",
-  REFUND_PICK_UP_COMPLETED = "REFUND_PICK_UP_COMPLETED",
-  REFUND_COMPLETED = "REFUND_COMPLETED",
-  REFUND_REFUSAL = "REFUND_REFUSAL",
-  REFUND_ERROR = "REFUND_ERROR",
-  EXCHANGE_REQUEST = "EXCHANGE_REQUEST",
-  EXCHANGE_PICK_UP_IN_PROGRESS = "EXCHANGE_PICK_UP_IN_PROGRESS",
-  EXCHANGE_PICK_UP_COMPLETED = "EXCHANGE_PICK_UP_COMPLETED",
-  SHIPPING_AGAIN = "SHIPPING_AGAIN",
-  EXCHANGE_COMPLETED = "EXCHANGE_COMPLETED",
-  EXCHANGE_REFUSAL = "EXCHANGE_REFUSAL",
-  EXCHANGE_ERROR = "EXCHANGE_ERROR",
-  CONFIRM_PURCHASE = "CONFIRM_PURCHASE",
-  PICK_UP_IN_PROGRESS = "PICK_UP_IN_PROGRESS",
-  PICK_UP_COMPLETED = "PICK_UP_COMPLETED",
-}
-
 export interface SearchQueryType {
   id: number;
   label: string;
   value: string;
 }
-
-export const searchQueryType: Array<SearchQueryType> = [
-  { id: 0, label: "구매자명", value: OrderSearchType.RECIPIENT_NAME },
-  {
-    id: 1,
-    label: "구매자 전화번호",
-    value: OrderSearchType.RECIPIENT_PHONE_NUMBER,
-  },
-  { id: 2, label: "주문번호", value: OrderSearchType.MERCHANT_UID },
-];
 
 export interface NormalizedListType {
   orders: {

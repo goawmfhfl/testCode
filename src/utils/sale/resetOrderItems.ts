@@ -1,4 +1,5 @@
 import { NormalizedListType } from "@models/sale";
+import { orderStatusNameType } from "@constants/sale";
 
 const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
   if (!recontructOrderItem || !recontructOrderItem.orders) return;
@@ -35,7 +36,9 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
     const resetUserName = user?.name ? user.name : "-";
 
     // 주문 상태
-    const resetOrderStatus = orderStatus?.name ? orderStatus.name : "-";
+    const resetOrderStatus = orderStatus?.name
+      ? orderStatusNameType[orderStatus.name]
+      : "-";
 
     // 클레임 상태
     const resetClaimStatus = claimStatus?.name ? claimStatus.name : "-";
