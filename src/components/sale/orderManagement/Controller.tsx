@@ -12,6 +12,7 @@ import { Input as SearchInput } from "@components/common/input/SearchInput";
 import ControllerContainer from "@components/sale/ControllerContainer";
 
 import {
+  checkAllBoxStatusVar,
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
   paginationSkipVar,
@@ -43,6 +44,7 @@ const Controller = () => {
   const checkedOrderItemIds = checkedOrderItems.map(
     (orderItem) => orderItem.id
   );
+
   const [temporaryQuery, setTemporaryQuery] = useState("");
 
   const [confirmOrderItems] = useMutation<
@@ -131,6 +133,9 @@ const Controller = () => {
                     ...systemModalVar(),
                     isVisible: false,
                   });
+
+                  checkedOrderItemsVar([]);
+                  checkAllBoxStatusVar(false);
                 },
               });
             }

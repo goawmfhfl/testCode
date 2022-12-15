@@ -1,6 +1,6 @@
 import styled from "styled-components/macro";
 
-const NumberInput = styled.input.attrs({
+export const NumberInput = styled.input.attrs({
   type: "number",
 })<{
   disabled?: boolean;

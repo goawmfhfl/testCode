@@ -62,7 +62,7 @@ export interface ResetOrderItemType {
   // 택배사
   courier: string;
   // 운송장번호
-  invoiceNumber: string;
+  invoiceNumber?: string;
   // 결제일
   payments: string;
   // 수취인

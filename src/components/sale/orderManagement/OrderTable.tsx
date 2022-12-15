@@ -11,18 +11,6 @@ import {
 
 import useLazyOrders from "@hooks/order/useLazyOrders";
 
-import {
-  FixedTable,
-  ScrollTable,
-  TableContainer,
-  TdContainer,
-  Td,
-  Th,
-  ThContainer,
-  Tr,
-} from "@components/common/table/Table";
-import Checkbox from "@components/common/input/Checkbox";
-import NoDataContainer from "@components/common/table/NoDataContainer";
 import { filterOptionVar } from "@cache/sale/orderManagement";
 import {
   commonFilterOptionVar,
@@ -40,8 +28,30 @@ import {
   paginationVisibilityVar,
 } from "@cache/index";
 import { OrderItemsType } from "@graphql/queries/getOrdersBySeller";
-import Loading from "@components/common/table/Loading";
 import { checkedOrderItemsVar } from "@cache/sale";
+
+import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
+
+import {
+  FixedTable,
+  ScrollTable,
+  TableContainer,
+  TdContainer,
+  Td,
+  Th,
+  ThContainer,
+  Tr,
+} from "@components/common/table/Table";
+import Checkbox from "@components/common/input/Checkbox";
+import Loading from "@components/common/table/Loading";
+import NoDataContainer from "@components/common/table/NoDataContainer";
+import {
+  SelectInput as Dropdown,
+  OptionInput as Option,
+} from "@components/common/input/Dropdown";
+import { NumberInput } from "@components/common/input/NumberInput";
+import Button from "@components/common/Button";
+import styled from "styled-components";
 
 const OrderTable = () => {
   const { getOrderItem, error, loading, data } = useLazyOrders();
@@ -315,8 +325,33 @@ const OrderTable = () => {
               }) => (
                 <Tr key={id}>
                   <Td width={scrollTableType[0].width}>{claimStatus}</Td>
-                  <Td width={scrollTableType[1].width}>{courier}</Td>
-                  <Td width={scrollTableType[2].width}>{invoiceNumber}</Td>
+                  <Td width={scrollTableType[1].width}>
+                    <Dropdown
+                      arrowSrc={triangleArrowSvg}
+                      value={"default"}
+                      sizing={"medium"}
+                      width={"104px"}
+                      disabled={true}
+                    >
+                      <Option hidden value="default">
+                        택배사
+                      </Option>
+                      <Option>택배1</Option>
+                      <Option>택배2</Option>
+                    </Dropdown>
+                  </Td>
+                  <Td width={scrollTableType[2].width}>
+                    {invoiceNumber ? (
+                      invoiceNumber
+                    ) : (
+                      <>
+                        <InvoiceNumberInput disabled={true} width={"145px"} />
+                        <Button size="small" disabled={true} width={"55px"}>
+                          발송
+                        </Button>
+                      </>
+                    )}
+                  </Td>
                   <Td width={scrollTableType[3].width}>{payments}</Td>
                   <Td width={scrollTableType[4].width}>{recipientName}</Td>
                   <Td width={scrollTableType[5].width}>
@@ -366,5 +401,9 @@ const OrderTable = () => {
     </TableContainer>
   );
 };
+
+const InvoiceNumberInput = styled(NumberInput)`
+  margin-right: 0px;
+`;
 
 export default OrderTable;

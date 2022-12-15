@@ -47,7 +47,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
     const resetCourier = "-";
 
     // 운송장번호
-    const resetInvoiceNumber = "-";
+    const resetInvoiceNumber = null;
 
     // 결제일
     const resetPayments = user?.payments?.createdAt
@@ -132,7 +132,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       // 택배사
       courier: resetCourier,
       // 운송장번호
-      invoiceNumber: resetInvoiceNumber,
+      invoiceNumber: null,
       // 결제일
       payments: resetPayments,
       // 수취인
