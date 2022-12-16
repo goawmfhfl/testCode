@@ -11,6 +11,7 @@ const useLazyOrders = () => {
     GetOrdersBySellerType,
     GetOrdersBySellerInputType
   >(GET_ORDERS_BY_SELLER, {
+    notifyOnNetworkStatusChange: true,
     fetchPolicy: "no-cache",
     errorPolicy: "all",
   });

@@ -17,10 +17,10 @@ export const TableContainer = styled.div<{
 
   ${({ type, hasData }) =>
     type === TableType.SCROLL && hasData
-      ? css`
+      ? css``
+      : css`
           height: 500px;
-        `
-      : css``}
+        `}
 `;
 interface FixedTableProps {
   width: number;

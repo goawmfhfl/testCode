@@ -1,9 +1,13 @@
 import { makeVar } from "@apollo/client";
-import { OrderStatusType, OrderStatusGroup } from "@constants/sale";
+import {
+  OrderStatusType,
+  OrderStatusGroup,
+  OrderSearchType,
+} from "@constants/sale";
 import { FilterOptionVarType } from "@models/sale";
 
 export const filterOptionVar = makeVar<FilterOptionVarType>({
-  type: null,
+  type: OrderSearchType.RECIPIENT_NAME,
   statusName: null,
   statusType: OrderStatusType.ORDER,
   statusGroup: OrderStatusGroup.ORDER,
@@ -13,6 +17,6 @@ export const shipmentInformationVar = makeVar<{
   shipmentNumber?: number;
   shipmentCompany?: string;
 }>({
-  shipmentNumber: null,
-  shipmentCompany: null,
+  shipmentNumber: 11,
+  shipmentCompany: "택배",
 });

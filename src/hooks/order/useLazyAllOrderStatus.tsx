@@ -11,6 +11,7 @@ const useLazyAllOrderStatus = () => {
     GetAllOrderStatusBySellerType,
     { input: GetAllOrderStatusBySellerInputType }
   >(GET_ALL_ORDER_STATUS_BY_SELLER, {
+    notifyOnNetworkStatusChange: true,
     fetchPolicy: "no-cache",
     errorPolicy: "all",
   });
