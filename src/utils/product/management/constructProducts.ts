@@ -1,4 +1,4 @@
-import { ProductsType } from "@graphql/queries/getAllProductsBySeller";
+import { ProductsType } from "@graphql/queries/getProductsBySeller";
 import { NormalizedType } from "@models/product/management/index";
 
 const contructProducts = (products: Array<ProductsType>) => {

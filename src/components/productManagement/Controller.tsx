@@ -35,7 +35,7 @@ import {
   checkedProductsVar,
 } from "@cache/productManagement";
 
-import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
+import { GET_PRODUCTS_BY_SELLER } from "@graphql/queries/getProductsBySeller";
 import ChangeCategoryModal from "@components/productManagement/ChangeCategoryModal";
 import ChangeDiscountModal from "@components/productManagement/ChangeDiscountModal";
 import Button from "@components/common/Button";
@@ -74,12 +74,12 @@ const Controller = () => {
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
-        query: GET_ALL_PRODUCTS_BY_SELLER,
+        query: GET_PRODUCTS_BY_SELLER,
         variables: {
           input: { page, skip, status, query },
         },
       },
-      "GetAllProductsBySeller",
+      "GetProductsBySeller",
     ],
   });
 
@@ -91,12 +91,12 @@ const Controller = () => {
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
-        query: GET_ALL_PRODUCTS_BY_SELLER,
+        query: GET_PRODUCTS_BY_SELLER,
         variables: {
           input: { page, skip, status, query },
         },
       },
-      "GetAllProductsBySeller",
+      "GetProductsBySeller",
     ],
   });
 
@@ -108,12 +108,12 @@ const Controller = () => {
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
-        query: GET_ALL_PRODUCTS_BY_SELLER,
+        query: GET_PRODUCTS_BY_SELLER,
         variables: {
           input: { page, skip, status, query },
         },
       },
-      "GetAllProductsBySeller",
+      "GetProductsBySeller",
     ],
   });
 

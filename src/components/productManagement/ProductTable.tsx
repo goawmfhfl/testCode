@@ -20,9 +20,9 @@ import {
 } from "@cache/index";
 import { ProductStatus, productStatus, productType } from "@constants/product";
 import {
-  GET_ALL_PRODUCTS_BY_SELLER,
+  GET_PRODUCTS_BY_SELLER,
   ProductsType,
-} from "@graphql/queries/getAllProductsBySeller";
+} from "@graphql/queries/getProductsBySeller";
 import {
   ChangeProductsInfoBySellerInputType,
   ChangeProductsInfoBySellerType,
@@ -30,7 +30,7 @@ import {
 } from "@graphql/mutations/changeProductsInfoBySeller";
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 import { TableType } from "@models/index";
-import useLazyProducts from "@hooks/product/useLazyProducts";
+import useLazyProducts from "@hooks/product/useLazyGetProducts";
 import {
   ThContainer,
   Th,
@@ -72,10 +72,10 @@ const ProductTable = () => {
     fetchPolicy: "no-cache",
     refetchQueries: [
       {
-        query: GET_ALL_PRODUCTS_BY_SELLER,
+        query: GET_PRODUCTS_BY_SELLER,
         variables: { input: { page, skip, status, query } },
       },
-      "GetAllProductsBySeller",
+      "GetProductsBySeller",
     ],
   });
 
@@ -243,7 +243,7 @@ const ProductTable = () => {
   }, [page, skip, status, query]);
 
   useEffect(() => {
-    if (!data || !data.getAllProductsBySeller) return;
+    if (!data || !data.getProductsBySeller) return;
 
     const {
       totalPages,
@@ -253,7 +253,7 @@ const ProductTable = () => {
       totalPages: number;
       totalResults: number;
       products: Array<ProductsType>;
-    } = data.getAllProductsBySeller;
+    } = data.getProductsBySeller;
 
     const isLastPageChanged = totalPages < page;
 

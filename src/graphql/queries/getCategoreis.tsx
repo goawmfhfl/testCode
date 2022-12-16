@@ -1,17 +1,17 @@
 import { gql } from "@apollo/client";
 import { CategoriesType } from "@models/index";
 
-export interface GetAllCategoriesType {
-  getAllCategories: {
+export interface GetCategoriesType {
+  getCategories: {
     ok: boolean;
     error?: string;
     categories: Array<CategoriesType>;
   };
 }
 
-export const GET_ALL_CATEGORIES = gql`
-  query GetAllCategories {
-    getAllCategories {
+export const GET_CATEGORIES = gql`
+  query GetCategories {
+    getCategories {
       ok
       error
       categories {

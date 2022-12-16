@@ -1,13 +1,13 @@
 import { useQuery } from "@apollo/client";
 
 import {
-  GetAllCategoriesType,
-  GET_ALL_CATEGORIES,
-} from "@graphql/queries/getAllCategoreis";
+  GetCategoriesType,
+  GET_CATEGORIES,
+} from "@graphql/queries/getCategoreis";
 
 const useCategories = () => {
-  const { loading, error, data } = useQuery<GetAllCategoriesType>(
-    GET_ALL_CATEGORIES,
+  const { loading, error, data } = useQuery<GetCategoriesType>(
+    GET_CATEGORIES,
 
     {
       notifyOnNetworkStatusChange: true,

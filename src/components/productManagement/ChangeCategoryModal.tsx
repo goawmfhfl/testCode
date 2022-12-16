@@ -40,7 +40,7 @@ import {
 
 import { checkAllBoxStatusVar } from "@cache/index";
 
-import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
+import { GET_PRODUCTS_BY_SELLER } from "@graphql/queries/getProductsBySeller";
 import useCategories from "@hooks/useCategories";
 import contructCategories from "@utils/contructCategories";
 import { CategoryNames } from "@constants/category";
@@ -99,12 +99,12 @@ const ChangeCategoryModal = () => {
 
     refetchQueries: [
       {
-        query: GET_ALL_PRODUCTS_BY_SELLER,
+        query: GET_PRODUCTS_BY_SELLER,
         variables: {
           input: filterOption,
         },
       },
-      "GetAllProductsBySeller",
+      "GetProductsBySeller",
     ],
   });
 
@@ -225,7 +225,7 @@ const ChangeCategoryModal = () => {
 
   useEffect(() => {
     const categories: Array<CategoriesType> =
-      data?.getAllCategories.categories || [];
+      data?.getCategories.categories || [];
     const recontructCategories = contructCategories(categories);
     setCategories(recontructCategories);
   }, [data]);

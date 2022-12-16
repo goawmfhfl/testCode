@@ -11,7 +11,7 @@ import {
 import { filterOptionVar } from "@cache/productManagement";
 import { Pathnames } from "@constants/index";
 import { ProductStatus } from "@constants/product";
-import useLazyAllProductStatus from "@hooks/product/useLazyAllProductStatus";
+import useLazyGetProductStatus from "@hooks/product/useLazyGetProductStatus";
 import { getProductLength } from "@utils/product/management";
 import questionMarkSrc from "@icons/questionmark.svg";
 
@@ -21,13 +21,12 @@ import FilterBarContainer from "@components/sale/FilterBarContainer";
 const FilterBar = () => {
   const navigate = useNavigate();
 
-  const { data: productStatus, getAllProductStatus } =
-    useLazyAllProductStatus();
+  const { data: productStatus, getProductStatus } = useLazyGetProductStatus();
 
   const { status: selectedStatus } = useReactiveVar(filterOptionVar);
   const totalPageLength = useReactiveVar(totalPageLengthVar);
 
-  const products = productStatus?.getAllProductsBySeller.products || [];
+  const products = productStatus?.getProductsBySeller.products || [];
   const productLength = getProductLength(products);
 
   const [showNotice, setShowNotice] = useState<boolean>(false);
@@ -52,7 +51,7 @@ const FilterBar = () => {
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
-      await getAllProductStatus({
+      await getProductStatus({
         variables: {
           input: {
             page: 1,

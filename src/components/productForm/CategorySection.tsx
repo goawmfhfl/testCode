@@ -60,7 +60,7 @@ const CategorySection = () => {
 
   useEffect(() => {
     const categories: Array<CategoriesType> =
-      categoryData?.getAllCategories.categories || [];
+      categoryData?.getCategories.categories || [];
     const recontructCategories = contructCategories(categories);
     setCategories(recontructCategories);
   }, [categoryData]);

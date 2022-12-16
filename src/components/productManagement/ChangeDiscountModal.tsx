@@ -42,7 +42,7 @@ import {
   CHANGE_PRODUCTS_INFO_BY_SELLER,
 } from "@graphql/mutations/changeProductsInfoBySeller";
 
-import { GET_ALL_PRODUCTS_BY_SELLER } from "@graphql/queries/getAllProductsBySeller";
+import { GET_PRODUCTS_BY_SELLER } from "@graphql/queries/getProductsBySeller";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -84,12 +84,12 @@ const ChangeDiscountModal = () => {
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
-        query: GET_ALL_PRODUCTS_BY_SELLER,
+        query: GET_PRODUCTS_BY_SELLER,
         variables: {
           input: filterOption,
         },
       },
-      "GetAllProductsBySeller",
+      "GetProductsBySeller",
     ],
   });
 

@@ -18,8 +18,8 @@ export interface ProductsType {
   quantity: number;
 }
 
-export interface GetAllProductsBySellerType {
-  getAllProductsBySeller: {
+export interface GetProductsBySellerType {
+  getProductsBySeller: {
     ok: boolean;
     error: string;
     totalPages: number;
@@ -28,7 +28,7 @@ export interface GetAllProductsBySellerType {
   };
 }
 
-export interface GetAllProductsBySellerInputType {
+export interface GetProductsBySellerInputType {
   input: {
     page: number;
     skip?: number;
@@ -37,9 +37,9 @@ export interface GetAllProductsBySellerInputType {
   };
 }
 
-export const GET_ALL_PRODUCTS_BY_SELLER = gql`
-  query GetAllProductsBySeller($input: GetAllProductsBySellerInput!) {
-    getAllProductsBySeller(input: $input) {
+export const GET_PRODUCTS_BY_SELLER = gql`
+  query GetProductsBySeller($input: GetAllProductsBySellerInput!) {
+    getProductsBySeller(input: $input) {
       ok
       error
       totalPages
@@ -72,8 +72,8 @@ export const GET_ALL_PRODUCTS_BY_SELLER = gql`
   }
 `;
 
-export interface GetAllProductStatusBySellerType {
-  getAllProductsBySeller: {
+export interface GetProductStatusBySellerType {
+  getProductsBySeller: {
     ok: boolean;
     error: string;
     totalResults: number;
@@ -84,7 +84,7 @@ export interface GetAllProductStatusBySellerType {
   };
 }
 
-export interface GetAllProductStatusBySellerInPutType {
+export interface GetProductStatusBySellerInPutType {
   input: {
     page: number;
     skip?: number;
@@ -93,9 +93,9 @@ export interface GetAllProductStatusBySellerInPutType {
   };
 }
 
-export const GET_ALL_PRODCUCTS_STATUS_BY_SELLER = gql`
-  query GetAllProductsBySeller($input: GetAllProductsBySellerInput!) {
-    getAllProductsBySeller(input: $input) {
+export const GET_PRODCUCTS_STATUS_BY_SELLER = gql`
+  query GetProductsBySeller($input: GetAllProductsBySellerInput!) {
+    getProductsBySeller(input: $input) {
       ok
       error
       products {

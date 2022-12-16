@@ -1,4 +1,4 @@
-import { ProductsType } from "@graphql/queries/getAllProductsBySeller";
+import { ProductsType } from "@graphql/queries/getProductsBySeller";
 import { NormalizedType } from "@models/product/management";
 
 import { getDiscountedPrice } from "@utils/calculator";

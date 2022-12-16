@@ -1,5 +1,5 @@
 import { ProductStatus } from "@constants/product";
-import { ProductsType } from "@graphql/queries/getAllProductsBySeller";
+import { ProductsType } from "@graphql/queries/getProductsBySeller";
 
 export interface NormalizedType {
   products: {
