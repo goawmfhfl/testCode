@@ -85,7 +85,7 @@ export interface ResetOrderItemType {
   // 클레임 상태
   claimStatus: string;
   // 택배사
-  courier: string;
+  shipmentCompany: string;
   // 운송장번호
   invoiceNumber?: string;
   // 결제일
@@ -119,4 +119,6 @@ export interface ResetOrderItemType {
   // 제주/도서 추가배송비
   shipmentDistantPrice: number;
   isChecked: boolean;
+  temporaryShipmentCompany: string;
+  temporaryShipmentNumber: string;
 }

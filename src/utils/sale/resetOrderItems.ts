@@ -44,10 +44,10 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
     const resetClaimStatus = claimStatus?.name ? claimStatus.name : "-";
 
     // 택배사
-    const resetCourier = "-";
+    const resetShipmentCompany = "";
 
     // 운송장번호
-    const resetInvoiceNumber = null;
+    const resetInvoiceNumber = "";
 
     // 결제일
     const resetPayments = user?.payments?.createdAt
@@ -113,6 +113,8 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       : 0;
 
     const isChecked = false;
+    const temporaryShipmentCompany = "";
+    const temporaryShipmentNumber = "";
 
     return {
       id,
@@ -130,9 +132,9 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       // 클레임 상태
       claimStatus: resetClaimStatus,
       // 택배사
-      courier: resetCourier,
+      shipmentCompany: resetShipmentCompany,
       // 운송장번호
-      invoiceNumber: null,
+      invoiceNumber: resetInvoiceNumber,
       // 결제일
       payments: resetPayments,
       // 수취인
@@ -164,6 +166,8 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       // 제주/도서 추가배송비
       shipmentDistantPrice: resetShipmentDistantPrice,
       isChecked,
+      temporaryShipmentCompany,
+      temporaryShipmentNumber,
     };
   });
   return result;

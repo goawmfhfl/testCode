@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { useReactiveVar } from "@apollo/client";
+import styled from "styled-components";
+import axios, { AxiosError } from "axios";
+import { useMutation, useReactiveVar } from "@apollo/client";
 import { cloneDeep } from "lodash";
 import { TableType } from "@models/index";
 
@@ -11,17 +13,21 @@ import {
 
 import useLazyOrders from "@hooks/order/useLazyOrders";
 
-import {
-  filterOptionVar,
-  shipmentInformationVar,
-} from "@cache/sale/orderManagement";
+import { filterOptionVar } from "@cache/sale/orderManagement";
 import {
   commonFilterOptionVar,
+  loadingSpinnerVisibilityVar,
+  showHasAnyProblemModal,
   systemModalVar,
   totalPageLengthVar,
 } from "@cache/index";
 
-import { NormalizedListType, ResetOrderItemType } from "@models/sale";
+import {
+  NormalizedListType,
+  ResetOrderItemType,
+  SendOrderItemsInputType,
+  SendOrderItemsType,
+} from "@models/sale";
 
 import resetOrderItems from "@utils/sale/resetOrderItems";
 import contructOrderItem from "@utils/sale/contructOrderItem";
@@ -30,7 +36,10 @@ import {
   pageNumberListVar,
   paginationVisibilityVar,
 } from "@cache/index";
-import { OrderItemsType } from "@graphql/queries/getOrdersBySeller";
+import {
+  GET_ORDERS_BY_SELLER,
+  OrderItemsType,
+} from "@graphql/queries/getOrdersBySeller";
 import { checkedOrderItemsVar } from "@cache/sale";
 
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
@@ -49,12 +58,16 @@ import Checkbox from "@components/common/input/Checkbox";
 import Loading from "@components/common/table/Loading";
 import NoDataContainer from "@components/common/table/NoDataContainer";
 import {
-  SelectInput as Dropdown,
+  SelectInput,
   OptionInput as Option,
 } from "@components/common/input/Dropdown";
-import { NumberInput } from "@components/common/input/NumberInput";
 import Button from "@components/common/Button";
-import styled from "styled-components";
+import { showHasServerErrorModal } from "@cache/productManagement/index";
+import { Input } from "@components/common/input/TextInput";
+import { preventNaNValues } from "@utils/index";
+
+import exclamationmarkSrc from "@icons/exclamationmark.svg";
+import { SEND_ORDERITEMS } from "@graphql/mutations/sendOrderItems";
 
 const OrderTable = () => {
   const { getOrderItem, error, loading, data } = useLazyOrders();
@@ -62,8 +75,44 @@ const OrderTable = () => {
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
+  const [sendOrderItems] = useMutation<
+    SendOrderItemsType,
+    {
+      input: SendOrderItemsInputType;
+    }
+  >(SEND_ORDERITEMS, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    refetchQueries: [
+      {
+        query: GET_ORDERS_BY_SELLER,
+        variables: {
+          input: {
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
+          },
+        },
+      },
+      "GetOrdersBySeller",
+    ],
+  });
+
   const [orderItems, setOrderItems] = useState<Array<ResetOrderItemType>>([]);
+  const [shipmentCompanys, setShipmentCompanys] = useState<
+    Array<{
+      Code: string;
+      International: boolean;
+      Name: string;
+    }>
+  >([]);
+
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
+  const checkedOrderItemIds = checkedOrderItems.map(({ id }) => id);
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
 
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,17 +180,107 @@ const OrderTable = () => {
     };
 
   const changeShipmentNumberHandler =
-    () => (e: React.ChangeEvent<HTMLInputElement>) => {
-      shipmentInformationVar({
-        ...shipmentInformationVar(),
-        shipmentNumber: Number(e.target.value),
-      });
+    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newOrderItems = cloneDeep(orderItems);
+      newOrderItems[index].temporaryShipmentNumber = e.target.value;
+      setOrderItems(newOrderItems);
     };
+
   const changeShipmentCompanyHandler =
-    () => (e: React.ChangeEvent<HTMLSelectElement>) => {
-      shipmentInformationVar({
-        ...shipmentInformationVar(),
-        shipmentCompany: e.target.value,
+    (index: number) => (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const newOrderItems = cloneDeep(orderItems);
+      newOrderItems[index].temporaryShipmentCompany = e.target.value;
+      setOrderItems(newOrderItems);
+    };
+
+  const handleSendButtonClick =
+    (shipmentCompany: string, shipmentNumber: string) => () => {
+      if (!shipmentCompany || !shipmentNumber) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          icon: exclamationmarkSrc,
+          description: <>송장정보를 기입해주세요</>,
+          cancelButtonVisibility: false,
+          confirmButtonVisibility: true,
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+              icon: "",
+            });
+          },
+        });
+
+        return;
+      }
+
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: (
+          <>
+            해당 주문을 <br />
+            발송처리 하시겠습니까?
+          </>
+        ),
+        cancelButtonVisibility: true,
+        confirmButtonVisibility: true,
+        confirmButtonClickHandler: () => {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            (async () => {
+              loadingSpinnerVisibilityVar(true);
+
+              const {
+                data: {
+                  sendOrderItems: { ok, error },
+                },
+              } = await sendOrderItems({
+                variables: {
+                  input: {
+                    shipmentCompany,
+                    shipmentNumber: Number(shipmentNumber),
+                    orderItemIds: checkedOrderItemIds,
+                  },
+                },
+              });
+
+              if (ok) {
+                loadingSpinnerVisibilityVar(false);
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: true,
+                  description: (
+                    <>
+                      발송이 처리되었습니다
+                      <br />
+                      (배송중에서 확인 가능)
+                    </>
+                  ),
+                  confirmButtonVisibility: true,
+                  cancelButtonVisibility: false,
+                  confirmButtonClickHandler: () => {
+                    systemModalVar({
+                      ...systemModalVar(),
+                      isVisible: false,
+                    });
+
+                    checkedOrderItemsVar([]);
+                    checkAllBoxStatusVar(false);
+                  },
+                });
+              }
+              if (error) {
+                loadingSpinnerVisibilityVar(false);
+                showHasServerErrorModal(error, "발송 처리");
+              }
+            })();
+          } catch (error) {
+            loadingSpinnerVisibilityVar(false);
+            showHasServerErrorModal(error as string, "발송 처리");
+          }
+        },
       });
     };
 
@@ -231,7 +370,7 @@ const OrderTable = () => {
             (전화 문의 070-4187-3848)
             <br />
             <br />
-            code:
+            Code:
             {error.message}
           </>
         ),
@@ -244,6 +383,48 @@ const OrderTable = () => {
       });
     }
   }, [error]);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    (async () => {
+      try {
+        const parameter = {
+          params: { t_key: process.env.REACT_APP_SWEETTRAKER_API_KEY },
+        };
+
+        const response = await axios.get(
+          "https://info.sweettracker.co.kr/api/v1/companylist",
+          parameter
+        );
+
+        const {
+          data: { Company },
+        } = response as {
+          data: {
+            Company: Array<{
+              Code: string;
+              International: boolean;
+              Name: string;
+            }>;
+          };
+        };
+
+        setShipmentCompanys(Company);
+      } catch (error) {
+        const errors = error as Error | AxiosError;
+
+        if (axios.isAxiosError(errors)) {
+          const { msg } = errors.response.data as {
+            status: boolean;
+            msg: string;
+            code: string;
+          };
+
+          showHasServerErrorModal(msg, "택배사 리스트 요청");
+        }
+      }
+    })();
+  }, []);
 
   const hasOrderItems = !loading && !error && !!orderItems?.length;
 
@@ -320,43 +501,52 @@ const OrderTable = () => {
         <TdContainer>
           {hasOrderItems &&
             orderItems.map(
-              ({
-                id,
-                claimStatus,
-                courier,
-                invoiceNumber,
-                payments,
-                recipientName,
-                recipientPhoneNumber,
-                recipientAddress,
-                postCode,
-                shipmentMemo,
-                userEmail,
-                userPhoneNumber,
-                option,
-                quantity,
-                price,
-                optionPrice,
-                totalPrice,
-                shipmentPrice,
-                shipmentDistantPrice,
-              }) => (
+              (
+                {
+                  id,
+                  claimStatus,
+                  orderStatus,
+                  shipmentCompany,
+                  invoiceNumber,
+                  payments,
+                  recipientName,
+                  recipientPhoneNumber,
+                  recipientAddress,
+                  postCode,
+                  shipmentMemo,
+                  userEmail,
+                  userPhoneNumber,
+                  option,
+                  quantity,
+                  price,
+                  optionPrice,
+                  totalPrice,
+                  shipmentPrice,
+                  shipmentDistantPrice,
+                  temporaryShipmentCompany,
+                  temporaryShipmentNumber,
+                },
+                index
+              ) => (
                 <Tr key={id}>
                   <Td width={scrollTableType[0].width}>{claimStatus}</Td>
                   <Td width={scrollTableType[1].width}>
                     <Dropdown
-                      onChange={changeShipmentCompanyHandler}
+                      onChange={changeShipmentCompanyHandler(index)}
                       arrowSrc={triangleArrowSvg}
-                      value={"default"}
+                      value={temporaryShipmentCompany}
                       sizing={"medium"}
                       width={"104px"}
-                      disabled={true}
+                      disabled={orderStatus === "새주문"}
                     >
                       <Option hidden value="default">
                         택배사
                       </Option>
-                      <Option>택배1</Option>
-                      <Option>택배2</Option>
+                      {shipmentCompanys.map(({ Code, Name }) => (
+                        <Option key={Code} value={Code}>
+                          {Name}
+                        </Option>
+                      ))}
                     </Dropdown>
                   </Td>
                   <Td width={scrollTableType[2].width}>
@@ -365,11 +555,21 @@ const OrderTable = () => {
                     ) : (
                       <>
                         <InvoiceNumberInput
-                          onChange={changeShipmentNumberHandler}
-                          disabled={true}
+                          onChange={changeShipmentNumberHandler(index)}
+                          disabled={orderStatus === "새주문"}
                           width={"145px"}
+                          value={temporaryShipmentNumber}
+                          onKeyDown={preventNaNValues}
                         />
-                        <Button size="small" disabled={true} width={"55px"}>
+                        <Button
+                          size="small"
+                          disabled={orderStatus === "새주문"}
+                          width={"55px"}
+                          onClick={handleSendButtonClick(
+                            temporaryShipmentCompany,
+                            temporaryShipmentNumber
+                          )}
+                        >
                           발송
                         </Button>
                       </>
@@ -425,7 +625,15 @@ const OrderTable = () => {
   );
 };
 
-const InvoiceNumberInput = styled(NumberInput)`
+const Dropdown = styled(SelectInput)`
+  padding-right: 16px;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`;
+
+const InvoiceNumberInput = styled(Input)`
   margin-right: 0px;
 `;
 

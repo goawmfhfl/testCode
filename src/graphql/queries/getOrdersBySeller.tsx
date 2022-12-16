@@ -192,7 +192,7 @@ export const GET_ORDERS_BY_SELLER = gql`
   }
 `;
 
-export interface GetAllOrderStatusBySellerType {
+export interface GetOrderStatusBySellerType {
   getOrdersBySeller: {
     ok: boolean;
     error: string;
@@ -204,7 +204,7 @@ export interface GetAllOrderStatusBySellerType {
   };
 }
 
-export interface GetAllOrderStatusBySellerInputType {
+export interface GetOrderStatusBySellerInputType {
   page?: number;
   skip?: number;
   query?: string;
@@ -214,8 +214,8 @@ export interface GetAllOrderStatusBySellerInputType {
   statusGroup?: OrderStatusGroup;
 }
 
-export const GET_ALL_ORDER_STATUS_BY_SELLER = gql`
-  query GetAllOrderStatusBySeller($input: GetOrdersBySellerInput!) {
+export const GET_ORDER_STATUS_BY_SELLER = gql`
+  query GetOrderStatusBySeller($input: GetOrdersBySellerInput!) {
     getOrdersBySeller(input: $input) {
       ok
       error

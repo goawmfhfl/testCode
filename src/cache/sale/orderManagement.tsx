@@ -12,11 +12,3 @@ export const filterOptionVar = makeVar<FilterOptionVarType>({
   statusType: OrderStatusType.ORDER,
   statusGroup: OrderStatusGroup.ORDER,
 });
-
-export const shipmentInformationVar = makeVar<{
-  shipmentNumber?: number;
-  shipmentCompany?: string;
-}>({
-  shipmentNumber: 11,
-  shipmentCompany: "택배",
-});

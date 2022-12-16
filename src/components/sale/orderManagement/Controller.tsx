@@ -29,10 +29,7 @@ import {
 } from "@constants/sale";
 import { useMutation, useReactiveVar } from "@apollo/client";
 import { checkedOrderItemsVar, reasonVar } from "@cache/sale";
-import {
-  filterOptionVar,
-  shipmentInformationVar,
-} from "@cache/sale/orderManagement";
+import { filterOptionVar } from "@cache/sale/orderManagement";
 import { CONFIRM_ORDERITMES_BY_SELLER } from "@graphql/mutations/confirmOrderItemsBySeller";
 import {
   CancelOrderItemsBySellerInputType,
@@ -50,20 +47,26 @@ import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import { showHasServerErrorModal } from "@cache/productManagement";
 import AskReasonModal from "@components/common/AskReasonModal";
 import { optionListType } from "@constants/sale/orderManagement";
+import { getHasCheckedOrderStatus } from "@utils/sale";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
-  const { shipmentCompany, shipmentNumber } = useReactiveVar(
-    shipmentInformationVar
-  );
+
   const reason = useReactiveVar(reasonVar);
 
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const checkedOrderItemIds = checkedOrderItems.map(
     (orderItem) => orderItem.id
   );
+
+  const {
+    isPaymentCompletedChecked,
+    isPreparingChecked,
+    isShippingChecked,
+    isShippingCompletedChecked,
+  } = getHasCheckedOrderStatus(checkedOrderItems);
 
   const [temporaryQuery, setTemporaryQuery] = useState("");
 
@@ -161,6 +164,19 @@ const Controller = () => {
       return;
     }
 
+    if (isPreparingChecked || isShippingChecked || isShippingCompletedChecked) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+      return;
+    }
+
     systemModalVar({
       ...systemModalVar(),
       isVisible: true,
@@ -239,7 +255,40 @@ const Controller = () => {
       return;
     }
 
-    if (!shipmentCompany || !shipmentNumber) {
+    if (
+      isPaymentCompletedChecked ||
+      isShippingChecked ||
+      isShippingCompletedChecked
+    ) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+      return;
+    }
+
+    const { isShipmentCompanyFullFilled, isShipmentNumberFullFilled } =
+      checkedOrderItems.reduce(
+        (result, { temporaryShipmentCompany, temporaryShipmentNumber }) => {
+          if (temporaryShipmentCompany === "")
+            result.isShipmentCompanyFullFilled = false;
+          if (temporaryShipmentNumber === "")
+            result.isShipmentCompanyFullFilled = false;
+
+          return result;
+        },
+        {
+          isShipmentCompanyFullFilled: true,
+          isShipmentNumberFullFilled: true,
+        }
+      );
+
+    if (!isShipmentCompanyFullFilled || !isShipmentNumberFullFilled) {
       systemModalVar({
         ...systemModalVar(),
         isVisible: true,
@@ -275,6 +324,7 @@ const Controller = () => {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           (async () => {
             loadingSpinnerVisibilityVar(true);
+
             const {
               data: {
                 sendOrderItems: { ok, error },
@@ -282,8 +332,8 @@ const Controller = () => {
             } = await sendOrderItems({
               variables: {
                 input: {
-                  shipmentCompany,
-                  shipmentNumber,
+                  shipmentCompany: "",
+                  shipmentNumber: 0,
                   orderItemIds: checkedOrderItemIds,
                 },
               },
@@ -340,6 +390,19 @@ const Controller = () => {
       return;
     }
 
+    if (isShippingChecked || isShippingCompletedChecked) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+      return;
+    }
+
     systemModalVar({
       ...systemModalVar(),
       isVisible: true,
@@ -387,6 +450,11 @@ const Controller = () => {
                         confirmButtonVisibility: true,
                         cancelButtonVisibility: false,
                         confirmButtonClickHandler: () => {
+                          modalVar({
+                            ...modalVar(),
+                            isVisible: false,
+                          });
+
                           systemModalVar({
                             ...systemModalVar(),
                             isVisible: false,
@@ -426,6 +494,19 @@ const Controller = () => {
       );
       return;
     }
+
+    if (isPaymentCompletedChecked || isPreparingChecked) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+      return;
+    }
   };
 
   //교환처리
@@ -436,6 +517,19 @@ const Controller = () => {
           선택된 주문건이 없습니다
           <br />
           주문건을 선택해주세요
+        </>
+      );
+      return;
+    }
+
+    if (isPaymentCompletedChecked || isPreparingChecked) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
         </>
       );
       return;
@@ -461,6 +555,7 @@ const Controller = () => {
       page: 1,
       skip: Number(value),
     });
+
     paginationSkipVar(0);
   };
 
@@ -537,7 +632,7 @@ const Controller = () => {
           arrowSrc={triangleArrowSvg}
           sizing={"medium"}
           width={"119px"}
-          defaultValue={OrderSearchType.RECIPIENT_NAME}
+          value={type}
           onChange={changeSearchTypeHandler}
         >
           {searchQueryType.map(({ id, label, value }) => (

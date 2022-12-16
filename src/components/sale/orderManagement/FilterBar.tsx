@@ -9,7 +9,7 @@ import {
   totalPageLengthVar,
 } from "@cache/index";
 
-import useLazyAllOrderStatus from "@hooks/order/useLazyAllOrderStatus";
+import useLazyOrderStatus from "@hooks/order/useLazyOrderStatus";
 
 import {
   OrderStatusType,
@@ -21,7 +21,7 @@ import FilterBarContainer from "@components/sale/FilterBarContainer";
 import Button from "@components/common/Button";
 
 const FilterBar = () => {
-  const { data, getAllOrderStatus } = useLazyAllOrderStatus();
+  const { data, getOrderStatus } = useLazyOrderStatus();
   const { statusName } = useReactiveVar(filterOptionVar);
   const totalPageLength = useReactiveVar(totalPageLengthVar);
   const orders = data?.getOrdersBySeller.totalOrderItems || [];
@@ -70,7 +70,7 @@ const FilterBar = () => {
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
-      await getAllOrderStatus({
+      await getOrderStatus({
         variables: {
           input: {
             page: 1,
