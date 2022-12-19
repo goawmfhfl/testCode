@@ -573,7 +573,7 @@ const Controller = () => {
   return (
     <ControllerContainer>
       <ActiveButtonContainer>
-        <ControllerButton
+        <ControlButton
           size="small"
           onClick={handleConfirmOrderButtonClick}
           disabled={
@@ -583,8 +583,8 @@ const Controller = () => {
           }
         >
           주문확인
-        </ControllerButton>
-        <ControllerButton
+        </ControlButton>
+        <ControlButton
           size="small"
           onClick={handleSendButtonClick}
           disabled={
@@ -594,8 +594,8 @@ const Controller = () => {
           }
         >
           발송 처리
-        </ControllerButton>
-        <ControllerButton
+        </ControlButton>
+        <ControlButton
           size="small"
           onClick={handleCancelOrderClick}
           disabled={
@@ -604,8 +604,8 @@ const Controller = () => {
           }
         >
           주문 취소
-        </ControllerButton>
-        <ControllerButton
+        </ControlButton>
+        <ControlButton
           size="small"
           onClick={handleReturnButtonClick}
           disabled={
@@ -614,8 +614,8 @@ const Controller = () => {
           }
         >
           반품 처리
-        </ControllerButton>
-        <ControllerButton
+        </ControlButton>
+        <ControlButton
           size="small"
           onClick={handleExchangeButtonClick}
           disabled={
@@ -624,10 +624,10 @@ const Controller = () => {
           }
         >
           교환 처리
-        </ControllerButton>
+        </ControlButton>
       </ActiveButtonContainer>
 
-      <SkipQuantityContainer>
+      <FilterContainer>
         <StatusDropDown
           arrowSrc={triangleArrowSvg}
           sizing={"medium"}
@@ -659,7 +659,7 @@ const Controller = () => {
           ))}
         </StatusDropDown>
         <Button size={"small"}>내보내기</Button>
-      </SkipQuantityContainer>
+      </FilterContainer>
     </ControllerContainer>
   );
 };
@@ -677,11 +677,11 @@ const StatusDropDown = styled(Dropdown)`
   margin-right: 12px;
 `;
 
-const ControllerButton = styled(Button)`
+const ControlButton = styled(Button)`
   margin-left: 12px;
 `;
 
-const SkipQuantityContainer = styled.div`
+const FilterContainer = styled.div`
   display: flex;
 `;
 
