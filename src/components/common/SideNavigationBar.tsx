@@ -10,13 +10,27 @@ import {
 import { showHasServerErrorModal } from "@cache/productManagement";
 import { useReactiveVar } from "@apollo/client";
 
+import mediumTopSrc from "@icons/medium-top.svg";
+import mediumBottomSrc from "@icons/medium-bottom.svg";
+
 const SideNavigationBar = () => {
   const { data, loading, error } = useShopInfo();
+  const [subNavItemStatus, setSubNavItemStatus] = useState<string>("order");
+  const [saleSubItemVisibilty, setSaleSubItemVisibilty] =
+    useState<boolean>(false);
+
+  const handleSaleDropdownClick = () => {
+    setSaleSubItemVisibilty((prev) => !prev);
+  };
 
   const sideNavigationBarStatus = useReactiveVar(sideNavigationBarStatusVar);
 
   const handleNavItemClick = (status: string) => () => {
     sideNavigationBarStatusVar(status);
+  };
+
+  const handleSubNavItemClick = (status: string) => () => {
+    setSubNavItemStatus(status);
   };
   useEffect(() => {
     loadingSpinnerVisibilityVar(loading);
@@ -36,42 +50,77 @@ const SideNavigationBar = () => {
         <NavItem
           disabled={!isRegisteredShop}
           isActive={sideNavigationBarStatus === "product"}
-          onClick={handleNavItemClick("product")}
         >
-          <Link to={Pathnames.Product}>상품관리</Link>
+          <Link to={Pathnames.Product} onClick={handleNavItemClick("product")}>
+            상품관리
+          </Link>
         </NavItem>
-        <NavItem
-          disabled={true}
-          isActive={sideNavigationBarStatus === "sale"}
-          onClick={handleNavItemClick("sale")}
-        >
-          <Link to={Pathnames.Order}>판매관리</Link>
+        <NavItem disabled={false} isActive={sideNavigationBarStatus === "sale"}>
+          <Link to={Pathnames.Order} onClick={handleNavItemClick("sale")}>
+            판매관리
+          </Link>
+          <DropdownIcon
+            src={saleSubItemVisibilty ? mediumTopSrc : mediumBottomSrc}
+            isActive={sideNavigationBarStatus === "sale"}
+            onClick={handleSaleDropdownClick}
+          />
         </NavItem>
+        {saleSubItemVisibilty && (
+          <SubNavContainer isActive={sideNavigationBarStatus === "sale"}>
+            <SubNavItem
+              isActive={subNavItemStatus === "order"}
+              onClick={handleSubNavItemClick("order")}
+            >
+              주문 관리
+            </SubNavItem>
+            <SubNavItem
+              isActive={subNavItemStatus === "cancel"}
+              onClick={handleSubNavItemClick("cancel")}
+            >
+              취소 관리
+            </SubNavItem>
+            <SubNavItem
+              isActive={subNavItemStatus === "return"}
+              onClick={handleSubNavItemClick("return")}
+            >
+              반품 관리
+            </SubNavItem>
+            <SubNavItem
+              isActive={subNavItemStatus === "exchange"}
+              onClick={handleSubNavItemClick("exchange")}
+            >
+              교환 관리
+            </SubNavItem>
+          </SubNavContainer>
+        )}
         <NavItem
           disabled={true}
           isActive={sideNavigationBarStatus === "inquiry"}
-          onClick={handleNavItemClick("inquiry")}
         >
-          <Link to={Pathnames.Inquiry}>문의관리</Link>
+          <Link to={Pathnames.Inquiry} onClick={handleNavItemClick("inquiry")}>
+            문의관리
+          </Link>
         </NavItem>
         <NavItem
           disabled={true}
           isActive={sideNavigationBarStatus === "settlement"}
-          onClick={handleNavItemClick("settlement")}
         >
-          <Link to={Pathnames.Settlement}>정산관리</Link>
+          <Link
+            to={Pathnames.Settlement}
+            onClick={handleNavItemClick("settlement")}
+          >
+            정산관리
+          </Link>
         </NavItem>
-        <NavItem
-          isActive={sideNavigationBarStatus === "shop"}
-          onClick={handleNavItemClick("shop")}
-        >
-          <Link to={Pathnames.Shop}>샵 설정</Link>
+        <NavItem isActive={sideNavigationBarStatus === "shop"}>
+          <Link to={Pathnames.Shop} onClick={handleNavItemClick("shop")}>
+            샵 설정
+          </Link>
         </NavItem>
-        <NavItem
-          isActive={sideNavigationBarStatus === "notice"}
-          onClick={handleNavItemClick("notice")}
-        >
-          <Link to={Pathnames.Notice}>판매자 공지사항</Link>
+        <NavItem isActive={sideNavigationBarStatus === "notice"}>
+          <Link to={Pathnames.Notice} onClick={handleNavItemClick("notice")}>
+            판매자 공지사항
+          </Link>
         </NavItem>
       </NavList>
     </Container>
@@ -109,6 +158,10 @@ const NavList = styled.ul`
 `;
 
 const NavItem = styled.li<{ disabled?: boolean; isActive?: boolean }>`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
   ${({ theme }) => theme.typo.korean.title.secondary.basic};
   padding: 15px 30px;
 
@@ -119,6 +172,29 @@ const NavItem = styled.li<{ disabled?: boolean; isActive?: boolean }>`
   background-color: ${({ isActive, theme: { palette } }) =>
     isActive && palette.grey700};
   pointer-events: ${({ disabled }) => (disabled ? "none" : "initial")}; ;
+`;
+
+const DropdownIcon = styled.img<{ isActive: boolean }>`
+  pointer-events: ${({ isActive }) => (isActive ? "initial" : "none")}; ;
+`;
+
+const SubNavContainer = styled.div<{ isActive: boolean }>`
+  display: flex;
+  flex-direction: column;
+
+  background-color: ${({ isActive, theme: { palette } }) =>
+    isActive && palette.grey700};
+
+  width: 100%;
+`;
+const SubNavItem = styled.li<{ isActive: boolean }>`
+  width: 100%;
+
+  color: ${({ theme: { palette }, isActive }) => isActive && palette.red500};
+
+  margin-top: 12px;
+  margin-bottom: 8px;
+  margin-left: 54px;
 `;
 
 export default SideNavigationBar;
