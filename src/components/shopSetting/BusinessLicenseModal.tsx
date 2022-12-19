@@ -186,7 +186,8 @@ const BusinessLicenseModal = () => {
         description: (
           <>
             사업자등록증과 통신판매업신고증이 <br />
-            등록되었습니다.
+            등록되었습니다. <br />
+            등록을 위해 확인 버튼을 눌러주세요.
           </>
         ),
         confirmButtonVisibility: true,

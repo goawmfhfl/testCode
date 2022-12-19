@@ -51,17 +51,15 @@ const RegistrationNumber = () => {
 
   return (
     <Container>
-      <NoticeContainer icon={exclamationmarkSource} width={"100%"}>
-        ᐧ 사업자등록증 없이 판매하시는 경우 주민등록증를 입력 및 사본을
-        첨부해주세요(주민등록번호 및 사본은 정산에만 활용)
+      <NoticeContainer icon={exclamationmarkSource} width={"550px"}>
+        ᐧ 사업자등록증 없이 판매하시는 경우 주민등록번호 입력 및 사본 이미지를
+        첨부해주세요. <br />
+        (주민등록번호 및 사본이미지는 정산에만 활용됩니다.)
         <br />
-        ᐧ 개인자격으로도 판매 가능하나 지속적으로 판매할 시 사업자등록을
+        ᐧ 개인 자격으로도 판매 가능하나 지속적으로 판매할 시 사업자등록을
         권유드립니다.
-        <br />
-        ᐧ 주민등록증 사본 속 성함은 정산 계좌 정보의 예금주명과 같아야 합니다.
-        <br />
-        ᐧ 사업자 등록 번호를 등록하셨을 경우 주민등록증 인증은 필수가 아닙니다.
-        <br />
+        <br />ᐧ 위에 사업자 정보를 등록하였을 경우 주민등록번호 및 사본 등록은
+        필수가 아닙니다.
       </NoticeContainer>
 
       <Section>

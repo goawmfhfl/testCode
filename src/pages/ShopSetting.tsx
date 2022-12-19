@@ -219,9 +219,7 @@ const ShopSetting = () => {
             <ContentsHeader headerName={HeaderNames.Shop} />
 
             <ContentsNavigation>
-              <ContentsNavItem selected={true}>
-                샵 / 판매자 정보
-              </ContentsNavItem>
+              <ContentsNavItem selected={true}>샵 정보</ContentsNavItem>
               {hasUserLoggedIn && <ContentsNavItem>탈퇴</ContentsNavItem>}
             </ContentsNavigation>
 
@@ -278,7 +276,7 @@ const ShopSetting = () => {
                   label={
                     <>
                       개인판매자 <br />
-                      주인등록증 인증
+                      주민등록번호 등록
                     </>
                   }
                   referenceKey={SHOP_SETTING_SECTIONS.REGISTRATION_NUMBER}

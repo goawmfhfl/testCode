@@ -174,11 +174,11 @@ const ShopInfo = () => {
     <Container>
       <ShopInfoContainer>
         <SectionContainer>
-          <Description>샵 대표 사진</Description>
+          <Description>대표 사진</Description>
 
-          <NoticeContainer icon={infoIconSrc} width={"627px"}>
+          <NoticeContainer icon={infoIconSrc}>
             샵 대표 사진은 브랜드페이지 및 창작자 프로필 사진으로 노출됩니다.
-            로고를 제외한 대표 상품 사진을 첨부해주세요.
+            브랜드를 대표하는 사진을 첨부해주세요.(단, 로고 제외)
           </NoticeContainer>
 
           <ShopImages>
@@ -275,10 +275,10 @@ const ShopInfo = () => {
         </SectionContainer>
 
         <SectionContainer>
-          <Description>샵 소개</Description>
+          <Description>소개 글</Description>
 
-          <NoticeContainer icon={questionmarkSrc} width={"349px"}>
-            창작자 페이지, 작품 상세 페이지에 노출되는 소개말입니다.
+          <NoticeContainer icon={questionmarkSrc} width={"377px"}>
+            브랜드 페이지와 상품 상세 페이지에 노출되는 소개 글입니다.
           </NoticeContainer>
 
           <TextareaContainer>
