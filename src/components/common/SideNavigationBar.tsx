@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components/macro";
 import { Link } from "react-router-dom";
+import { useReactiveVar } from "@apollo/client";
 import { Pathnames } from "@constants/index";
 import useShopInfo from "@hooks/useShopInfo";
 import {
@@ -8,14 +9,15 @@ import {
   sideNavigationBarStatusVar,
 } from "@cache/index";
 import { showHasServerErrorModal } from "@cache/productManagement";
-import { useReactiveVar } from "@apollo/client";
+import { saleMenuStatusVar } from "@cache/sale";
+import { SaleMenuStatusType } from "@constants/sale";
 
 import mediumTopSrc from "@icons/medium-top.svg";
 import mediumBottomSrc from "@icons/medium-bottom.svg";
 
 const SideNavigationBar = () => {
   const { data, loading, error } = useShopInfo();
-  const [subNavItemStatus, setSubNavItemStatus] = useState<string>("order");
+  const saleMenuStatus = useReactiveVar(saleMenuStatusVar);
   const [saleSubItemVisibilty, setSaleSubItemVisibilty] =
     useState<boolean>(false);
 
@@ -29,8 +31,8 @@ const SideNavigationBar = () => {
     sideNavigationBarStatusVar(status);
   };
 
-  const handleSubNavItemClick = (status: string) => () => {
-    setSubNavItemStatus(status);
+  const handleSubNavItemClick = (status: SaleMenuStatusType) => () => {
+    saleMenuStatusVar(status);
   };
   useEffect(() => {
     loadingSpinnerVisibilityVar(loading);
@@ -68,26 +70,26 @@ const SideNavigationBar = () => {
         {saleSubItemVisibilty && (
           <SubNavContainer isActive={sideNavigationBarStatus === "sale"}>
             <SubNavItem
-              isActive={subNavItemStatus === "order"}
-              onClick={handleSubNavItemClick("order")}
+              isActive={saleMenuStatus === SaleMenuStatusType.ORDER}
+              onClick={handleSubNavItemClick(SaleMenuStatusType.ORDER)}
             >
               주문 관리
             </SubNavItem>
             <SubNavItem
-              isActive={subNavItemStatus === "cancel"}
-              onClick={handleSubNavItemClick("cancel")}
+              isActive={saleMenuStatus === SaleMenuStatusType.CANCEL}
+              onClick={handleSubNavItemClick(SaleMenuStatusType.CANCEL)}
             >
               취소 관리
             </SubNavItem>
             <SubNavItem
-              isActive={subNavItemStatus === "return"}
-              onClick={handleSubNavItemClick("return")}
+              isActive={saleMenuStatus === SaleMenuStatusType.REFUND}
+              onClick={handleSubNavItemClick(SaleMenuStatusType.REFUND)}
             >
               반품 관리
             </SubNavItem>
             <SubNavItem
-              isActive={subNavItemStatus === "exchange"}
-              onClick={handleSubNavItemClick("exchange")}
+              isActive={saleMenuStatus === SaleMenuStatusType.EXCHANGE}
+              onClick={handleSubNavItemClick(SaleMenuStatusType.EXCHANGE)}
             >
               교환 관리
             </SubNavItem>

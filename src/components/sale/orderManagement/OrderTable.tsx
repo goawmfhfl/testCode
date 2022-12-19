@@ -303,16 +303,6 @@ const OrderTable = () => {
     })();
   }, [page, skip, query, type, statusName, statusType, statusGroup]);
 
-  console.log([
-    { page },
-    { skip },
-    { query },
-    { type },
-    { statusName },
-    { statusType },
-    { statusGroup },
-  ]);
-
   useEffect(() => {
     if (!data || !data.getOrdersBySeller) return;
 
