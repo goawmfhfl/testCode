@@ -55,7 +55,7 @@ const ScrollTableContainer = styled.div`
 `;
 
 const WrapperContainer = styled.div<{ width: number }>`
-  width: 1920px;
+  min-width: ${({ width }) => `${width}px`};
   border-left: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 

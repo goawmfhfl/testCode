@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import styled from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
-import { filterOptionVar } from "@cache/sale/orderManagement";
+import { filterOptionVar } from "@cache/sale/order";
 import {
   commonFilterOptionVar,
   paginationSkipVar,

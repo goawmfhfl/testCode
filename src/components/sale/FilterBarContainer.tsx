@@ -36,7 +36,6 @@ const Container = styled.div`
   align-items: flex-end;
 
   width: 100%;
-  /* min-width: 1182px; */
 
   margin-bottom: 12px;
 

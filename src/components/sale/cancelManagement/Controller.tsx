@@ -11,7 +11,7 @@ import ControllerContainer from "@components/sale/ControllerContainer";
 import Button from "@components/common/Button";
 import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
-import { filterOptionVar } from "@cache/sale/orderManagement";
+import { filterOptionVar } from "@cache/sale/order";
 import { useReactiveVar } from "@apollo/client";
 
 const Controller = () => {

@@ -29,7 +29,7 @@ import {
 } from "@constants/sale";
 import { useMutation, useReactiveVar } from "@apollo/client";
 import { checkedOrderItemsVar, reasonVar } from "@cache/sale";
-import { filterOptionVar } from "@cache/sale/orderManagement";
+import { filterOptionVar } from "@cache/sale/order";
 import { CONFIRM_ORDERITMES_BY_SELLER } from "@graphql/mutations/confirmOrderItemsBySeller";
 import {
   CancelOrderItemsBySellerInputType,

@@ -54,7 +54,7 @@ export const tableWidth = {
   optionPrice: 64,
 
   //상품별 총 금액
-  totalPrice: 64,
+  totalPrice: 136,
 
   // 배송비
   shipmentPrice: 64,
@@ -194,61 +194,61 @@ export const scrollTableType = [
     value: "totalPrice",
   },
   {
-    id: 10,
+    id: 11,
     label: "배송비",
     width: getAverageWidth(tableWidth.shipmentPrice, tableWidth.right),
     value: "shipmentPrice",
   },
   {
-    id: 11,
+    id: 12,
     label: "제주/도서 추가배송비",
     width: getAverageWidth(tableWidth.shipmentDistantPrice, tableWidth.right),
     value: "shipmentDistantPrice",
   },
   {
-    id: 12,
+    id: 13,
     label: "총 환불 금액",
     width: getAverageWidth(tableWidth.totalRefundPrice, tableWidth.right),
     value: "totalRefundPrice",
   },
   {
-    id: 12,
+    id: 14,
     label: "구매자 아이디",
     width: getAverageWidth(tableWidth.userEmail, tableWidth.right),
     value: "userEmail",
   },
   {
-    id: 13,
+    id: 15,
     label: "구매자 전화번호",
     width: getAverageWidth(tableWidth.userPhoneNumber, tableWidth.right),
     value: "userPhoneNumber",
   },
   {
-    id: 14,
+    id: 16,
     label: "수취인",
     width: getAverageWidth(tableWidth.recipientName, tableWidth.right),
     value: "recipientName",
   },
   {
-    id: 15,
+    id: 17,
     label: "수취인 전화번호",
     width: getAverageWidth(tableWidth.recipientPhoneNumber, tableWidth.right),
     value: "recipientPhoneNumber",
   },
   {
-    id: 16,
+    id: 18,
     label: "취소 거절일",
     width: getAverageWidth(tableWidth.rejectCancelDay, tableWidth.right),
     value: "rejectCancelDay",
   },
   {
-    id: 17,
+    id: 19,
     label: "거절대표사유",
     width: getAverageWidth(tableWidth.rejectReason, tableWidth.right),
     value: "rejectReason",
   },
   {
-    id: 18,
+    id: 20,
     label: "거절상세사유",
     width: getAverageWidth(tableWidth.detailRejectReason, tableWidth.right),
     value: "detailRejectReason",

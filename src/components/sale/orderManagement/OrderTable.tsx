@@ -11,7 +11,7 @@ import {
   tableWidth,
 } from "@constants/sale/orderManagement/table";
 
-import { filterOptionVar } from "@cache/sale/orderManagement";
+import { filterOptionVar } from "@cache/sale/order";
 import {
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
@@ -29,8 +29,8 @@ import {
   SendOrderItemsType,
 } from "@models/sale/order";
 
-import resetOrderItems from "@utils/sale/resetOrderItems";
-import contructOrderItem from "@utils/sale/contructOrderItem";
+import resetOrderItems from "@utils/sale/order/resetOrderItems";
+import contructOrderItem from "@utils/sale/order/contructOrderItem";
 import { preventNaNValues } from "@utils/index";
 
 import {

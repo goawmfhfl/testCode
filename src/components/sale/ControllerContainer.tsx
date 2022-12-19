@@ -14,7 +14,6 @@ const Container = styled.div`
   justify-content: space-between;
   align-items: center;
 
-  overflow-x: scroll;
   padding: 16px;
   background-color: ${({ theme: { palette } }) => palette.white};
 
