@@ -11,8 +11,6 @@ import {
   tableWidth,
 } from "@constants/sale/orderManagement/table";
 
-import useLazyOrders from "@hooks/order/useLazyOrders";
-
 import { filterOptionVar } from "@cache/sale/orderManagement";
 import {
   commonFilterOptionVar,
@@ -21,6 +19,8 @@ import {
   systemModalVar,
   totalPageLengthVar,
 } from "@cache/index";
+import { checkedOrderItemsVar } from "@cache/sale";
+import { showHasServerErrorModal } from "@cache/productManagement/index";
 
 import {
   NormalizedListType,
@@ -31,17 +31,23 @@ import {
 
 import resetOrderItems from "@utils/sale/resetOrderItems";
 import contructOrderItem from "@utils/sale/contructOrderItem";
+import { preventNaNValues } from "@utils/index";
+
 import {
   checkAllBoxStatusVar,
   pageNumberListVar,
   paginationVisibilityVar,
 } from "@cache/index";
+
 import {
   GET_ORDERS_BY_SELLER,
   OrderItemsType,
 } from "@graphql/queries/getOrdersBySeller";
-import { checkedOrderItemsVar } from "@cache/sale";
+import { SEND_ORDERITEMS } from "@graphql/mutations/sendOrderItems";
 
+import useLazyOrders from "@hooks/order/useLazyOrders";
+
+import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 
 import {
@@ -62,12 +68,7 @@ import {
   OptionInput as Option,
 } from "@components/common/input/Dropdown";
 import Button from "@components/common/Button";
-import { showHasServerErrorModal } from "@cache/productManagement/index";
 import { Input } from "@components/common/input/TextInput";
-import { preventNaNValues } from "@utils/index";
-
-import exclamationmarkSrc from "@icons/exclamationmark.svg";
-import { SEND_ORDERITEMS } from "@graphql/mutations/sendOrderItems";
 
 const OrderTable = () => {
   const { getOrderItem, error, loading, data } = useLazyOrders();
