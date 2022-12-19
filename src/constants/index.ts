@@ -1,3 +1,11 @@
+import { SkipQuantityType } from "@models/sale";
+
+export const skipQuantityType: Array<SkipQuantityType> = [
+  { id: 0, label: "20개씩 보기", value: 20 },
+  { id: 1, label: "50개씩 보기", value: 50 },
+  { id: 2, label: "100개씩 보기", value: 100 },
+];
+
 export enum SHOP_SETTING_SECTIONS {
   SHOP_INFO = "SHOP_INFO",
   SHOP_POLICY = "SHOP_POLICY",
