@@ -30,7 +30,6 @@ const ProductDescriptionSection = () => {
         placeholder={
           "최소 50자 이상 입력해주세요. ‘- (대쉬)’는 ‘・(글머리 기호)’로 나옵니다."
         }
-        maxLength={100}
       />
     </div>
   );
