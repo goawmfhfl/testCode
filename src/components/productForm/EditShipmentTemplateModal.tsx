@@ -15,7 +15,7 @@ interface EditShipmentTemplateModalProps {
 
 const READ_TEMPLATES = gql`
   query ReadTemplates {
-    getUserShipmentTemplates {
+    getShipmentTemplatesByUser {
       ok
       error
       shipmentTemplates {
@@ -60,9 +60,9 @@ const EditShipmentTemplateModal = ({
 
   useEffect(() => {
     const {
-      getUserShipmentTemplates: { shipmentTemplates },
+      getShipmentTemplatesByUser: { shipmentTemplates },
     }: {
-      getUserShipmentTemplates: {
+      getShipmentTemplatesByUser: {
         shipmentTemplates: Array<CreateShipmentInputType & { id: number }>;
       };
     } = client.readQuery({

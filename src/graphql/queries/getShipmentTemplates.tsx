@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const GET_SHIPMENT_TEMPLATES = gql`
   query GetAllShipmentTemplates {
-    getUserShipmentTemplates {
+    getShipmentTemplatesByUser {
       ok
       error
       shipmentTemplates {

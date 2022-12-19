@@ -49,7 +49,7 @@ const ShipmentChargeTemplateModal = () => {
     useState<boolean>(false);
 
   const { loading, error, data, refetch } = useQuery<{
-    getUserShipmentTemplates: {
+    getShipmentTemplatesByUser: {
       ok: boolean;
       error: string;
       shipmentTemplates: Array<{
@@ -157,7 +157,7 @@ const ShipmentChargeTemplateModal = () => {
       })();
     };
 
-  const shipmentTemplates = data?.getUserShipmentTemplates?.shipmentTemplates;
+  const shipmentTemplates = data?.getShipmentTemplatesByUser?.shipmentTemplates;
 
   if (error) {
     // TODO: system modal로 처리

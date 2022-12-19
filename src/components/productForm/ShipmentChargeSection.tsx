@@ -29,8 +29,8 @@ import {
 } from "@models/product/shipmentTemplate";
 
 const GET_SHIPMENT_TEMPLATES = gql`
-  query GetUserShipmentTemplates {
-    getUserShipmentTemplates {
+  query getShipmentTemplatesByUser {
+    getShipmentTemplatesByUser {
       ok
       error
       shipmentTemplates {
@@ -58,7 +58,7 @@ const ShipmentChargeSection = () => {
   const modal = useReactiveVar(modalVar);
 
   const [getShipmentTemplates, { loading }] = useLazyQuery<{
-    getUserShipmentTemplates: {
+    getShipmentTemplatesByUser: {
       ok: boolean;
       error: string;
       shipmentTemplates: Array<{
@@ -94,8 +94,8 @@ const ShipmentChargeSection = () => {
       const { data } = await getShipmentTemplates();
 
       const {
-        getUserShipmentTemplates: { shipmentTemplates },
-      } = data || { getUserShipmentTemplates: {} };
+        getShipmentTemplatesByUser: { shipmentTemplates },
+      } = data || { getShipmentTemplatesByUser: {} };
 
       if (!shipmentTemplates) return;
 
@@ -111,7 +111,7 @@ const ShipmentChargeSection = () => {
     (async () => {
       const {
         data: {
-          getUserShipmentTemplates: { shipmentTemplates },
+          getShipmentTemplatesByUser: { shipmentTemplates },
         },
       } = await getShipmentTemplates();
 
@@ -130,7 +130,7 @@ const ShipmentChargeSection = () => {
     (async () => {
       const {
         data: {
-          getUserShipmentTemplates: { shipmentTemplates },
+          getShipmentTemplatesByUser: { shipmentTemplates },
         },
       } = await getShipmentTemplates();
 
