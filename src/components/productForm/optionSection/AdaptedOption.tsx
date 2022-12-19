@@ -48,8 +48,8 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
                   {!adaptedOption.optionHeaders.length &&
                     optionType === OptionTypes.Selective && (
                       <>
-                        <TableHeader>추가 옵션명</TableHeader>
-                        <TableHeader>추가 옵션값</TableHeader>
+                        <TableHeader>선택 옵션명</TableHeader>
+                        <TableHeader>선택 옵션값</TableHeader>
                       </>
                     )}
                 </TableHeaderRow>

@@ -142,7 +142,7 @@ const ProductForm = () => {
             </SectionWrapper>
             <SectionWrapper
               referenceKey={PRODUCT_REGISTRATION_SECTIONS.SELECTIVE_OPTION}
-              label={"추가 상품 설정"}
+              label={"선택 옵션 설정"}
             >
               <SelectiveOptionSection />
             </SectionWrapper>

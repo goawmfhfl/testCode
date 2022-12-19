@@ -26,7 +26,7 @@ const SelectiveOption = () => {
   const handleAdaptButtonClick = () => {
     if (!getValues(HAS_SELECTIVE_OPTION)) return;
 
-    const optionHeaders = ["추가 옵션명", "추가 옵션값"].map((header) => {
+    const optionHeaders = ["선택 옵션명", "선택 옵션값"].map((header) => {
       return {
         id: uuidv4(),
         header,
