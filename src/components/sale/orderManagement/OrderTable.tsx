@@ -194,7 +194,7 @@ const OrderTable = () => {
     };
 
   const handleSendButtonClick =
-    (shipmentCompany: string, shipmentNumber: string) => () => {
+    (id: number, shipmentCompany: string, shipmentNumber: string) => () => {
       if (!shipmentCompany || !shipmentNumber) {
         systemModalVar({
           ...systemModalVar(),
@@ -241,7 +241,7 @@ const OrderTable = () => {
                   input: {
                     shipmentCompany,
                     shipmentNumber: Number(shipmentNumber),
-                    orderItemIds: checkedOrderItemIds,
+                    orderItemIds: [id],
                   },
                 },
               });
@@ -302,6 +302,16 @@ const OrderTable = () => {
       });
     })();
   }, [page, skip, query, type, statusName, statusType, statusGroup]);
+
+  console.log([
+    { page },
+    { skip },
+    { query },
+    { type },
+    { statusName },
+    { statusType },
+    { statusGroup },
+  ]);
 
   useEffect(() => {
     if (!data || !data.getOrdersBySeller) return;
@@ -566,6 +576,7 @@ const OrderTable = () => {
                           disabled={orderStatus === "새주문"}
                           width={"55px"}
                           onClick={handleSendButtonClick(
+                            id,
                             temporaryShipmentCompany,
                             temporaryShipmentNumber
                           )}

@@ -215,7 +215,7 @@ export interface GetOrderStatusBySellerInputType {
 }
 
 export const GET_ORDER_STATUS_BY_SELLER = gql`
-  query GetOrderStatusBySeller($input: GetOrdersBySellerInput!) {
+  query GetOrdersBySeller($input: GetOrdersBySellerInput!) {
     getOrdersBySeller(input: $input) {
       ok
       error
