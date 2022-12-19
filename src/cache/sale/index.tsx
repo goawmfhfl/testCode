@@ -5,7 +5,8 @@ import {
   OrderStatusType,
   SaleMenuStatusType,
 } from "@constants/sale";
-import { FilterOptionVarType, ResetOrderItemType } from "@models/sale";
+import { ResetOrderItemType } from "@models/sale/order";
+import { FilterOptionVarType } from "@models/sale";
 
 export const saleMenuStatusVar = makeVar<SaleMenuStatusType>(
   SaleMenuStatusType.ORDER

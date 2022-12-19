@@ -27,7 +27,7 @@ import {
   ResetOrderItemType,
   SendOrderItemsInputType,
   SendOrderItemsType,
-} from "@models/sale";
+} from "@models/sale/order";
 
 import resetOrderItems from "@utils/sale/resetOrderItems";
 import contructOrderItem from "@utils/sale/contructOrderItem";

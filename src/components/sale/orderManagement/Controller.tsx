@@ -38,7 +38,7 @@ import {
   ConfirmOrderItemsBySellerType,
   SendOrderItemsInputType,
   SendOrderItemsType,
-} from "@models/sale";
+} from "@models/sale/order";
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import { SEND_ORDERITEMS } from "@graphql/mutations/sendOrderItems";
 import { CANCEL_ORDERITEMS_BY_SELLER } from "@graphql/mutations/cancelOrderItemsBySeller";

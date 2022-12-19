@@ -1,4 +1,4 @@
-import { NormalizedListType } from "@models/sale";
+import { NormalizedListType } from "@models/sale/order";
 import { orderStatusNameType } from "@constants/sale";
 
 const resetOrderItems = (recontructOrderItem: NormalizedListType) => {

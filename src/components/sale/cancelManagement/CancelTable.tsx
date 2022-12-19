@@ -24,7 +24,7 @@ import {
   ResetOrderItemType,
   SendOrderItemsInputType,
   SendOrderItemsType,
-} from "@models/sale";
+} from "@models/sale/order";
 
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 import { checkedOrderItemsVar } from "@cache/sale";

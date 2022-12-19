@@ -1,5 +1,5 @@
 import { OrderItemsType } from "@graphql/queries/getOrdersBySeller";
-import { NormalizedListType } from "@models/sale";
+import { NormalizedListType } from "@models/sale/order";
 
 const contructOrderItem = (orderItem: Array<OrderItemsType>) => {
   const result: NormalizedListType = {
