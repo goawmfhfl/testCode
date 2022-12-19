@@ -216,7 +216,7 @@ const SaveBar = () => {
           watch(SHIPMENT_PRICE_TYPE) === ShipmentChargeType.Free;
         const hasTagInfo = watch(HAS_TAG_INFOS) as boolean;
 
-        const { isFulfilled, unfulfilledInputNames } = hasEveryInputFulfilled(
+        const { isFulfilled, unfulfilledInputList } = hasEveryInputFulfilled(
           input,
           [
             !isDiscounted && "discountAmount",
@@ -247,18 +247,19 @@ const SaveBar = () => {
         );
 
         if (!isFulfilled) {
-          const unfulfilledSectionNames = [
-            ...new Set(
-              unfulfilledInputNames.map((inputName: string): string => {
-                return productRegistrationSectionMapper[inputName];
-              })
-            ),
-          ];
+          const unfulfilledSectionList = unfulfilledInputList.map(
+            ({ name, status }) => {
+              return {
+                name: productRegistrationSectionMapper[name],
+                status,
+              };
+            }
+          );
 
-          unfulfilledSectionNames.forEach((sectionName) => {
+          unfulfilledSectionList.forEach(({ name, status }) => {
             sectionFulfillmentVar({
               ...sectionFulfillmentVar(),
-              [sectionName]: false,
+              [name]: status,
             });
           });
 

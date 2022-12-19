@@ -3,6 +3,7 @@ import styled, { css } from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
 import { sectionFulfillmentVar, sectionReferenceVar } from "@cache/index";
+import { UnfulfilledStatus } from "@constants/index";
 
 const SectionWrapper = ({
   label,
@@ -21,9 +22,7 @@ const SectionWrapper = ({
   labelMarginTop?: boolean;
   referenceKey?: string;
 }) => {
-  const isFulfilledSection = useReactiveVar(sectionFulfillmentVar)[
-    referenceKey
-  ];
+  const fulfillmentStatus = useReactiveVar(sectionFulfillmentVar)[referenceKey];
 
   return (
     <Container
@@ -40,7 +39,7 @@ const SectionWrapper = ({
       onMouseDown={() => {
         sectionFulfillmentVar({
           ...sectionFulfillmentVar(),
-          [referenceKey]: true,
+          [referenceKey]: UnfulfilledStatus.Fulfilled,
         });
       }}
     >
@@ -53,7 +52,7 @@ const SectionWrapper = ({
           {label}
         </InputLabel>
         <UnfulfilledMessageWrapper>
-          {!isFulfilledSection && "※필수 입력사항입니다."}
+          {fulfillmentStatus}
         </UnfulfilledMessageWrapper>
       </InputLabelWrapper>
 

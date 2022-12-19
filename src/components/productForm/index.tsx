@@ -27,7 +27,7 @@ import exclamationMarkSrc from "@icons/exclamationmark.svg";
 import SearchTagSection from "@components/productForm/searchTagSection";
 import { HeaderNames, PRODUCT_REGISTRATION_SECTIONS } from "@constants/index";
 import { useEffect } from "react";
-import { unfulfilledInputNamesVar } from "@cache/shopSettings";
+import { unfulfilledInputListVar } from "@cache/shopSettings";
 import {
   sectionFulfillmentVar,
   sectionFulfillmentInitialValue,
@@ -39,7 +39,7 @@ const ProductForm = () => {
   }, []);
 
   const initializeFormStatus = () => {
-    unfulfilledInputNamesVar([]);
+    unfulfilledInputListVar([]);
     sectionFulfillmentVar(sectionFulfillmentInitialValue);
   };
 

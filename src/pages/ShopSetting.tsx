@@ -40,7 +40,7 @@ import SettlementAccount from "@components/shopSetting/SettlementAccount";
 import RegistrationNumber from "@components/shopSetting/RegistrationNumber";
 import { showHasServerErrorModal } from "@cache/productManagement";
 import useAuthGuard from "@hooks/useAuthGuard";
-import { unfulfilledInputNamesVar } from "@cache/shopSettings";
+import { unfulfilledInputListVar } from "@cache/shopSettings";
 
 const ShopSetting = () => {
   useAuthGuard();
@@ -205,7 +205,7 @@ const ShopSetting = () => {
   }, []);
 
   const initializeFormStatus = () => {
-    unfulfilledInputNamesVar([]);
+    unfulfilledInputListVar([]);
     sectionFulfillmentVar(sectionFulfillmentInitialValue);
   };
 

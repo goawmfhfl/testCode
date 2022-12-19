@@ -1,4 +1,4 @@
-import { SyntheticEvent, useEffect } from "react";
+import { SyntheticEvent } from "react";
 import { useFormContext } from "react-hook-form";
 import styled from "styled-components/macro";
 
@@ -20,7 +20,7 @@ import {
   HAS_SET_CONDITIONAL_FREE_SHIPMENT,
 } from "@cache/shopSettings";
 import { ConditionalFreeShipmentPolicy } from "@constants/shop";
-import { unfulfilledInputNamesVar } from "@cache/shopSettings";
+import { unfulfilledInputListVar } from "@cache/shopSettings";
 import { useReactiveVar } from "@apollo/client";
 
 const ShipmentSettings = () => {
@@ -48,11 +48,11 @@ const ShipmentSettings = () => {
     watch(HAS_SET_CONDITIONAL_FREE_SHIPMENT) ===
     ConditionalFreeShipmentPolicy.Set;
 
-  const unfulfilledInputNames = useReactiveVar(unfulfilledInputNamesVar);
+  const unfulfilledInputList = useReactiveVar(unfulfilledInputListVar);
 
-  const isShipmentConditionalPriceUnfulfilled = unfulfilledInputNames.includes(
-    "shipmentConditionalPrice"
-  );
+  const isShipmentConditionalPriceUnfulfilled = unfulfilledInputList
+    .map(({ name }) => name)
+    .includes("shipmentConditionalPrice");
 
   return (
     <Container>

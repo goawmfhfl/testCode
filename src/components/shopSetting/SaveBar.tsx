@@ -18,7 +18,7 @@ import {
 import {
   HAS_SET_CONDITIONAL_FREE_SHIPMENT,
   SHIPMENT_PRICE_TYPE,
-  unfulfilledInputNamesVar,
+  unfulfilledInputListVar,
 } from "@cache/shopSettings";
 import { Pathnames, shopSettingsSectionMapper } from "@constants/index";
 import { ConditionalFreeShipmentPolicy } from "@constants/shop";
@@ -234,7 +234,7 @@ const SaveBar = () => {
           watch(HAS_SET_CONDITIONAL_FREE_SHIPMENT) ===
           ConditionalFreeShipmentPolicy.Unset;
 
-        const { isFulfilled, unfulfilledInputNames } = hasEveryInputFulfilled(
+        const { isFulfilled, unfulfilledInputList } = hasEveryInputFulfilled(
           input,
           [
             "safetyAuthentication",
@@ -254,26 +254,24 @@ const SaveBar = () => {
         );
 
         if (!isFulfilled) {
-          unfulfilledInputNamesVar(unfulfilledInputNames);
+          unfulfilledInputListVar(unfulfilledInputList);
 
-          const unfulfilledSectionNames = [
-            ...new Set(
-              unfulfilledInputNames.map(
-                (inputName: string): string =>
-                  shopSettingsSectionMapper[inputName]
-              )
-            ),
-          ];
+          const unfulfilledSectionNames = unfulfilledInputList.map(
+            ({ name, status }) => ({
+              name: shopSettingsSectionMapper[name],
+              status,
+            })
+          );
 
-          const targetSection =
-            shopSettingsSectionMapper[unfulfilledInputNames[0]];
-          const sectionReferenceList = sectionReferenceVar();
-          const targetSectionReference = sectionReferenceList[targetSection];
+          // const targetSection =
+          //   shopSettingsSectionMapper[unfulfilledInputList[0]];
+          // const sectionReferenceList = sectionReferenceVar();
+          // const targetSectionReference = sectionReferenceList[targetSection];
 
-          unfulfilledSectionNames.forEach((sectionName) => {
+          unfulfilledSectionNames.forEach(({ name, status }) => {
             sectionFulfillmentVar({
               ...sectionFulfillmentVar(),
-              [sectionName]: false,
+              [name]: status,
             });
           });
 

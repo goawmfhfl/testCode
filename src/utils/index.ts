@@ -1,4 +1,4 @@
-import { Pathnames } from "@constants/index";
+import { Pathnames, UnfulfilledStatus } from "@constants/index";
 import { UploadFileType } from "@models/index";
 import axios from "axios";
 
@@ -119,9 +119,15 @@ function hasEveryInputFulfilled(
   formType?: Pathnames.Shop | Pathnames.ProductRegistration
 ): {
   isFulfilled: boolean;
-  unfulfilledInputNames: Array<string>;
+  unfulfilledInputList: Array<{
+    name: string;
+    status: UnfulfilledStatus | string;
+  }>;
 } {
-  const unfulfilledInputNames = [];
+  const unfulfilledInputList: Array<{
+    name: string;
+    status: UnfulfilledStatus | string;
+  }> = [];
 
   const inputNames = Object.keys(inputFields);
   const inputValues = Object.values(inputFields);
@@ -157,7 +163,9 @@ function hasEveryInputFulfilled(
         );
 
         if (!shopImagePC || !shopImageMobile) {
-          unfulfilledInputNames.push("shopInfo");
+          unfulfilledInputList.push(
+            createUnfulfilledInput("shopInfo", UnfulfilledStatus.Unfilled)
+          );
 
           return false;
         }
@@ -191,11 +199,18 @@ function hasEveryInputFulfilled(
         const isDescriptionImagesUnfulfilled = !descriptionImages.length;
 
         if (isRequiredImagesUnfulfilled) {
-          unfulfilledInputNames.push("requiredImages");
+          unfulfilledInputList.push(
+            createUnfulfilledInput("requiredImages", UnfulfilledStatus.Unfilled)
+          );
         }
 
         if (isDescriptionImagesUnfulfilled) {
-          unfulfilledInputNames.push("descriptionImages");
+          unfulfilledInputList.push(
+            createUnfulfilledInput(
+              "descriptionImages",
+              UnfulfilledStatus.Unfilled
+            )
+          );
         }
 
         if (isRequiredImagesUnfulfilled || isDescriptionImagesUnfulfilled) {
@@ -208,7 +223,9 @@ function hasEveryInputFulfilled(
       // Array - colors
       if (inputValue instanceof Array && inputName === "colors") {
         if (!inputValue.length) {
-          unfulfilledInputNames.push(inputName);
+          unfulfilledInputList.push(
+            createUnfulfilledInput(inputName, UnfulfilledStatus.Unfilled)
+          );
 
           return false;
         }
@@ -280,12 +297,22 @@ function hasEveryInputFulfilled(
           Boolean(selectiveOptions.stockSum);
 
         if (hasRequiredOptions && !isRequiredOptionValid) {
-          unfulfilledInputNames.push("requiredOptions");
+          unfulfilledInputList.push(
+            createUnfulfilledInput(
+              "requiredOptions",
+              UnfulfilledStatus.Unfilled
+            )
+          );
           result = false;
         }
 
         if (hasSelectiveOptions && !isSelectiveOptionValid) {
-          unfulfilledInputNames.push("selectiveOptions");
+          unfulfilledInputList.push(
+            createUnfulfilledInput(
+              "selectiveOptions",
+              UnfulfilledStatus.Unfilled
+            )
+          );
           result = false;
         }
 
@@ -311,7 +338,9 @@ function hasEveryInputFulfilled(
         ) as boolean;
 
         if (!hasMinProperty || !hasMaxProperty) {
-          unfulfilledInputNames.push(inputName);
+          unfulfilledInputList.push(
+            createUnfulfilledInput(inputName, UnfulfilledStatus.Unfilled)
+          );
 
           return false;
         }
@@ -325,7 +354,9 @@ function hasEveryInputFulfilled(
           isNaN(manufacturingLeadTime["min"]) ||
           isNaN(manufacturingLeadTime["max"])
         ) {
-          unfulfilledInputNames.push(inputName);
+          unfulfilledInputList.push(
+            createUnfulfilledInput(inputName, UnfulfilledStatus.Unfilled)
+          );
 
           return false;
         }
@@ -336,7 +367,9 @@ function hasEveryInputFulfilled(
       // Array - tagInfos
       if (inputValue instanceof Array && inputName === "tagInfos") {
         if (!inputValue.length) {
-          unfulfilledInputNames.push(inputName);
+          unfulfilledInputList.push(
+            createUnfulfilledInput(inputName, UnfulfilledStatus.Unfilled)
+          );
 
           return false;
         }
@@ -344,12 +377,24 @@ function hasEveryInputFulfilled(
         return acc;
       }
 
+      if (typeof inputValue === "string" && inputName === "description") {
+        if (inputValue.length < 50) {
+          unfulfilledInputList.push(
+            createUnfulfilledInput(inputName, "50자 이상 입력해주세요.")
+          );
+
+          return false;
+        }
+      }
+
       // string
       if (typeof inputValue === "string") {
         const isValid = isVacantString(inputValue);
 
         if (!isValid) {
-          unfulfilledInputNames.push(inputName);
+          unfulfilledInputList.push(
+            createUnfulfilledInput(inputName, UnfulfilledStatus.Unfilled)
+          );
         }
 
         return acc && isValid;
@@ -367,7 +412,9 @@ function hasEveryInputFulfilled(
         );
 
         if (!isValidNumber) {
-          unfulfilledInputNames.push(inputName);
+          unfulfilledInputList.push(
+            createUnfulfilledInput(inputName, UnfulfilledStatus.Unfilled)
+          );
 
           return false;
         }
@@ -385,7 +432,9 @@ function hasEveryInputFulfilled(
         return acc;
       }
 
-      unfulfilledInputNames.push(inputName);
+      unfulfilledInputList.push(
+        createUnfulfilledInput(inputName, UnfulfilledStatus.Unfilled)
+      );
 
       return false;
     },
@@ -394,7 +443,17 @@ function hasEveryInputFulfilled(
 
   return {
     isFulfilled,
-    unfulfilledInputNames,
+    unfulfilledInputList,
+  };
+}
+
+function createUnfulfilledInput(
+  name: string,
+  status: UnfulfilledStatus | string
+) {
+  return {
+    name,
+    status,
   };
 }
 

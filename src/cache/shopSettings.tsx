@@ -1,4 +1,5 @@
 import { makeVar } from "@apollo/client";
+import { UnfulfilledStatus } from "@constants/index";
 
 import {
   ShopImageVariables,
@@ -59,4 +60,9 @@ export const settlementAccountVar = makeVar<SettlementAccountVariables>({
   bankName: "",
 });
 
-export const unfulfilledInputNamesVar = makeVar<Array<string>>([]);
+export const unfulfilledInputListVar = makeVar<
+  Array<{
+    name: string;
+    status: UnfulfilledStatus | string;
+  }>
+>([]);

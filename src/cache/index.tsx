@@ -6,6 +6,7 @@ import { CommonFilterOptionType } from "@models/index";
 import {
   SHOP_SETTING_SECTIONS,
   PRODUCT_REGISTRATION_SECTIONS,
+  UnfulfilledStatus,
 } from "@constants/index";
 
 // Global Layout
@@ -112,34 +113,34 @@ export const sectionReferenceVar = makeVar<{
 });
 
 export const sectionFulfillmentInitialValue = {
-  SHOP_INFO: true,
-  SHOP_POLICY: true,
-  SAFETY_CERTIFICATION: true,
-  SHIPMENT_SETTINGS: true,
-  BUSINESS_LICENSE: true,
-  REGISTRATION_NUMBER: true,
-  PHONE_NUMBER: true,
-  SETTLEMENT_ACCOUNT: true,
-  PRODUCT_NAME: true,
-  CATEGORY: true,
-  PRODUCT_IMAGE: true,
-  DESCRIPTION: true,
-  DESCRIPTION_IMAGE: true,
-  COLOR: true,
-  PRICE: true,
-  DISCOUNT: true,
-  STOCK: true,
-  REQUIRED_OPTION: true,
-  SELECTIVE_OPTION: true,
-  ORDER_PRODUCTION: true,
-  PRODUCT_SHIPMENT_SETTINGS: true,
-  SPECIFICATION: true,
-  SEARCH_TAG: true,
+  SHOP_INFO: UnfulfilledStatus.Fulfilled,
+  SHOP_POLICY: UnfulfilledStatus.Fulfilled,
+  SAFETY_CERTIFICATION: UnfulfilledStatus.Fulfilled,
+  SHIPMENT_SETTINGS: UnfulfilledStatus.Fulfilled,
+  BUSINESS_LICENSE: UnfulfilledStatus.Fulfilled,
+  REGISTRATION_NUMBER: UnfulfilledStatus.Fulfilled,
+  PHONE_NUMBER: UnfulfilledStatus.Fulfilled,
+  SETTLEMENT_ACCOUNT: UnfulfilledStatus.Fulfilled,
+  PRODUCT_NAME: UnfulfilledStatus.Fulfilled,
+  CATEGORY: UnfulfilledStatus.Fulfilled,
+  PRODUCT_IMAGE: UnfulfilledStatus.Fulfilled,
+  DESCRIPTION: UnfulfilledStatus.Fulfilled,
+  DESCRIPTION_IMAGE: UnfulfilledStatus.Fulfilled,
+  COLOR: UnfulfilledStatus.Fulfilled,
+  PRICE: UnfulfilledStatus.Fulfilled,
+  DISCOUNT: UnfulfilledStatus.Fulfilled,
+  STOCK: UnfulfilledStatus.Fulfilled,
+  REQUIRED_OPTION: UnfulfilledStatus.Fulfilled,
+  SELECTIVE_OPTION: UnfulfilledStatus.Fulfilled,
+  ORDER_PRODUCTION: UnfulfilledStatus.Fulfilled,
+  PRODUCT_SHIPMENT_SETTINGS: UnfulfilledStatus.Fulfilled,
+  SPECIFICATION: UnfulfilledStatus.Fulfilled,
+  SEARCH_TAG: UnfulfilledStatus.Fulfilled,
 };
 
-export const sectionFulfillmentVar = makeVar<{ [key: string]: boolean }>(
-  sectionFulfillmentInitialValue
-);
+export const sectionFulfillmentVar = makeVar<{
+  [key: string]: UnfulfilledStatus | string;
+}>(sectionFulfillmentInitialValue);
 
 export const SkipQuantityCache: Array<SkipQuantityType> = [
   { id: 0, label: "20개씩 보기", value: 20 },

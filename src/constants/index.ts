@@ -123,3 +123,8 @@ export enum SubmissionType {
   Create = "CREATE",
   Update = "UPDATE",
 }
+
+export enum UnfulfilledStatus {
+  Unfilled = "필수 입력사항입니다.",
+  Fulfilled = "",
+}
