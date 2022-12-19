@@ -11,6 +11,7 @@ import {
 
 // Global Layout
 export const loadingSpinnerVisibilityVar = makeVar<boolean>(false);
+export const sideNavigationBarStatusVar = makeVar<string>("");
 
 // TABLE: 페이지네이션
 export const paginationVisibilityVar = makeVar<boolean | ApolloError>(true);
