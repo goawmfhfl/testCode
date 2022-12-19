@@ -1,10 +1,10 @@
 import { useLazyQuery } from "@apollo/client";
 
+import { GET_ORDER_STATUS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import {
   GetOrderStatusBySellerType,
   GetOrderStatusBySellerInputType,
-  GET_ORDER_STATUS_BY_SELLER,
-} from "@graphql/queries/getOrdersBySeller";
+} from "@models/sale/order";
 
 const useLazyOrderStatus = () => {
   const [getOrderStatus, { loading, error, data }] = useLazyQuery<

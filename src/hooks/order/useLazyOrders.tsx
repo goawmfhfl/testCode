@@ -1,10 +1,10 @@
 import { useLazyQuery } from "@apollo/client";
 
+import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import {
   GetOrdersBySellerInputType,
   GetOrdersBySellerType,
-  GET_ORDERS_BY_SELLER,
-} from "@graphql/queries/getOrdersBySeller";
+} from "@models/sale/order";
 
 const useLazyOrders = () => {
   const [getOrderItem, { loading, error, data }] = useLazyQuery<

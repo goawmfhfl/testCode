@@ -28,7 +28,7 @@ import {
 
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 import { checkedOrderItemsVar } from "@cache/sale";
-import { OrderItemsType } from "@graphql/queries/getOrdersBySeller";
+import { OrderItemsType } from "@models/sale/order";
 
 import {
   FixedTable,

@@ -39,10 +39,8 @@ import {
   paginationVisibilityVar,
 } from "@cache/index";
 
-import {
-  GET_ORDERS_BY_SELLER,
-  OrderItemsType,
-} from "@graphql/queries/getOrdersBySeller";
+import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+import { OrderItemsType } from "@models/sale/order";
 import { SEND_ORDERITEMS } from "@graphql/mutations/sendOrderItems";
 
 import useLazyOrders from "@hooks/order/useLazyOrders";
