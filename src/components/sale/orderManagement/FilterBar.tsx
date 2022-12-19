@@ -19,6 +19,7 @@ import {
 
 import FilterBarContainer from "@components/sale/FilterBarContainer";
 import Button from "@components/common/Button";
+import { getOrdersLength } from "@utils/sale/order";
 
 const FilterBar = () => {
   const { data, getOrderStatus } = useLazyOrderStatus();
@@ -26,30 +27,8 @@ const FilterBar = () => {
   const totalPageLength = useReactiveVar(totalPageLengthVar);
   const orders = data?.getOrdersBySeller.totalOrderItems || [];
 
-  const ordersLength = {
-    allOrders: orders.length,
-    paymentCompleted: orders.filter(
-      (list) => list.orderStatus.name === OrderStatusName.PAYMENT_COMPLETED
-    ).length,
-    preparing: orders.filter(
-      (list) => list.orderStatus.name === OrderStatusName.PREPARING
-    ).length,
-    shipping: orders.filter(
-      (list) => list.orderStatus.name === OrderStatusName.SHIPPING
-    ).length,
-
-    shippingCompleted: orders.filter(
-      (list) => list.orderStatus.name === OrderStatusName.SHIPPING_COMPLETED
-    ).length,
-  };
-
-  const {
-    allOrders,
-    paymentCompleted,
-    preparing,
-    shipping,
-    shippingCompleted,
-  } = ordersLength;
+  const { all, paymentCompleted, preparing, shipping, shippingCompleted } =
+    getOrdersLength(orders);
 
   const handleFilterOptionNameClick =
     (filterOptionName: OrderStatusName) => () => {
@@ -95,7 +74,7 @@ const FilterBar = () => {
         isActvie={statusName === null}
         onClick={handleFilterOptionNameClick(null)}
       >
-        전체 {allOrders}
+        전체 {all}
       </Filter>
       <Filter
         isActvie={statusName === OrderStatusName.PAYMENT_COMPLETED}
