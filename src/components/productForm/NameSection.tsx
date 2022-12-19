@@ -15,10 +15,11 @@ const ProductName = () => {
     <Container>
       <NoticeContainer
         icon={exclamationMarkSrc}
-        width={"396px"}
+        width={"476px"}
         isOneLiner={true}
       >
-        상품명은 100자까지 입력 가능하며 특수문자를 포함할 수 없습니다.
+        상품명은 100자까지 입력 가능하며 특수문자는 [ ] ( ) _ - + & / ; : ‘ “
+        제외 불가합니다.
       </NoticeContainer>
 
       <TextInputWrapper>

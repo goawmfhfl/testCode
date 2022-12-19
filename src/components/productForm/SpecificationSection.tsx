@@ -19,7 +19,7 @@ const ProductSpecification = () => {
   return (
     <Container>
       <InputContainer>
-        <Label>작품명 ●</Label>
+        <Label>상품명 ●</Label>
         <TextInput register={register(SPEC_NAME)} width="100%" />
       </InputContainer>
       <InputContainer>

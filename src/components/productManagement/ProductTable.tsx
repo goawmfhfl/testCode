@@ -469,7 +469,7 @@ const ProductTable = () => {
           <NoDataContainer type={TableType.FIX}>
             {query === "" ? (
               <>
-                아직 들어온 <br /> 상품이 없습니다.
+                아직 등록된 <br /> 상품이 없습니다.
               </>
             ) : (
               <>

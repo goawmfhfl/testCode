@@ -120,14 +120,13 @@ const RequiredOption = () => {
             },
           }}
         />{" "}
-        옵션 설정하기
+        필수 옵션 설정하기
       </CheckboxContainer>
 
       <NoticeContainer icon={exclamationMarkSrc}>
         <NoticeList>
           <li>
-            필수 옵션은 구매자가 필수로 선택해야 하는 옵션입니다. ex) 핸드폰
-            케이스의 기종 옵션
+            필수 옵션은 구매자가 필수로 선택해야 상품 구매가 가능한 옵션입니다.
           </li>
           <li>옵션값은 쉼표로 구분해주세요.</li>
           <li>

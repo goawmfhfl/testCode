@@ -102,7 +102,7 @@ const SearchTagSection = () => {
 
       <TagInput
         width={"741px"}
-        placeholder={"태그를 입력해주세요."}
+        placeholder={"태그를 입력 후 엔터를 치면 하단에 태그가 생성됩니다."}
         onChange={handleTagInputChange}
         onKeyUp={handleTagInputKeyUp}
         value={tagInput}

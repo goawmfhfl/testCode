@@ -14,11 +14,11 @@ const ProductDescriptionSection = () => {
       <NoticeContainerWrapper>
         <NoticeContainer
           icon={exclamationmarkSrc}
-          width="502px"
+          width="655px"
           isOneLiner={true}
         >
-          상품에 관한 간략한 설명을 작성해주세요. 입력하신 내용은 상품페이지
-          상단에 노출됩니다.
+          상품의 스토리, 장점, 디테일, 사용 방법, 주의 사항 등을 알려주세요.
+          소비자가 상품 구매를 결정하는 데에 큰 도움이 됩니다.
         </NoticeContainer>
       </NoticeContainerWrapper>
 
@@ -28,7 +28,7 @@ const ProductDescriptionSection = () => {
         height={"120px"}
         register={register(PRODUCT_DESCRIPTION)}
         placeholder={
-          "최소 100 바이트 이상 입력해주세요. ‘- (대쉬)’는 ‘・(글머리 기호)’로 나옵니다."
+          "최소 50자 이상 입력해주세요. ‘- (대쉬)’는 ‘・(글머리 기호)’로 나옵니다."
         }
         maxLength={100}
       />

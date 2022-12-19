@@ -84,7 +84,7 @@ const AdaptedOption = ({ optionType }: { optionType: OptionTypes }) => {
           </TableHeader>
 
           <TableHeader className={"header--top-end header--price"}>
-            옵션가
+            추가 금액
           </TableHeader>
 
           <TableHeader className={"header--top-end header--stock"}>

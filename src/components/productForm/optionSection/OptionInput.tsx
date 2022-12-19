@@ -154,12 +154,14 @@ const OptionInputRow = ({
           )}
           disabled={disabled}
           maxLength={25}
+          placeholder={"컬러"}
         />
       </TableData>
       <TableData>
         <OptionValues
           width={"263px"}
           disabled={disabled}
+          placeholder={"빨강, 노랑, 주황"}
           register={register(
             optionType === OptionTypes.Required
               ? `requiredOptionValue-${optionId}`

@@ -166,7 +166,7 @@ const ProductForm = () => {
           <ContentsSection>
             <SectionWrapper
               referenceKey={PRODUCT_REGISTRATION_SECTIONS.SPECIFICATION}
-              label={"작품정보제공고시"}
+              label={"상품정보제공고시"}
             >
               <SpecificationSection />
             </SectionWrapper>

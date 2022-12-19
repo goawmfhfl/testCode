@@ -109,20 +109,16 @@ const SelectiveOption = () => {
   return (
     <Container>
       <CheckboxContainer>
-        <PurchaseOptionCheckbox {...register(HAS_SELECTIVE_OPTION)} /> 옵션
+        <PurchaseOptionCheckbox {...register(HAS_SELECTIVE_OPTION)} /> 선택 옵션
         설정하기
       </CheckboxContainer>
 
       <NoticeContainer icon={exclamationMarkSrc} width={"723px"}>
         <NoticeList>
           <li>
-            '추가 상품'은 구매자가 필수로 선택하지 않아도 되는 옵션입니다.
+            선택 옵션 설정하기'를 체크하여 기본 상품과 함께 구매하면 좋은
+            추가상품을 설정해보세요.
           </li>
-          <li>
-            '추가 상품 설정하기'를 체크하여 기본 상품과 함께 구매하면 좋은
-            상품으로 구성해보세요 ex) 기본상품 베개 커버, 추가상품 베개 솜
-          </li>
-          <li>추가 상품은 단독형만 가능합니다.</li>
         </NoticeList>
       </NoticeContainer>
 
