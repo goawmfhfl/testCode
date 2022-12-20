@@ -217,8 +217,8 @@ export const scrollTableType = [
   {
     id: 16,
     label: "배송비",
-    width: getAverageWidth(tableWidth.shipmentMemo, tableWidth.right),
-    value: "shipmentMemo",
+    width: getAverageWidth(tableWidth.shipmentPrice, tableWidth.right),
+    value: "shipmentPrice",
   },
   {
     id: 17,
