@@ -1,18 +1,18 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { useReactiveVar } from "@apollo/client";
 
-import { OrderSearchType, searchQueryType } from "@constants/sale";
 import { skipQuantityType } from "@constants/index";
+import { OrderSearchType, searchQueryType } from "@constants/sale";
 
 import { commonFilterOptionVar, paginationSkipVar } from "@cache/index";
+import { filterOptionVar } from "@cache/sale/cancel";
 
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 import ControllerContainer from "@components/sale/ControllerContainer";
 import Button from "@components/common/Button";
 import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
-import { filterOptionVar } from "@cache/sale/order";
-import { useReactiveVar } from "@apollo/client";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);

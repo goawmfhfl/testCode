@@ -1,34 +1,22 @@
-import { useEffect } from "react";
-import styled from "styled-components/macro";
+import React from "react";
+import styled from "styled-components";
 import { useReactiveVar } from "@apollo/client";
 
-import { filterOptionVar } from "@cache/sale/order";
 import {
   commonFilterOptionVar,
   paginationSkipVar,
   totalPageLengthVar,
 } from "@cache/index";
+import { filterOptionVar } from "@cache/sale/exchange";
 
-import useLazyOrderStatus from "@hooks/order/useLazyOrderStatus";
-
-import {
-  OrderStatusType,
-  OrderStatusGroup,
-  OrderStatusName,
-} from "@constants/sale";
-
-import { getOrdersLength } from "@utils/sale/cancel";
+import { OrderStatusName, OrderStatusType } from "@constants/sale";
 
 import FilterBarContainer from "@components/sale/FilterBarContainer";
 import Button from "@components/common/Button";
 
 const FilterBar = () => {
-  const { data, getOrderStatus } = useLazyOrderStatus();
-
   const { statusName } = useReactiveVar(filterOptionVar);
   const totalPageLength = useReactiveVar(totalPageLengthVar);
-  const orders = data?.getOrdersBySeller.totalOrderItems || [];
-  const { all, cancelRequest, cancelCompleted } = getOrdersLength(orders);
 
   const handleFilterOptionNameClick =
     (filterOptionName: OrderStatusName) => () => {
@@ -44,47 +32,46 @@ const FilterBar = () => {
       });
     };
 
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
-      await getOrderStatus({
-        variables: {
-          input: {
-            page: 1,
-            skip: null,
-            query: null,
-            type: null,
-            statusName: null,
-            statusType: null,
-            statusGroup: OrderStatusGroup.CANCEL,
-          },
-        },
-      });
-    })();
-  }, []);
-
   return (
     <FilterBarContainer
       button={<Button size={"small"}>전체 내역 내보내기</Button>}
-      searchResultLength={totalPageLength}
+      searchResultLength={0}
     >
       <Filter
         isActvie={statusName === null}
         onClick={handleFilterOptionNameClick(null)}
       >
-        전체 {all}
+        전체
       </Filter>
       <Filter
-        isActvie={statusName === OrderStatusName.PAYMENT_COMPLETED}
-        onClick={handleFilterOptionNameClick(OrderStatusName.PAYMENT_COMPLETED)}
+        isActvie={statusName === OrderStatusName.EXCHANGE_REQUEST}
+        onClick={handleFilterOptionNameClick(OrderStatusName.EXCHANGE_REQUEST)}
       >
-        qks {cancelRequest}
+        교환요청
       </Filter>
       <Filter
-        isActvie={statusName === OrderStatusName.PREPARING}
-        onClick={handleFilterOptionNameClick(OrderStatusName.PREPARING)}
+        isActvie={statusName === OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS}
+        onClick={handleFilterOptionNameClick(
+          OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS
+        )}
       >
-        취소완료 {cancelCompleted}
+        수거중
+      </Filter>
+      <Filter
+        isActvie={statusName === OrderStatusName.EXCHANGE_PICK_UP_COMPLETED}
+        onClick={handleFilterOptionNameClick(
+          OrderStatusName.EXCHANGE_PICK_UP_COMPLETED
+        )}
+      >
+        수거완료
+      </Filter>
+      <Filter
+        isActvie={statusName === OrderStatusName.EXCHANGE_COMPLETED}
+        onClick={handleFilterOptionNameClick(
+          OrderStatusName.EXCHANGE_COMPLETED
+        )}
+      >
+        반품완료
       </Filter>
     </FilterBarContainer>
   );

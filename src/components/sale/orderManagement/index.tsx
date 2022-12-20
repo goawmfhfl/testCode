@@ -1,21 +1,27 @@
 import { HeaderNames } from "@constants/index";
 import ContentsHeader from "@components/common/ContentsHeader";
-import ContentsContainer from "@components/common/ContentsContainer";
 import FilterBar from "@components/sale/orderManagement/FilterBar";
 import Controller from "@components/sale/orderManagement/Controller";
 import OrderTable from "@components/sale/orderManagement/OrderTable";
 import Pagination from "@components/common/Pagination";
+import styled from "styled-components";
 
 const OrderManagement = () => {
   return (
-    <ContentsContainer>
+    <Container>
       <ContentsHeader headerName={HeaderNames.Order} />
       <FilterBar />
       <Controller />
       <OrderTable />
       <Pagination />
-    </ContentsContainer>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  width: 100%;
+  padding: 16px 24px;
+  background-color: ${({ theme: { palette } }) => palette.grey100};
+`;
 
 export default OrderManagement;
