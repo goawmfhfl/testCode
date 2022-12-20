@@ -78,7 +78,7 @@ const FilterBar = () => {
         isActvie={statusName === OrderStatusName.PAYMENT_COMPLETED}
         onClick={handleFilterOptionNameClick(OrderStatusName.PAYMENT_COMPLETED)}
       >
-        qks {cancelRequest}
+        취소요청 {cancelRequest}
       </Filter>
       <Filter
         isActvie={statusName === OrderStatusName.PREPARING}

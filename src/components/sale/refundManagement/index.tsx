@@ -12,7 +12,7 @@ const RefundManagement = () => {
     <Container>
       <ContentsHeader headerName={HeaderNames.Refund} />
       <FilterBar />
-      {/* <Controller /> */}
+      <Controller />
       {/* <RefundTable /> */}
       {/* <Pagination /> */}
     </Container>

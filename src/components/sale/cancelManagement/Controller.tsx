@@ -108,7 +108,7 @@ const ActiveButtonContainer = styled.div`
 `;
 
 const ControlButton = styled(Button)`
-  margin-left: 12px;
+  margin-right: 12px;
 `;
 
 const FilterContainer = styled.div`

@@ -13,8 +13,8 @@ import { Pathnames } from "@constants/index";
 import { ProductStatus } from "@constants/product";
 import useLazyGetProductStatus from "@hooks/product/useLazyGetProductStatus";
 import { getProductLength } from "@utils/product/management";
-import questionMarkSrc from "@icons/questionmark.svg";
 
+import questionMarkSrc from "@icons/questionmark.svg";
 import Button from "@components/common/Button";
 import FilterBarContainer from "@components/sale/FilterBarContainer";
 
