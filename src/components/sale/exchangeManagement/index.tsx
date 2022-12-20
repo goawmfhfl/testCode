@@ -15,8 +15,8 @@ const ExchangeManagement = () => {
       <ContentsHeader headerName={HeaderNames.Exchange} />
       <FilterBar />
       <Controller />
-      {/* <ExchangeTable /> */}
-      {/* <Pagination /> */}
+      <ExchangeTable />
+      <Pagination />
     </Container>
   );
 };
