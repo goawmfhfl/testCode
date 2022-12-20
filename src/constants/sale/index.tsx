@@ -16,6 +16,15 @@ export const searchQueryType: Array<SearchQueryType> = [
   { id: 2, label: "주문번호", value: OrderSearchType.MERCHANT_UID },
 ];
 
+export enum MenuStatusType {
+  PRODUCT = "PRODUCT",
+  SALE = "SALE",
+  INQUIRY = "INQUIRY",
+  SETTLEMENT = "SETTLEMENT",
+  SHOP = "SHOP",
+  NOTICE = "NOTICE",
+}
+
 export enum SaleMenuStatusType {
   ORDER = "ORDER",
   CANCEL = "CANCEL",
