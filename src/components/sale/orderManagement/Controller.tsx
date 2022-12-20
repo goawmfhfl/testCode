@@ -54,7 +54,7 @@ const Controller = () => {
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
-  const reason = useReactiveVar(reasonVar);
+  const { detail, main } = useReactiveVar(reasonVar);
 
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const checkedOrderItemIds = checkedOrderItems.map(
@@ -379,29 +379,29 @@ const Controller = () => {
 
   //주문취소
   const handleCancelOrderClick = () => {
-    if (!checkedOrderItems.length) {
-      showHasAnyProblemModal(
-        <>
-          선택된 주문건이 없습니다
-          <br />
-          주문건을 선택해주세요
-        </>
-      );
-      return;
-    }
+    // if (!checkedOrderItems.length) {
+    //   showHasAnyProblemModal(
+    //     <>
+    //       선택된 주문건이 없습니다
+    //       <br />
+    //       주문건을 선택해주세요
+    //     </>
+    //   );
+    //   return;
+    // }
 
-    if (isShippingChecked || isShippingCompletedChecked) {
-      showHasAnyProblemModal(
-        <>
-          해당 버튼은 선택하신
-          <br />
-          주문건을 처리할 수 없습니다.
-          <br />
-          주문 상태를 다시 확인해주세요.
-        </>
-      );
-      return;
-    }
+    // if (isShippingChecked || isShippingCompletedChecked) {
+    //   showHasAnyProblemModal(
+    //     <>
+    //       해당 버튼은 선택하신
+    //       <br />
+    //       주문건을 처리할 수 없습니다.
+    //       <br />
+    //       주문 상태를 다시 확인해주세요.
+    //     </>
+    //   );
+    //   return;
+    // }
 
     systemModalVar({
       ...systemModalVar(),
@@ -410,6 +410,11 @@ const Controller = () => {
       confirmButtonVisibility: true,
       cancelButtonVisibility: true,
       confirmButtonClickHandler: () => {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: false,
+        });
+
         modalVar({
           isVisible: true,
           component: (
@@ -427,7 +432,7 @@ const Controller = () => {
                     } = await cancelOrderItems({
                       variables: {
                         input: {
-                          reason,
+                          reason: main,
                           orderItemIds: checkedOrderItemIds,
                         },
                       },

@@ -7,14 +7,16 @@ const Textarea = ({
   size,
   register,
   onFocus,
+  onChange,
   placeholder,
   maxLength,
 }: {
   width?: string;
   height?: string;
   size: string;
-  register: UseFormRegisterReturn;
+  register?: UseFormRegisterReturn;
   onFocus?: () => void;
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   placeholder?: string;
   maxLength?: number;
 }) => {
@@ -25,6 +27,7 @@ const Textarea = ({
       size={size}
       {...register}
       onFocus={onFocus}
+      onChange={onChange}
       placeholder={placeholder}
       maxLength={maxLength}
     />
