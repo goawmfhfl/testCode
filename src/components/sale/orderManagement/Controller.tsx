@@ -325,17 +325,21 @@ const Controller = () => {
           (async () => {
             loadingSpinnerVisibilityVar(true);
 
+            const components = checkedOrderItems.map(
+              ({ id, temporaryShipmentCompany, temporaryShipmentNumber }) => ({
+                orderItemId: id,
+                shipmentCompany: temporaryShipmentCompany,
+                shipmentNumber: Number(temporaryShipmentNumber),
+              })
+            );
+
             const {
               data: {
                 sendOrderItems: { ok, error },
               },
             } = await sendOrderItems({
               variables: {
-                input: {
-                  shipmentCompany: "",
-                  shipmentNumber: 0,
-                  orderItemIds: checkedOrderItemIds,
-                },
+                input: { components },
               },
             });
 

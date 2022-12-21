@@ -146,9 +146,11 @@ export interface SendOrderItemsType {
 }
 
 export interface SendOrderItemsInputType {
-  shipmentCompany: string;
-  shipmentNumber: number;
-  orderItemIds: Array<number>;
+  components: Array<{
+    orderItemId: number;
+    shipmentCompany: string;
+    shipmentNumber: number;
+  }>;
 }
 
 export interface ConfirmOrderItemsBySellerType {

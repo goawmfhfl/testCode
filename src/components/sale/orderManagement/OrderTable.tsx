@@ -269,9 +269,13 @@ const OrderTable = () => {
               } = await sendOrderItems({
                 variables: {
                   input: {
-                    shipmentCompany,
-                    shipmentNumber: Number(shipmentNumber),
-                    orderItemIds: [id],
+                    components: [
+                      {
+                        orderItemId: id,
+                        shipmentCompany,
+                        shipmentNumber: Number(shipmentNumber),
+                      },
+                    ],
                   },
                 },
               });
