@@ -10,6 +10,7 @@ import {
   scrollTableType,
   tableWidth,
 } from "@constants/sale/orderManagement/table";
+import { ShipmentStatus, shipmentCompanyCode } from "@constants/sale";
 
 import { filterOptionVar } from "@cache/sale/order";
 import {
@@ -23,6 +24,8 @@ import { checkedOrderItemsVar } from "@cache/sale";
 import { showHasServerErrorModal } from "@cache/productManagement/index";
 
 import {
+  EditShipmentNumberInputType,
+  EditShipmentNumberType,
   NormalizedListType,
   ResetOrderItemType,
   SendOrderItemsInputType,
@@ -67,6 +70,7 @@ import {
 } from "@components/common/input/Dropdown";
 import Button from "@components/common/Button";
 import { Input } from "@components/common/input/TextInput";
+import { EDIT_SHIPMENT_NUMBER } from "@graphql/mutations/editShipmentNumber";
 
 const OrderTable = () => {
   const { getOrderItem, error, loading, data } = useLazyOrders();
@@ -101,6 +105,33 @@ const OrderTable = () => {
     ],
   });
 
+  const [editShipmentNumber] = useMutation<
+    EditShipmentNumberType,
+    {
+      input: EditShipmentNumberInputType;
+    }
+  >(EDIT_SHIPMENT_NUMBER, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    refetchQueries: [
+      {
+        query: GET_ORDERS_BY_SELLER,
+        variables: {
+          input: {
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
+          },
+        },
+      },
+      "GetOrdersBySeller",
+    ],
+  });
+
   const [orderItems, setOrderItems] = useState<Array<ResetOrderItemType>>([]);
   const [shipmentCompanys, setShipmentCompanys] = useState<
     Array<{
@@ -109,6 +140,7 @@ const OrderTable = () => {
       Name: string;
     }>
   >([]);
+
   const [isEditShipmentInfo, setisEditShipmentInfo] = useState<boolean>(false);
 
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
@@ -319,18 +351,109 @@ const OrderTable = () => {
       });
     };
 
-  const handleSaveButtonClick = () => {
-    systemModalVar({
-      ...systemModalVar(),
-      isVisible: true,
-      description: <>송장을 수정하시겠습니까?</>,
-      confirmButtonVisibility: true,
-      cancelButtonVisibility: true,
-      confirmButtonClickHandler: () => {
-        setisEditShipmentInfo(false);
-      },
-    });
-  };
+  const handleSaveButtonClick =
+    (
+      orderItemId: number,
+      orderShipmentInfoId: number,
+      shipmentCompany: string,
+      shipmentNumber: number,
+      status: ShipmentStatus
+    ) =>
+    () => {
+      if (!shipmentCompany || !shipmentNumber) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          icon: exclamationmarkSrc,
+          description: <>송장정보를 기입해주세요</>,
+          cancelButtonVisibility: false,
+          confirmButtonVisibility: true,
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+              icon: "",
+            });
+          },
+        });
+
+        return;
+      }
+
+      console.log([
+        { orderItemId },
+        { orderShipmentInfoId },
+        { shipmentCompany },
+        { shipmentNumber },
+        { status },
+      ]);
+
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: <>송장을 수정하시겠습니까?</>,
+        confirmButtonVisibility: true,
+        cancelButtonVisibility: true,
+        confirmButtonClickHandler: () => {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+            (async () => {
+              loadingSpinnerVisibilityVar(true);
+
+              const {
+                data: {
+                  editShipmentNumber: { ok, error },
+                },
+              } = await editShipmentNumber({
+                variables: {
+                  input: {
+                    orderItemId,
+                    orderShipmentInfoId,
+                    shipmentCompany,
+                    shipmentNumber,
+                    status,
+                  },
+                },
+              });
+
+              if (ok) {
+                loadingSpinnerVisibilityVar(false);
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: true,
+                  description: (
+                    <>
+                      송장 수정이
+                      <br />
+                      완료되었습니다.
+                    </>
+                  ),
+                  confirmButtonVisibility: true,
+                  cancelButtonVisibility: false,
+                  confirmButtonClickHandler: () => {
+                    systemModalVar({
+                      ...systemModalVar(),
+                      isVisible: false,
+                    });
+
+                    checkedOrderItemsVar([]);
+                    checkAllBoxStatusVar(false);
+                    setisEditShipmentInfo(false);
+                  },
+                });
+              }
+              if (error) {
+                loadingSpinnerVisibilityVar(false);
+                showHasServerErrorModal(error, "송장 수정");
+              }
+            })();
+          } catch (error) {
+            loadingSpinnerVisibilityVar(false);
+            showHasServerErrorModal(error as string, "송장 수정");
+          }
+        },
+      });
+    };
 
   const handleEditButtonClick = () => {
     setisEditShipmentInfo(true);
@@ -487,6 +610,15 @@ const OrderTable = () => {
       action="http://info.sweettracker.co.kr/tracking/5"
       method="post"
     >
+      <ShipmentTemplateAPILabel htmlFor="t_key">
+        <input
+          type="text"
+          id="t_key"
+          name="t_key"
+          value={process.env.REACT_APP_SWEETTRAKER_API_KEY}
+          readOnly={true}
+        />
+      </ShipmentTemplateAPILabel>
       <FixedTable width={tableWidth.left}>
         <ThContainer>
           <Th width={fixTableType[0].width}>
@@ -563,6 +695,7 @@ const OrderTable = () => {
                   id,
                   claimStatus,
                   orderStatus,
+                  orderShipmentInfosId,
                   shipmentCompany,
                   shipmentNumber,
                   payments,
@@ -614,10 +747,11 @@ const OrderTable = () => {
                               type="text"
                               id="t_code"
                               name="t_code"
-                              value={shipmentCompany}
+                              value={shipmentCompany || ""}
+                              readOnly={true}
                             />
                           </ShipmentTemplateAPILabel>
-                          {shipmentCompany}
+                          {shipmentCompanyCode[shipmentCompany]}
                         </>
                       )
                     ) : (
@@ -648,17 +782,24 @@ const OrderTable = () => {
                             onChange={changeShipmentNumberHandler(index)}
                             disabled={orderStatus === "새주문"}
                             width={"145px"}
+                            onKeyDown={preventNaNValues}
                             value={
                               temporaryShipmentNumber === 0
                                 ? ""
                                 : temporaryShipmentNumber
                             }
-                            onKeyDown={preventNaNValues}
                           />
                           <Button
                             size="small"
                             width="55px"
-                            onClick={handleSaveButtonClick}
+                            onClick={handleSaveButtonClick(
+                              id,
+                              orderShipmentInfosId,
+                              temporaryShipmentCompany,
+                              temporaryShipmentNumber,
+                              ShipmentStatus.SHIPPING
+                            )}
+                            type="button"
                           >
                             저장
                           </Button>
@@ -671,7 +812,8 @@ const OrderTable = () => {
                               type="text"
                               id="t_invoice"
                               name="t_invoice"
-                              value={shipmentNumber}
+                              value={shipmentNumber || ""}
+                              readOnly={true}
                             />
                           </ShipmentTemplateAPILabel>
                           <Button
@@ -694,7 +836,7 @@ const OrderTable = () => {
                         </ShipmnetNumberContainer>
                       )
                     ) : (
-                      <>
+                      <ShipmnetNumberContainer>
                         <ShipmnetNumberInput
                           onChange={changeShipmentNumberHandler(index)}
                           disabled={orderStatus === "새주문"}
@@ -715,10 +857,11 @@ const OrderTable = () => {
                             temporaryShipmentCompany,
                             temporaryShipmentNumber
                           )}
+                          type="button"
                         >
                           발송
                         </Button>
-                      </>
+                      </ShipmnetNumberContainer>
                     )}
                   </Td>
                   <Td width={scrollTableType[3].width}>{payments}</Td>
@@ -767,15 +910,6 @@ const OrderTable = () => {
       )}
 
       {loading && <Loading type={TableType.SCROLL} />}
-
-      <ShipmentTemplateAPILabel htmlFor="t_key">
-        <input
-          type="text"
-          id="t_key"
-          name="t_key"
-          value={process.env.REACT_APP_SWEETTRAKER_API_KEY}
-        />
-      </ShipmentTemplateAPILabel>
     </TableContainer>
   );
 };

@@ -44,6 +44,14 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
     // 클레임 상태
     const resetClaimStatus = claimStatus?.name ? claimStatus.name : "-";
 
+    // 배송정보 Id
+
+    const resetOrderShipmentInfosId = orderShipmentInfos
+      ? orderShipmentInfos.filter(
+          (info) => info.status === ShipmentStatus.SHIPPING
+        )[0]?.id
+      : null;
+
     // 택배사
     const resetShipmentCompany = orderShipmentInfos
       ? orderShipmentInfos.filter(
@@ -122,8 +130,8 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       : 0;
 
     const isChecked = false;
-    const temporaryShipmentCompany = resetShipmentCompany;
-    const temporaryShipmentNumber = resetShipmentNumber;
+    const temporaryShipmentCompany = resetShipmentCompany || "";
+    const temporaryShipmentNumber = resetShipmentNumber || 0;
 
     return {
       id,
@@ -140,6 +148,8 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       orderStatus: resetOrderStatus,
       // 클레임 상태
       claimStatus: resetClaimStatus,
+      // 배송정보 아이디
+      orderShipmentInfosId: resetOrderShipmentInfosId,
       // 택배사
       shipmentCompany: resetShipmentCompany,
       // 운송장번호
