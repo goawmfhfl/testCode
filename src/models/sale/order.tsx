@@ -149,6 +149,21 @@ export interface CancelOrderItemsBySellerInputType {
   reason: string;
 }
 
+export interface EditShipmentNumberInputType {
+  orderItemId: number;
+  orderShipmentInfoId: number;
+  shipmentCompany: string;
+  shipmentNumber: number;
+  status: ShipmentStatus;
+}
+
+export interface EditShipmentNumberType {
+  editShipmentNumber: {
+    ok: boolean;
+    error?: string;
+  };
+}
+
 export interface SendOrderItemsType {
   sendOrderItems: {
     ok: boolean;
@@ -198,6 +213,8 @@ export interface ResetOrderItemType {
   orderStatus: string;
   // 클레임 상태
   claimStatus: string;
+  //
+  orderShipmentInfosId?: number;
   // 택배사
   shipmentCompany?: string;
   // 운송장번호
