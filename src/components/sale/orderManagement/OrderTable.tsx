@@ -111,7 +111,6 @@ const OrderTable = () => {
   >([]);
 
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
-  const checkedOrderItemIds = checkedOrderItems.map(({ id }) => id);
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
 
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
