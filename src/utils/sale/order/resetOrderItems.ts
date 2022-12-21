@@ -1,5 +1,5 @@
 import { NormalizedListType } from "@models/sale/order";
-import { orderStatusNameType } from "@constants/sale";
+import { orderStatusNameType, ShipmentStatus } from "@constants/sale";
 
 const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
   if (!recontructOrderItem || !recontructOrderItem.orders) return;
@@ -19,6 +19,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       originalPrice,
       shipmentPrice,
       shipmentDistantPrice,
+      orderShipmentInfos,
       orderStatus,
       claimStatus,
     } = orderByid[id];
@@ -44,10 +45,18 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
     const resetClaimStatus = claimStatus?.name ? claimStatus.name : "-";
 
     // 택배사
-    const resetShipmentCompany = "";
+    const resetShipmentCompany = orderShipmentInfos
+      ? orderShipmentInfos.filter(
+          (info) => info.status === ShipmentStatus.SHIPPING
+        )[0]?.shipmentCompany
+      : null;
 
     // 운송장번호
-    const resetInvoiceNumber = "";
+    const resetShipmentNumber = orderShipmentInfos
+      ? orderShipmentInfos.filter(
+          (info) => info.status === ShipmentStatus.SHIPPING
+        )[0]?.shipmentNumber
+      : null;
 
     // 결제일
     const resetPayments = user?.payments?.createdAt
@@ -113,8 +122,8 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       : 0;
 
     const isChecked = false;
-    const temporaryShipmentCompany = "";
-    const temporaryShipmentNumber = "";
+    const temporaryShipmentCompany = resetShipmentCompany;
+    const temporaryShipmentNumber = resetShipmentNumber;
 
     return {
       id,
@@ -134,7 +143,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       // 택배사
       shipmentCompany: resetShipmentCompany,
       // 운송장번호
-      invoiceNumber: resetInvoiceNumber,
+      shipmentNumber: resetShipmentNumber,
       // 결제일
       payments: resetPayments,
       // 수취인

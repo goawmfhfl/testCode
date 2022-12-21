@@ -40,7 +40,7 @@ import {
   SendOrderItemsType,
 } from "@models/sale/order";
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
-import { SEND_ORDERITEMS } from "@graphql/mutations/sendOrderItems";
+import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
 import { CANCEL_ORDERITEMS_BY_SELLER } from "@graphql/mutations/cancelOrderItemsBySeller";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -102,7 +102,7 @@ const Controller = () => {
     {
       input: SendOrderItemsInputType;
     }
-  >(SEND_ORDERITEMS, {
+  >(SEND_ORDER_ITEMS, {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
@@ -277,7 +277,7 @@ const Controller = () => {
         (result, { temporaryShipmentCompany, temporaryShipmentNumber }) => {
           if (temporaryShipmentCompany === "")
             result.isShipmentCompanyFullFilled = false;
-          if (temporaryShipmentNumber === "")
+          if (temporaryShipmentNumber === null)
             result.isShipmentCompanyFullFilled = false;
 
           return result;

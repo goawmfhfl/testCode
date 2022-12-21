@@ -41,7 +41,7 @@ import {
 
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import { OrderItemsType } from "@models/sale/order";
-import { SEND_ORDERITEMS } from "@graphql/mutations/sendOrderItems";
+import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
 
 import useLazyOrders from "@hooks/order/useLazyOrders";
 
@@ -79,7 +79,7 @@ const OrderTable = () => {
     {
       input: SendOrderItemsInputType;
     }
-  >(SEND_ORDERITEMS, {
+  >(SEND_ORDER_ITEMS, {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
@@ -109,6 +109,7 @@ const OrderTable = () => {
       Name: string;
     }>
   >([]);
+  const [isEditShipmentInfo, setisEditShipmentInfo] = useState<boolean>(false);
 
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
@@ -182,7 +183,7 @@ const OrderTable = () => {
       const newOrderItems = cloneDeep(orderItems);
       const newCheckedOrderItems = cloneDeep(checkedOrderItems);
 
-      newOrderItems[index].temporaryShipmentNumber = e.target.value;
+      newOrderItems[index].temporaryShipmentNumber = Number(e.target.value);
       setOrderItems(newOrderItems);
 
       if (newCheckedOrderItems.length > 0) {
@@ -193,7 +194,7 @@ const OrderTable = () => {
         if (findCheckedOrderItemsIndex !== -1) {
           newCheckedOrderItems[
             findCheckedOrderItemsIndex
-          ].temporaryShipmentNumber = e.target.value;
+          ].temporaryShipmentNumber = Number(e.target.value);
         }
 
         checkedOrderItemsVar(newCheckedOrderItems);
@@ -224,7 +225,7 @@ const OrderTable = () => {
     };
 
   const handleSendButtonClick =
-    (id: number, shipmentCompany: string, shipmentNumber: string) => () => {
+    (id: number, shipmentCompany: string, shipmentNumber: number) => () => {
       if (!shipmentCompany || !shipmentNumber) {
         systemModalVar({
           ...systemModalVar(),
@@ -273,7 +274,7 @@ const OrderTable = () => {
                       {
                         orderItemId: id,
                         shipmentCompany,
-                        shipmentNumber: Number(shipmentNumber),
+                        shipmentNumber,
                       },
                     ],
                   },
@@ -317,6 +318,23 @@ const OrderTable = () => {
         },
       });
     };
+
+  const handleSaveButtonClick = () => {
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: <>송장을 수정하시겠습니까?</>,
+      confirmButtonVisibility: true,
+      cancelButtonVisibility: true,
+      confirmButtonClickHandler: () => {
+        setisEditShipmentInfo(false);
+      },
+    });
+  };
+
+  const handleEditButtonClick = () => {
+    setisEditShipmentInfo(true);
+  };
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -463,7 +481,12 @@ const OrderTable = () => {
   const hasOrderItems = !loading && !error && !!orderItems?.length;
 
   return (
-    <TableContainer type={TableType.SCROLL} hasData={hasOrderItems}>
+    <TableContainer
+      type={TableType.SCROLL}
+      hasData={hasOrderItems}
+      action="http://info.sweettracker.co.kr/tracking/5"
+      method="post"
+    >
       <FixedTable width={tableWidth.left}>
         <ThContainer>
           <Th width={fixTableType[0].width}>
@@ -541,7 +564,7 @@ const OrderTable = () => {
                   claimStatus,
                   orderStatus,
                   shipmentCompany,
-                  invoiceNumber,
+                  shipmentNumber,
                   payments,
                   recipientName,
                   recipientPhoneNumber,
@@ -565,34 +588,122 @@ const OrderTable = () => {
                 <Tr key={id}>
                   <Td width={scrollTableType[0].width}>{claimStatus}</Td>
                   <Td width={scrollTableType[1].width}>
-                    <Dropdown
-                      onChange={changeShipmentCompanyHandler(index)}
-                      arrowSrc={triangleArrowSvg}
-                      value={temporaryShipmentCompany}
-                      sizing={"medium"}
-                      width={"104px"}
-                      disabled={orderStatus === "새주문"}
-                    >
-                      <Option hidden value="default">
-                        택배사
-                      </Option>
-                      {shipmentCompanys.map(({ Code, Name }) => (
-                        <Option key={Code} value={Code}>
-                          {Name}
+                    {shipmentCompany ? (
+                      isEditShipmentInfo ? (
+                        <Dropdown
+                          onChange={changeShipmentCompanyHandler(index)}
+                          arrowSrc={triangleArrowSvg}
+                          value={temporaryShipmentCompany}
+                          sizing={"medium"}
+                          width={"104px"}
+                          disabled={orderStatus === "새주문"}
+                        >
+                          <Option hidden value="default">
+                            택배사
+                          </Option>
+                          {shipmentCompanys.map(({ Code, Name }) => (
+                            <Option key={Code} value={Code}>
+                              {Name}
+                            </Option>
+                          ))}
+                        </Dropdown>
+                      ) : (
+                        <>
+                          <ShipmentTemplateAPILabel htmlFor="t_code">
+                            <input
+                              type="text"
+                              id="t_code"
+                              name="t_code"
+                              value={shipmentCompany}
+                            />
+                          </ShipmentTemplateAPILabel>
+                          {shipmentCompany}
+                        </>
+                      )
+                    ) : (
+                      <Dropdown
+                        onChange={changeShipmentCompanyHandler(index)}
+                        arrowSrc={triangleArrowSvg}
+                        value={temporaryShipmentCompany}
+                        sizing={"medium"}
+                        width={"104px"}
+                        disabled={orderStatus === "새주문"}
+                      >
+                        <Option hidden value="default">
+                          택배사
                         </Option>
-                      ))}
-                    </Dropdown>
+                        {shipmentCompanys.map(({ Code, Name }) => (
+                          <Option key={Code} value={Code}>
+                            {Name}
+                          </Option>
+                        ))}
+                      </Dropdown>
+                    )}
                   </Td>
                   <Td width={scrollTableType[2].width}>
-                    {invoiceNumber ? (
-                      invoiceNumber
+                    {shipmentNumber ? (
+                      isEditShipmentInfo ? (
+                        <ShipmnetNumberContainer>
+                          <EditShipmentNumberInput
+                            onChange={changeShipmentNumberHandler(index)}
+                            disabled={orderStatus === "새주문"}
+                            width={"145px"}
+                            value={
+                              temporaryShipmentNumber === 0
+                                ? ""
+                                : temporaryShipmentNumber
+                            }
+                            onKeyDown={preventNaNValues}
+                          />
+                          <Button
+                            size="small"
+                            width="55px"
+                            onClick={handleSaveButtonClick}
+                          >
+                            저장
+                          </Button>
+                        </ShipmnetNumberContainer>
+                      ) : (
+                        <ShipmnetNumberContainer>
+                          <ShipmnetNumber>{shipmentNumber}</ShipmnetNumber>
+                          <ShipmentTemplateAPILabel htmlFor="t_invoice">
+                            <input
+                              type="text"
+                              id="t_invoice"
+                              name="t_invoice"
+                              value={shipmentNumber}
+                            />
+                          </ShipmentTemplateAPILabel>
+                          <Button
+                            size="small"
+                            width="55px"
+                            onClick={handleEditButtonClick}
+                            type="button"
+                          >
+                            수정
+                          </Button>
+                          <Button
+                            size="small"
+                            width="55px"
+                            backgroundColor={"#414A5B"}
+                            color={"#fff"}
+                            type="submit"
+                          >
+                            조회
+                          </Button>
+                        </ShipmnetNumberContainer>
+                      )
                     ) : (
                       <>
-                        <InvoiceNumberInput
+                        <ShipmnetNumberInput
                           onChange={changeShipmentNumberHandler(index)}
                           disabled={orderStatus === "새주문"}
                           width={"145px"}
-                          value={temporaryShipmentNumber}
+                          value={
+                            temporaryShipmentNumber === 0
+                              ? ""
+                              : temporaryShipmentNumber
+                          }
                           onKeyDown={preventNaNValues}
                         />
                         <Button
@@ -656,6 +767,15 @@ const OrderTable = () => {
       )}
 
       {loading && <Loading type={TableType.SCROLL} />}
+
+      <ShipmentTemplateAPILabel htmlFor="t_key">
+        <input
+          type="text"
+          id="t_key"
+          name="t_key"
+          value={process.env.REACT_APP_SWEETTRAKER_API_KEY}
+        />
+      </ShipmentTemplateAPILabel>
     </TableContainer>
   );
 };
@@ -668,8 +788,26 @@ const Dropdown = styled(SelectInput)`
   text-overflow: ellipsis;
 `;
 
-const InvoiceNumberInput = styled(Input)`
+const ShipmnetNumberInput = styled(Input)`
   margin-right: 0px;
+`;
+
+const EditShipmentNumberInput = styled(Input)`
+  margin-right: 4px;
+`;
+
+const ShipmnetNumberContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ShipmnetNumber = styled.span`
+  margin-right: 8px;
+`;
+
+const ShipmentTemplateAPILabel = styled.label`
+  display: none;
 `;
 
 export default OrderTable;

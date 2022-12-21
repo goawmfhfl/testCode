@@ -3,6 +3,7 @@ import {
   OrderStatusGroup,
   OrderStatusName,
   OrderStatusType,
+  ShipmentStatus,
 } from "@constants/sale";
 
 export interface GetOrdersBySellerInputType {
@@ -82,6 +83,16 @@ export interface OrderItemsType {
 
   // 도서산간 배송비
   shipmentDistantPrice: number;
+
+  orderShipmentInfos: Array<{
+    id: number;
+    // 운송장번호
+    shipmentNumber: number;
+    // 택배사
+    shipmentCompany: string;
+    // 상태
+    status: ShipmentStatus;
+  }>;
 
   // 주문상태
   orderStatus: {
@@ -188,9 +199,9 @@ export interface ResetOrderItemType {
   // 클레임 상태
   claimStatus: string;
   // 택배사
-  shipmentCompany: string;
+  shipmentCompany?: string;
   // 운송장번호
-  invoiceNumber?: string;
+  shipmentNumber?: number;
   // 결제일
   payments: string;
   // 수취인
@@ -223,5 +234,5 @@ export interface ResetOrderItemType {
   shipmentDistantPrice: number;
   isChecked: boolean;
   temporaryShipmentCompany: string;
-  temporaryShipmentNumber: string;
+  temporaryShipmentNumber?: number;
 }

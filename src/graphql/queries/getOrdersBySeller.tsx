@@ -10,7 +10,6 @@ export const GET_ORDERS_BY_SELLER = gql`
       totalOrderItems {
         #아이디
         id
-
         #주문번호
         merchantItemUid
 
@@ -72,6 +71,16 @@ export const GET_ORDERS_BY_SELLER = gql`
 
         # 도서산간 배송비
         shipmentDistantPrice
+
+        orderShipmentInfos {
+          id
+          # 운송장번호
+          shipmentNumber
+          # 택배사
+          shipmentCompany
+          # 상태
+          status
+        }
 
         # 주문상태
         orderStatus {

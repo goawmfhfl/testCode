@@ -137,3 +137,10 @@ export const claimStatusType = {
   EXCHANGE_PICK_UP_COMPLETED: "교환 수거 완료",
   EXCHANGE_ING: "교환중",
 };
+
+export enum ShipmentStatus {
+  SHIPPING = "SHIPPING",
+  REFUND_PICK_UP = "REFUND_PICK_UP",
+  EXCHANGE_PICK_UP = "EXCHANGE_PICK_UP",
+  EXCHANGE_PICK_UP_AGAIN = "EXCHANGE_PICK_UP_AGAIN",
+}
