@@ -180,15 +180,47 @@ const OrderTable = () => {
   const changeShipmentNumberHandler =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const newOrderItems = cloneDeep(orderItems);
+      const newCheckedOrderItems = cloneDeep(checkedOrderItems);
+
       newOrderItems[index].temporaryShipmentNumber = e.target.value;
       setOrderItems(newOrderItems);
+
+      if (newCheckedOrderItems.length > 0) {
+        const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
+          (list) => list.id === newOrderItems[index].id
+        );
+
+        if (findCheckedOrderItemsIndex !== -1) {
+          newCheckedOrderItems[
+            findCheckedOrderItemsIndex
+          ].temporaryShipmentNumber = e.target.value;
+        }
+
+        checkedOrderItemsVar(newCheckedOrderItems);
+      }
     };
 
   const changeShipmentCompanyHandler =
     (index: number) => (e: React.ChangeEvent<HTMLSelectElement>) => {
       const newOrderItems = cloneDeep(orderItems);
+      const newCheckedOrderItems = cloneDeep(checkedOrderItems);
+
       newOrderItems[index].temporaryShipmentCompany = e.target.value;
       setOrderItems(newOrderItems);
+
+      if (newCheckedOrderItems.length > 0) {
+        const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
+          (list) => list.id === newOrderItems[index].id
+        );
+
+        if (findCheckedOrderItemsIndex !== -1) {
+          newCheckedOrderItems[
+            findCheckedOrderItemsIndex
+          ].temporaryShipmentCompany = e.target.value;
+        }
+
+        checkedOrderItemsVar(newCheckedOrderItems);
+      }
     };
 
   const handleSendButtonClick =
