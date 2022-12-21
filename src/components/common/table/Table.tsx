@@ -1,7 +1,7 @@
 import { TableType } from "@models/index";
 import styled, { css } from "styled-components/macro";
 
-export const TableContainer = styled.div<{
+export const TableContainer = styled.form<{
   type: TableType;
   hasData?: boolean;
 }>`
@@ -16,11 +16,11 @@ export const TableContainer = styled.div<{
     `}
 
   ${({ type, hasData }) =>
-    type === TableType.SCROLL && hasData
-      ? css``
-      : css`
+    type === TableType.SCROLL && !hasData
+      ? css`
           height: 500px;
-        `}
+        `
+      : css``}
 `;
 interface FixedTableProps {
   width: number;
