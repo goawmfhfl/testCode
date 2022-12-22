@@ -8,12 +8,14 @@ export const getHasCheckedOrderStatus = (
     isPreparingChecked,
     isShippingChecked,
     isShippingCompletedChecked,
+    isCancelRequestChecked,
   } = checkedOrderItems.reduce(
-    (result, { orderStatus }) => {
+    (result, { orderStatus, claimStatus }) => {
       if (orderStatus === "새주문") result.isPaymentCompletedChecked = true;
       if (orderStatus === "상품준비중") result.isPreparingChecked = true;
       if (orderStatus === "배송중") result.isShippingChecked = true;
       if (orderStatus === "배송완료") result.isShippingCompletedChecked = true;
+      if (claimStatus === "취소요청") result.isCancelRequestChecked = true;
 
       return result;
     },
@@ -22,6 +24,7 @@ export const getHasCheckedOrderStatus = (
       isPreparingChecked: false,
       isShippingChecked: false,
       isShippingCompletedChecked: false,
+      isCancelRequestChecked: false,
     }
   );
 
@@ -30,5 +33,6 @@ export const getHasCheckedOrderStatus = (
     isPreparingChecked,
     isShippingChecked,
     isShippingCompletedChecked,
+    isCancelRequestChecked,
   };
 };

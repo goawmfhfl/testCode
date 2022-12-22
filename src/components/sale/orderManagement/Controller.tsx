@@ -66,6 +66,7 @@ const Controller = () => {
     isPreparingChecked,
     isShippingChecked,
     isShippingCompletedChecked,
+    isCancelRequestChecked,
   } = getHasCheckedOrderStatus(checkedOrderItems);
 
   const [temporaryQuery, setTemporaryQuery] = useState("");
@@ -164,7 +165,12 @@ const Controller = () => {
       return;
     }
 
-    if (isPreparingChecked || isShippingChecked || isShippingCompletedChecked) {
+    if (
+      isPreparingChecked ||
+      isShippingChecked ||
+      isShippingCompletedChecked ||
+      isCancelRequestChecked
+    ) {
       showHasAnyProblemModal(
         <>
           해당 버튼은 선택하신
@@ -258,7 +264,8 @@ const Controller = () => {
     if (
       isPaymentCompletedChecked ||
       isShippingChecked ||
-      isShippingCompletedChecked
+      isShippingCompletedChecked ||
+      isCancelRequestChecked
     ) {
       showHasAnyProblemModal(
         <>
@@ -394,7 +401,7 @@ const Controller = () => {
     //   return;
     // }
 
-    // if (isShippingChecked || isShippingCompletedChecked) {
+    // if (isShippingChecked || isShippingCompletedChecked || isCancelRequestChecked) {
     //   showHasAnyProblemModal(
     //     <>
     //       해당 버튼은 선택하신
@@ -504,7 +511,11 @@ const Controller = () => {
       return;
     }
 
-    if (isPaymentCompletedChecked || isPreparingChecked) {
+    if (
+      isPaymentCompletedChecked ||
+      isPreparingChecked ||
+      isCancelRequestChecked
+    ) {
       showHasAnyProblemModal(
         <>
           해당 버튼은 선택하신
@@ -531,7 +542,11 @@ const Controller = () => {
       return;
     }
 
-    if (isPaymentCompletedChecked || isPreparingChecked) {
+    if (
+      isPaymentCompletedChecked ||
+      isPreparingChecked ||
+      isCancelRequestChecked
+    ) {
       showHasAnyProblemModal(
         <>
           해당 버튼은 선택하신
