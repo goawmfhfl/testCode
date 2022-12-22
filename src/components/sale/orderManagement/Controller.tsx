@@ -26,6 +26,7 @@ import {
   OrderSearchType,
   OrderStatusType,
   OrderStatusName,
+  optionListType,
 } from "@constants/sale";
 import { useMutation, useReactiveVar } from "@apollo/client";
 import { checkedOrderItemsVar, reasonVar } from "@cache/sale";
@@ -46,7 +47,6 @@ import { CANCEL_ORDERITEMS_BY_SELLER } from "@graphql/mutations/cancelOrderItems
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import { showHasServerErrorModal } from "@cache/productManagement";
 import AskReasonModal from "@components/common/AskReasonModal";
-import { optionListType } from "@constants/sale/orderManagement";
 import { getHasCheckedOrderStatus } from "@utils/sale";
 
 const Controller = () => {
@@ -54,7 +54,7 @@ const Controller = () => {
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
-  const { detail, main } = useReactiveVar(reasonVar);
+  const { detailedReason, mainReason } = useReactiveVar(reasonVar);
 
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const checkedOrderItemIds = checkedOrderItems.map(
@@ -443,7 +443,7 @@ const Controller = () => {
                     } = await cancelOrderItems({
                       variables: {
                         input: {
-                          reason: main,
+                          reason: mainReason,
                           orderItemIds: checkedOrderItemIds,
                         },
                       },

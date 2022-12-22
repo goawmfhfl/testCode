@@ -16,6 +16,7 @@ import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
 import { useReactiveVar } from "@apollo/client";
+import { MainReason } from "@constants/sale";
 
 interface AskReasonModalType {
   option: Array<{
@@ -30,12 +31,12 @@ const AskReasonModal = ({
   option,
   handleSubmitButtonClick,
 }: AskReasonModalType) => {
-  const { main, detail } = useReactiveVar(reasonVar);
+  const { mainReason, detailedReason } = useReactiveVar(reasonVar);
 
   const changeReasonHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
     reasonVar({
       ...reasonVar(),
-      main: e.target.value,
+      mainReason: e.target.value as MainReason,
     });
   };
 
@@ -44,7 +45,7 @@ const AskReasonModal = ({
   ) => {
     reasonVar({
       ...reasonVar(),
-      detail: e.target.value,
+      detailedReason: e.target.value,
     });
   };
 
@@ -58,8 +59,8 @@ const AskReasonModal = ({
   useEffect(() => {
     return () => {
       reasonVar({
-        main: "",
-        detail: "",
+        mainReason: MainReason.DEFAULT,
+        detailedReason: "",
       });
     };
   }, []);
@@ -80,10 +81,10 @@ const AskReasonModal = ({
           arrowSrc={triangleArrowSvg}
           sizing={"medium"}
           width={"160px"}
-          value={main}
+          value={mainReason}
           onChange={changeReasonHandler}
         >
-          <Option value={"default"} hidden>
+          <Option value={MainReason.DEFAULT} hidden>
             사유를 선택해주세요
           </Option>
           {option.map(({ id, label, value }) => (
@@ -108,7 +109,7 @@ const AskReasonModal = ({
           size={"small"}
           width={"55px"}
           onClick={handleSubmitButtonClick}
-          disabled={!main || !detail}
+          disabled={mainReason === MainReason.DEFAULT || !detailedReason}
         >
           확인
         </StyledButton>

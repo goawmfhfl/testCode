@@ -86,7 +86,7 @@ const resetCancelOrders = (recontructCancelOrders: NormalizedType) => {
       thumbnail: product?.thumbnail || "-",
       orderProduct: resetOrderProduct,
       userName: resetUserName,
-      mainReason: mainReason,
+      mainReason: refusalMainReason,
       detaildReason: detaildReason,
       refusalMainReason: refusalMainReason,
       refusalDetaildReason: refusalDetaildReason,

@@ -1,5 +1,4 @@
-import { OrderStatusName } from "@constants/sale";
-import { MainReason } from "@models/sale/cancel";
+import { OrderStatusName, MainReason } from "@constants/sale";
 
 const getStatusReasonState = (
   statusReasons: Array<{

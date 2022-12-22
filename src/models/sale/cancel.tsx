@@ -3,6 +3,7 @@ import {
   OrderStatusGroup,
   OrderStatusName,
   OrderStatusType,
+  MainReason,
 } from "@constants/sale";
 
 export interface CancelOrdersType {
@@ -125,17 +126,4 @@ export interface ResetCancelOrders {
   cancelCompletedDay: string;
   totalRefundPrice: number;
   isChecked: boolean;
-}
-
-export enum MainReason {
-  DEFAULT = "DEFAULT",
-  NO_INTENTION = "NO_INTENTION",
-  CHANGE_COLOR_OR_SIZE = "CHANGE_COLOR_OR_SIZE",
-  DIFFERENT_PRODUCT = "DIFFERENT_PRODUCT",
-  DELAYED_SHIPMENT = "DELAYED_SHIPMENT",
-  OMITTED_SHIPMENT = "OMITTED_SHIPMENT",
-  OUT_OF_STOCK = "OUT_OF_STOCK",
-  DAMAGED = "DAMAGED",
-  MISINFORMED = "MISINFORMED",
-  MISDELIVERY = "MISDELIVERY",
 }

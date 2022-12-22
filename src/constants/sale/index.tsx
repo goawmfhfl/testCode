@@ -270,3 +270,45 @@ export const shipmentCompanyCode = {
   "151": "자이언트",
   "152": "(주)엠티인터내셔널",
 };
+
+export enum MainReason {
+  DEFAULT = "DEFAULT",
+  NO_INTENTION = "NO_INTENTION",
+  CHANGE_COLOR_OR_SIZE = "CHANGE_COLOR_OR_SIZE",
+  DIFFERENT_PRODUCT = "DIFFERENT_PRODUCT",
+  DELAYED_SHIPMENT = "DELAYED_SHIPMENT",
+  OMITTED_SHIPMENT = "OMITTED_SHIPMENT",
+  OUT_OF_STOCK = "OUT_OF_STOCK",
+  DAMAGED = "DAMAGED",
+  MISINFORMED = "MISINFORMED",
+  MISDELIVERY = "MISDELIVERY",
+}
+
+export const mainReasonType = {
+  DEFAULT: "사유를 선택해주세요.",
+  NO_INTENTION: "구매 의사 취소",
+  CHANGE_COLOR_OR_SIZE: "색상 및 사이즈 변경",
+  DIFFERENT_PRODUCT: "다른 상품 잘못 주문",
+  DELAYED_SHIPMENT: "배송 지연",
+  OMITTED_SHIPMENT: "배송 누락",
+  OUT_OF_STOCK: "상품 품절",
+  DAMAGED: "상품 파손",
+  MISINFORMED: "상품 정보 상이",
+  MISDELIVERY: "오배송",
+};
+
+export const optionListType: Array<{
+  id: number;
+  label: string;
+  value: string;
+}> = [
+  { id: 0, label: mainReasonType.NO_INTENTION, value: "consumer" },
+  { id: 1, label: mainReasonType.CHANGE_COLOR_OR_SIZE, value: "consumer" },
+  { id: 2, label: mainReasonType.DIFFERENT_PRODUCT, value: "consumer" },
+  { id: 3, label: mainReasonType.DELAYED_SHIPMENT, value: "seller" },
+  { id: 4, label: mainReasonType.OMITTED_SHIPMENT, value: "seller" },
+  { id: 5, label: mainReasonType.OUT_OF_STOCK, value: "seller" },
+  { id: 6, label: mainReasonType.DAMAGED, value: "seller" },
+  { id: 7, label: mainReasonType.MISINFORMED, value: "seller" },
+  { id: 8, label: mainReasonType.MISDELIVERY, value: "seller" },
+];

@@ -9,6 +9,7 @@ import {
   checkAllBoxStatusVar,
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
+  modalVar,
   pageNumberListVar,
   paginationVisibilityVar,
   showHasAnyProblemModal,
@@ -21,8 +22,9 @@ import {
   fixTableType,
   scrollTableType,
 } from "@constants/sale/cancelManagement/table";
+import { MainReason, mainReasonType, optionListType } from "@constants/sale";
 
-import { checkedOrderItemsVar } from "@cache/sale";
+import { checkedOrderItemsVar, reasonVar } from "@cache/sale";
 import useLazyCancelOrders from "@hooks/order/useLazyCancelOrders";
 import contructCancelOrders from "@utils/sale/cancel/contructCancelOrders";
 import resetCancelOrders from "@utils/sale/cancel/resetCancelOrders";
@@ -53,12 +55,15 @@ import {
   NormalizedType,
   ResetCancelOrders,
 } from "@models/sale/cancel";
+import AskReasonModal from "@components/common/AskReasonModal";
 
 const CancelTable = () => {
   const { getOrders, error, loading, data } = useLazyCancelOrders();
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
+
+  const { mainReason, detailedReason } = useReactiveVar(reasonVar);
 
   const [orders, setOrders] = useState<Array<ResetCancelOrders>>([]);
 
@@ -126,6 +131,23 @@ const CancelTable = () => {
         newOrders[index].isChecked = false;
         setOrders(newOrders);
       }
+    };
+
+  const handleEditReasonButtonClick =
+    (mainReason: MainReason, detailedReason: string) => () => {
+      reasonVar({ mainReason, detailedReason });
+
+      modalVar({
+        isVisible: true,
+        component: (
+          <AskReasonModal
+            handleSubmitButtonClick={() => {
+              console.log("");
+            }}
+            option={optionListType}
+          />
+        ),
+      });
     };
 
   useEffect(() => {
@@ -338,7 +360,20 @@ const CancelTable = () => {
                   <Td width={scrollTableType[0].width}>{claimStatus}</Td>
                   <Td width={scrollTableType[1].width}>{payments}</Td>
                   <Td width={scrollTableType[2].width}>{cancelRequestDay}</Td>
-                  <Td width={scrollTableType[3].width}>{mainReason}</Td>
+                  <ReasonTd width={scrollTableType[3].width}>
+                    <Reason>{mainReasonType[mainReason]}</Reason>
+                    <Button
+                      type={"button"}
+                      size={"small"}
+                      width={"55px"}
+                      onClick={handleEditReasonButtonClick(
+                        mainReason,
+                        detaildReason
+                      )}
+                    >
+                      수정
+                    </Button>
+                  </ReasonTd>
                   <Td width={scrollTableType[4].width}>{detaildReason}</Td>
                   <Td width={scrollTableType[5].width}>{cancelCompletedDay}</Td>
                   <Td width={scrollTableType[6].width}>
@@ -362,7 +397,20 @@ const CancelTable = () => {
                     {recipientPhoneNumber}
                   </Td>
                   <Td width={scrollTableType[18].width}>{cancelRefusalDay}</Td>
-                  <Td width={scrollTableType[19].width}>{refusalMainReason}</Td>
+                  <ReasonTd width={scrollTableType[19].width}>
+                    <Reason>{mainReasonType[refusalMainReason]}</Reason>
+                    <Button
+                      type={"button"}
+                      size={"small"}
+                      width={"55px"}
+                      onClick={handleEditReasonButtonClick(
+                        refusalMainReason,
+                        refusalDetaildReason
+                      )}
+                    >
+                      수정
+                    </Button>
+                  </ReasonTd>
                   <Td width={scrollTableType[20].width}>
                     {refusalDetaildReason}
                   </Td>
@@ -396,6 +444,14 @@ const CancelTable = () => {
     </TableContainer>
   );
 };
+
+const ReasonTd = styled(Td)`
+  display: flex;
+  justify-content: space-between;
+
+  padding: 0px 8px;
+`;
+const Reason = styled.span``;
 
 const Quantity = styled.span<{ quantity: number }>`
   color: ${({ theme: { palette }, quantity }) =>
