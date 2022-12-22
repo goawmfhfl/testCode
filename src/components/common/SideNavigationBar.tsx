@@ -6,6 +6,7 @@ import { Pathnames } from "@constants/index";
 import useShopInfo from "@hooks/useShopInfo";
 import {
   loadingSpinnerVisibilityVar,
+  saleSubItemVisibilityVar,
   sideNavigationBarStatusVar,
 } from "@cache/index";
 import { showHasServerErrorModal } from "@cache/productManagement";
@@ -20,14 +21,15 @@ const SideNavigationBar = () => {
 
   const saleMenuStatus = useReactiveVar(saleMenuStatusVar);
   const sideNavigationBarStatus = useReactiveVar(sideNavigationBarStatusVar);
-  const [saleSubItemVisibilty, setSaleSubItemVisibilty] =
-    useState<boolean>(false);
-
-  const handleSaleDropdownClick = () => {
-    setSaleSubItemVisibilty((prev) => !prev);
-  };
+  const saleSubItemVisibility = useReactiveVar(saleSubItemVisibilityVar);
 
   const handleNavItemClick = (status: MenuStatusType) => () => {
+    if (status === MenuStatusType.SALE) {
+      saleSubItemVisibilityVar(!saleSubItemVisibility);
+    } else {
+      saleSubItemVisibilityVar(false);
+    }
+
     sideNavigationBarStatusVar(status);
   };
 
@@ -60,23 +62,20 @@ const SideNavigationBar = () => {
             상품관리
           </Link>
         </NavItem>
-        <NavItem
-          disabled={false}
-          isActive={sideNavigationBarStatus === MenuStatusType.SALE}
-        >
-          <Link
-            to={Pathnames.Order}
+        <Link to={Pathnames.Order}>
+          <NavItem
+            disabled={false}
+            isActive={sideNavigationBarStatus === MenuStatusType.SALE}
             onClick={handleNavItemClick(MenuStatusType.SALE)}
           >
             판매관리
-          </Link>
-          <DropdownIcon
-            src={saleSubItemVisibilty ? mediumTopSrc : mediumBottomSrc}
-            isActive={sideNavigationBarStatus === MenuStatusType.SALE}
-            onClick={handleSaleDropdownClick}
-          />
-        </NavItem>
-        {saleSubItemVisibilty && (
+            <DropdownIcon
+              src={saleSubItemVisibility ? mediumTopSrc : mediumBottomSrc}
+              isActive={sideNavigationBarStatus === MenuStatusType.SALE}
+            />
+          </NavItem>
+        </Link>
+        {saleSubItemVisibility && (
           <SubNavContainer
             isActive={sideNavigationBarStatus === MenuStatusType.SALE}
           >

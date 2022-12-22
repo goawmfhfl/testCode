@@ -609,16 +609,15 @@ const OrderTable = () => {
       hasData={hasOrderItems}
       action="http://info.sweettracker.co.kr/tracking/5"
       method="post"
+      target="_black"
     >
-      <ShipmentTemplateAPILabel htmlFor="t_key">
-        <input
-          type="text"
-          id="t_key"
-          name="t_key"
-          value={process.env.REACT_APP_SWEETTRAKER_API_KEY}
-          readOnly={true}
-        />
-      </ShipmentTemplateAPILabel>
+      <ShipmentTemplateInput
+        type="text"
+        id="t_key"
+        name="t_key"
+        value={process.env.REACT_APP_SWEETTRAKER_API_KEY}
+        readOnly={true}
+      />
       <FixedTable width={tableWidth.left}>
         <ThContainer>
           <Th width={fixTableType[0].width}>
@@ -742,15 +741,13 @@ const OrderTable = () => {
                         </Dropdown>
                       ) : (
                         <>
-                          <ShipmentTemplateAPILabel htmlFor="t_code">
-                            <input
-                              type="text"
-                              id="t_code"
-                              name="t_code"
-                              value={shipmentCompany || ""}
-                              readOnly={true}
-                            />
-                          </ShipmentTemplateAPILabel>
+                          <ShipmentTemplateInput
+                            type="text"
+                            id="t_code"
+                            name="t_code"
+                            value={shipmentCompany}
+                            readOnly={true}
+                          />
                           {shipmentCompanyCode[shipmentCompany]}
                         </>
                       )
@@ -807,15 +804,13 @@ const OrderTable = () => {
                       ) : (
                         <ShipmnetNumberContainer>
                           <ShipmnetNumber>{shipmentNumber}</ShipmnetNumber>
-                          <ShipmentTemplateAPILabel htmlFor="t_invoice">
-                            <input
-                              type="text"
-                              id="t_invoice"
-                              name="t_invoice"
-                              value={shipmentNumber || ""}
-                              readOnly={true}
-                            />
-                          </ShipmentTemplateAPILabel>
+                          <ShipmentTemplateInput
+                            type="text"
+                            id="t_invoice"
+                            name="t_invoice"
+                            value={shipmentNumber}
+                            readOnly={true}
+                          />
                           <Button
                             size="small"
                             width="55px"
@@ -940,7 +935,7 @@ const ShipmnetNumber = styled.span`
   margin-right: 8px;
 `;
 
-const ShipmentTemplateAPILabel = styled.label`
+const ShipmentTemplateInput = styled.input`
   display: none;
 `;
 

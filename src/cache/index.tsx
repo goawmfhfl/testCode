@@ -12,6 +12,7 @@ import { MenuStatusType } from "@constants/sale";
 
 // Global Layout
 export const loadingSpinnerVisibilityVar = makeVar<boolean>(false);
+export const saleSubItemVisibilityVar = makeVar<boolean>(false);
 export const sideNavigationBarStatusVar = makeVar<MenuStatusType>(
   MenuStatusType.PRODUCT
 );
