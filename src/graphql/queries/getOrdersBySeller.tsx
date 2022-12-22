@@ -104,29 +104,19 @@ export const GET_CANCEL_ORDERS_BY_SELLER = gql`
       totalPages
       totalResults
       totalOrderItems {
-        #아이디
         id
-
-        #주문번호
         merchantItemUid
 
         product {
-          #상품 주문번호
           code
-          #상품 섬네일
           thumbnail
-          #주문 상품
           name
         }
 
         user {
-          #구매자명
           name
-          #구매자 아이디
           email
-          #구매자 전화번호
           phoneNumber
-          # 결제일
           payments {
             createdAt
           }
@@ -134,41 +124,35 @@ export const GET_CANCEL_ORDERS_BY_SELLER = gql`
 
         orderByShop {
           order {
-            # 수취인
             recipientName
-            # 수취인 전화번호
             recipientPhoneNumber
           }
         }
 
         options {
-          # 옵션명
           components {
             name
             value
           }
-          # 옵션가
           price
         }
-        # 상품개수
         quantity
-
-        # 상품가
         discountAppliedPrice
         originalPrice
-
-        # 배송비
         shipmentPrice
-
-        # 도서산간 배송비
         shipmentDistantPrice
 
-        # 주문상태
+        statusReasons {
+          id
+          createdAt
+          amount
+          mainReason
+          detailedReason
+          status
+        }
         orderStatus {
           name
         }
-
-        # 클레임상태
         claimStatus {
           name
         }

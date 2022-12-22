@@ -1,64 +1,141 @@
-import { OrderItemsType } from "@models/sale/order";
+import {
+  OrderSearchType,
+  OrderStatusGroup,
+  OrderStatusName,
+  OrderStatusType,
+} from "@constants/sale";
 
-// 변경 필요
-export interface NormalizedListType {
-  orders: {
-    allIds: Array<number>;
-    byId: { [key: number]: OrderItemsType };
+export interface CancelOrdersType {
+  id: number;
+
+  merchantItemUid: string;
+
+  product: {
+    code: string;
+    thumbnail: string;
+    name: string;
+  };
+
+  user: {
+    name: string;
+    email: string;
+    phoneNumber: string;
+    payments: {
+      createdAt: string;
+    };
+  };
+
+  orderByShop: {
+    order: {
+      recipientName: string;
+      recipientPhoneNumber: string;
+    };
+  };
+
+  options: Array<{
+    components: Array<{
+      name: string;
+      value: string;
+    }>;
+    price: number;
+  }>;
+
+  quantity: number;
+
+  discountAppliedPrice: number;
+
+  originalPrice: number;
+
+  shipmentPrice: number;
+
+  shipmentDistantPrice: number;
+
+  statusReasons: Array<{
+    id: number;
+    createdAt: string;
+    amount: number;
+    mainReason: MainReason;
+    detailedReason: string;
+    status: OrderStatusName;
+  }>;
+
+  orderStatus: {
+    name: OrderStatusName;
+  };
+
+  claimStatus: {
+    name: OrderStatusName;
   };
 }
 
-// 변경 필요
-export interface ResetOrderItemType {
+export interface GetCancelOrdersBySellerType {
+  getOrdersBySeller: {
+    ok: boolean;
+    error: string;
+    totalPages: number;
+    totalResults: number;
+    totalOrderItems: Array<CancelOrdersType>;
+  };
+}
+
+export interface GetCancelOrdersBySellerInputType {
+  page?: number;
+  skip?: number;
+  query?: string;
+  type?: OrderSearchType;
+  statusName?: OrderStatusName;
+  statusType?: OrderStatusType;
+  statusGroup: OrderStatusGroup;
+}
+
+export interface NormalizedType {
+  orders: {
+    allIds: Array<number>;
+    byId: { [key: number]: CancelOrdersType };
+  };
+}
+
+export interface ResetCancelOrders {
   id: number;
-  // 주문번호
   merchantItemUid: string;
-  // 상품 주문번호
   productCode: string;
-  // 주문 상품
   thumbnail: string;
   orderProduct: string;
-  // 구매자 명
   userName: string;
-  // 주문 상태
+  mainReason: MainReason;
+  detaildReason: string;
+  refusalMainReason: MainReason;
+  refusalDetaildReason: string;
   orderStatus: string;
-  // 클레임 상태
   claimStatus: string;
-  // 택배사
-  shipmentCompany: string;
-  // 운송장번호
-  invoiceNumber?: string;
-  // 결제일
   payments: string;
-  // 수취인
   recipientName: string;
-  // 수취인 전화번호
   recipientPhoneNumber: string;
-  // 수취인 주소
-  recipientAddress: string;
-  // 우편번호
-  postCode: string | number;
-  // 배송메세지
-  shipmentMemo: string;
-  // 구매자 아이디
   userEmail: string;
-  // 구매자 전화번호
   userPhoneNumber: string;
-  // 옵션
   option: string;
-  // 상품개수
   quantity: number;
-  // 상품가
   price: number;
-  // 옵션가
   optionPrice: string;
-  // 상품별 총 금액
   totalPrice: string;
-  // 배송비
   shipmentPrice: number;
-  // 제주/도서 추가배송비
   shipmentDistantPrice: number;
+  cancelRequestDay: string;
+  cancelRefusalDay: string;
+  cancelCompletedDay: string;
+  totalRefundPrice: number;
   isChecked: boolean;
-  temporaryShipmentCompany: string;
-  temporaryShipmentNumber: string;
+}
+
+export enum MainReason {
+  DEFAULT = "DEFAULT",
+  NO_INTENTION = "NO_INTENTION",
+  CHANGE_COLOR_OR_SIZE = "CHANGE_COLOR_OR_SIZE",
+  DIFFERENT_PRODUCT = "DIFFERENT_PRODUCT",
+  DELAYED_SHIPMENT = "DELAYED_SHIPMENT",
+  OMITTED_SHIPMENT = "OMITTED_SHIPMENT",
+  OUT_OF_STOCK = "OUT_OF_STOCK",
+  DAMAGED = "DAMAGED",
+  MISINFORMED = "MISINFORMED",
+  MISDELIVERY = "MISDELIVERY",
 }

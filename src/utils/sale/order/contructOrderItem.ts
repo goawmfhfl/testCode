@@ -1,7 +1,7 @@
-import { OrderItemsType } from "@models/sale/order";
+import { OrdersType } from "@models/sale/order";
 import { NormalizedListType } from "@models/sale/order";
 
-const contructOrderItem = (orderItem: Array<OrderItemsType>) => {
+const contructOrderItem = (orderItem: Array<OrdersType>) => {
   const result: NormalizedListType = {
     orders: {
       allIds: orderItem.map((order) => order.id),

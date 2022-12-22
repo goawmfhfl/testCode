@@ -18,7 +18,7 @@ export interface GetOrdersBySellerInputType {
   };
 }
 
-export interface OrderItemsType {
+export interface OrdersType {
   id: number;
   // 주문 번호
   merchantItemUid: string;
@@ -111,7 +111,7 @@ export interface GetOrdersBySellerType {
     error: string;
     totalPages: number;
     totalResults: number;
-    totalOrderItems: Array<OrderItemsType>;
+    totalOrderItems: Array<OrdersType>;
   };
 }
 
@@ -193,11 +193,10 @@ export interface ConfirmOrderItemsBySellerInputType {
 export interface NormalizedListType {
   orders: {
     allIds: Array<number>;
-    byId: { [key: number]: OrderItemsType };
+    byId: { [key: number]: OrdersType };
   };
 }
 
-// need Change Type
 export interface ResetOrderItemType {
   id: number;
   // 주문번호
