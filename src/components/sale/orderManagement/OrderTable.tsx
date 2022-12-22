@@ -43,8 +43,9 @@ import {
 } from "@cache/index";
 
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
-import { OrderItemsType } from "@models/sale/order";
+import { OrdersType } from "@models/sale/order";
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
+import { EDIT_SHIPMENT_NUMBER } from "@graphql/mutations/editShipmentNumber";
 
 import useLazyOrders from "@hooks/order/useLazyOrders";
 
@@ -70,7 +71,6 @@ import {
 } from "@components/common/input/Dropdown";
 import Button from "@components/common/Button";
 import { Input } from "@components/common/input/TextInput";
-import { EDIT_SHIPMENT_NUMBER } from "@graphql/mutations/editShipmentNumber";
 
 const OrderTable = () => {
   const { getOrderItem, error, loading, data } = useLazyOrders();
@@ -488,7 +488,7 @@ const OrderTable = () => {
     }: {
       totalPages: number;
       totalResults: number;
-      totalOrderItems: Array<OrderItemsType>;
+      totalOrderItems: Array<OrdersType>;
     } = data.getOrdersBySeller;
 
     const isLastPageChanged = totalPages < page;
@@ -787,6 +787,7 @@ const OrderTable = () => {
                             }
                           />
                           <Button
+                            type="button"
                             size="small"
                             width="55px"
                             onClick={handleSaveButtonClick(
@@ -796,7 +797,6 @@ const OrderTable = () => {
                               temporaryShipmentNumber,
                               ShipmentStatus.SHIPPING
                             )}
-                            type="button"
                           >
                             저장
                           </Button>
@@ -870,7 +870,9 @@ const OrderTable = () => {
                   <Td width={scrollTableType[9].width}>{userEmail}</Td>
                   <Td width={scrollTableType[10].width}>{userPhoneNumber}</Td>
                   <Td width={scrollTableType[11].width}>{option}</Td>
-                  <Td width={scrollTableType[12].width}>{quantity}</Td>
+                  <Td width={scrollTableType[12].width}>
+                    <Quantity quantity={quantity}>{quantity}</Quantity>
+                  </Td>
                   <Td width={scrollTableType[13].width}>{price}</Td>
                   <Td width={scrollTableType[14].width}>{optionPrice}</Td>
                   <Td width={scrollTableType[15].width}>{totalPrice}</Td>
@@ -937,6 +939,11 @@ const ShipmnetNumber = styled.span`
 
 const ShipmentTemplateInput = styled.input`
   display: none;
+`;
+
+const Quantity = styled.span<{ quantity: number }>`
+  color: ${({ theme: { palette }, quantity }) =>
+    quantity > 1 ? palette.red900 : palette.black};
 `;
 
 export default OrderTable;
