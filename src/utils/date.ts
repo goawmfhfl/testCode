@@ -27,7 +27,7 @@ export const getYYMMDDdateFormat = (date: string) => {
 
   const day = `0${formatDate.getDate()}`.slice(-2);
 
-  const format = `${year}/${month}/${day}`;
+  const format = `${year}.${month}.${day}`;
 
   return format;
 };
