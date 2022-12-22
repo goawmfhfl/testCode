@@ -22,7 +22,12 @@ import {
   fixTableType,
   scrollTableType,
 } from "@constants/sale/cancelManagement/table";
-import { MainReason, mainReasonType, optionListType } from "@constants/sale";
+import {
+  MainReason,
+  mainReasonType,
+  optionListType,
+  OrderStatusName,
+} from "@constants/sale";
 
 import { checkedOrderItemsVar, reasonVar } from "@cache/sale";
 import useLazyCancelOrders from "@hooks/order/useLazyCancelOrders";
@@ -361,7 +366,7 @@ const CancelTable = () => {
                   <Td width={scrollTableType[1].width}>{payments}</Td>
                   <Td width={scrollTableType[2].width}>{cancelRequestDay}</Td>
                   <ReasonTd width={scrollTableType[3].width}>
-                    <Reason>{mainReasonType[mainReason]}</Reason>
+                    <Reason>{mainReasonType[mainReason as string]}</Reason>
                     <Button
                       type={"button"}
                       size={"small"}
@@ -370,6 +375,7 @@ const CancelTable = () => {
                         mainReason,
                         detaildReason
                       )}
+                      disabled={statusName === OrderStatusName.CANCEL_COMPLETED}
                     >
                       수정
                     </Button>
@@ -398,7 +404,9 @@ const CancelTable = () => {
                   </Td>
                   <Td width={scrollTableType[18].width}>{cancelRefusalDay}</Td>
                   <ReasonTd width={scrollTableType[19].width}>
-                    <Reason>{mainReasonType[refusalMainReason]}</Reason>
+                    <Reason>
+                      {mainReasonType[refusalMainReason as string]}
+                    </Reason>
                     <Button
                       type={"button"}
                       size={"small"}
@@ -407,6 +415,7 @@ const CancelTable = () => {
                         refusalMainReason,
                         refusalDetaildReason
                       )}
+                      disabled={statusName === OrderStatusName.CANCEL_COMPLETED}
                     >
                       수정
                     </Button>

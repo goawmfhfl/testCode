@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import styled from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
-import { filterOptionVar } from "@cache/sale/order";
+import { filterOptionVar } from "@cache/sale/cancel";
 import {
   commonFilterOptionVar,
   paginationSkipVar,
@@ -75,14 +75,14 @@ const FilterBar = () => {
         전체 {all}
       </Filter>
       <Filter
-        isActvie={statusName === OrderStatusName.PAYMENT_COMPLETED}
-        onClick={handleFilterOptionNameClick(OrderStatusName.PAYMENT_COMPLETED)}
+        isActvie={statusName === OrderStatusName.CANCEL_REQUEST}
+        onClick={handleFilterOptionNameClick(OrderStatusName.CANCEL_REQUEST)}
       >
         취소요청 {cancelRequest}
       </Filter>
       <Filter
-        isActvie={statusName === OrderStatusName.PREPARING}
-        onClick={handleFilterOptionNameClick(OrderStatusName.PREPARING)}
+        isActvie={statusName === OrderStatusName.CANCEL_COMPLETED}
+        onClick={handleFilterOptionNameClick(OrderStatusName.CANCEL_COMPLETED)}
       >
         취소완료 {cancelCompleted}
       </Filter>
