@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import styled from "styled-components/macro";
 import { Link } from "react-router-dom";
 import { useReactiveVar } from "@apollo/client";
@@ -20,28 +20,18 @@ const SideNavigationBar = () => {
   const { data, loading, error } = useShopInfo();
 
   const saleMenuStatus = useReactiveVar(saleMenuStatusVar);
-  const sideNavigationBarStatus = useReactiveVar(sideNavigationBarStatusVar);
   const saleSubItemVisibility = useReactiveVar(saleSubItemVisibilityVar);
-
-  const handleNavItemClick = (status: MenuStatusType) => () => {
-    if (status === MenuStatusType.SALE) {
-      saleSubItemVisibilityVar(!saleSubItemVisibility);
-    } else {
-      saleSubItemVisibilityVar(false);
-    }
-
-    sideNavigationBarStatusVar(status);
-  };
+  const sideNavigationBarStatus = useReactiveVar(sideNavigationBarStatusVar);
 
   const handleSubNavItemClick = (status: SaleMenuStatusType) => () => {
     saleMenuStatusVar(status);
   };
+
   useEffect(() => {
     loadingSpinnerVisibilityVar(loading);
 
     if (error) {
       showHasServerErrorModal("", "샵 정보 가져오기");
-      console.error(error);
     }
   }, [loading, error]);
 
@@ -53,31 +43,23 @@ const SideNavigationBar = () => {
       <NavList>
         <NavItem
           disabled={!isRegisteredShop}
-          isActive={sideNavigationBarStatus === MenuStatusType.PRODUCT}
+          isActive={sideNavigationBarStatus === Pathnames.Product}
         >
-          <Link
-            to={Pathnames.Product}
-            onClick={handleNavItemClick(MenuStatusType.PRODUCT)}
-          >
-            상품관리
-          </Link>
+          <Link to={Pathnames.Product}>상품관리</Link>
         </NavItem>
-        <Link to={Pathnames.Order}>
-          <NavItem
-            disabled={false}
+        <NavItem
+          disabled={true}
+          isActive={sideNavigationBarStatus === Pathnames.Order}
+        >
+          <Link to={Pathnames.Order}>판매관리</Link>
+          <DropdownIcon
+            src={saleSubItemVisibility ? mediumTopSrc : mediumBottomSrc}
             isActive={sideNavigationBarStatus === MenuStatusType.SALE}
-            onClick={handleNavItemClick(MenuStatusType.SALE)}
-          >
-            판매관리
-            <DropdownIcon
-              src={saleSubItemVisibility ? mediumTopSrc : mediumBottomSrc}
-              isActive={sideNavigationBarStatus === MenuStatusType.SALE}
-            />
-          </NavItem>
-        </Link>
+          />
+        </NavItem>
         {saleSubItemVisibility && (
           <SubNavContainer
-            isActive={sideNavigationBarStatus === MenuStatusType.SALE}
+            isActive={sideNavigationBarStatus === Pathnames.Order}
           >
             <SubNavItem
               isActive={saleMenuStatus === SaleMenuStatusType.ORDER}
@@ -107,41 +89,21 @@ const SideNavigationBar = () => {
         )}
         <NavItem
           disabled={true}
-          isActive={sideNavigationBarStatus === MenuStatusType.INQUIRY}
+          isActive={sideNavigationBarStatus === Pathnames.Inquiry}
         >
-          <Link
-            to={Pathnames.Inquiry}
-            onClick={handleNavItemClick(MenuStatusType.INQUIRY)}
-          >
-            문의관리
-          </Link>
+          <Link to={Pathnames.Inquiry}>문의관리</Link>
         </NavItem>
         <NavItem
           disabled={true}
-          isActive={sideNavigationBarStatus === MenuStatusType.SETTLEMENT}
+          isActive={sideNavigationBarStatus === Pathnames.Settlement}
         >
-          <Link
-            to={Pathnames.Settlement}
-            onClick={handleNavItemClick(MenuStatusType.SETTLEMENT)}
-          >
-            정산관리
-          </Link>
+          <Link to={Pathnames.Settlement}>정산관리</Link>
         </NavItem>
-        <NavItem isActive={sideNavigationBarStatus === MenuStatusType.SHOP}>
-          <Link
-            to={Pathnames.Shop}
-            onClick={handleNavItemClick(MenuStatusType.SHOP)}
-          >
-            샵 설정
-          </Link>
+        <NavItem isActive={sideNavigationBarStatus === Pathnames.Shop}>
+          <Link to={Pathnames.Shop}>샵 설정</Link>
         </NavItem>
-        <NavItem isActive={sideNavigationBarStatus === MenuStatusType.NOTICE}>
-          <Link
-            to={Pathnames.Notice}
-            onClick={handleNavItemClick(MenuStatusType.NOTICE)}
-          >
-            판매자 공지사항
-          </Link>
+        <NavItem isActive={sideNavigationBarStatus === Pathnames.Notice}>
+          <Link to={Pathnames.Notice}>판매자 공지사항</Link>
         </NavItem>
       </NavList>
     </Container>

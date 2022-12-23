@@ -13,9 +13,12 @@ import {
   systemModalVar,
   contentsContainerReferenceVar,
   loadingSpinnerVisibilityVar,
+  sideNavigationBarStatusVar,
+  saleSubItemVisibilityVar,
 } from "@cache/index";
 import SystemModal from "@components/common/SystemModal";
 import { Pathnames } from "@constants/index";
+import { useEffect } from "react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -38,6 +41,11 @@ const Layout = ({
   const isTablePage =
     location.pathname === Pathnames.Product ||
     location.pathname === Pathnames.Order;
+
+  useEffect(() => {
+    sideNavigationBarStatusVar(location.pathname);
+    saleSubItemVisibilityVar(location.pathname === Pathnames.Order);
+  }, []);
 
   return (
     <>
