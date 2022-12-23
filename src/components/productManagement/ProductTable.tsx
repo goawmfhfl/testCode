@@ -365,7 +365,7 @@ const ProductTable = () => {
             ) => {
               return (
                 <Tr key={`product-${productId}-row`}>
-                  <TableData
+                  <Td
                     width={tableData[0].width}
                     className={tableData[0].className}
                   >
@@ -373,70 +373,24 @@ const ProductTable = () => {
                       onChange={changeSingleCheckBoxHandler(index)}
                       checked={isChecked}
                     />
-                  </TableData>
-                  <TableData
-                    width={tableData[1].width}
-                    className={tableData[1].className}
-                  >
-                    {productId}
-                  </TableData>
-                  <TableData
-                    width={tableData[2].width}
-                    className={tableData[2].className}
-                  >
+                  </Td>
+                  <Td width={tableData[1].width}>{productId}</Td>
+                  <ProductNameTd width={tableData[2].width}>
                     <ProductThumbNailWrapper>
                       <ProductThumbNail src={thumbnail} />
                     </ProductThumbNailWrapper>
                     <ProductName>
                       <Link to={`/product/${productId}`}>{productName}</Link>
                     </ProductName>
-                  </TableData>
-                  <TableData
-                    width={tableData[3].width}
-                    className={tableData[3].className}
-                  >
-                    {firstCategory}
-                  </TableData>
-                  <TableData
-                    width={tableData[4].width}
-                    className={tableData[4].className}
-                  >
-                    {secondCategory}
-                  </TableData>
-                  <TableData
-                    width={tableData[5].width}
-                    className={tableData[5].className}
-                  >
-                    {thirdCategory}
-                  </TableData>
-                  <TableData
-                    width={tableData[6].width}
-                    className={tableData[6].className}
-                  >
-                    {originalPriceToWonSign}
-                  </TableData>
-                  <TableData
-                    width={tableData[7].width}
-                    className={tableData[7].className}
-                  >
-                    {discountedRate}
-                  </TableData>
-                  <TableData
-                    width={tableData[8].width}
-                    className={tableData[8].className}
-                  >
-                    {discountAppliedPrice}
-                  </TableData>
-                  <TableData
-                    width={tableData[9].width}
-                    className={tableData[9].className}
-                  >
-                    {quantity}
-                  </TableData>
-                  <TableData
-                    width={tableData[10].width}
-                    className={tableData[10].className}
-                  >
+                  </ProductNameTd>
+                  <Td width={tableData[3].width}>{firstCategory}</Td>
+                  <Td width={tableData[4].width}>{secondCategory}</Td>
+                  <Td width={tableData[5].width}>{thirdCategory}</Td>
+                  <Td width={tableData[6].width}>{originalPriceToWonSign}</Td>
+                  <Td width={tableData[7].width}>{discountedRate}</Td>
+                  <Td width={tableData[8].width}>{discountAppliedPrice}</Td>
+                  <Td width={tableData[9].width}>{quantity}</Td>
+                  <Td width={tableData[10].width}>
                     <Dropdown
                       onChange={changeSingleSaleStatusHandler(productId)}
                       arrowSrc={triangleArrowSvg}
@@ -458,7 +412,7 @@ const ProductTable = () => {
                         </Option>
                       ))}
                     </Dropdown>
-                  </TableData>
+                  </Td>
                 </Tr>
               );
             }
@@ -483,10 +437,8 @@ const ProductTable = () => {
   );
 };
 
-const TableData = styled(Td)`
-  &.name {
-    justify-content: flex-start;
-  }
+const ProductNameTd = styled(Td)`
+  justify-content: flex-start;
 `;
 
 const ProductThumbNailWrapper = styled.div`

@@ -51,7 +51,7 @@ export const tableData = [
   },
   {
     id: 8,
-    label: "할인가",
+    label: "최종가",
     width: Math.round((80 / maxWidth) * 100),
     className: "discountAppliedPrice",
   },
