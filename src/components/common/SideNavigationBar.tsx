@@ -52,10 +52,10 @@ const SideNavigationBar = () => {
           isActive={sideNavigationBarStatus === Pathnames.Order}
         >
           <Link to={Pathnames.Order}>판매관리</Link>
-          <DropdownIcon
+          {/* <DropdownIcon
             src={saleSubItemVisibility ? mediumTopSrc : mediumBottomSrc}
-            isActive={sideNavigationBarStatus === MenuStatusType.SALE}
-          />
+            isActive={sideNavigationBarStatus === Pathnames.Order}
+          /> */}
         </NavItem>
         {saleSubItemVisibility && (
           <SubNavContainer
