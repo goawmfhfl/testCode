@@ -22,16 +22,8 @@ export const TableContainer = styled.form<{
         `
       : css``}
 `;
-interface FixedTableProps {
-  width: number;
-  children: React.ReactNode;
-}
 
-export const FixedTable = ({ width, children }: FixedTableProps) => {
-  return <FixedTableContainer width={width}>{children}</FixedTableContainer>;
-};
-
-export const FixedTableContainer = styled.div<{ width: number }>`
+export const FixedTable = styled.div<{ width: number }>`
   min-width: ${({ width }) => `${width}px`};
 `;
 
