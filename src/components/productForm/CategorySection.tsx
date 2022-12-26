@@ -149,8 +149,8 @@ const CategorySection = () => {
                 e.preventDefault();
 
                 const isChemicalProduct =
-                  e.target.value === CategoryNames.DIFFUSER_ROOMSPRAY ||
-                  e.target.value === CategoryNames.CANDLE;
+                  e.target.value === CategoryNames.HOME_FRAGRANCE ||
+                  e.target.value === CategoryNames.CANDLE_HOLDER;
 
                 if (isChemicalProduct && !isSafetyAuthenticated) {
                   systemModalVar({
