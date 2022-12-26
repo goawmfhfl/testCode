@@ -1,4 +1,3 @@
-import axios from "axios";
 import styled from "styled-components/macro";
 import { useFormContext } from "react-hook-form";
 
@@ -13,41 +12,31 @@ import exclamationmarkSource from "@icons/exclamationmark.svg";
 import exclamationIconGreySource from "@icons/exclamation-grey.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import TextInput from "@components/common/input/TextInput";
+import { addImageOnServer } from "@utils/index";
 
 const RegistrationNumber = () => {
-  const { register, watch, setValue, getValues } = useFormContext();
+  const { register, setValue, watch } = useFormContext();
 
   const handleChangePhotocopyInput = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (!e.target.files.length) return;
 
-    const previous = getValues(PHOTOCOPY) as string;
+    const previous = watch(PHOTOCOPY) as string;
     const [image] = e.target.files;
 
     if (previous) {
       await deleteImageUrl(previous);
     }
 
-    const formData = new FormData();
-    formData.append("files", image);
+    const { url } = await addImageOnServer(image);
 
-    const { data }: { data: Array<{ url: string }> } = await axios.post(
-      `${process.env.REACT_APP_SERVER_URI}/upload`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    const { url } = data[0];
+    console.log("등록 결과", url);
 
     setValue(PHOTOCOPY, url);
   };
 
-  const attachedPhotocopy = getValues(PHOTOCOPY) as string;
+  const attachedPhotocopy = watch(PHOTOCOPY) as string;
 
   return (
     <Container>

@@ -11,12 +11,16 @@ const deleteImageUrl = async (imageUrl: string) => {
       }
     );
 
+    console.log("삭제 시 보내는 것", {
+      url: imageUrl.toString(),
+    });
+
     if (!response.data.result) {
       console.log("이미지 삭제 서버 에러", response);
 
-      return {
-        ok: false,
-      };
+      // return {
+      //   ok: false,
+      // };
     }
 
     return {
