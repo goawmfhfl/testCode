@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 
 import { HeaderNames } from "@constants/index";
@@ -6,7 +5,6 @@ import { HeaderNames } from "@constants/index";
 import ContentsHeader from "@components/common/ContentsHeader";
 import FilterBar from "@components/sale/exchangeManagement/FilterBar";
 import Controller from "@components/sale/exchangeManagement/Controller";
-import ExchangeTable from "@components/sale/exchangeManagement/ExchangeTable";
 import Pagination from "@components/common/Pagination";
 
 const ExchangeManagement = () => {
@@ -15,7 +13,6 @@ const ExchangeManagement = () => {
       <ContentsHeader headerName={HeaderNames.Exchange} />
       <FilterBar />
       <Controller />
-      <ExchangeTable />
       <Pagination />
     </Container>
   );

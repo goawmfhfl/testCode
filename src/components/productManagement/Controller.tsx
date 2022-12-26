@@ -321,7 +321,6 @@ const Controller = () => {
       description: <>상품을 복제하시겠습니까?</>,
       confirmButtonVisibility: true,
       cancelButtonVisibility: true,
-
       confirmButtonClickHandler: () => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
