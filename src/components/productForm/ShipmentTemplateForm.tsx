@@ -19,7 +19,7 @@ import {
 } from "@components/productForm/ShipmentChargeSection";
 import closeIconSource from "@icons/delete.svg";
 import downwordArrowMedium from "@icons/arrow-downward-medium.svg";
-import { hasEveryInputFulfilled } from "@utils/index";
+import { hasEveryInputFulfilled, preventNaNValues } from "@utils/index";
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 import { loadingSpinnerVisibilityVar, overModalVar } from "@cache/index";
 import { shipmentTemplateVar } from "@cache/productForm/shipmentTemplate";
@@ -177,9 +177,10 @@ const ShipmentTemplateForm = ({
               <TextInputWrapper hasLeftMargin={false}>
                 <TextInput
                   width={"138px"}
-                  onChange={handleInputChange("shipmentCharge")}
                   value={shipmentCharge}
                   disabled={shipmentChargeType === ShipmentChargeType.Free}
+                  onChange={handleInputChange("shipmentCharge")}
+                  onKeyDown={preventNaNValues}
                   placeholder={"숫자만 입력"}
                 />
               </TextInputWrapper>
@@ -196,6 +197,7 @@ const ShipmentTemplateForm = ({
               <TextInput
                 value={additionalCharge}
                 onChange={handleInputChange("additionalCharge")}
+                onKeyDown={preventNaNValues}
                 placeholder="숫자만 입력"
               />
             </TextInputWrapper>
@@ -213,6 +215,7 @@ const ShipmentTemplateForm = ({
                 <TextInput
                   value={returnCharge}
                   onChange={handleInputChange("returnCharge")}
+                  onKeyDown={preventNaNValues}
                   placeholder="숫자만 입력"
                 />{" "}
               </TextInputWrapper>
@@ -225,6 +228,7 @@ const ShipmentTemplateForm = ({
                 <TextInput
                   value={exchangeCharge}
                   onChange={handleInputChange("exchangeCharge")}
+                  onKeyDown={preventNaNValues}
                   placeholder="숫자만 입력"
                 />{" "}
               </TextInputWrapper>
