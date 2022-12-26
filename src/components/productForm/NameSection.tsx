@@ -48,7 +48,7 @@ const ProductName = () => {
           width={"689px"}
           maxLength={100}
         />
-        <TextLength>{title?.length}/100</TextLength>
+        <TextLength>{title?.length ?? 0}/100</TextLength>
       </TextInputWrapper>
     </Container>
   );
