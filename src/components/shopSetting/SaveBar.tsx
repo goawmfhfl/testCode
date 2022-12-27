@@ -439,10 +439,6 @@ const SaveBar = () => {
         >
           {hasShopRegistered ? "저장" : "등록"}
         </SubmitButton>
-
-        <Button size="big" width="126px">
-          취소
-        </Button>
       </ButtonContainer>
     </Container>
   );

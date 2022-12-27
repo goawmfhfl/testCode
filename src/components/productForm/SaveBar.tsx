@@ -398,10 +398,6 @@ const SaveBar = () => {
       }
     };
 
-  const handleCancelButtonClick = () => {
-    navigate(-1);
-  };
-
   useEffect(() => {
     const isLoading =
       isLoadingProduct || isLoadingCreateProduct || isEditingProduct;
@@ -467,15 +463,6 @@ const SaveBar = () => {
         >
           {hasProductRegistered ? "저장" : "등록"}
         </SubmitButton>
-
-        <Button
-          size="big"
-          width="126px"
-          onClick={handleCancelButtonClick}
-          disabled={isLoadingTemporarySave}
-        >
-          취소
-        </Button>
       </ButtonContainer>
     </Container>
   );
