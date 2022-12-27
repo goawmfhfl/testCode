@@ -13,7 +13,7 @@ export const shopImagesVar = makeVar<ShopImageVariables>({
   pcImage: "",
 });
 
-export const SHOP_INTRODUCTION = "SHIP_INTRODUCTION";
+export const SHOP_INTRODUCTION = "SHOP_INTRODUCTION";
 
 export const SHIPMENT_POLICY = "SHIPMENT_POLICY";
 export const RETURN_POLICY = "RETURN_POLICY";

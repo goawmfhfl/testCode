@@ -15,6 +15,7 @@ const GlobalStyles = createGlobalStyle<{ isModalVisible: boolean }>`
 
     body {
       overflow: ${({ isModalVisible }) => (isModalVisible ? "hidden" : "")};;
+      overflow: hidden;
     }
 
     #root {

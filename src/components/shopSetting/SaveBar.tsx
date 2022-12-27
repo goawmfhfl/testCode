@@ -220,6 +220,7 @@ const SaveBar = () => {
       try {
         e.preventDefault();
         loadingSpinnerVisibilityVar(true);
+        unfulfilledInputListVar([]);
 
         const input = restructureShopSettingStates(watch);
 
@@ -263,10 +264,10 @@ const SaveBar = () => {
             })
           );
 
-          // const targetSection =
-          //   shopSettingsSectionMapper[unfulfilledInputList[0]];
-          // const sectionReferenceList = sectionReferenceVar();
-          // const targetSectionReference = sectionReferenceList[targetSection];
+          const targetSection =
+            shopSettingsSectionMapper[unfulfilledInputList[0].name];
+          const sectionReferenceList = sectionReferenceVar();
+          const targetSectionReference = sectionReferenceList[targetSection];
 
           unfulfilledSectionNames.forEach(({ name, status }) => {
             sectionFulfillmentVar({
@@ -275,15 +276,12 @@ const SaveBar = () => {
             });
           });
 
-          // const GNBReference: HTMLElement = GNBReferenceVar();
-          // const SECTION_TOP_MARGIN = 88;
+          const SECTION_TOP_MARGIN = 44;
 
-          // const scrollTo =
-          //   targetSectionReference.offsetTop -
-          //   GNBReference.offsetHeight -
-          //   SECTION_TOP_MARGIN;
+          const scrollTo =
+            targetSectionReference.offsetTop - SECTION_TOP_MARGIN;
 
-          // contentsContainerReferenceVar().scrollTo(0, scrollTo);
+          contentsContainerReferenceVar().scrollTo(0, scrollTo);
 
           loadingSpinnerVisibilityVar(false);
 

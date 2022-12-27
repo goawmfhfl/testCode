@@ -263,19 +263,18 @@ const SaveBar = () => {
             });
           });
 
-          // const targetSection = unfulfilledSectionNames[0];
-          // const sectionReferenceList = sectionReferenceVar();
-          // const targetSectionReference = sectionReferenceList[targetSection];
+          const targetSection = unfulfilledSectionList[0];
+          const sectionReferenceList = sectionReferenceVar();
 
-          // const GNBReference: HTMLElement = GNBReferenceVar();
-          // const SECTION_TOP_MARGIN = 88;
+          const targetSectionReference =
+            sectionReferenceList[targetSection.name];
 
-          // const scrollTo =
-          //   targetSectionReference.offsetTop -
-          //   GNBReference.offsetHeight -
-          //   SECTION_TOP_MARGIN;
+          const SECTION_TOP_MARGIN = 44;
 
-          // contentsContainerReferenceVar().scrollTo(0, scrollTo);
+          const scrollTo =
+            targetSectionReference.offsetTop - SECTION_TOP_MARGIN;
+
+          contentsContainerReferenceVar().scrollTo(0, scrollTo);
 
           return;
         }

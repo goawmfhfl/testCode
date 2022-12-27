@@ -1,10 +1,18 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useEffect } from "react";
 import { useReactiveVar } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
 import styled from "styled-components/macro";
 
-import { shopImagesVar, SHOP_INTRODUCTION } from "@cache/shopSettings";
-import { systemModalVar } from "@cache/index";
+import {
+  shopImagesVar,
+  SHOP_INTRODUCTION,
+  unfulfilledInputListVar,
+} from "@cache/shopSettings";
+import {
+  sectionFulfillmentInitialValue,
+  sectionFulfillmentVar,
+  systemModalVar,
+} from "@cache/index";
 import {
   addImageOnServer,
   validateImageDimensionRatio,
@@ -165,6 +173,15 @@ const ShopInfo = () => {
         });
       }
     };
+
+  useEffect(() => {
+    initializeFormStatus();
+  }, []);
+
+  const initializeFormStatus = () => {
+    unfulfilledInputListVar([]);
+    sectionFulfillmentVar(sectionFulfillmentInitialValue);
+  };
 
   const shopIntroduction = watch(SHOP_INTRODUCTION) as string;
 

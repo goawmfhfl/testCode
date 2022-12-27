@@ -378,7 +378,10 @@ function hasEveryInputFulfilled(
         return acc;
       }
 
-      if (typeof inputValue === "string" && inputName === "description") {
+      if (
+        typeof inputValue === "string" &&
+        inputName === "productDescription"
+      ) {
         if (inputValue.length < 50) {
           unfulfilledInputList.push(
             createUnfulfilledInput(inputName, "50자 이상 입력해주세요.")

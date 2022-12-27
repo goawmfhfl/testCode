@@ -72,7 +72,7 @@ const Layout = ({
           ref={(newRef: HTMLElement) => contentsContainerReferenceVar(newRef)}
           preventScroll={loadingSpinnerVisibility}
         >
-          <ContentsWrapper>{children}</ContentsWrapper>
+          {children}
 
           <Footer />
         </ContentsContainer>
@@ -123,8 +123,10 @@ const ContentsContainer = styled.div<{
   preventScroll: boolean;
   isTablePage: boolean;
 }>`
-  flex: 1;
-  min-height: 100%;
+  width: calc(100% - 210px);
+  height: calc(100vh - 72px - 56px);
+  position: absolute;
+  overflow: scroll;
 
   display: flex;
   flex-direction: column;
