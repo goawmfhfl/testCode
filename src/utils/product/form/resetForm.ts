@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { UseFormReturn } from "react-hook-form";
-import { ProductFormValues } from "@models/product/index";
+import { DiscountMethod, ProductFormValues } from "@models/product/index";
 
 import {
   requiredImagesVar,
@@ -20,6 +20,7 @@ import {
 } from "@cache/productForm/productOptions";
 import { tagListVar } from "@cache/productForm/searchTag";
 import {
+  DISCOUNT_OPTION,
   IS_BUNDLE_SHIPMENT,
   LEAD_TIME_MAX,
   LEAD_TIME_MIN,
@@ -39,6 +40,7 @@ export default function resetForm({
   setValue(LEAD_TIME_MAX, null);
   setValue(PRODUCT_PRICE, null);
   setValue(PRODUCT_STOCK, null);
+  setValue(DISCOUNT_OPTION, DiscountMethod.PERCENT);
 
   initializeProductImages();
   initializeOptionalImages();

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components/macro";
 import { useFormContext, Controller } from "react-hook-form";
 import { format, compareAsc } from "date-fns";
