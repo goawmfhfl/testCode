@@ -47,6 +47,18 @@ const Layout = ({
     saleSubItemVisibilityVar(location.pathname === Pathnames.Order);
   }, []);
 
+  useEffect(() => {
+    if (systemModal.isVisible) return;
+
+    systemModalVar({
+      ...systemModalVar(),
+      confirmButtonClickHandler: () =>
+        systemModalVar({ ...systemModalVar(), isVisible: false }),
+      cancelButtonClickHandler: () =>
+        systemModalVar({ ...systemModalVar(), isVisible: false }),
+    });
+  }, [systemModal.isVisible]);
+
   return (
     <>
       <Container>
