@@ -134,10 +134,17 @@ const ProductImageSection = () => {
       return;
     }
 
-    optionalImagesVar([
-      ...optionalImagesVar(),
-      { id: uuidv4(), url: "", type: UploadFileType.PRODUCT_OPTIONAL },
-    ]);
+    const newOptionalImages = [...optionalImagesVar()];
+
+    if (optionalImages.length < 5) {
+      newOptionalImages.push({
+        id: uuidv4(),
+        url: "",
+        type: UploadFileType.PRODUCT_OPTIONAL,
+      });
+    }
+
+    optionalImagesVar(newOptionalImages);
   }, [optionalImages]);
 
   const handleProductImageRemoveButtonClick = async (targetId: string) => {
@@ -181,7 +188,7 @@ const ProductImageSection = () => {
       <OptionalImageHeader>추가 이미지</OptionalImageHeader>
 
       <OptionalImageList>
-        {optionalImages.map(({ id, url }, index) => {
+        {optionalImages.map(({ id, url }, index, arr) => {
           const isFirstRow = index < 5;
           const isRightEnd = (index + 1) % 5 === 0;
 
