@@ -148,28 +148,6 @@ const CategorySection = () => {
               onChange: (e: React.ChangeEvent<HTMLSelectElement>) => {
                 e.preventDefault();
 
-                const isChemicalProduct =
-                  e.target.value === CategoryNames.HOME_FRAGRANCE ||
-                  e.target.value === CategoryNames.CANDLE_HOLDER;
-
-                if (isChemicalProduct && !isSafetyAuthenticated) {
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: true,
-                    description: (
-                      <>
-                        샵 설정에서 안전기준 적합 확인검사를 <br />
-                        인증 후 선택하실 수 있습니다.
-                      </>
-                    ),
-                  });
-
-                  setValue(CATEGORY_SECOND, "");
-                  setValue(CATEGORY_THIRD, "");
-
-                  return;
-                }
-
                 setValue(CATEGORY_SECOND, e.target.value);
                 setValue(CATEGORY_THIRD, "");
               },
