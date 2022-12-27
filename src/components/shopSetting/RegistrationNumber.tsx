@@ -12,7 +12,7 @@ import exclamationmarkSource from "@icons/exclamationmark.svg";
 import exclamationIconGreySource from "@icons/exclamation-grey.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import TextInput from "@components/common/input/TextInput";
-import { addImageOnServer } from "@utils/index";
+import { addImageOnServer, encodeLastComponent } from "@utils/index";
 
 const RegistrationNumber = () => {
   const { register, setValue, watch } = useFormContext();
@@ -80,7 +80,7 @@ const RegistrationNumber = () => {
 
           {attachedPhotocopy && (
             <AttachedPhotocopyWrapper>
-              <AttachedPhotocopy src={attachedPhotocopy} />
+              <AttachedPhotocopy src={encodeLastComponent(attachedPhotocopy)} />
 
               <NoticeContainer icon={exclamationIconGreySource}>
                 미리보기 용으로만 블러처리되며 첨부된 이미지는 <br />

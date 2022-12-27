@@ -13,6 +13,7 @@ import {
   RemoveImageErrorType,
   validateImageDimensionRatio,
   validateImageSize,
+  encodeLastComponent,
 } from "@utils/index";
 
 import { ProductImageType } from "@models/product/productImages";
@@ -160,7 +161,7 @@ const RequiredImages = () => {
           {thumbnailImage.url ? (
             <ProductImage
               id={thumbnailImage.id}
-              imageSource={thumbnailImage.url}
+              imageSource={encodeLastComponent(thumbnailImage.url)}
               handleRemoveButtonClick={() => {
                 // eslint-disable-next-line
                 (async () => {
@@ -188,7 +189,7 @@ const RequiredImages = () => {
                 {url ? (
                   <ProductImage
                     id={id}
-                    imageSource={url}
+                    imageSource={encodeLastComponent(url)}
                     handleRemoveButtonClick={() => {
                       // eslint-disable-next-line
                       (async () => {

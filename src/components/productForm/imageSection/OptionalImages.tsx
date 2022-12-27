@@ -19,6 +19,7 @@ import {
   RemoveImageErrorType,
   validateImageSize,
   validateImageDimensionRatio,
+  encodeLastComponent,
 } from "@utils/index";
 import { systemModalVar } from "@cache/index";
 
@@ -193,7 +194,7 @@ const ProductImageSection = () => {
               {url ? (
                 <ProductImage
                   id={id}
-                  imageSource={url}
+                  imageSource={encodeLastComponent(url)}
                   handleRemoveButtonClick={() => {
                     // eslint-disable-next-line
                     (async () => {

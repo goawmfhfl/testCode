@@ -1,6 +1,7 @@
 import { Pathnames, UnfulfilledStatus } from "@constants/index";
 import { UploadFileType } from "@models/index";
 import axios from "axios";
+import { last } from "lodash";
 
 export interface RemoveImageErrorType {
   code: string;
@@ -13,7 +14,7 @@ async function addImageOnServer(
 ): Promise<{ url: string; size: number }> {
   try {
     const formData = new FormData();
-    formData.append("files", imageFile);
+    formData.append("files", imageFile, imageFile.name.replaceAll(" ", "_"));
 
     const response: { data: Array<{ url: string; size: number }> } =
       await axios.post(`${process.env.REACT_APP_SERVER_URI}/upload`, formData);
@@ -508,6 +509,19 @@ function validatePassword(password: string) {
   return regex.test(password);
 }
 
+function encodeLastComponent(url: string) {
+  const splited = url.split("/");
+
+  const lastComponent = last(splited);
+  splited.pop();
+
+  const result = splited.join("/") + "/" + encodeURIComponent(lastComponent);
+
+  console.log("결과물", result);
+
+  return result;
+}
+
 export {
   addImageOnServer,
   removeImageFromServer,
@@ -522,4 +536,5 @@ export {
   bytesToMegaBytes,
   preventNaNValues,
   validatePassword,
+  encodeLastComponent,
 };

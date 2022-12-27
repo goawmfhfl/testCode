@@ -1,12 +1,15 @@
 import React, { ChangeEvent } from "react";
 import { useReactiveVar } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
-import axios from "axios";
 import styled from "styled-components/macro";
 
 import { shopImagesVar, SHOP_INTRODUCTION } from "@cache/shopSettings";
 import { systemModalVar } from "@cache/index";
-import { validateImageDimensionRatio } from "@utils/index";
+import {
+  addImageOnServer,
+  validateImageDimensionRatio,
+  encodeLastComponent,
+} from "@utils/index";
 import deleteImageUrl from "@utils/shopSettings/deleteImageUrl";
 
 import NoticeContainer from "@components/common/NoticeContainer";
@@ -28,11 +31,8 @@ const ShopInfo = () => {
     event: ChangeEvent<HTMLInputElement>
   ) => {
     try {
-      const formData = new FormData();
       const version = event.target.name;
       const [targetImage] = event.target.files;
-      const { size } = targetImage;
-      formData.append("files", targetImage);
 
       // 이미지 비율 확인
       if (version === "mobileImage") {
@@ -72,6 +72,8 @@ const ShopInfo = () => {
         }
       }
 
+      const { size } = targetImage;
+
       // 이미지 사이즈 확인
       const imageSizeAsMegabyte = size / 1000 / 1000;
 
@@ -99,11 +101,7 @@ const ShopInfo = () => {
         return;
       }
 
-      // 확인이 끝난 이미지들은 업로드 이후 상태로 세팅
-      const { data }: { data: Array<{ url: string }> } = await axios.post(
-        `${process.env.REACT_APP_SERVER_URI}/upload`,
-        formData
-      );
+      const { url } = await addImageOnServer(targetImage);
 
       if (version === "mobileImage") {
         if (mobileImage) {
@@ -117,7 +115,7 @@ const ShopInfo = () => {
 
         shopImagesVar({
           ...shopImagesVar(),
-          mobileImage: data[0].url,
+          mobileImage: url,
         });
       }
 
@@ -133,7 +131,7 @@ const ShopInfo = () => {
 
         shopImagesVar({
           ...shopImagesVar(),
-          pcImage: data[0].url,
+          pcImage: url,
         });
       }
     } catch (error) {
@@ -193,12 +191,14 @@ const ShopInfo = () => {
 
               {mobileImage ? (
                 <AddedMobileImageContainer>
-                  <AddedMobileImage src={mobileImage} />
+                  <AddedMobileImage src={encodeLastComponent(mobileImage)} />
+
                   <DeleteButton
                     src={closeIconSource}
                     // eslint-disable-next-line
                     onClick={handleDeleteButtonClick(mobileImage)}
                   />
+
                   <ChangeImageLabel htmlFor="mobileImage">
                     <ImageInput
                       type="file"
@@ -238,7 +238,7 @@ const ShopInfo = () => {
 
               {pcImage ? (
                 <AddedPcImageContainer>
-                  <AddedPcImage src={pcImage} />
+                  <AddedPcImage src={encodeLastComponent(pcImage)} />
                   <DeleteButton
                     src={closeIconSource}
                     // eslint-disable-next-line

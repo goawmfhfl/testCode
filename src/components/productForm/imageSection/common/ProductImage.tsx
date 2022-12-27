@@ -40,7 +40,7 @@ const Container = styled.div<{
   height: 140px;
   background-color: ${({ theme: { palette } }) => palette.grey300};
   background-image: ${({ backgroundImageSource }) =>
-    backgroundImageSource ? `url(${encodeURI(backgroundImageSource)})` : ""};
+    backgroundImageSource ? `url("${backgroundImageSource}")` : ""};
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;

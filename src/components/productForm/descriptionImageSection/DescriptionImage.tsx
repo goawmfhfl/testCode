@@ -7,7 +7,11 @@ import AddImageInputWrapper from "@components/productForm/imageSection/common/Ad
 
 import { descriptionImagesVar } from "@cache/productForm/descriptionImages";
 import deleteImageUrl from "@utils/shopSettings/deleteImageUrl";
-import { bytesToMegaBytes } from "@utils/index";
+import {
+  addImageOnServer,
+  bytesToMegaBytes,
+  encodeLastComponent,
+} from "@utils/index";
 
 const DescriptionImage = ({ id, url }: { id: string; url: string }) => {
   const handleImageChange =
@@ -25,9 +29,6 @@ const DescriptionImage = ({ id, url }: { id: string; url: string }) => {
 
       // 2. 업로드
       const [image] = e.target.files;
-
-      const formData = new FormData();
-      formData.append("files", image);
 
       const size: number = image.size;
 
@@ -48,17 +49,7 @@ const DescriptionImage = ({ id, url }: { id: string; url: string }) => {
         return;
       }
 
-      const { data }: { data: Array<{ url: string }> } = await axios.post(
-        `${process.env.REACT_APP_SERVER_URI}/upload`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      const { url } = data[0];
+      const { url } = await addImageOnServer(image);
 
       // 3. 업데이트
       const updated = [...descriptionImagesVar()];
@@ -75,7 +66,7 @@ const DescriptionImage = ({ id, url }: { id: string; url: string }) => {
       {url ? (
         <ProductImageContainer>
           <ProductImage
-            src={url}
+            src={encodeLastComponent(url)}
             handleChangeButtonClick={handleImageChange(id)}
           />
         </ProductImageContainer>
