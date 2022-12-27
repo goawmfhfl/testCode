@@ -26,7 +26,7 @@ const ProductName = () => {
         <TextInput
           {...register(TITLE)}
           onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-            const regex = /[{}[\]?|*~`!^<>@#$%\\=]/g;
+            const regex = /[{}?₩|*~`!^<>@#$%\\=]/g;
 
             const hasSpecialChars = regex.test(e.key);
 
@@ -37,7 +37,7 @@ const ProductName = () => {
             }
           }}
           onCompositionEnd={(e: React.CompositionEvent<HTMLInputElement>) => {
-            const regex = /[{}[\]?|*~`!^<>@#$%\\=]/g;
+            const regex = /[{}?₩|*~`!^<>@#$%\\=]/g;
 
             const previousValue = watch(TITLE) as string;
 
