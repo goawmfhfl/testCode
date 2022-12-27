@@ -87,23 +87,32 @@ const SideNavigationBar = () => {
             </SubNavItem>
           </SubNavContainer>
         )}
+
         <NavItem
           disabled={true}
           isActive={sideNavigationBarStatus === Pathnames.Inquiry}
         >
           <Link to={Pathnames.Inquiry}>문의관리</Link>
         </NavItem>
+
         <NavItem
           disabled={true}
           isActive={sideNavigationBarStatus === Pathnames.Settlement}
         >
           <Link to={Pathnames.Settlement}>정산관리</Link>
         </NavItem>
+
         <NavItem isActive={sideNavigationBarStatus === Pathnames.Shop}>
           <Link to={Pathnames.Shop}>샵 설정</Link>
         </NavItem>
+
         <NavItem isActive={sideNavigationBarStatus === Pathnames.Notice}>
-          <Link to={Pathnames.Notice}>판매자 공지사항</Link>
+          <a
+            href="https://chopsticks.notion.site/b66465d0849a4593b4aec0464ce4151d"
+            target="_blank"
+          >
+            판매자 공지사항
+          </a>
         </NavItem>
       </NavList>
     </Container>
