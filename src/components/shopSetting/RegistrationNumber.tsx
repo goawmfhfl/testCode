@@ -30,7 +30,6 @@ const RegistrationNumber = () => {
     }
 
     const { url } = await addImageOnServer(image);
-
     console.log("등록 결과", url);
 
     setValue(PHOTOCOPY, url);
