@@ -45,6 +45,7 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
     const originalPriceToWonSign = originalPrice
       ? `${originalPrice.toLocaleString("ko-KR")} ₩`
       : "-";
+
     // 할인율
     const discountedRate =
       discountMethod && discountAmount
@@ -52,17 +53,20 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
             discountMethod === "PERCENT" ? "%" : "₩"
           }`
         : "-";
+
     const discountAppliedPrice =
       discountAmount && discountMethod
         ? Number(
             getDiscountedPrice(originalPrice, discountAmount, discountMethod)
           ).toLocaleString("ko-KR") + " ₩"
-        : "-";
+        : "";
 
     // 최종가
     const finalSellngPrice = discountAppliedPrice
       ? discountAppliedPrice
       : originalPriceToWonSign;
+
+    console.log("originalPriceToWonSign", originalPriceToWonSign);
 
     const isChecked = false;
 
