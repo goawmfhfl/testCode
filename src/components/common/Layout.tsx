@@ -36,6 +36,7 @@ const Layout = ({
   const systemModal = useReactiveVar(systemModalVar);
   const loadingSpinnerVisibility = useReactiveVar(loadingSpinnerVisibilityVar);
 
+  const isLoginPage = location.pathname === Pathnames.Login;
   const isShopPage = location.pathname === Pathnames.Shop;
   const isProductPage = location.pathname.includes(Pathnames.Product);
   const isTablePage =
@@ -69,6 +70,7 @@ const Layout = ({
           hasBottomMargin={hasSaveBar}
           hasLeftMargin={hasSideNavigation}
           isTablePage={isTablePage}
+          isLoginPage={isLoginPage}
           ref={(newRef: HTMLElement) => contentsContainerReferenceVar(newRef)}
           preventScroll={loadingSpinnerVisibility}
         >
@@ -122,9 +124,12 @@ const ContentsContainer = styled.div<{
   hasLeftMargin: boolean;
   preventScroll: boolean;
   isTablePage: boolean;
+  isLoginPage: boolean;
 }>`
-  width: calc(100% - 210px);
-  height: calc(100vh - 72px - 56px);
+  width: ${(isLoginPage) => (isLoginPage ? "100%" : "calc(100% - 210px)")};
+  height: ${(isLoginPage) =>
+    isLoginPage ? "100%" : "calc(100vh - 72px - 56px)"};
+
   position: absolute;
   overflow: scroll;
 
