@@ -363,7 +363,7 @@ const ProductTable = () => {
                 thirdCategory,
                 originalPriceToWonSign,
                 discountedRate,
-                discountAppliedPrice,
+                finalSellngPrice,
                 quantity,
                 status,
                 isChecked,
@@ -395,7 +395,7 @@ const ProductTable = () => {
                   <Td width={tableData[5].width}>{thirdCategory}</Td>
                   <Td width={tableData[6].width}>{originalPriceToWonSign}</Td>
                   <Td width={tableData[7].width}>{discountedRate}</Td>
-                  <Td width={tableData[8].width}>{discountAppliedPrice}</Td>
+                  <Td width={tableData[8].width}>{finalSellngPrice}</Td>
                   <Td width={tableData[9].width}>{quantity}</Td>
                   <Td width={tableData[10].width}>
                     <Dropdown

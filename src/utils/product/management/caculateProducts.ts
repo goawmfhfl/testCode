@@ -52,13 +52,17 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
             discountMethod === "PERCENT" ? "%" : "₩"
           }`
         : "-";
-    // 최종가
     const discountAppliedPrice =
       discountAmount && discountMethod
         ? Number(
             getDiscountedPrice(originalPrice, discountAmount, discountMethod)
           ).toLocaleString("ko-KR") + " ₩"
         : "-";
+
+    // 최종가
+    const finalSellngPrice = discountAppliedPrice
+      ? discountAppliedPrice
+      : originalPriceToWonSign;
 
     const isChecked = false;
 
@@ -71,7 +75,7 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
       thirdCategory,
       originalPriceToWonSign,
       discountedRate,
-      discountAppliedPrice,
+      finalSellngPrice,
       quantity: quantity ? quantity : 0,
       status,
       isChecked,
