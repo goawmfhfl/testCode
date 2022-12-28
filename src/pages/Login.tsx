@@ -289,7 +289,7 @@ const Login = () => {
   );
 };
 
-const Container = styled.main`
+const Container = styled.div`
   width: 400px;
 
   margin: 0 auto;

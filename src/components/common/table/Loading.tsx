@@ -1,5 +1,5 @@
 import React from "react";
-import styled, { css } from "styled-components";
+import styled, { css } from "styled-components/macro";
 import { TailSpin } from "react-loader-spinner";
 import { TableType } from "@models/index";
 

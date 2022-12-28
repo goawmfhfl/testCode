@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 const SelectNew = ({ children }: { children: React.ReactNode }) => {
   return <Container>{children}</Container>;

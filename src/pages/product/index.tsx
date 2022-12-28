@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import { HeaderNames } from "@constants/index";
 
 import Layout from "@components/common/Layout";

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import styled, { useTheme } from "styled-components";
+import styled, { useTheme } from "styled-components/macro";
 import { useMutation, useReactiveVar } from "@apollo/client";
 
 import { Medium as InputMedium } from "@components/common/input/Input";

@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components/macro";
 
 import Layout from "@components/common/Layout";
 import UserAuthentication from "@components/changePassword/UserAuthentication";

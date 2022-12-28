@@ -22,12 +22,14 @@ import { useEffect } from "react";
 
 interface LayoutProps {
   children: React.ReactNode;
+  hasGNB?: boolean;
   hasSaveBar?: boolean;
   hasSideNavigation?: boolean;
 }
 
 const Layout = ({
   children,
+  hasGNB,
   hasSaveBar,
   hasSideNavigation = true,
 }: LayoutProps) => {
@@ -36,7 +38,6 @@ const Layout = ({
   const systemModal = useReactiveVar(systemModalVar);
   const loadingSpinnerVisibility = useReactiveVar(loadingSpinnerVisibilityVar);
 
-  const isLoginPage = location.pathname === Pathnames.Login;
   const isShopPage = location.pathname === Pathnames.Shop;
   const isProductPage = location.pathname.includes(Pathnames.Product);
   const isTablePage =
@@ -67,10 +68,10 @@ const Layout = ({
         {hasSideNavigation && <SideNavigationBar />}
 
         <ContentsContainer
+          hasTopMargin={hasGNB ?? true}
           hasBottomMargin={hasSaveBar}
           hasLeftMargin={hasSideNavigation}
           isTablePage={isTablePage}
-          isLoginPage={isLoginPage}
           ref={(newRef: HTMLElement) => contentsContainerReferenceVar(newRef)}
           preventScroll={loadingSpinnerVisibility}
         >
@@ -120,23 +121,35 @@ const Container = styled.div`
 `;
 
 const ContentsContainer = styled.div<{
-  hasBottomMargin: boolean;
-  hasLeftMargin: boolean;
+  hasTopMargin?: boolean;
+  hasBottomMargin?: boolean;
+  hasLeftMargin?: boolean;
   preventScroll: boolean;
-  isTablePage: boolean;
-  isLoginPage: boolean;
+  isTablePage?: boolean;
 }>`
-  width: ${(isLoginPage) => (isLoginPage ? "100%" : "calc(100% - 210px)")};
-  height: ${(isLoginPage) =>
-    isLoginPage ? "100%" : "calc(100vh - 72px - 56px)"};
+  width: ${({ hasLeftMargin }) =>
+    hasLeftMargin ? "calc(100vw - 210px)" : "100%"};
+  height: ${({ hasTopMargin, hasBottomMargin }) => {
+    if (hasTopMargin && hasBottomMargin) {
+      return `calc(100vh - 56px - 72px)`;
+    }
+
+    if (hasTopMargin) {
+      return `calc(100vh - 56px)`;
+    }
+
+    if (hasBottomMargin) {
+      return `calc(100vh - 72px)`;
+    }
+
+    return "100%";
+  }};
 
   position: absolute;
-  overflow: scroll;
+  overflow-y: scroll;
 
   display: flex;
   flex-direction: column;
-
-  min-width: ${({ isTablePage }) => (isTablePage ? "1182px" : "none")};
 
   margin-left: ${({ hasLeftMargin }) => (hasLeftMargin ? "210px" : "0px")};
   margin-top: 56px;
@@ -151,6 +164,10 @@ const ContentsContainer = styled.div<{
         overflow: hidden;
         `
       : ""};
+
+  & > div {
+    flex: 1;
+  }
 `;
 
 const ModalLayer = styled.div`
