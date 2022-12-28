@@ -43,7 +43,7 @@ import { checkAllBoxStatusVar } from "@cache/index";
 import { GET_PRODUCTS_BY_SELLER } from "@graphql/queries/getProductsBySeller";
 import useCategories from "@hooks/useCategories";
 import contructCategories from "@utils/contructCategories";
-import { CategoryNames } from "@constants/category";
+import { CategoryNames, CATEGORY_NAMES } from "@constants/category";
 import { CategoriesType } from "@models/index";
 import { CaculatedProductsType } from "@models/product/management";
 
@@ -269,15 +269,15 @@ const ChangeCategoryModal = () => {
             {[
               {
                 name: "대분류를 선택해주세요",
-                value: "",
+                value: "DEFAULT",
               },
               ...categoryDepthFirst.map((value: string) => ({
                 name: value,
                 value,
               })),
-            ].map((option) => (
-              <Option key={option.value} value={option.value}>
-                {option.name}
+            ].map(({ value, name }) => (
+              <Option key={value} value={value}>
+                {value === "DEFAULT" ? name : CATEGORY_NAMES[name]}
               </Option>
             ))}
           </StyledDropdown>
@@ -295,15 +295,15 @@ const ChangeCategoryModal = () => {
             {[
               {
                 name: "중분류를 선택해주세요",
-                value: "",
+                value: "DEFAULT",
               },
               ...categoryDepthSecond.map((value: string) => ({
                 name: value,
                 value,
               })),
-            ].map((option) => (
-              <Option key={option.value} value={option.value}>
-                {option.name}
+            ].map(({ value, name }) => (
+              <Option key={value} value={value}>
+                {value === "DEFAULT" ? name : CATEGORY_NAMES[name]}
               </Option>
             ))}
           </StyledDropdown>
@@ -321,15 +321,15 @@ const ChangeCategoryModal = () => {
             {[
               {
                 name: "소분류를 선택해주세요",
-                value: "",
+                value: "DEFAULT",
               },
               ...categoryDepthThird.map((value) => ({
                 name: value,
                 value: value,
               })),
-            ].map((option) => (
-              <Option key={option.value} value={option.name}>
-                {option.name}
+            ].map(({ value, name }) => (
+              <Option key={value} value={name}>
+                {value === "DEFAULT" ? name : CATEGORY_NAMES[name]}
               </Option>
             ))}
           </StyledDropdown>
