@@ -288,7 +288,14 @@ const ProductTable = () => {
   }, [loading, error]);
 
   useEffect(() => {
-    commonFilterOptionVar({ ...commonFilterOptionVar(), page: 1 });
+    if (!query) {
+      return;
+    }
+
+    commonFilterOptionVar({
+      ...commonFilterOptionVar(),
+      page: 1,
+    });
   }, [query]);
 
   useEffect(() => {
