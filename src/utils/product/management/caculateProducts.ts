@@ -1,3 +1,4 @@
+import { CategoryNames, CATEGORY_NAMES } from "@constants/category";
 import { ProductsType } from "@graphql/queries/getProductsBySeller";
 import { NormalizedType } from "@models/product/management";
 
@@ -24,18 +25,27 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
 
     // 상품명
     const productName = name ? name : "-";
+
     // 대분류
-    const firstCategory = category?.parent?.name ? category?.parent?.name : "-";
+    const firstCategory = category?.parent?.name
+      ? (CATEGORY_NAMES[category?.parent?.name] as string)
+      : "-";
+
     // 중분류
-    const secondCategory = category?.name ? category.name : "-";
+    const secondCategory = category?.name
+      ? (CATEGORY_NAMES[category.name] as string)
+      : "-";
+
     // 소분류
     const thirdCategory = category?.children?.name
-      ? category.children.name
+      ? (CATEGORY_NAMES[category.children.name] as string)
       : "-";
+
     // 판매가
     const originalPriceToWonSign = originalPrice
       ? `${originalPrice.toLocaleString("ko-KR")} ₩`
       : "-";
+
     // 할인율
     const discountedRate =
       discountMethod && discountAmount
@@ -43,13 +53,20 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
             discountMethod === "PERCENT" ? "%" : "₩"
           }`
         : "-";
-    // 최종가
+
     const discountAppliedPrice =
       discountAmount && discountMethod
         ? Number(
             getDiscountedPrice(originalPrice, discountAmount, discountMethod)
           ).toLocaleString("ko-KR") + " ₩"
-        : "-";
+        : "";
+
+    // 최종가
+    const finalSellngPrice = discountAppliedPrice
+      ? discountAppliedPrice
+      : originalPriceToWonSign;
+
+    console.log("originalPriceToWonSign", originalPriceToWonSign);
 
     const isChecked = false;
 
@@ -62,7 +79,7 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
       thirdCategory,
       originalPriceToWonSign,
       discountedRate,
-      discountAppliedPrice,
+      finalSellngPrice,
       quantity: quantity ? quantity : 0,
       status,
       isChecked,

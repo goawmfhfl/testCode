@@ -17,7 +17,7 @@ export interface CaculatedProductsType {
   thirdCategory: string;
   originalPriceToWonSign: string;
   discountedRate: string;
-  discountAppliedPrice: string;
+  finalSellngPrice: string;
   quantity: number;
   status: ProductStatus;
   isChecked: boolean;

@@ -10,6 +10,7 @@ const Textarea = ({
   onChange,
   placeholder,
   maxLength,
+  value,
 }: {
   width?: string;
   height?: string;
@@ -19,6 +20,7 @@ const Textarea = ({
   onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   placeholder?: string;
   maxLength?: number;
+  value?: string;
 }) => {
   return (
     <Container
@@ -30,6 +32,7 @@ const Textarea = ({
       onChange={onChange}
       placeholder={placeholder}
       maxLength={maxLength}
+      value={value}
     />
   );
 };
