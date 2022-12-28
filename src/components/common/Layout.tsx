@@ -148,13 +148,6 @@ const ContentsContainer = styled.div<{
       : ""};
 `;
 
-const ContentsWrapper = styled.div`
-  flex: 1;
-
-  display: flex;
-  flex-direction: column;
-`;
-
 const ModalLayer = styled.div`
   position: fixed;
   top: 0;
