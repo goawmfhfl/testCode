@@ -306,7 +306,7 @@ const ShopInfo = () => {
               register={register(SHOP_INTRODUCTION)}
               maxLength={200}
             />
-            <TextCounter>{shopIntroduction?.length}/200</TextCounter>
+            <TextCounter>{shopIntroduction.length}/200</TextCounter>
           </TextareaContainer>
         </SectionContainer>
       </ShopInfoContainer>

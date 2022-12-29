@@ -29,7 +29,7 @@ const Textarea = ({
       size={size}
       {...register}
       onFocus={onFocus}
-      onChange={onChange}
+      onChange={onChange ? onChange : register.onChange}
       placeholder={placeholder}
       maxLength={maxLength}
       value={value}

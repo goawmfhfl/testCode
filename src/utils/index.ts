@@ -520,8 +520,6 @@ function encodeLastComponent(url: string) {
 
   const result = splited.join("/") + "/" + encodeURIComponent(lastComponent);
 
-  console.log("결과물", result);
-
   return result;
 }
 
