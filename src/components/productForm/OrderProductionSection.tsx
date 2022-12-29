@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 import Checkbox from "@components/common/input/Checkbox";
 import TextInput from "@components/common/input/TextInput";
 import NoticeContainer from "@components/common/NoticeContainer";
-import exclamationMarkSrc from "@icons/exclamationmark.svg";
+import exclamationMarkSrc from "@icons/exclamation-grey.svg";
 import {
   HAS_MANUFACTURING_LEAD_TIME,
   LEAD_TIME_MIN,
@@ -20,11 +20,13 @@ const OrderProduction = () => {
         <Checkbox {...register(HAS_MANUFACTURING_LEAD_TIME)} /> 주문 후 제작
       </CheckboxWrapper>
       <NoticeContainerWrapper>
-        <NoticeContainer icon={exclamationMarkSrc} width="570px">
-          주문 확인 후 제작에 들어가는 상품이라면 ‘주문 후 제작’에 체크를 하고
-          소요기간을 입력해주세요. <br />
-          상품 상세페이지 상단에 노출되어 소비자들에게 상품 수령까지의 대략적인
-          기간을 알려줄 수 있습니다.
+        <NoticeContainer
+          icon={exclamationMarkSrc}
+          width="610px"
+          isOneLiner={true}
+        >
+          주문 폭주, 브랜드 휴가, 예약 발송 등의 이유로 출고가 늦어질 경우 일시
+          품절 대신 해당 기능을 사용하면 좋습니다.
         </NoticeContainer>
       </NoticeContainerWrapper>
       제작 기간 최소{" "}

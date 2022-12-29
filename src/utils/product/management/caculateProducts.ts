@@ -66,8 +66,6 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
       ? discountAppliedPrice
       : originalPriceToWonSign;
 
-    console.log("originalPriceToWonSign", originalPriceToWonSign);
-
     const isChecked = false;
 
     return {
