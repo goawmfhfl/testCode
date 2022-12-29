@@ -91,7 +91,7 @@ const BusinessLicense = () => {
             backgroundColor="#fff"
             borderColor={theme.palette.grey500}
           >
-            등록하기
+            변경하기
           </Button>
         </HasInfoContainer>
       )}
