@@ -59,8 +59,10 @@ const RegistrationNumber = () => {
             numbersOnly={true}
             maxLength={6}
           />
-          <Suffix
-            register={register(REGISTRATION_NUMBER_SUFFIX)}
+          <input
+            id="password"
+            type="password"
+            {...register(REGISTRATION_NUMBER_SUFFIX)}
             maxLength={7}
           />
         </RegistrationNumbers>
@@ -135,6 +137,13 @@ const RegistrationNumbers = styled.div`
 
   & div {
     flex: 1;
+  }
+
+  #password {
+    background-color: #fff;
+    padding: 7px;
+    border: 1px solid ${({ theme }) => theme.palette.grey500};
+    height: 32px;
   }
 `;
 
