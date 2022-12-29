@@ -195,7 +195,7 @@ const SafetyModal = () => {
               <SafetyNumberInput
                 onChange={handleSafetyNumberInputChange}
                 value={safetyNumber}
-                placeholder={"CB19-12-2032"}
+                placeholder={"AB12-34-5678"}
               />
             </InputContainer>
 

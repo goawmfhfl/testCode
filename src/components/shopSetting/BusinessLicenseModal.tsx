@@ -292,7 +292,7 @@ const BusinessLicenseModal = () => {
             <Input
               onChange={handleChangeInput("ecommerceNumber-2")}
               value={ecommerceNumber[2]}
-              placeholder={"0138"}
+              placeholder={"0123"}
             />
           </EcommerceNumber>
         </InputContainer>
