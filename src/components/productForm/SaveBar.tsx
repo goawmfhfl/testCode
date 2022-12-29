@@ -1,15 +1,11 @@
-import { compareAsc } from "date-fns";
 import React, { useEffect, useState } from "react";
 import { useTheme } from "styled-components/macro";
 import { useMutation } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 
-import Button from "@components/common/Button";
-
 import {
   contentsContainerReferenceVar,
-  GNBReferenceVar,
   sectionReferenceVar,
   sectionFulfillmentVar,
   loadingSpinnerVisibilityVar,
@@ -34,7 +30,7 @@ import {
   TemporarySaveProductInputType,
 } from "@models/product/index";
 
-import { hasEveryInputFulfilled } from "@utils/index";
+import validateInputFulfillment from "@utils/product/form/validateInputFulfillment";
 import constructProductInput from "@utils/product/form/constructProductInput";
 import {
   TEMPORARY_SAVE_PRODUCT,
@@ -216,7 +212,7 @@ const SaveBar = () => {
           watch(SHIPMENT_PRICE_TYPE) === ShipmentChargeType.Free;
         const hasTagInfo = watch(HAS_TAG_INFOS) as boolean;
 
-        const { isFulfilled, unfulfilledInputList } = hasEveryInputFulfilled(
+        const { isFulfilled, unfulfilledInputList } = validateInputFulfillment(
           input,
           [
             !isDiscounted && "discountAmount",
@@ -242,8 +238,7 @@ const SaveBar = () => {
             !isDiscounted && "discountAmount",
             hasRequiredOption && "quantity",
             isShipmentPriceFree && "shipmentPrice",
-          ],
-          Pathnames.ProductRegistration
+          ]
         );
 
         if (!isFulfilled) {

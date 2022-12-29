@@ -19,10 +19,11 @@ import {
 } from "@components/productForm/ShipmentChargeSection";
 import closeIconSource from "@icons/delete.svg";
 import downwordArrowMedium from "@icons/arrow-downward-medium.svg";
-import { hasEveryInputFulfilled, preventNaNValues } from "@utils/index";
+import { preventNaNValues } from "@utils/index";
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 import { loadingSpinnerVisibilityVar, overModalVar } from "@cache/index";
 import { shipmentTemplateVar } from "@cache/productForm/shipmentTemplate";
+import validateInputFulfillment from "@utils/shopSettings/validateInputFulfillment";
 
 const ShipmentTemplateForm = ({
   formTitle,
@@ -46,7 +47,7 @@ const ShipmentTemplateForm = ({
       allowsZeroInputNames.push("shipmentCharge");
     }
 
-    const { isFulfilled } = hasEveryInputFulfilled(
+    const { isFulfilled } = validateInputFulfillment(
       shipmentTemplate,
       [],
       allowsZeroInputNames

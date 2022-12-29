@@ -4,30 +4,25 @@ import { useMutation } from "@apollo/client";
 import { useFormContext } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
-import Button from "@components/common/Button";
-
 import {
   systemModalVar,
   contentsContainerReferenceVar,
-  GNBReferenceVar,
   sectionReferenceVar,
   sectionFulfillmentVar,
   loadingSpinnerVisibilityVar,
-  showHasAnyProblemModal,
 } from "@cache/index";
 import {
   HAS_SET_CONDITIONAL_FREE_SHIPMENT,
   SHIPMENT_PRICE_TYPE,
   unfulfilledInputListVar,
 } from "@cache/shopSettings";
-import { Pathnames, shopSettingsSectionMapper } from "@constants/index";
+import { shopSettingsSectionMapper } from "@constants/index";
 import { ConditionalFreeShipmentPolicy } from "@constants/shop";
 import {
   TemporarySaveShopSettingsInputType,
   SaveShopSettingsInputType,
 } from "@models/shopSettings";
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
-import { hasEveryInputFulfilled } from "@utils/index";
 import restructureShopSettingStates from "@utils/shopSettings/restructureShopSettingStates";
 import useShopInfo from "@hooks/useShopInfo";
 import { GET_SHOP_INFO, ShopInfo } from "@graphql/queries/getShopInfo";
@@ -35,6 +30,8 @@ import {
   TEMPORARY_SAVE_SHOP_SETTINGS,
   SAVE_SHOP_SETTINGS,
 } from "@graphql/mutations/shop";
+import { EDIT_SHOP } from "@graphql/mutations/editShop";
+import validateInputFulfillment from "@utils/shopSettings/validateInputFulfillment";
 
 import Container from "@components/common/saveBar/Container";
 import ButtonContainer from "@components/common/saveBar/ButtonContainer";
@@ -42,7 +39,6 @@ import TemporarySaveButton from "@components/common/saveBar/TemporarySaveButton"
 import SubmitButton from "@components/common/saveBar/SubmitButton";
 import { showHasServerErrorModal } from "@cache/productManagement";
 import { SubmissionType } from "@constants/index";
-import { EDIT_SHOP } from "@graphql/mutations/editShop";
 
 const SaveBar = () => {
   const navigate = useNavigate();
@@ -235,7 +231,7 @@ const SaveBar = () => {
           watch(HAS_SET_CONDITIONAL_FREE_SHIPMENT) ===
           ConditionalFreeShipmentPolicy.Unset;
 
-        const { isFulfilled, unfulfilledInputList } = hasEveryInputFulfilled(
+        const { isFulfilled, unfulfilledInputList } = validateInputFulfillment(
           input,
           [
             "safetyAuthentication",
@@ -250,8 +246,7 @@ const SaveBar = () => {
             hasIdentificationCardAuthenticated && "onlineSalesLicense",
             isConditionalFreeShipmentUnset && "shipmentConditionalPrice",
           ],
-          [isShipmentPriceFree && "shipmentPrice"].filter(Boolean),
-          Pathnames.Shop
+          [isShipmentPriceFree && "shipmentPrice"].filter(Boolean)
         );
 
         if (!isFulfilled) {
