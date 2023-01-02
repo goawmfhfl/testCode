@@ -212,28 +212,30 @@ const SaveBar = () => {
           watch(SHIPMENT_PRICE_TYPE) === ShipmentChargeType.Free;
         const hasTagInfo = watch(HAS_TAG_INFOS) as boolean;
 
+        const nullableFields = [
+          !isDiscounted && "discountAmount",
+          !isDiscounted && "discountMethod",
+          "startDiscountDate",
+          "endDiscountDate",
+          hasRequiredOption && "quantity",
+          !hasRequiredOption && !hasSelectiveOption && "optionCombinations",
+          !hasRequiredOption && "requiredOptions",
+          !hasSelectiveOption && "selectiveOptions",
+          !hasLeadtime && "manufacturingLeadTime",
+          "shipmentId",
+          hasTemplateSelected && "isBundleShipment",
+          hasTemplateSelected && "shipmentType",
+          hasTemplateSelected && "shipmentPrice",
+          hasTemplateSelected && "shipmentDistantPrice",
+          hasTemplateSelected && "shipmentReturnPrice",
+          hasTemplateSelected && "shipmentExchangePrice",
+          "authorization",
+          !hasTagInfo && "tagInfos",
+        ];
+
         const { isFulfilled, unfulfilledInputList } = validateInputFulfillment(
           input,
-          [
-            !isDiscounted && "discountAmount",
-            !isDiscounted && "discountMethod",
-            "startDiscountDate",
-            "endDiscountDate",
-            hasRequiredOption && "quantity",
-            !hasRequiredOption && !hasSelectiveOption && "optionCombinations",
-            !hasRequiredOption && "requiredOptions",
-            !hasSelectiveOption && "selectiveOptions",
-            !hasLeadtime && "manufacturingLeadTime",
-            "shipmentId",
-            hasTemplateSelected && "isBundleShipment",
-            hasTemplateSelected && "shipmentType",
-            hasTemplateSelected && "shipmentPrice",
-            hasTemplateSelected && "shipmentDistantPrice",
-            hasTemplateSelected && "shipmentReturnPrice",
-            hasTemplateSelected && "shipmentExchangePrice",
-            "authorization",
-            !hasTagInfo && "tagInfos",
-          ],
+          nullableFields,
           [
             !isDiscounted && "discountAmount",
             hasRequiredOption && "quantity",
@@ -375,6 +377,8 @@ const SaveBar = () => {
           cancelButtonVisibility: false,
         });
       } catch (error) {
+        console.log(error);
+
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,

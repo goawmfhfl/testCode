@@ -31,6 +31,7 @@ import {
 import { restructureOptions } from "./options";
 import { tagListVar } from "@cache/productForm/searchTag";
 import { SearchTag, TagTypes } from "@models/product/searchTag";
+import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 
 const setProduct = (
   product: ProductType,
@@ -87,7 +88,7 @@ const setProduct = (
     PRODUCT_STOCK: quantity,
     IS_BUNDLE_SHIPMENT: isBundleShipment ? "가능" : "불가능",
     SHIPMENT_TEMPLATE_ID: shipment && shipment.id ? Number(shipment.id) : null,
-    SHIPMENT_PRICE_TYPE: shipmentType,
+    SHIPMENT_PRICE_TYPE: shipmentType ?? ShipmentChargeType.Charged,
     SHIPMENT_PRICE: shipmentPrice,
     SHIPMENT_DISTANT_PRICE: shipmentDistantPrice,
     SHIPMENT_RETURN_PRICE: shipmentReturnPrice,

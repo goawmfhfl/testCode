@@ -181,7 +181,7 @@ const ShipmentChargeSection = () => {
 
   return (
     <Container>
-      <InputContainer>
+      {/* <InputContainer>
         <Label>배송 템플릿</Label>
 
         <DropdownWrapper>
@@ -231,7 +231,7 @@ const ShipmentChargeSection = () => {
         >
           배송 템플릿
         </Button>
-      </InputContainer>
+      </InputContainer> */}
 
       <InputContainer>
         <Label>묶음 배송</Label>
