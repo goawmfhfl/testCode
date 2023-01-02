@@ -35,7 +35,13 @@ import {
   checkedProductsVar,
 } from "@cache/productManagement";
 
+import { ProductStatus } from "@constants/product";
+import { tableData } from "@constants/product/table";
 import { GET_PRODUCTS_BY_SELLER } from "@graphql/queries/getProductsBySeller";
+import { CaculatedProductsType } from "@models/product/management";
+
+import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
+import ExportToExcelButton from "@components/productManagement/ExportToExcelButton";
 import ChangeCategoryModal from "@components/productManagement/ChangeCategoryModal";
 import ChangeDiscountModal from "@components/productManagement/ChangeDiscountModal";
 import Button from "@components/common/Button";
@@ -43,11 +49,7 @@ import {
   SelectInput as Dropdown,
   OptionInput as Option,
 } from "@components/common/input/Dropdown";
-
-import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
-import { CaculatedProductsType } from "@models/product/management";
-import { ProductStatus } from "@constants/product";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -521,6 +523,14 @@ const Controller = () => {
           <Option value={50}>50개씩보기</Option>
           <Option value={100}>100개씩보기</Option>
         </StatusDropDown>
+        <ExportToExcelWrapper>
+          <ExportToExcelButton
+            tableData={tableData}
+            exportData={checkedProducts}
+          >
+            내보내기
+          </ExportToExcelButton>
+        </ExportToExcelWrapper>
       </SkipQuantityContainer>
     </Container>
   );
@@ -554,6 +564,10 @@ const ControllerButton = styled(Button)`
 
 const SkipQuantityContainer = styled.div`
   display: flex;
+`;
+
+const ExportToExcelWrapper = styled.div`
+  margin-left: 12px;
 `;
 
 export default Controller;

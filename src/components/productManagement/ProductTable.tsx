@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import styled from "styled-components/macro";
 import { useMutation, useReactiveVar } from "@apollo/client";
 
-import { tableData } from "@cache/productManagement/table";
 import {
   checkedProductsVar,
   filterOptionVar,
@@ -18,6 +17,7 @@ import {
   paginationVisibilityVar,
   totalPageLengthVar,
 } from "@cache/index";
+import { tableData } from "@constants/product/table";
 import { ProductStatus, productStatus, productType } from "@constants/product";
 import {
   GET_PRODUCTS_BY_SELLER,
@@ -337,8 +337,8 @@ const ProductTable = () => {
   return (
     <TableContainer type={TableType.FIX} hasData={isFetchingProductFailed}>
       <ThContainer>
-        {tableData.map(({ id, label, width, className }) => (
-          <Th key={`th-${id}`} width={width} className={className}>
+        {tableData.map(({ id, label, width }) => (
+          <Th key={`th-${id}`} width={width}>
             {label === "checkBox" ? (
               <Checkbox
                 onChange={changeAllCheckBoxHandler}
@@ -373,10 +373,7 @@ const ProductTable = () => {
             ) => {
               return (
                 <Tr key={`product-${productId}-row`}>
-                  <Td
-                    width={tableData[0].width}
-                    className={tableData[0].className}
-                  >
+                  <Td width={tableData[0].width}>
                     <Checkbox
                       onChange={changeSingleCheckBoxHandler(index)}
                       checked={isChecked}
