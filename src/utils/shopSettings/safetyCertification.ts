@@ -17,7 +17,7 @@ export const evaluateSafetyCertificationResponse = (
   hasNoData: boolean;
   hasWrongAuthenticationNumber: boolean;
 } => {
-  const hasNoData = parsed.rows.count === "0";
+  const hasNoData = parsed.rows?.count === "0";
   const hasWrongAuthenticationNumber = parsed.rows?.row?.valid_yn === "N";
 
   return {
