@@ -72,59 +72,15 @@ export interface SettlementAccountVariables {
   bankName: string;
 }
 
-export interface TemporarySaveShopSettingsInputType {
-  // 샵 정보
-  uploadedFileInfos?: Array<{ url: string; type: UploadFileType }>;
-  description?: string;
-  shipmentPolicy?: string;
-  returnPolicy?: string;
-
-  // 안전 검사
-  safetyAuthentication?: string;
-  safetyAuthenticationExpiredDate?: Date;
-
-  // 배송
-  isBundleShipment?: boolean;
-  shipmentType?: ShipmentChargeType;
-  shipmentPrice?: number;
-  shipmentDistantPrice?: number;
-  shipmentReturnPrice?: number;
-  shipmentExchangePrice?: number;
-  shipmentConditionalPrice?: number | null;
-
-  // 사업자 / 통신판매업
-  representativeName?: string;
-  businessRegistrationNumber?: string;
-  corporateRegistrationNumber?: string;
-  isSimpleTaxpayers?: boolean;
-  companyLocation?: string;
-  onlineSalesLicense?: string;
-
-  // 주민등록증
-  identificationCardNumber?: string;
-  identificationCardCopyPhoto?: string;
-
-  // 전화번호
-  phoneNumber?: string;
-
-  // 정산 계좌
-  bankAccountNumber?: string;
-  bankAccountHolder?: string;
-  bankName?: string;
-}
-
 export interface SaveShopSettingsInputType {
-  // 샵 정보
   uploadedFileInfos: Array<{ url: string; type: UploadFileType }>;
   description: string;
   shipmentPolicy: string;
   returnPolicy: string;
 
-  // 안전 검사
   safetyAuthentication: string;
   safetyAuthenticationExpiredDate: Date;
 
-  // 배송
   isBundleShipment: boolean;
   shipmentType: ShipmentChargeType;
   shipmentPrice: number;
@@ -133,7 +89,6 @@ export interface SaveShopSettingsInputType {
   shipmentExchangePrice: number;
   shipmentConditionalPrice: number | null;
 
-  // 사업자 / 통신판매업
   representativeName: string;
   businessRegistrationNumber: string;
   corporateRegistrationNumber: string;
@@ -141,15 +96,15 @@ export interface SaveShopSettingsInputType {
   companyLocation: string;
   onlineSalesLicense: string;
 
-  // 주민등록증
   identificationCardNumber?: string;
   identificationCardCopyPhoto?: string;
 
-  // 전화번호
   phoneNumber: string;
 
-  // 정산 계좌
   bankAccountNumber: string;
   bankAccountHolder: string;
   bankName: string;
 }
+
+export type TemporarySaveShopSettingsInputType =
+  Partial<SaveShopSettingsInputType>;
