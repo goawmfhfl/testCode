@@ -331,8 +331,11 @@ const ProductTable = () => {
     }
   }, [error]);
 
+  const hasProducts = !!products && !!products.length;
+  const isFetchingProductFailed = !!loading || !!error || hasProducts;
+
   return (
-    <TableContainer type={TableType.FIX}>
+    <TableContainer type={TableType.FIX} hasData={isFetchingProductFailed}>
       <ThContainer>
         {tableData.map(({ id, label, width, className }) => (
           <Th key={`th-${id}`} width={width} className={className}>
@@ -348,11 +351,9 @@ const ProductTable = () => {
         ))}
       </ThContainer>
 
-      {loading ? <Loading type={TableType.FIX} /> : null}
-
-      {!loading && !!products.length ? (
-        <TdContainer>
-          {products?.map(
+      <TdContainer>
+        {!loading &&
+          products?.map(
             (
               {
                 productId,
@@ -424,21 +425,28 @@ const ProductTable = () => {
               );
             }
           )}
-        </TdContainer>
-      ) : (
-        !loading && (
-          <NoDataContainer type={TableType.FIX}>
-            {query === "" ? (
-              <>
-                아직 등록된 <br /> 상품이 없습니다.
-              </>
-            ) : (
-              <>
-                검색어와 일치하는 <br /> 상품이 없습니다.
-              </>
-            )}
-          </NoDataContainer>
-        )
+      </TdContainer>
+
+      {loading && <Loading type={TableType.FIX} />}
+
+      {!hasProducts && (
+        <NoDataContainer type={TableType.FIX}>
+          {query && (
+            <>
+              검색어와 일치하는
+              <br />
+              상품이 없습니다.
+            </>
+          )}
+
+          {!query && (
+            <>
+              아직 등록된
+              <br />
+              상품이 없습니다
+            </>
+          )}
+        </NoDataContainer>
       )}
     </TableContainer>
   );
