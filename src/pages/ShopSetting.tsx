@@ -240,7 +240,7 @@ const ShopSetting = () => {
                 </SectionWrapper>
               </ContentsSection>
 
-              <ContentsSection>
+              {/* <ContentsSection>
                 <SectionWrapper
                   label={
                     <>
@@ -252,7 +252,7 @@ const ShopSetting = () => {
                 >
                   <SafetyCertification />
                 </SectionWrapper>
-              </ContentsSection>
+              </ContentsSection> */}
 
               {/* <ContentsSection>
                 <SectionWrapper
