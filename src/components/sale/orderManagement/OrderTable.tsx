@@ -380,14 +380,6 @@ const OrderTable = () => {
         return;
       }
 
-      console.log([
-        { orderItemId },
-        { orderShipmentInfoId },
-        { shipmentCompany },
-        { shipmentNumber },
-        { status },
-      ]);
-
       systemModalVar({
         ...systemModalVar(),
         isVisible: true,

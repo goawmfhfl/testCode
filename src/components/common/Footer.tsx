@@ -16,7 +16,7 @@ const Footer = () => {
           <Info>개인정보관리책임자 : 설지우</Info>
 
           <Info>
-            <a href="https://www.notion.so/chopsticks/8e49eba3c6034bdd8791ebaca63f067d">
+            <a href="https://chopsticks.notion.site/b66465d0849a4593b4aec0464ce4151d">
               공지사항
             </a>
           </Info>
