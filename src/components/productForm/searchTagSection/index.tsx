@@ -30,7 +30,11 @@ const SearchTagSection = () => {
   const handleTagInputKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const isEnterKey = e.key === "Enter";
 
-    if (!isEnterKey) return;
+    if (isEnterKey) {
+      e.preventDefault();
+    } else {
+      return;
+    }
 
     if (tagInput === "") {
       return;
@@ -74,6 +78,14 @@ const SearchTagSection = () => {
     setTagInput("");
   };
 
+  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const isEnterKey = e.key === "Enter";
+
+    if (isEnterKey) {
+      e.preventDefault();
+    }
+  };
+
   const hasSearchTags = watch(HAS_TAG_INFOS) as boolean;
 
   return (
@@ -105,6 +117,7 @@ const SearchTagSection = () => {
         placeholder={"태그를 입력 후 엔터를 치면 하단에 태그가 생성됩니다."}
         onChange={handleTagInputChange}
         onKeyUp={handleTagInputKeyUp}
+        onKeyDown={handleTagInputKeyDown}
         value={tagInput}
         disabled={!hasSearchTags}
       />
