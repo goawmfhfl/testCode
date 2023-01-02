@@ -93,7 +93,7 @@ const BusinessLicenseModal = () => {
       };
 
       const response = await axios.get(
-        "http://apis.data.go.kr/1130000/MllBsDtlService/getMllBsInfoDetail",
+        "https://apis.data.go.kr/1130000/MllBsDtlService/getMllBsInfoDetail",
         parameter
       );
 
