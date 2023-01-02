@@ -231,21 +231,43 @@ const SaveBar = () => {
           watch(HAS_SET_CONDITIONAL_FREE_SHIPMENT) ===
           ConditionalFreeShipmentPolicy.Unset;
 
+        // const nullableFields = [
+        //   "safetyAuthentication",
+        //   "safetyAuthenticationExpiredDate",
+        //   "identificationCardNumber",
+        //   "identificationCardCopyPhoto",
+        //   hasIdentificationCardAuthenticated && "representativeName",
+        //   hasIdentificationCardAuthenticated && "businessRegistrationNumber",
+        //   hasIdentificationCardAuthenticated && "corporateRegistrationNumber",
+        //   hasIdentificationCardAuthenticated && "isSimpleTaxpayers",
+        //   hasIdentificationCardAuthenticated && "companyLocation",
+        //   hasIdentificationCardAuthenticated && "onlineSalesLicense",
+        //   isConditionalFreeShipmentUnset && "shipmentConditionalPrice",
+        // ];
+
+        const nullableFields = [
+          "safetyAuthentication",
+          "safetyAuthenticationExpiredDate",
+          "identificationCardNumber",
+          "identificationCardCopyPhoto",
+          hasIdentificationCardAuthenticated && "representativeName",
+          hasIdentificationCardAuthenticated && "businessRegistrationNumber",
+          hasIdentificationCardAuthenticated && "corporateRegistrationNumber",
+          hasIdentificationCardAuthenticated && "isSimpleTaxpayers",
+          hasIdentificationCardAuthenticated && "companyLocation",
+          hasIdentificationCardAuthenticated && "onlineSalesLicense",
+          "shipmentType",
+          "shipmentPrice",
+          "shipmentDistantPrice",
+          "shipmentReturnPrice",
+          "shipmentExchangePrice",
+          "isBundleShipment",
+          "shipmentConditionalPrice",
+        ];
+
         const { isFulfilled, unfulfilledInputList } = validateInputFulfillment(
           input,
-          [
-            "safetyAuthentication",
-            "safetyAuthenticationExpiredDate",
-            "identificationCardNumber",
-            "identificationCardCopyPhoto",
-            hasIdentificationCardAuthenticated && "representativeName",
-            hasIdentificationCardAuthenticated && "businessRegistrationNumber",
-            hasIdentificationCardAuthenticated && "corporateRegistrationNumber",
-            hasIdentificationCardAuthenticated && "isSimpleTaxpayers",
-            hasIdentificationCardAuthenticated && "companyLocation",
-            hasIdentificationCardAuthenticated && "onlineSalesLicense",
-            isConditionalFreeShipmentUnset && "shipmentConditionalPrice",
-          ],
+          nullableFields,
           [isShipmentPriceFree && "shipmentPrice"].filter(Boolean)
         );
 

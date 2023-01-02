@@ -7,13 +7,13 @@ import {
   SHOP_INTRODUCTION,
   SHIPMENT_POLICY,
   RETURN_POLICY,
-  SHIPMENT_BUNDLING,
-  SHIPMENT_PRICE_TYPE,
-  SHIPMENT_PRICE,
-  SHIPMENT_DISTANT_PRICE,
-  SHIPMENT_RETURN_PRICE,
-  SHIPMENT_EXCHANGE_PRICE,
-  SHIPMENT_CONDITIONAL_PRICE,
+  // SHIPMENT_BUNDLING,
+  // SHIPMENT_PRICE_TYPE,
+  // SHIPMENT_PRICE,
+  // SHIPMENT_DISTANT_PRICE,
+  // SHIPMENT_RETURN_PRICE,
+  // SHIPMENT_EXCHANGE_PRICE,
+  // SHIPMENT_CONDITIONAL_PRICE,
   shopImagesVar,
   safetyCertificationVar,
   businessLicenseVar,
@@ -39,16 +39,16 @@ const restructureShopSettingStates = (
     safetyAuthenticationExpiredDate,
   } = safetyCertificationVar();
 
-  const isBundleShipment = watch(SHIPMENT_BUNDLING) === "가능" ? true : false;
-  const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
-  const shipmentPrice = Number(watch(SHIPMENT_PRICE));
-  const shipmentDistantPrice = Number(watch(SHIPMENT_DISTANT_PRICE));
+  // const isBundleShipment = watch(SHIPMENT_BUNDLING) === "가능" ? true : false;
+  // const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
+  // const shipmentPrice = Number(watch(SHIPMENT_PRICE));
+  // const shipmentDistantPrice = Number(watch(SHIPMENT_DISTANT_PRICE));
 
-  const shipmentReturnPrice = Number(watch(SHIPMENT_RETURN_PRICE));
-  const shipmentExchangePrice = Number(watch(SHIPMENT_EXCHANGE_PRICE));
-  const shipmentConditionalPrice = watch(SHIPMENT_CONDITIONAL_PRICE) as
-    | number
-    | null;
+  // const shipmentReturnPrice = Number(watch(SHIPMENT_RETURN_PRICE));
+  // const shipmentExchangePrice = Number(watch(SHIPMENT_EXCHANGE_PRICE));
+  // const shipmentConditionalPrice = watch(SHIPMENT_CONDITIONAL_PRICE) as
+  //   | number
+  //   | null;
 
   const uploadedFileInfos = [
     {
@@ -84,6 +84,29 @@ const restructureShopSettingStates = (
     bankName,
   } = settlementAccountVar();
 
+  // const shipmentInputs = {
+  //   shipmentType,
+  //   shipmentPrice,
+  //   shipmentDistantPrice,
+  //   shipmentReturnPrice,
+  //   shipmentExchangePrice,
+  //   shipmentConditionalPrice:
+  //     shipmentConditionalPrice !== null
+  //       ? Number(shipmentConditionalPrice)
+  //       : null,
+  //   isBundleShipment,
+  // };
+
+  const tempShipmentInputs = {
+    shipmentType: ShipmentChargeType.Free,
+    shipmentPrice: 0,
+    shipmentDistantPrice: 0,
+    shipmentReturnPrice: 0,
+    shipmentExchangePrice: 0,
+    shipmentConditionalPrice: null,
+    isBundleShipment: false,
+  };
+
   const input = {
     uploadedFileInfos,
     description,
@@ -93,16 +116,8 @@ const restructureShopSettingStates = (
     safetyAuthenticationExpiredDate: isConfirmed
       ? new Date(safetyAuthenticationExpiredDate)
       : null,
-    shipmentType,
-    shipmentPrice,
-    shipmentDistantPrice,
-    shipmentReturnPrice,
-    shipmentExchangePrice,
-    shipmentConditionalPrice:
-      shipmentConditionalPrice !== null
-        ? Number(shipmentConditionalPrice)
-        : null,
-    isBundleShipment,
+
+    ...tempShipmentInputs,
     representativeName,
     businessRegistrationNumber,
     corporateRegistrationNumber,
