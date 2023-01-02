@@ -48,9 +48,8 @@ const ProductDescriptionSection = () => {
           placeholder={
             "최소 50자 이상 입력해주세요. ‘- (대쉬)’는 ‘・(글머리 기호)’로 나옵니다."
           }
-          maxLength={200}
         />
-        <TextCounter>{text ? text.length : "0"}/200</TextCounter>
+        <TextCounter>{text ? text.length : "0"}자</TextCounter>
       </TextAreaContainer>
     </div>
   );
