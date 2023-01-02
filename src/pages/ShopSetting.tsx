@@ -254,14 +254,14 @@ const ShopSetting = () => {
                 </SectionWrapper>
               </ContentsSection>
 
-              <ContentsSection>
+              {/* <ContentsSection>
                 <SectionWrapper
                   label={SectionLabels.ShipmentSettings}
                   referenceKey={SHOP_SETTING_SECTIONS.SHIPMENT_SETTINGS}
                 >
                   <ShipmentSettings />
                 </SectionWrapper>
-              </ContentsSection>
+              </ContentsSection> */}
 
               <ContentsSection>
                 <SectionWrapper

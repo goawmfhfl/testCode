@@ -155,12 +155,12 @@ const ProductForm = () => {
             >
               <OrderProductionSection />
             </SectionWrapper>
-            <SectionWrapper
+            {/* <SectionWrapper
               referenceKey={PRODUCT_REGISTRATION_SECTIONS.SHIPMENT_SETTINGS}
               label={"배송 설정"}
             >
               <ShipmentChargeSection />
-            </SectionWrapper>
+            </SectionWrapper> */}
           </ContentsSection>
 
           <ContentsSection>
