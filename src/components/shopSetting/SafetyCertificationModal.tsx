@@ -111,7 +111,7 @@ const SafetyModal = () => {
 
       setSafetyInformation((prev) => ({
         ...prev,
-        safetyExpiredDate: parsed.rows.row.expired_date,
+        safetyExpiredDate: parsed.rows?.row.expired_date,
       }));
 
       setValidation(() => ({
