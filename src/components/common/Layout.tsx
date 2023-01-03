@@ -129,6 +129,9 @@ const ContentsContainer = styled.div<{
 }>`
   width: ${({ hasLeftMargin }) =>
     hasLeftMargin ? "calc(100vw - 210px)" : "100%"};
+
+  min-width: ${({ isTablePage }) => isTablePage && "1180px"};
+
   height: ${({ hasTopMargin, hasBottomMargin }) => {
     if (hasTopMargin && hasBottomMargin) {
       return `calc(100vh - 56px - 72px)`;
