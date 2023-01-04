@@ -1,4 +1,6 @@
 import {
+  Cause,
+  MainReason,
   OrderSearchType,
   OrderStatusGroup,
   OrderStatusName,
@@ -146,7 +148,10 @@ export interface CancelOrderItemsBySellerType {
 
 export interface CancelOrderItemsBySellerInputType {
   orderItemIds: Array<number>;
-  reason: string;
+  amount: number;
+  mainReason: MainReason;
+  detailedReason: string;
+  cause: Cause;
 }
 
 export interface EditShipmentNumberInputType {

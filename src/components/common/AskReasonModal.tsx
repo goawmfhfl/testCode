@@ -1,8 +1,11 @@
 import React, { useEffect } from "react";
+import { useReactiveVar } from "@apollo/client";
 import styled from "styled-components/macro";
 
 import { reasonVar } from "@cache/sale";
 import { modalVar } from "@cache/index";
+
+import { Cause, MainReason } from "@constants/sale";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -15,14 +18,14 @@ import {
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
-import { useReactiveVar } from "@apollo/client";
-import { MainReason } from "@constants/sale";
+import getWhoseResponsibility from "@utils/sale/order/getWhoseResponsibility";
 
 interface AskReasonModalType {
   option: Array<{
     id: number;
     label: string;
-    value: string;
+    value: MainReason;
+    cause: Cause;
   }>;
   handleSubmitButtonClick: () => void;
 }
@@ -34,9 +37,12 @@ const AskReasonModal = ({
   const { mainReason, detailedReason } = useReactiveVar(reasonVar);
 
   const changeReasonHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const cause: Cause = getWhoseResponsibility(e.target.value as MainReason);
+
     reasonVar({
       ...reasonVar(),
       mainReason: e.target.value as MainReason,
+      cause,
     });
   };
 
@@ -61,6 +67,7 @@ const AskReasonModal = ({
       reasonVar({
         mainReason: MainReason.DEFAULT,
         detailedReason: "",
+        cause: Cause.DEFAULT,
       });
     };
   }, []);

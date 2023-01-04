@@ -54,7 +54,7 @@ const Controller = () => {
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
-  const { detailedReason, mainReason } = useReactiveVar(reasonVar);
+  const { detailedReason, mainReason, cause } = useReactiveVar(reasonVar);
 
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const checkedOrderItemIds = checkedOrderItems.map(
@@ -152,7 +152,6 @@ const Controller = () => {
     ],
   });
 
-  //주문확인
   const handleConfirmOrderButtonClick = () => {
     if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
@@ -388,31 +387,34 @@ const Controller = () => {
     });
   };
 
-  //주문취소
   const handleCancelOrderClick = () => {
-    // if (!checkedOrderItems.length) {
-    //   showHasAnyProblemModal(
-    //     <>
-    //       선택된 주문건이 없습니다
-    //       <br />
-    //       주문건을 선택해주세요
-    //     </>
-    //   );
-    //   return;
-    // }
+    if (!checkedOrderItems.length) {
+      showHasAnyProblemModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
+      return;
+    }
 
-    // if (isShippingChecked || isShippingCompletedChecked || isCancelRequestChecked) {
-    //   showHasAnyProblemModal(
-    //     <>
-    //       해당 버튼은 선택하신
-    //       <br />
-    //       주문건을 처리할 수 없습니다.
-    //       <br />
-    //       주문 상태를 다시 확인해주세요.
-    //     </>
-    //   );
-    //   return;
-    // }
+    if (
+      isShippingChecked ||
+      isShippingCompletedChecked ||
+      isCancelRequestChecked
+    ) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+      return;
+    }
 
     systemModalVar({
       ...systemModalVar(),
@@ -443,7 +445,10 @@ const Controller = () => {
                     } = await cancelOrderItems({
                       variables: {
                         input: {
-                          reason: mainReason,
+                          amount: checkedOrderItemIds.length,
+                          mainReason,
+                          detailedReason,
+                          cause,
                           orderItemIds: checkedOrderItemIds,
                         },
                       },
@@ -498,7 +503,6 @@ const Controller = () => {
     });
   };
 
-  //반품처리
   const handleReturnButtonClick = () => {
     if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
@@ -529,7 +533,6 @@ const Controller = () => {
     }
   };
 
-  //교환처리
   const handleExchangeButtonClick = () => {
     if (!checkedOrderItems.length) {
       showHasAnyProblemModal(

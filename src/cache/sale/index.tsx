@@ -1,5 +1,5 @@
 import { makeVar } from "@apollo/client";
-import { MainReason, SaleMenuStatusType } from "@constants/sale";
+import { Cause, MainReason, SaleMenuStatusType } from "@constants/sale";
 import { ResetOrderItemType } from "@models/sale/order";
 
 export const saleMenuStatusVar = makeVar<SaleMenuStatusType>(
@@ -10,7 +10,9 @@ export const checkedOrderItemsVar = makeVar<Array<ResetOrderItemType>>([]);
 export const reasonVar = makeVar<{
   detailedReason: string;
   mainReason: MainReason;
+  cause: Cause;
 }>({
   mainReason: MainReason.DEFAULT,
   detailedReason: "",
+  cause: Cause.DEFAULT,
 });
