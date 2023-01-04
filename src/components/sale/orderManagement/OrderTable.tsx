@@ -597,7 +597,7 @@ const OrderTable = () => {
 
   return (
     <TableContainer type={TableType.SCROLL} hasData={hasOrderItems}>
-      <FixedTable width={tableWidth.left}>
+      <FixedTable>
         <ThContainer>
           <Th width={fixTableType[0].width} type={TableType.SCROLL}>
             <Checkbox

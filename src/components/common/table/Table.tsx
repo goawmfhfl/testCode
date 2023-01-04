@@ -23,8 +23,8 @@ export const TableContainer = styled.div<{
       : css``}
 `;
 
-export const FixedTable = styled.div<{ width: number }>`
-  min-width: ${({ width }) => `${width}px`};
+export const FixedTable = styled.div<{ width?: number }>`
+  width: ${({ width }) => `${width}px`};
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 

@@ -57,8 +57,12 @@ const Controller = () => {
   const { detailedReason, mainReason, cause } = useReactiveVar(reasonVar);
 
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
-  const checkedOrderItemIds = checkedOrderItems.map(
-    (orderItem) => orderItem.id
+  const checkedOrderItemIds = checkedOrderItems.map(({ id }) => id);
+  const checkedOrderItemTotalPrices = checkedOrderItems.map(
+    ({ totalPrice }) => {
+      const removeComma = totalPrice.replace(",", "");
+      return Number(removeComma);
+    }
   );
 
   const {
@@ -445,7 +449,7 @@ const Controller = () => {
                     } = await cancelOrderItems({
                       variables: {
                         input: {
-                          amount: checkedOrderItemIds.length,
+                          amount: checkedOrderItemTotalPrices,
                           mainReason,
                           detailedReason,
                           cause,

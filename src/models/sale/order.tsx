@@ -148,7 +148,7 @@ export interface CancelOrderItemsBySellerType {
 
 export interface CancelOrderItemsBySellerInputType {
   orderItemIds: Array<number>;
-  amount: number;
+  amount: Array<number>;
   mainReason: MainReason;
   detailedReason: string;
   cause: Cause;
@@ -244,15 +244,15 @@ export interface ResetOrderItemType {
   // 상품개수
   quantity: number;
   // 상품가
-  price: number;
+  price: string;
   // 옵션가
   optionPrice: string;
   // 상품별 총 금액
   totalPrice: string;
   // 배송비
-  shipmentPrice: number;
+  shipmentPrice: string;
   // 제주/도서 추가배송비
-  shipmentDistantPrice: number;
+  shipmentDistantPrice: string;
   isChecked: boolean;
   temporaryShipmentCompany: string;
   temporaryShipmentNumber?: number;
