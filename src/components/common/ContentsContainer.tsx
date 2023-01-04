@@ -11,7 +11,18 @@ const ContentsContainer = ({ isForm, children }: ContentsContainerProps) => {
     return <Container>{children}</Container>;
   }
 
-  return <Form id="hook-form">{children}</Form>;
+  return (
+    <Form
+      id="hook-form"
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+        }
+      }}
+    >
+      {children}
+    </Form>
+  );
 };
 
 const containerStyles = css`
