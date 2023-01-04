@@ -2,6 +2,9 @@ import { NormalizedListType } from "@models/sale/order";
 import { orderStatusNameType, ShipmentStatus } from "@constants/sale";
 
 const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
+  const hasOrderItems = !!recontructOrderItem && !!recontructOrderItem.orders;
+  if (!hasOrderItems) return;
+
   if (!recontructOrderItem || !recontructOrderItem.orders) return;
 
   const orderAllIds = recontructOrderItem?.orders.allIds;
