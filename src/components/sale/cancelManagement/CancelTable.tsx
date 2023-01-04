@@ -140,7 +140,7 @@ const CancelTable = () => {
 
   const handleEditReasonButtonClick =
     (mainReason: MainReason, detailedReason: string) => () => {
-      reasonVar({ mainReason, detailedReason });
+      // reasonVar({ mainReason, detailedReason });
 
       modalVar({
         isVisible: true,
