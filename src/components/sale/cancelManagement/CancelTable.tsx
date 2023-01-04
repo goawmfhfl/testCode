@@ -262,17 +262,27 @@ const CancelTable = () => {
     <TableContainer type={TableType.SCROLL} hasData={false}>
       <FixedTable width={tableWidth.left}>
         <ThContainer>
-          <Th width={fixTableType[0].width}>
+          <Th type={TableType.SCROLL} width={fixTableType[0].width}>
             <Checkbox
               onChange={changeAllCheckBoxHandler}
               checked={checkAllBoxStatus}
             />
           </Th>
-          <Th width={fixTableType[1].width}>{fixTableType[1].label}</Th>
-          <Th width={fixTableType[2].width}>{fixTableType[2].label}</Th>
-          <Th width={fixTableType[3].width}>{fixTableType[3].label}</Th>
-          <Th width={fixTableType[4].width}>{fixTableType[4].label}</Th>
-          <Th width={fixTableType[5].width}>{fixTableType[5].label}</Th>
+          <Th type={TableType.SCROLL} width={fixTableType[1].width}>
+            {fixTableType[1].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={fixTableType[2].width}>
+            {fixTableType[2].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={fixTableType[3].width}>
+            {fixTableType[3].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={fixTableType[4].width}>
+            {fixTableType[4].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={fixTableType[5].width}>
+            {fixTableType[5].label}
+          </Th>
         </ThContainer>
         <TdContainer>
           {hasOrders &&
@@ -290,17 +300,27 @@ const CancelTable = () => {
                 index
               ) => (
                 <Tr key={id}>
-                  <Td width={fixTableType[0].width}>
+                  <Td type={TableType.SCROLL} width={fixTableType[0].width}>
                     <Checkbox
                       onChange={changeSingleCheckBoxHandler(index)}
                       checked={isChecked}
                     />
                   </Td>
-                  <Td width={fixTableType[1].width}>{merchantItemUid}</Td>
-                  <Td width={fixTableType[2].width}>{productCode}</Td>
-                  <Td width={fixTableType[3].width}>{orderProduct}</Td>
-                  <Td width={fixTableType[4].width}>{userName}</Td>
-                  <Td width={fixTableType[5].width}>{orderStatus}</Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[1].width}>
+                    {merchantItemUid}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[2].width}>
+                    {productCode}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[3].width}>
+                    {orderProduct}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[4].width}>
+                    {userName}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[5].width}>
+                    {orderStatus}
+                  </Td>
                 </Tr>
               )
             )}
@@ -308,27 +328,69 @@ const CancelTable = () => {
       </FixedTable>
       <ScrollTable width={tableWidth.right}>
         <ThContainer>
-          <Th width={scrollTableType[0].width}>{scrollTableType[0].label}</Th>
-          <Th width={scrollTableType[1].width}>{scrollTableType[1].label}</Th>
-          <Th width={scrollTableType[2].width}>{scrollTableType[2].label}</Th>
-          <Th width={scrollTableType[3].width}>{scrollTableType[3].label}</Th>
-          <Th width={scrollTableType[4].width}>{scrollTableType[4].label}</Th>
-          <Th width={scrollTableType[5].width}>{scrollTableType[5].label}</Th>
-          <Th width={scrollTableType[6].width}>{scrollTableType[6].label}</Th>
-          <Th width={scrollTableType[7].width}>{scrollTableType[7].label}</Th>
-          <Th width={scrollTableType[8].width}>{scrollTableType[8].label}</Th>
-          <Th width={scrollTableType[9].width}>{scrollTableType[9].label}</Th>
-          <Th width={scrollTableType[10].width}>{scrollTableType[10].label}</Th>
-          <Th width={scrollTableType[11].width}>{scrollTableType[11].label}</Th>
-          <Th width={scrollTableType[12].width}>{scrollTableType[12].label}</Th>
-          <Th width={scrollTableType[13].width}>{scrollTableType[13].label}</Th>
-          <Th width={scrollTableType[14].width}>{scrollTableType[14].label}</Th>
-          <Th width={scrollTableType[15].width}>{scrollTableType[15].label}</Th>
-          <Th width={scrollTableType[16].width}>{scrollTableType[16].label}</Th>
-          <Th width={scrollTableType[17].width}>{scrollTableType[17].label}</Th>
-          <Th width={scrollTableType[18].width}>{scrollTableType[18].label}</Th>
-          <Th width={scrollTableType[19].width}>{scrollTableType[19].label}</Th>
-          <Th width={scrollTableType[20].width}>{scrollTableType[20].label}</Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[0].width}>
+            {scrollTableType[0].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[1].width}>
+            {scrollTableType[1].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[2].width}>
+            {scrollTableType[2].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[3].width}>
+            {scrollTableType[3].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[4].width}>
+            {scrollTableType[4].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[5].width}>
+            {scrollTableType[5].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[6].width}>
+            {scrollTableType[6].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[7].width}>
+            {scrollTableType[7].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[8].width}>
+            {scrollTableType[8].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[9].width}>
+            {scrollTableType[9].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[10].width}>
+            {scrollTableType[10].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[11].width}>
+            {scrollTableType[11].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[12].width}>
+            {scrollTableType[12].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[13].width}>
+            {scrollTableType[13].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[14].width}>
+            {scrollTableType[14].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[15].width}>
+            {scrollTableType[15].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[16].width}>
+            {scrollTableType[16].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[17].width}>
+            {scrollTableType[17].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[18].width}>
+            {scrollTableType[18].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[19].width}>
+            {scrollTableType[19].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[20].width}>
+            {scrollTableType[20].label}
+          </Th>
         </ThContainer>
 
         <TdContainer>
@@ -362,10 +424,19 @@ const CancelTable = () => {
                 index
               ) => (
                 <Tr key={id}>
-                  <Td width={scrollTableType[0].width}>{claimStatus}</Td>
-                  <Td width={scrollTableType[1].width}>{payments}</Td>
-                  <Td width={scrollTableType[2].width}>{cancelRequestDay}</Td>
-                  <ReasonTd width={scrollTableType[3].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
+                    {claimStatus}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[1].width}>
+                    {payments}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[2].width}>
+                    {cancelRequestDay}
+                  </Td>
+                  <ReasonTd
+                    type={TableType.SCROLL}
+                    width={scrollTableType[3].width}
+                  >
                     <Reason>{mainReasonType[mainReason as string]}</Reason>
                     <Button
                       type={"button"}
@@ -380,30 +451,55 @@ const CancelTable = () => {
                       수정
                     </Button>
                   </ReasonTd>
-                  <Td width={scrollTableType[4].width}>{detaildReason}</Td>
-                  <Td width={scrollTableType[5].width}>{cancelCompletedDay}</Td>
-                  <Td width={scrollTableType[6].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[4].width}>
+                    {detaildReason}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[5].width}>
+                    {cancelCompletedDay}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[6].width}>
                     {"컬러: 레드/크기:s"}
                   </Td>
-                  <Td width={scrollTableType[7].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[7].width}>
                     <Quantity quantity={quantity}>{quantity}</Quantity>
                   </Td>
-                  <Td width={scrollTableType[8].width}>{price}</Td>
-                  <Td width={scrollTableType[9].width}>{optionPrice}</Td>
-                  <Td width={scrollTableType[10].width}>{totalPrice}</Td>
-                  <Td width={scrollTableType[11].width}>{shipmentPrice}</Td>
-                  <Td width={scrollTableType[12].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[8].width}>
+                    {price}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[9].width}>
+                    {optionPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[10].width}>
+                    {totalPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[11].width}>
+                    {shipmentPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[12].width}>
                     {shipmentDistantPrice}
                   </Td>
-                  <Td width={scrollTableType[13].width}>{totalRefundPrice}</Td>
-                  <Td width={scrollTableType[14].width}>{userEmail}</Td>
-                  <Td width={scrollTableType[15].width}>{userPhoneNumber}</Td>
-                  <Td width={scrollTableType[16].width}>{recipientName}</Td>
-                  <Td width={scrollTableType[17].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[13].width}>
+                    {totalRefundPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[14].width}>
+                    {userEmail}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[15].width}>
+                    {userPhoneNumber}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[16].width}>
+                    {recipientName}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[17].width}>
                     {recipientPhoneNumber}
                   </Td>
-                  <Td width={scrollTableType[18].width}>{cancelRefusalDay}</Td>
-                  <ReasonTd width={scrollTableType[19].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[18].width}>
+                    {cancelRefusalDay}
+                  </Td>
+                  <ReasonTd
+                    type={TableType.SCROLL}
+                    width={scrollTableType[19].width}
+                  >
                     <Reason>
                       {mainReasonType[refusalMainReason as string]}
                     </Reason>
@@ -420,7 +516,7 @@ const CancelTable = () => {
                       수정
                     </Button>
                   </ReasonTd>
-                  <Td width={scrollTableType[20].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[20].width}>
                     {refusalDetaildReason}
                   </Td>
                 </Tr>

@@ -596,33 +596,30 @@ const OrderTable = () => {
   const hasOrderItems = !loading && !error && !!orderItems?.length;
 
   return (
-    <TableContainer
-      type={TableType.SCROLL}
-      hasData={hasOrderItems}
-      action="http://info.sweettracker.co.kr/tracking/5"
-      method="post"
-      target="_black"
-    >
-      <ShipmentTemplateInput
-        type="text"
-        id="t_key"
-        name="t_key"
-        value={process.env.REACT_APP_SWEETTRAKER_API_KEY}
-        readOnly={true}
-      />
+    <TableContainer type={TableType.SCROLL} hasData={hasOrderItems}>
       <FixedTable width={tableWidth.left}>
         <ThContainer>
-          <Th width={fixTableType[0].width}>
+          <Th width={fixTableType[0].width} type={TableType.SCROLL}>
             <Checkbox
               onChange={changeAllCheckBoxHandler}
               checked={checkAllBoxStatus}
             />
           </Th>
-          <Th width={fixTableType[1].width}>{fixTableType[1].label}</Th>
-          <Th width={fixTableType[2].width}>{fixTableType[2].label}</Th>
-          <Th width={fixTableType[3].width}>{fixTableType[3].label}</Th>
-          <Th width={fixTableType[4].width}>{fixTableType[4].label}</Th>
-          <Th width={fixTableType[5].width}>{fixTableType[5].label}</Th>
+          <Th type={TableType.SCROLL} width={fixTableType[1].width}>
+            {fixTableType[1].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={fixTableType[2].width}>
+            {fixTableType[2].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={fixTableType[3].width}>
+            {fixTableType[3].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={fixTableType[4].width}>
+            {fixTableType[4].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={fixTableType[5].width}>
+            {fixTableType[5].label}
+          </Th>
         </ThContainer>
         <TdContainer>
           {hasOrderItems &&
@@ -640,17 +637,27 @@ const OrderTable = () => {
                 index
               ) => (
                 <Tr key={id}>
-                  <Td width={fixTableType[0].width}>
+                  <Td type={TableType.SCROLL} width={fixTableType[0].width}>
                     <Checkbox
                       onChange={changeSingleCheckBoxHandler(index)}
                       checked={isChecked}
                     />
                   </Td>
-                  <Td width={fixTableType[1].width}>{merchantItemUid}</Td>
-                  <Td width={fixTableType[2].width}>{productCode}</Td>
-                  <Td width={fixTableType[3].width}>{orderProduct}</Td>
-                  <Td width={fixTableType[4].width}>{userName}</Td>
-                  <Td width={fixTableType[5].width}>{orderStatus}</Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[1].width}>
+                    {merchantItemUid}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[2].width}>
+                    {productCode}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[3].width}>
+                    {orderProduct}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[4].width}>
+                    {userName}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[5].width}>
+                    {orderStatus}
+                  </Td>
                 </Tr>
               )
             )}
@@ -658,24 +665,60 @@ const OrderTable = () => {
       </FixedTable>
       <ScrollTable width={tableWidth.right}>
         <ThContainer>
-          <Th width={scrollTableType[0].width}>{scrollTableType[0].label}</Th>
-          <Th width={scrollTableType[1].width}>{scrollTableType[1].label}</Th>
-          <Th width={scrollTableType[2].width}>{scrollTableType[2].label}</Th>
-          <Th width={scrollTableType[3].width}>{scrollTableType[3].label}</Th>
-          <Th width={scrollTableType[4].width}>{scrollTableType[4].label}</Th>
-          <Th width={scrollTableType[5].width}>{scrollTableType[5].label}</Th>
-          <Th width={scrollTableType[6].width}>{scrollTableType[6].label}</Th>
-          <Th width={scrollTableType[7].width}>{scrollTableType[7].label}</Th>
-          <Th width={scrollTableType[8].width}>{scrollTableType[8].label}</Th>
-          <Th width={scrollTableType[9].width}>{scrollTableType[9].label}</Th>
-          <Th width={scrollTableType[10].width}>{scrollTableType[10].label}</Th>
-          <Th width={scrollTableType[11].width}>{scrollTableType[11].label}</Th>
-          <Th width={scrollTableType[12].width}>{scrollTableType[12].label}</Th>
-          <Th width={scrollTableType[13].width}>{scrollTableType[13].label}</Th>
-          <Th width={scrollTableType[14].width}>{scrollTableType[14].label}</Th>
-          <Th width={scrollTableType[15].width}>{scrollTableType[15].label}</Th>
-          <Th width={scrollTableType[16].width}>{scrollTableType[16].label}</Th>
-          <Th width={scrollTableType[17].width}>{scrollTableType[17].label}</Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[0].width}>
+            {scrollTableType[0].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[1].width}>
+            {scrollTableType[1].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[2].width}>
+            {scrollTableType[2].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[3].width}>
+            {scrollTableType[3].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[4].width}>
+            {scrollTableType[4].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[5].width}>
+            {scrollTableType[5].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[6].width}>
+            {scrollTableType[6].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[7].width}>
+            {scrollTableType[7].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[8].width}>
+            {scrollTableType[8].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[9].width}>
+            {scrollTableType[9].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[10].width}>
+            {scrollTableType[10].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[11].width}>
+            {scrollTableType[11].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[12].width}>
+            {scrollTableType[12].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[13].width}>
+            {scrollTableType[13].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[14].width}>
+            {scrollTableType[14].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[15].width}>
+            {scrollTableType[15].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[16].width}>
+            {scrollTableType[16].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[17].width}>
+            {scrollTableType[17].label}
+          </Th>
         </ThContainer>
 
         <TdContainer>
@@ -710,10 +753,57 @@ const OrderTable = () => {
                 index
               ) => (
                 <Tr key={id}>
-                  <Td width={scrollTableType[0].width}>{claimStatus}</Td>
-                  <Td width={scrollTableType[1].width}>
-                    {shipmentCompany ? (
-                      isEditShipmentInfo ? (
+                  <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
+                    {claimStatus}
+                  </Td>
+                  <ShipmentColumn
+                    type={TableType.SCROLL}
+                    width={scrollTableType[1].width + scrollTableType[2].width}
+                    as={"form"}
+                    action="http://info.sweettracker.co.kr/tracking/5"
+                    method="post"
+                    target="_black"
+                  >
+                    <ShipmentTemplateInput
+                      type="text"
+                      id="t_key"
+                      name="t_key"
+                      value={process.env.REACT_APP_SWEETTRAKER_API_KEY}
+                      readOnly={true}
+                    />
+                    <ShipmentCompanyTd width={scrollTableType[1].width}>
+                      {shipmentCompany ? (
+                        isEditShipmentInfo ? (
+                          <Dropdown
+                            onChange={changeShipmentCompanyHandler(index)}
+                            arrowSrc={triangleArrowSvg}
+                            value={temporaryShipmentCompany}
+                            sizing={"medium"}
+                            width={"104px"}
+                            disabled={orderStatus === "새주문"}
+                          >
+                            <Option hidden value="default">
+                              택배사
+                            </Option>
+                            {shipmentCompanys.map(({ Code, Name }) => (
+                              <Option key={Code} value={Code}>
+                                {Name}
+                              </Option>
+                            ))}
+                          </Dropdown>
+                        ) : (
+                          <>
+                            <ShipmentTemplateInput
+                              type="text"
+                              id="t_code"
+                              name="t_code"
+                              value={shipmentCompany}
+                              readOnly={true}
+                            />
+                            {shipmentCompanyCode[shipmentCompany]}
+                          </>
+                        )
+                      ) : (
                         <Dropdown
                           onChange={changeShipmentCompanyHandler(index)}
                           arrowSrc={triangleArrowSvg}
@@ -731,145 +821,141 @@ const OrderTable = () => {
                             </Option>
                           ))}
                         </Dropdown>
+                      )}
+                    </ShipmentCompanyTd>
+                    <ShipmnetNumberTd width={scrollTableType[2].width}>
+                      {shipmentNumber ? (
+                        isEditShipmentInfo ? (
+                          <ShipmnetNumberContainer>
+                            <EditShipmentNumberInput
+                              onChange={changeShipmentNumberHandler(index)}
+                              disabled={orderStatus === "새주문"}
+                              width={"145px"}
+                              onKeyDown={preventNaNValues}
+                              value={
+                                temporaryShipmentNumber === 0
+                                  ? ""
+                                  : temporaryShipmentNumber
+                              }
+                            />
+                            <Button
+                              type="button"
+                              size="small"
+                              width="55px"
+                              onClick={handleSaveButtonClick(
+                                id,
+                                orderShipmentInfosId,
+                                temporaryShipmentCompany,
+                                temporaryShipmentNumber,
+                                ShipmentStatus.SHIPPING
+                              )}
+                            >
+                              저장
+                            </Button>
+                          </ShipmnetNumberContainer>
+                        ) : (
+                          <ShipmnetNumberContainer>
+                            <ShipmnetNumber>{shipmentNumber}</ShipmnetNumber>
+                            <ShipmentTemplateInput
+                              type="text"
+                              id="t_invoice"
+                              name="t_invoice"
+                              value={shipmentNumber}
+                              readOnly={true}
+                            />
+                            <Button
+                              size="small"
+                              width="55px"
+                              onClick={handleEditButtonClick}
+                              type="button"
+                            >
+                              수정
+                            </Button>
+                            <Button
+                              size="small"
+                              width="55px"
+                              backgroundColor={"#414A5B"}
+                              color={"#fff"}
+                              type="submit"
+                            >
+                              조회
+                            </Button>
+                          </ShipmnetNumberContainer>
+                        )
                       ) : (
-                        <>
-                          <ShipmentTemplateInput
-                            type="text"
-                            id="t_code"
-                            name="t_code"
-                            value={shipmentCompany}
-                            readOnly={true}
-                          />
-                          {shipmentCompanyCode[shipmentCompany]}
-                        </>
-                      )
-                    ) : (
-                      <Dropdown
-                        onChange={changeShipmentCompanyHandler(index)}
-                        arrowSrc={triangleArrowSvg}
-                        value={temporaryShipmentCompany}
-                        sizing={"medium"}
-                        width={"104px"}
-                        disabled={orderStatus === "새주문"}
-                      >
-                        <Option hidden value="default">
-                          택배사
-                        </Option>
-                        {shipmentCompanys.map(({ Code, Name }) => (
-                          <Option key={Code} value={Code}>
-                            {Name}
-                          </Option>
-                        ))}
-                      </Dropdown>
-                    )}
-                  </Td>
-                  <Td width={scrollTableType[2].width}>
-                    {shipmentNumber ? (
-                      isEditShipmentInfo ? (
                         <ShipmnetNumberContainer>
-                          <EditShipmentNumberInput
+                          <ShipmnetNumberInput
                             onChange={changeShipmentNumberHandler(index)}
                             disabled={orderStatus === "새주문"}
                             width={"145px"}
-                            onKeyDown={preventNaNValues}
                             value={
                               temporaryShipmentNumber === 0
                                 ? ""
                                 : temporaryShipmentNumber
                             }
+                            onKeyDown={preventNaNValues}
                           />
                           <Button
-                            type="button"
                             size="small"
-                            width="55px"
-                            onClick={handleSaveButtonClick(
+                            disabled={orderStatus === "새주문"}
+                            width={"55px"}
+                            onClick={handleSendButtonClick(
                               id,
-                              orderShipmentInfosId,
                               temporaryShipmentCompany,
-                              temporaryShipmentNumber,
-                              ShipmentStatus.SHIPPING
+                              temporaryShipmentNumber
                             )}
-                          >
-                            저장
-                          </Button>
-                        </ShipmnetNumberContainer>
-                      ) : (
-                        <ShipmnetNumberContainer>
-                          <ShipmnetNumber>{shipmentNumber}</ShipmnetNumber>
-                          <ShipmentTemplateInput
-                            type="text"
-                            id="t_invoice"
-                            name="t_invoice"
-                            value={shipmentNumber}
-                            readOnly={true}
-                          />
-                          <Button
-                            size="small"
-                            width="55px"
-                            onClick={handleEditButtonClick}
                             type="button"
                           >
-                            수정
-                          </Button>
-                          <Button
-                            size="small"
-                            width="55px"
-                            backgroundColor={"#414A5B"}
-                            color={"#fff"}
-                            type="submit"
-                          >
-                            조회
+                            발송
                           </Button>
                         </ShipmnetNumberContainer>
-                      )
-                    ) : (
-                      <ShipmnetNumberContainer>
-                        <ShipmnetNumberInput
-                          onChange={changeShipmentNumberHandler(index)}
-                          disabled={orderStatus === "새주문"}
-                          width={"145px"}
-                          value={
-                            temporaryShipmentNumber === 0
-                              ? ""
-                              : temporaryShipmentNumber
-                          }
-                          onKeyDown={preventNaNValues}
-                        />
-                        <Button
-                          size="small"
-                          disabled={orderStatus === "새주문"}
-                          width={"55px"}
-                          onClick={handleSendButtonClick(
-                            id,
-                            temporaryShipmentCompany,
-                            temporaryShipmentNumber
-                          )}
-                          type="button"
-                        >
-                          발송
-                        </Button>
-                      </ShipmnetNumberContainer>
-                    )}
+                      )}
+                    </ShipmnetNumberTd>
+                  </ShipmentColumn>
+
+                  <Td type={TableType.SCROLL} width={scrollTableType[3].width}>
+                    {payments}
                   </Td>
-                  <Td width={scrollTableType[3].width}>{payments}</Td>
-                  <Td width={scrollTableType[4].width}>{recipientName}</Td>
-                  <Td width={scrollTableType[5].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[4].width}>
+                    {recipientName}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[5].width}>
                     {recipientPhoneNumber}
                   </Td>
-                  <Td width={scrollTableType[6].width}>{recipientAddress}</Td>
-                  <Td width={scrollTableType[7].width}>{postCode}</Td>
-                  <Td width={scrollTableType[8].width}>{shipmentMemo}</Td>
-                  <Td width={scrollTableType[9].width}>{userEmail}</Td>
-                  <Td width={scrollTableType[10].width}>{userPhoneNumber}</Td>
-                  <Td width={scrollTableType[11].width}>{option}</Td>
-                  <Td width={scrollTableType[12].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[6].width}>
+                    {recipientAddress}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[7].width}>
+                    {postCode}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[8].width}>
+                    {shipmentMemo}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[9].width}>
+                    {userEmail}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[10].width}>
+                    {userPhoneNumber}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[11].width}>
+                    {option}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[12].width}>
                     <Quantity quantity={quantity}>{quantity}</Quantity>
                   </Td>
-                  <Td width={scrollTableType[13].width}>{price}</Td>
-                  <Td width={scrollTableType[14].width}>{optionPrice}</Td>
-                  <Td width={scrollTableType[15].width}>{totalPrice}</Td>
-                  <Td width={scrollTableType[16].width}>{shipmentPrice}</Td>
-                  <Td width={scrollTableType[17].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[13].width}>
+                    {price}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[14].width}>
+                    {optionPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[15].width}>
+                    {totalPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[16].width}>
+                    {shipmentPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[17].width}>
                     {shipmentDistantPrice}
                   </Td>
                 </Tr>
@@ -903,6 +989,8 @@ const OrderTable = () => {
   );
 };
 
+const ShipmentColumn = styled(Td)``;
+
 const Dropdown = styled(SelectInput)`
   padding-right: 16px;
 
@@ -917,6 +1005,25 @@ const ShipmnetNumberInput = styled(Input)`
 
 const EditShipmentNumberInput = styled(Input)`
   margin-right: 4px;
+`;
+
+const ShipmentCompanyTd = styled.div<{ width: number }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: ${({ width }) => `${width}px`};
+  height: 100%;
+  border-right: 1px solid ${({ theme }) => theme.palette.grey500};
+`;
+
+const ShipmnetNumberTd = styled.div<{ width: number }>`
+  width: ${({ width }) => `${width}px`};
+  overflow: hidden;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const ShipmnetNumberContainer = styled.div`
