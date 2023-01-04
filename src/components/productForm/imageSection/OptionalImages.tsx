@@ -129,10 +129,7 @@ const ProductImageSection = () => {
     );
 
     if (!hasAllImagesUploaded) return;
-
-    if (optionalImages.length >= 15) {
-      return;
-    }
+    if (optionalImages.length >= 5) return;
 
     const newOptionalImages = [...optionalImagesVar()];
 
