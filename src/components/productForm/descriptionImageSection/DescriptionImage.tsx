@@ -66,7 +66,7 @@ const DescriptionImage = ({ id, url }: { id: string; url: string }) => {
       {url ? (
         <ProductImageContainer>
           <ProductImage
-            src={encodeLastComponent(url)}
+            src={url}
             handleChangeButtonClick={handleImageChange(id)}
           />
         </ProductImageContainer>
