@@ -111,7 +111,7 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
   ) => {
     setReason((prev) => ({
       ...prev,
-      detailedReason: e.target.value,
+      detail: e.target.value,
     }));
   };
 
@@ -235,7 +235,7 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
           size={"small"}
           width={"55px"}
           onClick={handleSubmitButtonClick}
-          disabled={reason.main === MainReason.DEFAULT || !!reason.detail}
+          disabled={reason.main === MainReason.DEFAULT || !reason.detail}
         >
           확인
         </StyledButton>
