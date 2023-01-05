@@ -193,12 +193,13 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
   return (
     <Container>
       <CloseButton onClick={handleCloseButtonClick} src={closeIconSource} />
-      <Title>반품 처리하기</Title>
+      <Title>취소 처리하기</Title>
       <NoticeContainer icon={exclamationmarkSrc} width={"392px"}>
-        • &nbsp;반품 처리 전 반드시 소비자와 합의 후 처리해주시길 바랍니다.
-        <br />• &nbsp;수거완료 후 환불 처리시 선택된 대표사유에 의해 환불금액이
+        • &nbsp;취소 처리 전 반드시 소비자와 합의 후 처리해주시길 바랍니다.
+        <br />• &nbsp;여러 주문 선택 후 취소 처리하면 같은 대표사유 및 상세
+        사유로 취소
         <br />
-        &nbsp;&nbsp;&nbsp;결정되니 환불비용을 따로 청구하지 말아주세요.
+        &nbsp;&nbsp;&nbsp;처리 됩니다.
       </NoticeContainer>
       <ReasonContainer>
         <Label>대표사유</Label>
@@ -234,7 +235,7 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
           size={"small"}
           width={"55px"}
           onClick={handleSubmitButtonClick}
-          disabled={reason.main === MainReason.DEFAULT || !reason.detail}
+          disabled={reason.main === MainReason.DEFAULT || !!reason.detail}
         >
           확인
         </StyledButton>
