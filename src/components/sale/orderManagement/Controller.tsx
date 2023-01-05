@@ -29,12 +29,10 @@ import {
   optionListType,
 } from "@constants/sale";
 import { useMutation, useReactiveVar } from "@apollo/client";
-import { checkedOrderItemsVar, reasonVar } from "@cache/sale";
+import { checkedOrderItemsVar } from "@cache/sale";
 import { filterOptionVar } from "@cache/sale/order";
 import { CONFIRM_ORDERITMES_BY_SELLER } from "@graphql/mutations/confirmOrderItemsBySeller";
 import {
-  CancelOrderItemsBySellerInputType,
-  CancelOrderItemsBySellerType,
   ConfirmOrderItemsBySellerInputType,
   ConfirmOrderItemsBySellerType,
   SendOrderItemsInputType,
@@ -48,29 +46,14 @@ import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import { showHasServerErrorModal } from "@cache/productManagement";
 import AskReasonModal from "@components/common/AskReasonModal";
 import { getHasCheckedOrderStatus } from "@utils/sale/order/getHasCheckedOrderStatus";
-import getCancelOrderItemsInput from "@utils/sale/order/getCancelOrderItemsInput";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
-  const { detailedReason, mainReason, cause } = useReactiveVar(reasonVar);
-
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const checkedOrderItemIds = checkedOrderItems.map(({ id }) => id);
-  const checkedOrderItemTotalPrices = checkedOrderItems.map(
-    ({ totalPrice }) => {
-      const removeComma = totalPrice.replace(",", "");
-      return Number(removeComma);
-    }
-  );
-  const components = getCancelOrderItemsInput(
-    checkedOrderItems,
-    mainReason,
-    detailedReason,
-    cause
-  );
 
   const {
     isPaymentCompletedChecked,
@@ -115,33 +98,6 @@ const Controller = () => {
       input: SendOrderItemsInputType;
     }
   >(SEND_ORDER_ITEMS, {
-    fetchPolicy: "no-cache",
-    notifyOnNetworkStatusChange: true,
-    refetchQueries: [
-      {
-        query: GET_ORDERS_BY_SELLER,
-        variables: {
-          input: {
-            page,
-            skip,
-            query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
-          },
-        },
-      },
-      "GetOrdersBySeller",
-    ],
-  });
-
-  const [cancelOrderItems] = useMutation<
-    CancelOrderItemsBySellerType,
-    {
-      input: CancelOrderItemsBySellerInputType;
-    }
-  >(CANCEL_ORDERITEMS_BY_SELLER, {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
@@ -440,68 +396,7 @@ const Controller = () => {
 
         modalVar({
           isVisible: true,
-          component: (
-            <AskReasonModal
-              option={optionListType}
-              handleSubmitButtonClick={() => {
-                try {
-                  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                  (async () => {
-                    loadingSpinnerVisibilityVar(true);
-                    const {
-                      data: {
-                        cancelOrderItemsBySeller: { ok, error },
-                      },
-                    } = await cancelOrderItems({
-                      variables: {
-                        input: { components },
-                      },
-                    });
-
-                    if (ok) {
-                      loadingSpinnerVisibilityVar(false);
-                      systemModalVar({
-                        ...systemModalVar(),
-                        isVisible: true,
-                        description: (
-                          <>
-                            선택하신 주문이
-                            <br />
-                            취소 완료되었습니다.
-                            <br />
-                            (취소관리 - 취소완료에서 확인 가능)
-                          </>
-                        ),
-                        confirmButtonVisibility: true,
-                        cancelButtonVisibility: false,
-                        confirmButtonClickHandler: () => {
-                          modalVar({
-                            ...modalVar(),
-                            isVisible: false,
-                          });
-
-                          systemModalVar({
-                            ...systemModalVar(),
-                            isVisible: false,
-                          });
-
-                          checkedOrderItemsVar([]);
-                          checkAllBoxStatusVar(false);
-                        },
-                      });
-                    }
-                    if (error) {
-                      loadingSpinnerVisibilityVar(false);
-                      showHasServerErrorModal(error, "주문 취소");
-                    }
-                  })();
-                } catch (error) {
-                  loadingSpinnerVisibilityVar(false);
-                  showHasServerErrorModal(error as string, "주문 취소");
-                }
-              }}
-            />
-          ),
+          component: <AskReasonModal option={optionListType} />,
         });
       },
     });

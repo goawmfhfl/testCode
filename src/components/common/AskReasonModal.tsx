@@ -1,11 +1,29 @@
-import React, { useEffect } from "react";
-import { useReactiveVar } from "@apollo/client";
+import React, { useEffect, useState } from "react";
+import { useReactiveVar, useMutation } from "@apollo/client";
 import styled from "styled-components/macro";
 
-import { reasonVar } from "@cache/sale";
-import { modalVar } from "@cache/index";
+import {
+  modalVar,
+  commonFilterOptionVar,
+  loadingSpinnerVisibilityVar,
+  checkAllBoxStatusVar,
+  systemModalVar,
+} from "@cache/index";
+import { checkedOrderItemsVar } from "@cache/sale";
+import { showHasServerErrorModal } from "@cache/productManagement";
+import { filterOptionVar } from "@cache/sale/order";
 
 import { Cause, MainReason } from "@constants/sale";
+
+import {
+  CancelOrderItemsBySellerInputType,
+  CancelOrderItemsBySellerType,
+} from "@models/sale/order";
+import { CANCEL_ORDERITEMS_BY_SELLER } from "@graphql/mutations/cancelOrderItemsBySeller";
+import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+
+import getWhoseResponsibility from "@utils/sale/order/getWhoseResponsibility";
+import getCancelOrderItemsInput from "@utils/sale/order/getCancelOrderItemsInput";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -18,7 +36,6 @@ import {
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
-import getWhoseResponsibility from "@utils/sale/order/getWhoseResponsibility";
 
 interface AskReasonModalType {
   option: Array<{
@@ -27,32 +44,75 @@ interface AskReasonModalType {
     value: MainReason;
     cause: Cause;
   }>;
-  handleSubmitButtonClick: () => void;
 }
 
-const AskReasonModal = ({
-  option,
-  handleSubmitButtonClick,
-}: AskReasonModalType) => {
-  const { mainReason, detailedReason } = useReactiveVar(reasonVar);
+const AskReasonModal = ({ option }: AskReasonModalType) => {
+  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
+  const { type, statusName, statusType, statusGroup } =
+    useReactiveVar(filterOptionVar);
+  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
+
+  const [reason, setReason] = useState<{
+    main: MainReason;
+    detail: string;
+    cause: Cause;
+  }>({
+    main: MainReason.DEFAULT,
+    detail: "",
+    cause: Cause.DEFAULT,
+  });
+
+  const components = getCancelOrderItemsInput(
+    checkedOrderItems,
+    reason.main,
+    reason.detail,
+    reason.cause
+  );
+
+  const [cancelOrderItems] = useMutation<
+    CancelOrderItemsBySellerType,
+    {
+      input: CancelOrderItemsBySellerInputType;
+    }
+  >(CANCEL_ORDERITEMS_BY_SELLER, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    refetchQueries: [
+      {
+        query: GET_ORDERS_BY_SELLER,
+        variables: {
+          input: {
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
+          },
+        },
+      },
+      "GetOrdersBySeller",
+    ],
+  });
 
   const changeReasonHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const cause: Cause = getWhoseResponsibility(e.target.value as MainReason);
 
-    reasonVar({
-      ...reasonVar(),
-      mainReason: e.target.value as MainReason,
+    setReason((prev) => ({
+      ...prev,
+      main: e.target.value as MainReason,
       cause,
-    });
+    }));
   };
 
   const changeDetailReasonHandler = (
     e: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
-    reasonVar({
-      ...reasonVar(),
+    setReason((prev) => ({
+      ...prev,
       detailedReason: e.target.value,
-    });
+    }));
   };
 
   const handleCloseButtonClick = () => {
@@ -62,11 +122,69 @@ const AskReasonModal = ({
     });
   };
 
+  const handleSubmitButtonClick = () => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      (async () => {
+        loadingSpinnerVisibilityVar(true);
+        const {
+          data: {
+            cancelOrderItemsBySeller: { ok, error },
+          },
+        } = await cancelOrderItems({
+          variables: {
+            input: { components },
+          },
+        });
+
+        if (ok) {
+          loadingSpinnerVisibilityVar(false);
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: (
+              <>
+                선택하신 주문이
+                <br />
+                취소 완료되었습니다.
+                <br />
+                (취소관리 - 취소완료에서 확인 가능)
+              </>
+            ),
+            confirmButtonVisibility: true,
+            cancelButtonVisibility: false,
+            confirmButtonClickHandler: () => {
+              modalVar({
+                ...modalVar(),
+                isVisible: false,
+              });
+
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+
+              checkedOrderItemsVar([]);
+              checkAllBoxStatusVar(false);
+            },
+          });
+        }
+        if (error) {
+          loadingSpinnerVisibilityVar(false);
+          showHasServerErrorModal(error, "주문 취소");
+        }
+      })();
+    } catch (error) {
+      loadingSpinnerVisibilityVar(false);
+      showHasServerErrorModal(error as string, "주문 취소");
+    }
+  };
+
   useEffect(() => {
     return () => {
-      reasonVar({
-        mainReason: MainReason.DEFAULT,
-        detailedReason: "",
+      setReason({
+        main: MainReason.DEFAULT,
+        detail: "",
         cause: Cause.DEFAULT,
       });
     };
@@ -88,7 +206,7 @@ const AskReasonModal = ({
           arrowSrc={triangleArrowSvg}
           sizing={"medium"}
           width={"160px"}
-          value={mainReason}
+          value={reason.main}
           onChange={changeReasonHandler}
         >
           <Option value={MainReason.DEFAULT} hidden>
@@ -116,7 +234,7 @@ const AskReasonModal = ({
           size={"small"}
           width={"55px"}
           onClick={handleSubmitButtonClick}
-          disabled={mainReason === MainReason.DEFAULT || !detailedReason}
+          disabled={reason.main === MainReason.DEFAULT || !reason.detail}
         >
           확인
         </StyledButton>

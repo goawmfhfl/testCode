@@ -29,7 +29,7 @@ import {
   OrderStatusName,
 } from "@constants/sale";
 
-import { checkedOrderItemsVar, reasonVar } from "@cache/sale";
+import { checkedOrderItemsVar } from "@cache/sale";
 import useLazyCancelOrders from "@hooks/order/useLazyCancelOrders";
 import contructCancelOrders from "@utils/sale/cancel/contructCancelOrders";
 import resetCancelOrders from "@utils/sale/cancel/resetCancelOrders";
@@ -67,8 +67,6 @@ const CancelTable = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
-
-  const { mainReason, detailedReason } = useReactiveVar(reasonVar);
 
   const [orders, setOrders] = useState<Array<ResetCancelOrders>>([]);
 
@@ -138,22 +136,12 @@ const CancelTable = () => {
       }
     };
 
-  const handleEditReasonButtonClick =
-    (mainReason: MainReason, detailedReason: string) => () => {
-      // reasonVar({ mainReason, detailedReason });
-
-      modalVar({
-        isVisible: true,
-        component: (
-          <AskReasonModal
-            handleSubmitButtonClick={() => {
-              console.log("");
-            }}
-            option={optionListType}
-          />
-        ),
-      });
-    };
+  const handleEditReasonButtonClick = () => () => {
+    modalVar({
+      isVisible: true,
+      component: <AskReasonModal option={optionListType} />,
+    });
+  };
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -442,10 +430,6 @@ const CancelTable = () => {
                       type={"button"}
                       size={"small"}
                       width={"55px"}
-                      onClick={handleEditReasonButtonClick(
-                        mainReason,
-                        detaildReason
-                      )}
                       disabled={statusName === OrderStatusName.CANCEL_COMPLETED}
                     >
                       수정
@@ -507,10 +491,6 @@ const CancelTable = () => {
                       type={"button"}
                       size={"small"}
                       width={"55px"}
-                      onClick={handleEditReasonButtonClick(
-                        refusalMainReason,
-                        refusalDetaildReason
-                      )}
                       disabled={statusName === OrderStatusName.CANCEL_COMPLETED}
                     >
                       수정
