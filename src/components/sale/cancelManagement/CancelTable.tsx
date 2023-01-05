@@ -60,7 +60,6 @@ import {
   NormalizedType,
   ResetCancelOrders,
 } from "@models/sale/cancel";
-import AskReasonModal from "@components/common/AskReasonModal";
 
 const CancelTable = () => {
   const { getOrders, error, loading, data } = useLazyCancelOrders();
@@ -136,11 +135,8 @@ const CancelTable = () => {
       }
     };
 
-  const handleEditReasonButtonClick = () => () => {
-    modalVar({
-      isVisible: true,
-      component: <AskReasonModal option={optionListType} />,
-    });
+  const handleEditReasonButtonClick = () => {
+    return "";
   };
 
   useEffect(() => {

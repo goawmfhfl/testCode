@@ -44,7 +44,7 @@ import { CANCEL_ORDERITEMS_BY_SELLER } from "@graphql/mutations/cancelOrderItems
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import { showHasServerErrorModal } from "@cache/productManagement";
-import AskReasonModal from "@components/common/AskReasonModal";
+import AskReasonModal from "@components/sale/orderManagement/AskReasonModal";
 import { getHasCheckedOrderStatus } from "@utils/sale/order/getHasCheckedOrderStatus";
 
 const Controller = () => {
