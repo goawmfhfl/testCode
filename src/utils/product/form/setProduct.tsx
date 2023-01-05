@@ -125,7 +125,11 @@ const setProduct = (
     const requiredOptions = sortedOptions.filter((ops) => ops.isRequired);
 
     if (requiredOptions.length) {
-      setValue(HAS_REQUIRED_OPTION, true);
+      if (isNaN(quantity)) {
+        setValue(HAS_REQUIRED_OPTION, true);
+      } else {
+        setValue(HAS_REQUIRED_OPTION, false);
+      }
 
       const { optionInputList, adaptedOption } =
         restructureOptions(requiredOptions);
@@ -157,7 +161,11 @@ const setProduct = (
     const selectiveOptions = sortedOptions.filter((ops) => !ops.isRequired);
 
     if (selectiveOptions.length) {
-      setValue(HAS_SELECTIVE_OPTION, true);
+      if (isNaN(quantity)) {
+        setValue(HAS_SELECTIVE_OPTION, true);
+      } else {
+        setValue(HAS_SELECTIVE_OPTION, false);
+      }
 
       const { optionInputList, adaptedOption } =
         restructureOptions(selectiveOptions);
