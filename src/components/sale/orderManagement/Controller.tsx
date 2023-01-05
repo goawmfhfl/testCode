@@ -48,6 +48,7 @@ import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import { showHasServerErrorModal } from "@cache/productManagement";
 import AskReasonModal from "@components/common/AskReasonModal";
 import { getHasCheckedOrderStatus } from "@utils/sale/order/getHasCheckedOrderStatus";
+import getCancelOrderItemsInput from "@utils/sale/order/getCancelOrderItemsInput";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -63,6 +64,12 @@ const Controller = () => {
       const removeComma = totalPrice.replace(",", "");
       return Number(removeComma);
     }
+  );
+  const components = getCancelOrderItemsInput(
+    checkedOrderItems,
+    mainReason,
+    detailedReason,
+    cause
   );
 
   const {
@@ -251,7 +258,6 @@ const Controller = () => {
     });
   };
 
-  //발송처리
   const handleSendButtonClick = () => {
     if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
@@ -448,13 +454,7 @@ const Controller = () => {
                       },
                     } = await cancelOrderItems({
                       variables: {
-                        input: {
-                          amount: checkedOrderItemTotalPrices,
-                          mainReason,
-                          detailedReason,
-                          cause,
-                          orderItemIds: checkedOrderItemIds,
-                        },
+                        input: { components },
                       },
                     });
 

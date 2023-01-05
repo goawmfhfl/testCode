@@ -147,11 +147,13 @@ export interface CancelOrderItemsBySellerType {
 }
 
 export interface CancelOrderItemsBySellerInputType {
-  orderItemIds: Array<number>;
-  amount: Array<number>;
-  mainReason: MainReason;
-  detailedReason: string;
-  cause: Cause;
+  components: Array<{
+    orderItemId: number;
+    amount: number;
+    mainReason: MainReason;
+    detailedReason: string;
+    cause: Cause;
+  }>;
 }
 
 export interface EditShipmentNumberInputType {
