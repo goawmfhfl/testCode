@@ -113,7 +113,7 @@ const RequiredOption = () => {
             ...register(HAS_REQUIRED_OPTION),
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
               if (e.target.checked) {
-                setValue(PRODUCT_STOCK, 0);
+                setValue(PRODUCT_STOCK, null);
               }
 
               setValue(HAS_REQUIRED_OPTION, e.target.checked);
