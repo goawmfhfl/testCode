@@ -138,6 +138,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       : "-";
 
     const isChecked = false;
+    const isShipmentInfoEdit = false;
     const temporaryShipmentCompany = resetShipmentCompany || "";
     const temporaryShipmentNumber = resetShipmentNumber || 0;
 
@@ -193,6 +194,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       // 제주/도서 추가배송비
       shipmentDistantPrice: resetShipmentDistantPrice,
       isChecked,
+      isShipmentInfoEdit,
       temporaryShipmentCompany,
       temporaryShipmentNumber,
     };

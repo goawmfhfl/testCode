@@ -141,8 +141,6 @@ const OrderTable = () => {
     }>
   >([]);
 
-  const [isEditShipmentInfo, setisEditShipmentInfo] = useState<boolean>(false);
-
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
 
@@ -410,6 +408,7 @@ const OrderTable = () => {
 
               if (ok) {
                 loadingSpinnerVisibilityVar(false);
+
                 systemModalVar({
                   ...systemModalVar(),
                   isVisible: true,
@@ -423,6 +422,19 @@ const OrderTable = () => {
                   confirmButtonVisibility: true,
                   cancelButtonVisibility: false,
                   confirmButtonClickHandler: () => {
+                    const newOrderItems = cloneDeep(orderItems);
+                    const findOrderItmeIndex = orderItems.findIndex(
+                      ({ id }) => id === orderItemId
+                    );
+                    newOrderItems[findOrderItmeIndex].isShipmentInfoEdit =
+                      false;
+                    newOrderItems[findOrderItmeIndex].shipmentCompany =
+                      shipmentCompany;
+                    newOrderItems[findOrderItmeIndex].shipmentNumber =
+                      shipmentNumber;
+
+                    setOrderItems(newOrderItems);
+
                     systemModalVar({
                       ...systemModalVar(),
                       isVisible: false,
@@ -430,7 +442,6 @@ const OrderTable = () => {
 
                     checkedOrderItemsVar([]);
                     checkAllBoxStatusVar(false);
-                    setisEditShipmentInfo(false);
                   },
                 });
               }
@@ -447,8 +458,14 @@ const OrderTable = () => {
       });
     };
 
-  const handleEditButtonClick = () => {
-    setisEditShipmentInfo(true);
+  const handleEditButtonClick = (id: number) => () => {
+    const newOrderItems = cloneDeep(orderItems);
+
+    const findOrderItmeIndex = newOrderItems.findIndex(
+      (orderItem) => orderItem.id === id
+    );
+    newOrderItems[findOrderItmeIndex].isShipmentInfoEdit = true;
+    setOrderItems(newOrderItems);
   };
 
   useEffect(() => {
@@ -747,6 +764,7 @@ const OrderTable = () => {
                   totalPrice,
                   shipmentPrice,
                   shipmentDistantPrice,
+                  isShipmentInfoEdit,
                   temporaryShipmentCompany,
                   temporaryShipmentNumber,
                 },
@@ -773,7 +791,7 @@ const OrderTable = () => {
                     />
                     <ShipmentCompanyTd width={scrollTableType[1].width}>
                       {shipmentCompany ? (
-                        isEditShipmentInfo ? (
+                        isShipmentInfoEdit ? (
                           <Dropdown
                             onChange={changeShipmentCompanyHandler(index)}
                             arrowSrc={triangleArrowSvg}
@@ -825,7 +843,7 @@ const OrderTable = () => {
                     </ShipmentCompanyTd>
                     <ShipmnetNumberTd width={scrollTableType[2].width}>
                       {shipmentNumber ? (
-                        isEditShipmentInfo ? (
+                        isShipmentInfoEdit ? (
                           <ShipmnetNumberContainer>
                             <EditShipmentNumberInput
                               onChange={changeShipmentNumberHandler(index)}
@@ -863,23 +881,25 @@ const OrderTable = () => {
                               value={shipmentNumber}
                               readOnly={true}
                             />
-                            <Button
-                              size="small"
-                              width="55px"
-                              onClick={handleEditButtonClick}
-                              type="button"
-                            >
-                              수정
-                            </Button>
-                            <Button
-                              size="small"
-                              width="55px"
-                              backgroundColor={"#414A5B"}
-                              color={"#fff"}
-                              type="submit"
-                            >
-                              조회
-                            </Button>
+                            <ButtonContainer>
+                              <Button
+                                size="small"
+                                width="55px"
+                                onClick={handleEditButtonClick(id)}
+                                type="button"
+                              >
+                                수정
+                              </Button>
+                              <Button
+                                size="small"
+                                width="55px"
+                                backgroundColor={"#414A5B"}
+                                color={"#fff"}
+                                type="submit"
+                              >
+                                조회
+                              </Button>
+                            </ButtonContainer>
                           </ShipmnetNumberContainer>
                         )
                       ) : (
@@ -1027,12 +1047,18 @@ const ShipmnetNumberTd = styled.div<{ width: number }>`
 `;
 
 const ShipmnetNumberContainer = styled.div`
+  width: 100%;
+  padding: 0px 8px 0px 8px;
+
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 `;
 
 const ShipmnetNumber = styled.span`
+  width: 100%;
+  text-align: center;
+
   margin-right: 8px;
 `;
 
@@ -1043,6 +1069,10 @@ const ShipmentTemplateInput = styled.input`
 const Quantity = styled.span<{ quantity: number }>`
   color: ${({ theme: { palette }, quantity }) =>
     quantity > 1 ? palette.red900 : palette.black};
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
 `;
 
 export default OrderTable;

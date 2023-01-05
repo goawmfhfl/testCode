@@ -256,6 +256,7 @@ export interface ResetOrderItemType {
   // 제주/도서 추가배송비
   shipmentDistantPrice: string;
   isChecked: boolean;
+  isShipmentInfoEdit: boolean;
   temporaryShipmentCompany: string;
   temporaryShipmentNumber?: number;
 }
