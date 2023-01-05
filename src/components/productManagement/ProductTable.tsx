@@ -338,7 +338,7 @@ const ProductTable = () => {
     <TableContainer type={TableType.FIX} hasData={isFetchingProductFailed}>
       <ThContainer>
         {tableData.map(({ id, label, width }) => (
-          <Th key={`th-${id}`} width={width}>
+          <Th type={TableType.FIX} key={`th-${id}`} width={width}>
             {label === "checkBox" ? (
               <Checkbox
                 onChange={changeAllCheckBoxHandler}
@@ -373,14 +373,19 @@ const ProductTable = () => {
             ) => {
               return (
                 <Tr key={`product-${productId}-row`}>
-                  <Td width={tableData[0].width}>
+                  <Td type={TableType.FIX} width={tableData[0].width}>
                     <Checkbox
                       onChange={changeSingleCheckBoxHandler(index)}
                       checked={isChecked}
                     />
                   </Td>
-                  <Td width={tableData[1].width}>{productId}</Td>
-                  <ProductNameTd width={tableData[2].width}>
+                  <Td type={TableType.FIX} width={tableData[1].width}>
+                    {productId}
+                  </Td>
+                  <ProductNameTd
+                    type={TableType.FIX}
+                    width={tableData[2].width}
+                  >
                     <ProductThumbNailWrapper>
                       <ProductThumbNail src={thumbnail} />
                     </ProductThumbNailWrapper>
@@ -388,14 +393,28 @@ const ProductTable = () => {
                       <Link to={`/product/${productId}`}>{productName}</Link>
                     </ProductName>
                   </ProductNameTd>
-                  <Td width={tableData[3].width}>{firstCategory}</Td>
-                  <Td width={tableData[4].width}>{secondCategory}</Td>
-                  <Td width={tableData[5].width}>{thirdCategory}</Td>
-                  <Td width={tableData[6].width}>{originalPriceToWonSign}</Td>
-                  <Td width={tableData[7].width}>{discountedRate}</Td>
-                  <Td width={tableData[8].width}>{finalSellngPrice}</Td>
-                  <Td width={tableData[9].width}>{quantity}</Td>
-                  <Td width={tableData[10].width}>
+                  <Td type={TableType.FIX} width={tableData[3].width}>
+                    {firstCategory}
+                  </Td>
+                  <Td type={TableType.FIX} width={tableData[4].width}>
+                    {secondCategory}
+                  </Td>
+                  <Td type={TableType.FIX} width={tableData[5].width}>
+                    {thirdCategory}
+                  </Td>
+                  <Td type={TableType.FIX} width={tableData[6].width}>
+                    {originalPriceToWonSign}
+                  </Td>
+                  <Td type={TableType.FIX} width={tableData[7].width}>
+                    {discountedRate}
+                  </Td>
+                  <Td type={TableType.FIX} width={tableData[8].width}>
+                    {finalSellngPrice}
+                  </Td>
+                  <Td type={TableType.FIX} width={tableData[9].width}>
+                    {quantity}
+                  </Td>
+                  <Td type={TableType.FIX} width={tableData[10].width}>
                     <Dropdown
                       onChange={changeSingleSaleStatusHandler(productId)}
                       arrowSrc={triangleArrowSvg}

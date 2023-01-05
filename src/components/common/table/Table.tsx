@@ -1,7 +1,7 @@
 import { TableType } from "@models/index";
 import styled, { css } from "styled-components/macro";
 
-export const TableContainer = styled.form<{
+export const TableContainer = styled.div<{
   type: TableType;
   hasData?: boolean;
 }>`
@@ -23,8 +23,9 @@ export const TableContainer = styled.form<{
       : css``}
 `;
 
-export const FixedTable = styled.div<{ width: number }>`
-  min-width: ${({ width }) => `${width}px`};
+export const FixedTable = styled.div<{ width?: number }>`
+  width: ${({ width }) => `${width}px`};
+  border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 
 interface ScrollTableProps {
@@ -48,7 +49,6 @@ const ScrollTableContainer = styled.div`
 
 const WrapperContainer = styled.div<{ width: number }>`
   min-width: ${({ width }) => `${width}px`};
-  border-left: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 
 export const ThContainer = styled.div`
@@ -62,6 +62,7 @@ export const ThContainer = styled.div`
 export const Th = styled.div<{
   width: number;
   isOneLiner?: boolean;
+  type: TableType;
 }>`
   display: flex;
   justify-content: center;
@@ -74,7 +75,10 @@ export const Th = styled.div<{
       flex-direction: column;
     `}
 
-  width: ${({ width }) => `${width}%`};
+  min-width: ${({ width, type }) => {
+    if (type === TableType.FIX) return `${width}%`;
+    if (type === TableType.SCROLL) return `${width}px`;
+  }};
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
   overflow: hidden;
 
@@ -103,12 +107,16 @@ export const Tr = styled.div`
   border-bottom: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 
-export const Td = styled.div<{ width: number }>`
+export const Td = styled.div<{ width: number; type: TableType }>`
   display: flex;
   justify-content: center;
   align-items: center;
 
-  width: ${({ width }) => `${width}%`};
+  width: ${({ width, type }) => {
+    if (type === TableType.FIX) return `${width}%`;
+    if (type === TableType.SCROLL) return `${width}px`;
+  }};
+
   height: 40px;
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 

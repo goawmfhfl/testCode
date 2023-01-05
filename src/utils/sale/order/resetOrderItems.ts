@@ -2,6 +2,9 @@ import { NormalizedListType } from "@models/sale/order";
 import { orderStatusNameType, ShipmentStatus } from "@constants/sale";
 
 const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
+  const hasOrderItems = !!recontructOrderItem && !!recontructOrderItem.orders;
+  if (!hasOrderItems) return;
+
   if (!recontructOrderItem || !recontructOrderItem.orders) return;
 
   const orderAllIds = recontructOrderItem?.orders.allIds;
@@ -109,27 +112,33 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
     const resetQuantity = quantity ? quantity : 0;
 
     // 상품가
-    const resetPrice = discountAppliedPrice
-      ? discountAppliedPrice
-      : originalPrice
-      ? originalPrice
-      : 0;
+    const resetPrice = originalPrice
+      ? `${originalPrice.toLocaleString("ko-KR")}`
+      : "-";
 
     // 옵션가
     const resetOptionPrice = "-";
 
     // 상품별 총 금액
-    const resetTotalPrice = "0";
+    const resetTotalPrice = getTotalPrice(
+      originalPrice,
+      discountAppliedPrice,
+      shipmentDistantPrice,
+      shipmentPrice
+    );
 
     // 배송비
-    const resetShipmentPrice = shipmentPrice ? shipmentPrice : 0;
+    const resetShipmentPrice = shipmentPrice
+      ? `${shipmentPrice.toLocaleString("ko-KR")}`
+      : "-";
 
     // 제주/도서 추가배송비
     const resetShipmentDistantPrice = shipmentDistantPrice
-      ? shipmentDistantPrice
-      : 0;
+      ? `${shipmentDistantPrice.toLocaleString("ko-KR")}`
+      : "-";
 
     const isChecked = false;
+    const isShipmentInfoEdit = false;
     const temporaryShipmentCompany = resetShipmentCompany || "";
     const temporaryShipmentNumber = resetShipmentNumber || 0;
 
@@ -185,11 +194,32 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       // 제주/도서 추가배송비
       shipmentDistantPrice: resetShipmentDistantPrice,
       isChecked,
+      isShipmentInfoEdit,
       temporaryShipmentCompany,
       temporaryShipmentNumber,
     };
   });
   return result;
+};
+
+const getTotalPrice = (
+  originalPrice: number,
+  discountAppliedPrice: number,
+  shipmentDistantPrice: number,
+  shipmentPrice: number
+) => {
+  const shipmentDistantPay = shipmentDistantPrice || 0;
+  const shipmentPay = shipmentPrice || 0;
+
+  if (discountAppliedPrice) {
+    const totalPrice = discountAppliedPrice + shipmentPay + shipmentDistantPay;
+    return `${totalPrice.toLocaleString("ko-KR")}`;
+  }
+
+  if (originalPrice) {
+    const totalPrice = originalPrice + shipmentPay + shipmentDistantPay;
+    return `${totalPrice.toLocaleString("ko-KR")}`;
+  }
 };
 
 export default resetOrderItems;

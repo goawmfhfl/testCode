@@ -29,12 +29,10 @@ import {
   optionListType,
 } from "@constants/sale";
 import { useMutation, useReactiveVar } from "@apollo/client";
-import { checkedOrderItemsVar, reasonVar } from "@cache/sale";
+import { checkedOrderItemsVar } from "@cache/sale";
 import { filterOptionVar } from "@cache/sale/order";
 import { CONFIRM_ORDERITMES_BY_SELLER } from "@graphql/mutations/confirmOrderItemsBySeller";
 import {
-  CancelOrderItemsBySellerInputType,
-  CancelOrderItemsBySellerType,
   ConfirmOrderItemsBySellerInputType,
   ConfirmOrderItemsBySellerType,
   SendOrderItemsInputType,
@@ -46,7 +44,7 @@ import { CANCEL_ORDERITEMS_BY_SELLER } from "@graphql/mutations/cancelOrderItems
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import { showHasServerErrorModal } from "@cache/productManagement";
-import AskReasonModal from "@components/common/AskReasonModal";
+import AskReasonModal from "@components/sale/orderManagement/AskReasonModal";
 import { getHasCheckedOrderStatus } from "@utils/sale/order/getHasCheckedOrderStatus";
 
 const Controller = () => {
@@ -54,12 +52,8 @@ const Controller = () => {
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
-  const { detailedReason, mainReason } = useReactiveVar(reasonVar);
-
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
-  const checkedOrderItemIds = checkedOrderItems.map(
-    (orderItem) => orderItem.id
-  );
+  const checkedOrderItemIds = checkedOrderItems.map(({ id }) => id);
 
   const {
     isPaymentCompletedChecked,
@@ -125,34 +119,6 @@ const Controller = () => {
     ],
   });
 
-  const [cancelOrderItems] = useMutation<
-    CancelOrderItemsBySellerType,
-    {
-      input: CancelOrderItemsBySellerInputType;
-    }
-  >(CANCEL_ORDERITEMS_BY_SELLER, {
-    fetchPolicy: "no-cache",
-    notifyOnNetworkStatusChange: true,
-    refetchQueries: [
-      {
-        query: GET_ORDERS_BY_SELLER,
-        variables: {
-          input: {
-            page,
-            skip,
-            query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
-          },
-        },
-      },
-      "GetOrdersBySeller",
-    ],
-  });
-
-  //주문확인
   const handleConfirmOrderButtonClick = () => {
     if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
@@ -248,7 +214,6 @@ const Controller = () => {
     });
   };
 
-  //발송처리
   const handleSendButtonClick = () => {
     if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
@@ -388,31 +353,34 @@ const Controller = () => {
     });
   };
 
-  //주문취소
   const handleCancelOrderClick = () => {
-    // if (!checkedOrderItems.length) {
-    //   showHasAnyProblemModal(
-    //     <>
-    //       선택된 주문건이 없습니다
-    //       <br />
-    //       주문건을 선택해주세요
-    //     </>
-    //   );
-    //   return;
-    // }
+    if (!checkedOrderItems.length) {
+      showHasAnyProblemModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
+      return;
+    }
 
-    // if (isShippingChecked || isShippingCompletedChecked || isCancelRequestChecked) {
-    //   showHasAnyProblemModal(
-    //     <>
-    //       해당 버튼은 선택하신
-    //       <br />
-    //       주문건을 처리할 수 없습니다.
-    //       <br />
-    //       주문 상태를 다시 확인해주세요.
-    //     </>
-    //   );
-    //   return;
-    // }
+    if (
+      isShippingChecked ||
+      isShippingCompletedChecked ||
+      isCancelRequestChecked
+    ) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+      return;
+    }
 
     systemModalVar({
       ...systemModalVar(),
@@ -428,77 +396,12 @@ const Controller = () => {
 
         modalVar({
           isVisible: true,
-          component: (
-            <AskReasonModal
-              option={optionListType}
-              handleSubmitButtonClick={() => {
-                try {
-                  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                  (async () => {
-                    loadingSpinnerVisibilityVar(true);
-                    const {
-                      data: {
-                        cancelOrderItemsBySeller: { ok, error },
-                      },
-                    } = await cancelOrderItems({
-                      variables: {
-                        input: {
-                          reason: mainReason,
-                          orderItemIds: checkedOrderItemIds,
-                        },
-                      },
-                    });
-
-                    if (ok) {
-                      loadingSpinnerVisibilityVar(false);
-                      systemModalVar({
-                        ...systemModalVar(),
-                        isVisible: true,
-                        description: (
-                          <>
-                            선택하신 주문이
-                            <br />
-                            취소 완료되었습니다.
-                            <br />
-                            (취소관리 - 취소완료에서 확인 가능)
-                          </>
-                        ),
-                        confirmButtonVisibility: true,
-                        cancelButtonVisibility: false,
-                        confirmButtonClickHandler: () => {
-                          modalVar({
-                            ...modalVar(),
-                            isVisible: false,
-                          });
-
-                          systemModalVar({
-                            ...systemModalVar(),
-                            isVisible: false,
-                          });
-
-                          checkedOrderItemsVar([]);
-                          checkAllBoxStatusVar(false);
-                        },
-                      });
-                    }
-                    if (error) {
-                      loadingSpinnerVisibilityVar(false);
-                      showHasServerErrorModal(error, "주문 취소");
-                    }
-                  })();
-                } catch (error) {
-                  loadingSpinnerVisibilityVar(false);
-                  showHasServerErrorModal(error as string, "주문 취소");
-                }
-              }}
-            />
-          ),
+          component: <AskReasonModal option={optionListType} />,
         });
       },
     });
   };
 
-  //반품처리
   const handleReturnButtonClick = () => {
     if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
@@ -529,7 +432,6 @@ const Controller = () => {
     }
   };
 
-  //교환처리
   const handleExchangeButtonClick = () => {
     if (!checkedOrderItems.length) {
       showHasAnyProblemModal(

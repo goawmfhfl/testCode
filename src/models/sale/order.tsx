@@ -1,4 +1,6 @@
 import {
+  Cause,
+  MainReason,
   OrderSearchType,
   OrderStatusGroup,
   OrderStatusName,
@@ -145,8 +147,13 @@ export interface CancelOrderItemsBySellerType {
 }
 
 export interface CancelOrderItemsBySellerInputType {
-  orderItemIds: Array<number>;
-  reason: string;
+  components: Array<{
+    orderItemId: number;
+    amount: number;
+    mainReason: MainReason;
+    detailedReason: string;
+    cause: Cause;
+  }>;
 }
 
 export interface EditShipmentNumberInputType {
@@ -239,16 +246,17 @@ export interface ResetOrderItemType {
   // 상품개수
   quantity: number;
   // 상품가
-  price: number;
+  price: string;
   // 옵션가
   optionPrice: string;
   // 상품별 총 금액
   totalPrice: string;
   // 배송비
-  shipmentPrice: number;
+  shipmentPrice: string;
   // 제주/도서 추가배송비
-  shipmentDistantPrice: number;
+  shipmentDistantPrice: string;
   isChecked: boolean;
+  isShipmentInfoEdit: boolean;
   temporaryShipmentCompany: string;
   temporaryShipmentNumber?: number;
 }

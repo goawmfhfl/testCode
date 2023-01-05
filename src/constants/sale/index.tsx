@@ -43,6 +43,11 @@ export enum OrderStatusType {
   ORDER = "ORDER",
   CLAIM = "CLAIM",
 }
+export enum Cause {
+  DEFAULT = "DEFAULT",
+  CLIENT = "CLIENT",
+  SELLER = "SELLER",
+}
 
 export enum OrderStatusName {
   PAYMENT_COMPLETED = "PAYMENT_COMPLETED",
@@ -300,15 +305,61 @@ export const mainReasonType = {
 export const optionListType: Array<{
   id: number;
   label: string;
-  value: string;
+  value: MainReason;
+  cause: Cause;
 }> = [
-  { id: 0, label: mainReasonType.NO_INTENTION, value: "consumer" },
-  { id: 1, label: mainReasonType.CHANGE_COLOR_OR_SIZE, value: "consumer" },
-  { id: 2, label: mainReasonType.DIFFERENT_PRODUCT, value: "consumer" },
-  { id: 3, label: mainReasonType.DELAYED_SHIPMENT, value: "seller" },
-  { id: 4, label: mainReasonType.OMITTED_SHIPMENT, value: "seller" },
-  { id: 5, label: mainReasonType.OUT_OF_STOCK, value: "seller" },
-  { id: 6, label: mainReasonType.DAMAGED, value: "seller" },
-  { id: 7, label: mainReasonType.MISINFORMED, value: "seller" },
-  { id: 8, label: mainReasonType.MISDELIVERY, value: "seller" },
+  {
+    id: 0,
+    label: mainReasonType.NO_INTENTION,
+    value: MainReason.NO_INTENTION,
+    cause: Cause.CLIENT,
+  },
+  {
+    id: 1,
+    label: mainReasonType.CHANGE_COLOR_OR_SIZE,
+    value: MainReason.CHANGE_COLOR_OR_SIZE,
+    cause: Cause.CLIENT,
+  },
+  {
+    id: 2,
+    label: mainReasonType.DIFFERENT_PRODUCT,
+    value: MainReason.DIFFERENT_PRODUCT,
+    cause: Cause.CLIENT,
+  },
+  {
+    id: 3,
+    label: mainReasonType.DELAYED_SHIPMENT,
+    value: MainReason.DELAYED_SHIPMENT,
+    cause: Cause.SELLER,
+  },
+  {
+    id: 4,
+    label: mainReasonType.OMITTED_SHIPMENT,
+    value: MainReason.OMITTED_SHIPMENT,
+    cause: Cause.SELLER,
+  },
+  {
+    id: 5,
+    label: mainReasonType.OUT_OF_STOCK,
+    value: MainReason.OUT_OF_STOCK,
+    cause: Cause.SELLER,
+  },
+  {
+    id: 6,
+    label: mainReasonType.DAMAGED,
+    value: MainReason.DAMAGED,
+    cause: Cause.SELLER,
+  },
+  {
+    id: 7,
+    label: mainReasonType.MISINFORMED,
+    value: MainReason.MISINFORMED,
+    cause: Cause.SELLER,
+  },
+  {
+    id: 8,
+    label: mainReasonType.MISDELIVERY,
+    value: MainReason.MISDELIVERY,
+    cause: Cause.SELLER,
+  },
 ];
