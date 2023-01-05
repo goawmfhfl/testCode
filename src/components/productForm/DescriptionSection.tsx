@@ -44,6 +44,9 @@ const ProductDescriptionSection = () => {
           height={"120px"}
           register={register(PRODUCT_DESCRIPTION)}
           onChange={changeTextAreaHandler}
+          onKeyDown={(e) => {
+            e.stopPropagation();
+          }}
           value={text}
           placeholder={
             "최소 50자 이상 입력해주세요. ‘- (대쉬)’는 ‘・(글머리 기호)’로 나옵니다."

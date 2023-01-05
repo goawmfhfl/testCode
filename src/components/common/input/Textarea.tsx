@@ -8,6 +8,9 @@ const Textarea = ({
   register,
   onFocus,
   onChange,
+  onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    return;
+  },
   placeholder,
   maxLength,
   value,
@@ -18,6 +21,7 @@ const Textarea = ({
   register?: UseFormRegisterReturn;
   onFocus?: () => void;
   onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   placeholder?: string;
   maxLength?: number;
   value?: string;
@@ -30,6 +34,7 @@ const Textarea = ({
       {...register}
       onFocus={onFocus}
       onChange={onChange ? onChange : register.onChange}
+      onKeyDown={onKeyDown}
       placeholder={placeholder}
       maxLength={maxLength}
       value={value}

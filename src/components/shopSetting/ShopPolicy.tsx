@@ -24,6 +24,9 @@ const ShopPolicy = () => {
             height={"156px"}
             size="small"
             register={register(SHIPMENT_POLICY)}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+            }}
           />
         </TextareaContainer>
       </SectionContainer>
@@ -36,6 +39,9 @@ const ShopPolicy = () => {
             height={"156px"}
             size="small"
             register={register(RETURN_POLICY)}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+            }}
           />
         </TextareaContainer>
       </SectionContainer>

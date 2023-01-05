@@ -304,6 +304,9 @@ const ShopInfo = () => {
               width={"377px"}
               height={"156px"}
               register={register(SHOP_INTRODUCTION)}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+              }}
               maxLength={200}
             />
 
