@@ -1057,9 +1057,13 @@ const ShipmnetNumberContainer = styled.div`
 
 const ShipmnetNumber = styled.span`
   width: 100%;
+  margin-right: 8px;
+
   text-align: center;
 
-  margin-right: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 const ShipmentTemplateInput = styled.input`
