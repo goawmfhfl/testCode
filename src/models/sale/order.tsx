@@ -63,14 +63,15 @@ export interface OrdersType {
   };
 
   options: Array<{
-    // 옵션명
+    id: number;
     components: Array<{
       name: string;
       value: string;
     }>;
 
-    // 옵션 가격
+    quantity: number;
     price: number;
+    isRequired: boolean;
   }>;
 
   // 상품 갯수
@@ -248,7 +249,7 @@ export interface ResetOrderItemType {
   // 상품가
   price: string;
   // 옵션가
-  optionPrice: string;
+  optionPrice: string | number;
   // 상품별 총 금액
   totalPrice: string;
   // 배송비

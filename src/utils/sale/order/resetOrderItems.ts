@@ -27,28 +27,14 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       claimStatus,
     } = orderByid[id];
 
-    // 주문번호
     const resetMerchantItemUid = merchantItemUid ? merchantItemUid : "-";
-
-    // 상품 주문번호
     const resetProductCode = product?.code ? product.code : "-";
-
-    // 주문 상품
     const resetOrderProduct = product?.name ? product.name : "-";
-
-    // 구매자 명
     const resetUserName = user?.name ? user.name : "-";
-
-    // 주문 상태
     const resetOrderStatus = orderStatus?.name
       ? orderStatusNameType[orderStatus.name]
       : "-";
-
-    // 클레임 상태
     const resetClaimStatus = claimStatus?.name ? claimStatus.name : "-";
-
-    // 배송정보 Id
-
     const resetOrderShipmentInfosId = orderShipmentInfos
       ? orderShipmentInfos.filter(
           (info) => info.status === ShipmentStatus.SHIPPING
@@ -106,17 +92,15 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
     const resetUserPhoneNumber = user?.phoneNumber ? user.phoneNumber : "-";
 
     // 옵션
-    const resetOption = getOptions(options);
+    const { resetOptions, resetOptionPrice, resetOptionQuantity } =
+      getOptions(options);
 
     // 상품개수
-    const resetQuantity = quantity ? quantity : 0;
-
+    const resetQuantity = quantity ? quantity : resetOptionQuantity;
     // 상품가
     const resetPrice = originalPrice
       ? `${originalPrice.toLocaleString("ko-KR")}`
       : "-";
-
-    const resetOptionPrice = "-";
 
     // 상품별 총 금액
     const resetTotalPrice = getTotalPrice(
@@ -172,25 +156,15 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       recipientAddress: resetRecipientAddress,
       // 우편번호
       postCode: resetPostCode,
-      // 배송메세지
       shipmentMemo: resetShipmentMemo,
-      // 구매자 아이디
       userEmail: resetUserEmail,
-      // 구매자 전화번호
       userPhoneNumber: resetUserPhoneNumber,
-      // 옵션
-      option: resetOption,
-      // 상품개수
+      option: resetOptions,
       quantity: resetQuantity,
-      // 상품가
       price: resetPrice,
-      // 옵션가
       optionPrice: resetOptionPrice,
-      // 상품별 총 금액
       totalPrice: resetTotalPrice,
-      // 배송비
       shipmentPrice: resetShipmentPrice,
-      // 제주/도서 추가배송비
       shipmentDistantPrice: resetShipmentDistantPrice,
       isChecked,
       isShipmentInfoEdit,
@@ -224,26 +198,47 @@ const getTotalPrice = (
 const getOptions = (
   options: Array<{
     components: Array<{ name: string; value: string }>;
+    quantity: number;
     price: number;
+    isRequired: boolean;
   }>
 ) => {
   const hasOptions = !!options && !!options.length;
-  if (!hasOptions) return "-";
+  if (!hasOptions) {
+    return {
+      resetOptions: "-",
+      resetOptionPrice: "-",
+      resetOptionQuantity: 0,
+    };
+  }
 
-  return options.reduce((options, { components }) => {
-    options += components.reduce((result, { name, value }) => {
-      if (options) {
-        result += ` / ${name} : ${value} `;
-      }
-      if (!options) {
-        result = `${name} : ${value} `;
-      }
+  return options.reduce(
+    (result, { components, price, quantity }) => {
+      result.resetOptions += components.reduce(
+        (components, { name, value }) => {
+          if (components) {
+            components += `/ ${name} : ${value} `;
+          }
+          if (!components) {
+            components = `${name} : ${value} `;
+          }
+
+          return components;
+        },
+        ""
+      );
+
+      result.resetOptionPrice = price;
+      result.resetOptionQuantity = quantity;
 
       return result;
-    }, "");
-
-    return options;
-  }, "");
+    },
+    {
+      resetOptions: "",
+      resetOptionPrice: 0,
+      resetOptionQuantity: 0,
+    }
+  );
 };
 
 export default resetOrderItems;

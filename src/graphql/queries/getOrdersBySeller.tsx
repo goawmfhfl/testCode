@@ -51,6 +51,7 @@ export const GET_ORDERS_BY_SELLER = gql`
         }
 
         options {
+          id
           # 옵션명
           components {
             name
@@ -58,6 +59,8 @@ export const GET_ORDERS_BY_SELLER = gql`
           }
           # 옵션가
           price
+          quantity
+          isRequired
         }
         # 상품개수
         quantity

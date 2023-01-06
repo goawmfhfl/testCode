@@ -107,7 +107,10 @@ export const Tr = styled.div`
   border-bottom: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 
-export const Td = styled.div<{ width: number; type: TableType }>`
+export const Td = styled.div<{
+  width: number;
+  type: TableType;
+}>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -117,14 +120,14 @@ export const Td = styled.div<{ width: number; type: TableType }>`
     if (type === TableType.SCROLL) return `${width}px`;
   }};
 
-  height: 40px;
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 
   &:last-child {
     border-right: none;
   }
 
-  overflow: hidden;
+  height: 80px;
+  padding: 8px;
 
   font-family: "Spoqa Han Sans Neo";
   font-size: 10px;
