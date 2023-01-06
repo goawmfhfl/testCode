@@ -1,4 +1,4 @@
-import { CategoryNames, CATEGORY_NAMES } from "@constants/category";
+import { CATEGORY_NAMES } from "@constants/category";
 import { ProductsType } from "@graphql/queries/getProductsBySeller";
 import { NormalizedType } from "@models/product/management";
 
@@ -11,7 +11,6 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
 
   const result = productsAllIds?.map((id) => {
     const {
-      // 상품 번호
       id: productId,
       name,
       category,
@@ -23,30 +22,23 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
       quantity,
     } = productByids[id];
 
-    // 상품명
     const productName = name ? name : "-";
-
-    // 대분류
     const firstCategory = category?.parent?.name
       ? (CATEGORY_NAMES[category?.parent?.name] as string)
       : "-";
 
-    // 중분류
     const secondCategory = category?.name
       ? (CATEGORY_NAMES[category.name] as string)
       : "-";
 
-    // 소분류
     const thirdCategory = category?.children?.name
       ? (CATEGORY_NAMES[category.children.name] as string)
       : "-";
 
-    // 판매가
     const originalPriceToWonSign = originalPrice
       ? `${originalPrice.toLocaleString("ko-KR")} ₩`
       : "-";
 
-    // 할인율
     const discountedRate =
       discountMethod && discountAmount
         ? `${discountAmount.toLocaleString("ko-KR")} ${
@@ -61,7 +53,6 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
           ).toLocaleString("ko-KR") + " ₩"
         : "";
 
-    // 최종가
     const finalSellngPrice = discountAppliedPrice
       ? discountAppliedPrice
       : originalPriceToWonSign;

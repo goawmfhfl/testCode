@@ -19,7 +19,7 @@ import {
 
 import FilterBarContainer from "@components/sale/FilterBarContainer";
 import Button from "@components/common/Button";
-import { getOrdersLength } from "@utils/sale/order";
+import { getOrdersLength } from "@utils/sale/order/getOrdersLength";
 
 const FilterBar = () => {
   const { data, getOrderStatus } = useLazyOrderStatus();
