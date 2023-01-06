@@ -51,7 +51,7 @@ import {
   NormalizedType,
   CaculatedProductsType,
 } from "@models/product/management";
-import { caculateProducts } from "@utils/product/management/caculateProducts";
+import caculateProducts from "@utils/product/management/caculateProducts";
 
 const ProductTable = () => {
   const { loading, error, data, getProducts } = useLazyProducts();

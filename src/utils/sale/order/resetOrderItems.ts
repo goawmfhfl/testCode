@@ -106,7 +106,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
     const resetUserPhoneNumber = user?.phoneNumber ? user.phoneNumber : "-";
 
     // 옵션
-    const resetOption = "-";
+    const resetOption = getOptions(options);
 
     // 상품개수
     const resetQuantity = quantity ? quantity : 0;
@@ -116,7 +116,6 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       ? `${originalPrice.toLocaleString("ko-KR")}`
       : "-";
 
-    // 옵션가
     const resetOptionPrice = "-";
 
     // 상품별 총 금액
@@ -220,6 +219,31 @@ const getTotalPrice = (
     const totalPrice = originalPrice + shipmentPay + shipmentDistantPay;
     return `${totalPrice.toLocaleString("ko-KR")}`;
   }
+};
+
+const getOptions = (
+  options: Array<{
+    components: Array<{ name: string; value: string }>;
+    price: number;
+  }>
+) => {
+  const hasOptions = !!options && !!options.length;
+  if (!hasOptions) return "-";
+
+  return options.reduce((options, { components }) => {
+    options += components.reduce((result, { name, value }) => {
+      if (options) {
+        result += ` / ${name} : ${value} `;
+      }
+      if (!options) {
+        result = `${name} : ${value} `;
+      }
+
+      return result;
+    }, "");
+
+    return options;
+  }, "");
 };
 
 export default resetOrderItems;
