@@ -56,17 +56,12 @@ const BusinessLicenseModal = () => {
   const handleSaveButtonClick = async () => {
     try {
       // 사업자등록증, 혹은 통신판매업신고 번호를 입력하지 않았을 경우
-      if (!businessNumber || !ecommerceNumber.join("")) {
+      if (!businessNumber) {
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
           icon: exclamationmarkSrc,
-          description: (
-            <>
-              사업자등록번호와 통신판매업신고 번호를
-              <br /> 모두 입력해주세요.
-            </>
-          ),
+          description: <>사업자등록번호는 필수 입력입니다.</>,
           confirmButtonText: "확인",
           confirmButtonClickHandler: () => {
             systemModalVar({
@@ -85,10 +80,9 @@ const BusinessLicenseModal = () => {
         params: {
           ServiceKey: process.env.REACT_APP_BUSINESS_AUTHENTICATION_API_KEY,
           pageNo: 1,
-          numOfRows: 1,
+          numOfRows: 9999,
           resultType: "json",
           bizrno: businessNumber,
-          prmsnMgtNo: ecommerceNumber.join("-"),
         },
       };
 
@@ -155,18 +149,12 @@ const BusinessLicenseModal = () => {
         return;
       }
 
-      if (data.items[0].mngStateNm !== "정상영업") {
+      if (last(data.items).mngStateNm !== "정상영업") {
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
           icon: exclamationmarkSrc,
-          description: (
-            <>
-              유효하지 않은 정보입니다.
-              <br />
-              최신 정보를 입력해주세요.
-            </>
-          ),
+          description: <>유효하지 않은 사업자 등록 정보입니다.</>,
           confirmButtonText: "확인",
           confirmButtonClickHandler: () => {
             systemModalVar({
@@ -202,7 +190,7 @@ const BusinessLicenseModal = () => {
             isVisible: false,
           });
 
-          const businessLicense = data.items[0];
+          const businessLicense = last(data.items);
 
           const { coNm, bizrno, crno, simTxtnTrgtYnDesc, rdnAddr, prmsnMgtNo } =
             businessLicense;
