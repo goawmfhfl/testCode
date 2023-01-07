@@ -24,11 +24,54 @@ const contructOrderItem = (orderItem: Array<OrdersType>) => {
 
   const normalize = newOrderItems.reduce((orderItemResult, orderItem) => {
     const { id, product, options } = orderItem;
+    const hasOptions = !!options && !!options.length;
 
-    options.reduce((optionResult, option) => {
-      const hasOptions =
-        !!option && !!option.components && !!option.components.length;
+    if (hasOptions) {
+      options.reduce((optionResult, option) => {
+        const hasOptions =
+          !!option && !!option.components && !!option.components.length;
 
+        if (!hasOptions) return;
+
+        const findObject = orderItemResult.findIndex((item) => item.id === id);
+
+        if (orderItemResult.length === 0) {
+          colorBox.index = 0;
+        }
+
+        if (findObject === -1 && orderItemResult.length !== 0) {
+          colorBox.index += 1;
+        }
+
+        if (colorBox.index >= 3) {
+          colorBox.index = 0;
+        }
+
+        if (option.isRequired) {
+          orderItemResult.push({
+            ...orderItem,
+            rowIndex: uuidv4(),
+            options: [option],
+            colorIndex: colorBox.index,
+          });
+        }
+
+        if (!option.isRequired) {
+          const resetProducts = getProducts(product, option.components);
+
+          orderItemResult.push({
+            ...orderItem,
+            rowIndex: uuidv4(),
+            product: resetProducts,
+            colorIndex: colorBox.index,
+          });
+        }
+
+        return optionResult;
+      }, optionsInitialValue);
+    }
+
+    if (!hasOptions) {
       const findObject = orderItemResult.findIndex((item) => item.id === id);
 
       if (orderItemResult.length === 0) {
@@ -43,28 +86,12 @@ const contructOrderItem = (orderItem: Array<OrdersType>) => {
         colorBox.index = 0;
       }
 
-      if (hasOptions && option.isRequired) {
-        orderItemResult.push({
-          ...orderItem,
-          rowIndex: uuidv4(),
-          options: [option],
-          colorIndex: colorBox.index,
-        });
-      }
-
-      if (hasOptions && !option.isRequired) {
-        const resetProducts = getProducts(product, option.components);
-
-        orderItemResult.push({
-          ...orderItem,
-          rowIndex: uuidv4(),
-          product: resetProducts,
-          colorIndex: colorBox.index,
-        });
-      }
-
-      return optionResult;
-    }, optionsInitialValue);
+      orderItemResult.push({
+        ...orderItem,
+        rowIndex: uuidv4(),
+        colorIndex: colorBox.index,
+      });
+    }
 
     return orderItemResult;
   }, newOrderItemsInitialValue);
