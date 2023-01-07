@@ -21,6 +21,9 @@ export interface GetOrdersBySellerInputType {
 }
 
 export interface OrdersType {
+  rowIndex?: string;
+  colorIndex?: number;
+
   id: number;
   // 주문 번호
   merchantItemUid: string;
@@ -200,8 +203,8 @@ export interface ConfirmOrderItemsBySellerInputType {
 
 export interface NormalizedListType {
   orders: {
-    allIds: Array<number>;
-    byId: { [key: number]: OrdersType };
+    allIds: Array<string>;
+    byId: { [key: string]: OrdersType };
   };
 }
 
@@ -260,4 +263,6 @@ export interface ResetOrderItemType {
   isShipmentInfoEdit: boolean;
   temporaryShipmentCompany: string;
   temporaryShipmentNumber?: number;
+  colorIndex: number;
+  rowIndex: string;
 }

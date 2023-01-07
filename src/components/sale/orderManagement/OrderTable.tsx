@@ -639,21 +639,23 @@ const OrderTable = () => {
           </Th>
         </ThContainer>
         <TdContainer>
-          {hasOrderItems &&
-            orderItems.map(
+          {!loading &&
+            orderItems?.map(
               (
                 {
                   id,
+                  rowIndex,
                   merchantItemUid,
                   productCode,
                   orderProduct,
                   userName,
                   orderStatus,
                   isChecked,
+                  colorIndex,
                 },
                 index
               ) => (
-                <Tr key={id}>
+                <Tr key={rowIndex} colorIndex={colorIndex}>
                   <Td type={TableType.SCROLL} width={fixTableType[0].width}>
                     <Checkbox
                       onChange={changeSingleCheckBoxHandler(index)}
@@ -739,11 +741,13 @@ const OrderTable = () => {
         </ThContainer>
 
         <TdContainer>
-          {hasOrderItems &&
-            orderItems.map(
+          {!loading &&
+            orderItems?.map(
               (
                 {
                   id,
+                  rowIndex,
+                  colorIndex,
                   claimStatus,
                   orderStatus,
                   orderShipmentInfosId,
@@ -770,7 +774,7 @@ const OrderTable = () => {
                 },
                 index
               ) => (
-                <Tr key={id}>
+                <Tr key={rowIndex} colorIndex={colorIndex}>
                   <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
                     {claimStatus}
                   </Td>
@@ -957,9 +961,12 @@ const OrderTable = () => {
                   <Td type={TableType.SCROLL} width={scrollTableType[10].width}>
                     {userPhoneNumber}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[11].width}>
-                    {option}
-                  </Td>
+                  <OptionTd
+                    type={TableType.SCROLL}
+                    width={scrollTableType[11].width}
+                  >
+                    <OptionWrapper>{option}</OptionWrapper>
+                  </OptionTd>
                   <Td type={TableType.SCROLL} width={scrollTableType[12].width}>
                     <Quantity quantity={quantity}>{quantity}</Quantity>
                   </Td>
@@ -984,13 +991,12 @@ const OrderTable = () => {
         </TdContainer>
       </ScrollTable>
 
-      {orderItems?.length === 0 && !loading && (
+      {!hasOrderItems && (
         <NoDataContainer type={TableType.SCROLL}>
           {query && (
             <>
               검색어와 일치하는
-              <br />
-              주문이 없습니다.
+              <br />y 주문이 없습니다.
             </>
           )}
 
@@ -1009,7 +1015,9 @@ const OrderTable = () => {
   );
 };
 
-const ShipmentColumn = styled(Td)``;
+const ShipmentColumn = styled(Td)`
+  padding: 0px;
+`;
 
 const Dropdown = styled(SelectInput)`
   padding-right: 16px;
@@ -1038,12 +1046,12 @@ const ShipmentCompanyTd = styled.div<{ width: number }>`
 `;
 
 const ShipmnetNumberTd = styled.div<{ width: number }>`
-  width: ${({ width }) => `${width}px`};
-  overflow: hidden;
-
   display: flex;
   justify-content: center;
   align-items: center;
+
+  width: ${({ width }) => `${width}px`};
+  overflow: hidden;
 `;
 
 const ShipmnetNumberContainer = styled.div`
@@ -1068,6 +1076,20 @@ const ShipmnetNumber = styled.span`
 
 const ShipmentTemplateInput = styled.input`
   display: none;
+`;
+
+const OptionTd = styled(Td)`
+  margin: 0 auto;
+`;
+
+const OptionWrapper = styled.span`
+  text-align: center;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 `;
 
 const Quantity = styled.span<{ quantity: number }>`

@@ -12,6 +12,9 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
 
   const result = orderAllIds.map((id) => {
     const {
+      id: orderId,
+      colorIndex,
+      rowIndex,
       merchantItemUid,
       product,
       user,
@@ -126,7 +129,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
     const temporaryShipmentNumber = resetShipmentNumber || 0;
 
     return {
-      id,
+      id: orderId,
       // 주문번호
       merchantItemUid: resetMerchantItemUid,
       // 상품 주문번호
@@ -170,6 +173,8 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       isShipmentInfoEdit,
       temporaryShipmentCompany,
       temporaryShipmentNumber,
+      colorIndex,
+      rowIndex,
     };
   });
   return result;

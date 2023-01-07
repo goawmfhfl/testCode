@@ -101,10 +101,16 @@ export const TdContainer = styled.div`
   border-radius: 0px 0px 7px 7px;
 `;
 
-export const Tr = styled.div`
+export const Tr = styled.div<{ colorIndex?: number }>`
   display: flex;
   width: 100%;
   border-bottom: 1px solid ${({ theme: { palette } }) => palette.grey500};
+
+  background-color: ${({ theme: { palette }, colorIndex }) => {
+    if (colorIndex === 0) return palette.white;
+    if (colorIndex === 1) return palette.yellow100;
+    if (colorIndex === 2) return palette.blue100;
+  }};
 `;
 
 export const Td = styled.div<{
