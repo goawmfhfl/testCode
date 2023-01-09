@@ -171,7 +171,7 @@ const SettlementAccountModal = () => {
           <Option value={["012", "축협"]}>축협</Option>
           <Option value={["020", "우리은행"]}>우리은행</Option>
           <Option value={["023", "SC제일은행"]}>SC제일은행</Option>
-          <Option value={["한국씨티은행(한미은행)", "027"]}>
+          <Option value={["027", "한국씨티은행(한미은행)"]}>
             한국씨티은행(한미은행)
           </Option>
           <Option value={["031", "대구은행"]}>대구은행</Option>
@@ -186,8 +186,8 @@ const SettlementAccountModal = () => {
           <Option value={["081", "하나은행(서울은행)"]}>
             하나은행(서울은행)
           </Option>
-          <Option value={["K뱅크", "089"]}>K뱅크</Option>
-          <Option value={["카카오뱅크", "090"]}>카카오뱅크</Option>
+          <Option value={["089", "K뱅크"]}>K뱅크</Option>
+          <Option value={["090", "카카오뱅크"]}>카카오뱅크</Option>
         </Select>
 
         <UserAccountContainer>
