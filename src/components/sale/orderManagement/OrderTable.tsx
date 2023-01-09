@@ -647,6 +647,7 @@ const OrderTable = () => {
                   rowIndex,
                   merchantItemUid,
                   productCode,
+                  thumbnail,
                   orderProduct,
                   userName,
                   orderStatus,
@@ -668,9 +669,16 @@ const OrderTable = () => {
                   <Td type={TableType.SCROLL} width={fixTableType[2].width}>
                     {productCode}
                   </Td>
-                  <Td type={TableType.SCROLL} width={fixTableType[3].width}>
-                    {orderProduct}
-                  </Td>
+
+                  <ProductNameTd
+                    type={TableType.SCROLL}
+                    width={fixTableType[3].width}
+                  >
+                    <ProductThumbNailWrapper>
+                      <ProductThumbNail src={thumbnail} />
+                    </ProductThumbNailWrapper>
+                    <ProductName>{orderProduct}</ProductName>
+                  </ProductNameTd>
                   <Td type={TableType.SCROLL} width={fixTableType[4].width}>
                     {userName}
                   </Td>
@@ -890,6 +898,8 @@ const OrderTable = () => {
                                 size="small"
                                 width="55px"
                                 onClick={handleEditButtonClick(id)}
+                                backgroundColor={"#fff"}
+                                borderColor={"#BBC0C6"}
                                 type="button"
                               >
                                 수정
@@ -919,7 +929,7 @@ const OrderTable = () => {
                             }
                             onKeyDown={preventNaNValues}
                           />
-                          <Button
+                          <SubmitButton
                             size="small"
                             disabled={orderStatus === "새주문"}
                             width={"55px"}
@@ -928,10 +938,12 @@ const OrderTable = () => {
                               temporaryShipmentCompany,
                               temporaryShipmentNumber
                             )}
+                            backgroundColor={"#fff"}
+                            borderColor={"#BBC0C6"}
                             type="button"
                           >
                             발송
-                          </Button>
+                          </SubmitButton>
                         </ShipmnetNumberContainer>
                       )}
                     </ShipmnetNumberTd>
@@ -1014,6 +1026,36 @@ const OrderTable = () => {
     </TableContainer>
   );
 };
+
+const ProductNameTd = styled(Td)`
+  justify-content: flex-start;
+  padding: 8px 0px;
+`;
+
+const ProductThumbNailWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-width: 56px;
+  height: 80px;
+
+  border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
+`;
+
+const ProductThumbNail = styled.img`
+  width: 24px;
+  height: 24px;
+`;
+
+const ProductName = styled.span`
+  display: block;
+
+  padding: 0 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
 
 const ShipmentColumn = styled(Td)`
   padding: 0px;
@@ -1099,6 +1141,10 @@ const Quantity = styled.span<{ quantity: number }>`
 
 const ButtonContainer = styled.div`
   display: flex;
+`;
+
+const SubmitButton = styled(Button)`
+  border-left: none;
 `;
 
 export default OrderTable;

@@ -478,7 +478,7 @@ const ProductThumbNailWrapper = styled.div`
   align-items: center;
 
   min-width: 56px;
-  height: 40px;
+  height: 80px;
 
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;

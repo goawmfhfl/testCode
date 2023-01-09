@@ -33,6 +33,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
     const resetMerchantItemUid = merchantItemUid ? merchantItemUid : "-";
     const resetProductCode = product?.code ? product.code : "-";
     const resetOrderProduct = product?.name ? product.name : "-";
+    const resetProductThumbnail = product?.thumbnail ? product.thumbnail : "-";
     const resetUserName = user?.name ? user.name : "-";
     const resetOrderStatus = orderStatus?.name
       ? orderStatusNameType[orderStatus.name]
@@ -130,12 +131,9 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
 
     return {
       id: orderId,
-      // 주문번호
       merchantItemUid: resetMerchantItemUid,
-      // 상품 주문번호
       productCode: resetProductCode,
-      // 주문 상품
-      thumbnail: product?.thumbnail ? product?.thumbnail : "-",
+      thumbnail: resetProductThumbnail,
       orderProduct: resetOrderProduct,
       // 구매자 명
       userName: resetUserName,
@@ -202,7 +200,7 @@ const getTotalPrice = (
 
 const getOptions = (
   options: Array<{
-    components: Array<{ name: string; value: string }>;
+    components?: Array<{ name: string; value: string }>;
     quantity: number;
     price: number;
     isRequired: boolean;
@@ -219,19 +217,22 @@ const getOptions = (
 
   return options.reduce(
     (result, { components, price, quantity }) => {
-      result.resetOptions += components.reduce(
-        (components, { name, value }) => {
-          if (components) {
-            components += `/ ${name} : ${value} `;
-          }
-          if (!components) {
-            components = `${name} : ${value} `;
-          }
+      const hasComponents = !!components && !!components.length;
+      if (hasComponents) {
+        result.resetOptions += components.reduce(
+          (components, { name, value }) => {
+            if (components) {
+              components += `/ ${name} : ${value} `;
+            }
+            if (!components) {
+              components = `${name} : ${value} `;
+            }
 
-          return components;
-        },
-        ""
-      );
+            return components;
+          },
+          ""
+        );
+      }
 
       result.resetOptionPrice = price;
       result.resetOptionQuantity = quantity;

@@ -1,28 +1,27 @@
-import { cloneDeep } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 
 import { OrdersType } from "@models/sale/order";
 
+const optionsInitialValue: Array<{
+  id: number;
+  components: Array<{
+    name: string;
+    value: string;
+  }>;
+  quantity: number;
+  price: number;
+  isRequired: boolean;
+}> = [];
+
 const contructOrderItem = (orderItem: Array<OrdersType>) => {
   const hasOrderItems = !!orderItem && !!orderItem.length;
   if (!hasOrderItems) return;
-
-  const newOrderItems = cloneDeep(orderItem);
-
-  const newOrderItemsInitialValue: Array<OrdersType> = [];
-  const optionsInitialValue: Array<{
-    components: {
-      name: string;
-      value: string;
-    };
-    price: number;
-  }> = [];
-
+  const newOrderItems: Array<OrdersType> = [];
   const colorBox = {
     index: 0,
   };
 
-  const normalize = newOrderItems.reduce((orderItemResult, orderItem) => {
+  orderItem.map((orderItem) => {
     const { id, product, options } = orderItem;
     const hasOptions = !!options && !!options.length;
 
@@ -33,13 +32,13 @@ const contructOrderItem = (orderItem: Array<OrdersType>) => {
 
         if (!hasOptions) return;
 
-        const findObject = orderItemResult.findIndex((item) => item.id === id);
+        const findObject = newOrderItems.findIndex((item) => item.id === id);
 
-        if (orderItemResult.length === 0) {
+        if (newOrderItems.length === 0) {
           colorBox.index = 0;
         }
 
-        if (findObject === -1 && orderItemResult.length !== 0) {
+        if (findObject === -1 && newOrderItems.length !== 0) {
           colorBox.index += 1;
         }
 
@@ -48,7 +47,7 @@ const contructOrderItem = (orderItem: Array<OrdersType>) => {
         }
 
         if (option.isRequired) {
-          orderItemResult.push({
+          newOrderItems.push({
             ...orderItem,
             rowIndex: uuidv4(),
             options: [option],
@@ -57,12 +56,19 @@ const contructOrderItem = (orderItem: Array<OrdersType>) => {
         }
 
         if (!option.isRequired) {
-          const resetProducts = getProducts(product, option.components);
+          const resetProducts = reconstructRequiredProducts(
+            product,
+            option.components
+          );
+          const resetOption = reconstructRequiredOption(options);
 
-          orderItemResult.push({
+          newOrderItems.push({
             ...orderItem,
             rowIndex: uuidv4(),
+            originalPrice: null,
+            discountAppliedPrice: null,
             product: resetProducts,
+            options: resetOption,
             colorIndex: colorBox.index,
           });
         }
@@ -72,13 +78,13 @@ const contructOrderItem = (orderItem: Array<OrdersType>) => {
     }
 
     if (!hasOptions) {
-      const findObject = orderItemResult.findIndex((item) => item.id === id);
+      const findObject = newOrderItems.findIndex((item) => item.id === id);
 
-      if (orderItemResult.length === 0) {
+      if (newOrderItems.length === 0) {
         colorBox.index = 0;
       }
 
-      if (findObject === -1 && orderItemResult.length !== 0) {
+      if (findObject === -1 && newOrderItems.length !== 0) {
         colorBox.index += 1;
       }
 
@@ -86,20 +92,18 @@ const contructOrderItem = (orderItem: Array<OrdersType>) => {
         colorBox.index = 0;
       }
 
-      orderItemResult.push({
+      newOrderItems.push({
         ...orderItem,
         rowIndex: uuidv4(),
         colorIndex: colorBox.index,
       });
     }
-
-    return orderItemResult;
-  }, newOrderItemsInitialValue);
+  });
 
   return {
     orders: {
-      allIds: normalize.map((order) => order.rowIndex),
-      byId: normalize.reduce((byId, order) => {
+      allIds: newOrderItems.map((order) => order.rowIndex),
+      byId: newOrderItems.reduce((byId, order) => {
         byId[order.rowIndex] = order;
         return byId;
       }, {}),
@@ -107,7 +111,7 @@ const contructOrderItem = (orderItem: Array<OrdersType>) => {
   };
 };
 
-const getProducts = (
+const reconstructRequiredProducts = (
   product: {
     code: string;
     thumbnail: string;
@@ -119,7 +123,14 @@ const getProducts = (
   }>
 ) => {
   const optionName = components.reduce((result, { name, value }) => {
-    return (result += `${name} : ${value}`);
+    if (result) {
+      result += `/ ${name} : ${value} `;
+    }
+    if (!result) {
+      result = `${name} : ${value} `;
+    }
+
+    return result;
   }, "");
 
   return {
@@ -127,6 +138,31 @@ const getProducts = (
     thumbnail: product.thumbnail,
     name: optionName,
   };
+};
+
+const reconstructRequiredOption = (
+  option: Array<{
+    id: number;
+    components: Array<{
+      name: string;
+      value: string;
+    }>;
+    quantity: number;
+    price: number;
+    isRequired: boolean;
+  }>
+) => {
+  return option.reduce((result, { id, quantity, price, isRequired }) => {
+    result.push({
+      id: id,
+      components: null,
+      quantity,
+      price,
+      isRequired,
+    });
+
+    return result;
+  }, optionsInitialValue);
 };
 
 export default contructOrderItem;
