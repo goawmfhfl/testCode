@@ -69,6 +69,8 @@ const contructOrderItem = (orderItem: Array<OrdersType>) => {
             discountAppliedPrice: null,
             product: resetProducts,
             options: resetOption,
+            shipmentPrice: null,
+            shipmentDistantPrice: null,
             colorIndex: colorBox.index,
           });
         }

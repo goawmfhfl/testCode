@@ -746,6 +746,12 @@ const OrderTable = () => {
           <Th type={TableType.SCROLL} width={scrollTableType[17].width}>
             {scrollTableType[17].label}
           </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[18].width}>
+            {scrollTableType[18].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[19].width}>
+            {scrollTableType[19].label}
+          </Th>
         </ThContainer>
 
         <TdContainer>
@@ -773,9 +779,11 @@ const OrderTable = () => {
                   quantity,
                   price,
                   optionPrice,
+                  discountPrice,
                   totalPrice,
                   shipmentPrice,
                   shipmentDistantPrice,
+                  totalPaymentAmount,
                   isShipmentInfoEdit,
                   temporaryShipmentCompany,
                   temporaryShipmentNumber,
@@ -989,13 +997,19 @@ const OrderTable = () => {
                     {optionPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[15].width}>
-                    {totalPrice}
+                    {discountPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[16].width}>
-                    {shipmentPrice}
+                    {totalPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[17].width}>
+                    {shipmentPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[18].width}>
                     {shipmentDistantPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[19].width}>
+                    {totalPaymentAmount}
                   </Td>
                 </Tr>
               )

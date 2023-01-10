@@ -44,85 +44,62 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
           (info) => info.status === ShipmentStatus.SHIPPING
         )[0]?.id
       : null;
-
-    // 택배사
     const resetShipmentCompany = orderShipmentInfos
       ? orderShipmentInfos.filter(
           (info) => info.status === ShipmentStatus.SHIPPING
         )[0]?.shipmentCompany
       : null;
-
-    // 운송장번호
     const resetShipmentNumber = orderShipmentInfos
       ? orderShipmentInfos.filter(
           (info) => info.status === ShipmentStatus.SHIPPING
         )[0]?.shipmentNumber
       : null;
-
-    // 결제일
     const resetPayments = user?.payments?.createdAt
       ? user.payments.createdAt
       : "-";
 
-    // 수취인
     const resetRecipientName = orderByShop?.order?.recipientName
       ? orderByShop.order.recipientName
       : "-";
-
-    // 수취인 전화번호
     const resetRecipientPhoneNumber = orderByShop?.order?.recipientPhoneNumber
       ? orderByShop.order.recipientPhoneNumber
       : "-";
-
-    // 수취인 주소
     const resetRecipientAddress = orderByShop?.order?.recipientAddress
       ? orderByShop.order.recipientAddress
       : "-";
-
-    // 우편번호
     const resetPostCode = orderByShop?.order?.postCode
       ? orderByShop.order.postCode
       : "-";
-
-    // 배송메세지
     const resetShipmentMemo = orderByShop?.order?.shipmentMemo
       ? orderByShop.order.shipmentMemo
       : "-";
-
-    // 구매자 아이디
     const resetUserEmail = user?.email ? user.email : "-";
-
-    // 구매자 전화번호
     const resetUserPhoneNumber = user?.phoneNumber ? user.phoneNumber : "-";
-
-    // 옵션
     const { resetOptions, resetOptionPrice, resetOptionQuantity } =
       getOptions(options);
-
-    // 상품개수
     const resetQuantity = quantity ? quantity : resetOptionQuantity;
-    // 상품가
     const resetPrice = originalPrice
       ? `${originalPrice.toLocaleString("ko-KR")}`
       : "-";
-
-    // 상품별 총 금액
-    const resetTotalPrice = getTotalPrice(
+    const resetDiscountPrice = discountAppliedPrice
+      ? `${(discountAppliedPrice - originalPrice).toLocaleString("ko-KR")}`
+      : "-";
+    const totalPrice = getTotalPrice(
       originalPrice,
       discountAppliedPrice,
-      shipmentDistantPrice,
-      shipmentPrice
+      resetOptionPrice
     );
-
-    // 배송비
     const resetShipmentPrice = shipmentPrice
       ? `${shipmentPrice.toLocaleString("ko-KR")}`
       : "-";
-
-    // 제주/도서 추가배송비
     const resetShipmentDistantPrice = shipmentDistantPrice
       ? `${shipmentDistantPrice.toLocaleString("ko-KR")}`
       : "-";
+    const totalPaymentAmount = getTotalPaymentAmount(
+      totalPrice,
+      resetShipmentPrice,
+      resetShipmentDistantPrice
+    );
 
     const isChecked = false;
     const isShipmentInfoEdit = false;
@@ -135,27 +112,16 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       productCode: resetProductCode,
       thumbnail: resetProductThumbnail,
       orderProduct: resetOrderProduct,
-      // 구매자 명
       userName: resetUserName,
-      // 주문 상태
       orderStatus: resetOrderStatus,
-      // 클레임 상태
       claimStatus: resetClaimStatus,
-      // 배송정보 아이디
       orderShipmentInfosId: resetOrderShipmentInfosId,
-      // 택배사
       shipmentCompany: resetShipmentCompany,
-      // 운송장번호
       shipmentNumber: resetShipmentNumber,
-      // 결제일
       payments: resetPayments,
-      // 수취인
       recipientName: resetRecipientName,
-      // 수취인 전화번호
       recipientPhoneNumber: resetRecipientPhoneNumber,
-      // 수취인 주소
       recipientAddress: resetRecipientAddress,
-      // 우편번호
       postCode: resetPostCode,
       shipmentMemo: resetShipmentMemo,
       userEmail: resetUserEmail,
@@ -164,9 +130,11 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       quantity: resetQuantity,
       price: resetPrice,
       optionPrice: resetOptionPrice,
-      totalPrice: resetTotalPrice,
+      discountPrice: resetDiscountPrice,
+      totalPrice,
       shipmentPrice: resetShipmentPrice,
       shipmentDistantPrice: resetShipmentDistantPrice,
+      totalPaymentAmount,
       isChecked,
       isShipmentInfoEdit,
       temporaryShipmentCompany,
@@ -178,24 +146,52 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
   return result;
 };
 
+const getTotalPaymentAmount = (
+  totalPrice: string,
+  resetShipmentPrice: string,
+  resetShipmentDistantPrice: string
+) => {
+  if (!totalPrice) {
+    return "-";
+  }
+
+  const resetTotalPrice =
+    totalPrice !== "-" && Number(totalPrice.replace(",", ""))
+      ? Number(totalPrice.replace(",", ""))
+      : 0;
+  const shipmentPrice =
+    resetShipmentPrice !== "-" && Number(resetShipmentPrice.replace(",", ""))
+      ? Number(resetShipmentPrice.replace(",", ""))
+      : 0;
+
+  const shipmentDistantPrice =
+    resetShipmentDistantPrice !== "-" &&
+    Number(resetShipmentDistantPrice.replace(",", ""))
+      ? Number(resetShipmentDistantPrice.replace(",", ""))
+      : 0;
+
+  const result = resetTotalPrice + shipmentPrice + shipmentDistantPrice;
+
+  return result ? `${result.toLocaleString("ko-KR")}` : "-";
+};
+
 const getTotalPrice = (
   originalPrice: number,
   discountAppliedPrice: number,
-  shipmentDistantPrice: number,
-  shipmentPrice: number
+  optionPrice: string
 ) => {
-  const shipmentDistantPay = shipmentDistantPrice || 0;
-  const shipmentPay = shipmentPrice || 0;
+  const price = discountAppliedPrice ? discountAppliedPrice : originalPrice;
+  const resetOptionPrice =
+    optionPrice !== "-" && Number(optionPrice.replace(",", ""))
+      ? Number(optionPrice.replace(",", ""))
+      : 0;
 
-  if (discountAppliedPrice) {
-    const totalPrice = discountAppliedPrice + shipmentPay + shipmentDistantPay;
-    return `${totalPrice.toLocaleString("ko-KR")}`;
+  if (!price && !resetOptionPrice) {
+    return "-";
   }
+  const result = price + resetOptionPrice;
 
-  if (originalPrice) {
-    const totalPrice = originalPrice + shipmentPay + shipmentDistantPay;
-    return `${totalPrice.toLocaleString("ko-KR")}`;
-  }
+  return `${result.toLocaleString("ko-KR")}`;
 };
 
 const getOptions = (
@@ -218,6 +214,7 @@ const getOptions = (
   return options.reduce(
     (result, { components, price, quantity }) => {
       const hasComponents = !!components && !!components.length;
+
       if (hasComponents) {
         result.resetOptions += components.reduce(
           (components, { name, value }) => {
@@ -234,14 +231,20 @@ const getOptions = (
         );
       }
 
-      result.resetOptionPrice = price;
+      if (!hasComponents) {
+        result.resetOptions = "-";
+      }
+
+      result.resetOptionPrice = price
+        ? `${price.toLocaleString("ko-KR")}`
+        : "-";
       result.resetOptionQuantity = quantity;
 
       return result;
     },
     {
       resetOptions: "",
-      resetOptionPrice: 0,
+      resetOptionPrice: "-",
       resetOptionQuantity: 0,
     }
   );
