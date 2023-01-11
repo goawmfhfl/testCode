@@ -23,89 +23,60 @@ export interface GetOrdersBySellerInputType {
 export interface OrdersType {
   rowIndex?: string;
   colorIndex?: number;
+  isLastColumn?: boolean;
 
   id: number;
-  // 주문 번호
+  merchantUid: string;
   merchantItemUid: string;
-
+  isBundleShipment: boolean;
   product: {
-    // 상품 번호
     code: string;
-    // 상품 썸네일
     thumbnail: string;
-    // 주문 상품
     name: string;
   };
-
   user: {
-    // 유저 이름
     name: string;
-    // 유저 이메일
     email: string;
-    // 유저 핸드폰번호
     phoneNumber: string;
-    // 유저 결제일
     payments: {
       createdAt: string;
     };
   };
-
   orderByShop: {
     order: {
-      // 수취인 명
       recipientName: string;
-      // 수취인 번호
       recipientPhoneNumber: string;
-      // 수취인 주소
       recipientAddress: string;
-      // 수취인 우편번호
       postCode?: number;
-      // 수취인 배송메모
       shipmentMemo?: string;
+      paidAt: string;
     };
   };
-
   options: Array<{
     id: number;
     components: Array<{
       name: string;
       value: string;
     }>;
-
     quantity: number;
     price: number;
     isRequired: boolean;
   }>;
 
-  // 상품 갯수
   quantity: number;
-
-  // 상품가
   discountAppliedPrice: number;
   originalPrice: number;
-
-  // 배송비
   shipmentPrice: number;
-
-  // 도서산간 배송비
   shipmentDistantPrice: number;
-
   orderShipmentInfos: Array<{
     id: number;
-    // 운송장번호
     shipmentNumber: number;
-    // 택배사
     shipmentCompany: string;
-    // 상태
     status: ShipmentStatus;
   }>;
-
-  // 주문상태
   orderStatus: {
     name: OrderStatusName;
   };
-
-  // 클레임상태
   claimStatus: {
     name: OrderStatusName;
   };
@@ -210,6 +181,7 @@ export interface NormalizedListType {
 
 export interface ResetOrderItemType {
   id: number;
+  merchantUid: string;
   merchantItemUid: string;
   productCode: string;
   thumbnail: string;
@@ -243,4 +215,5 @@ export interface ResetOrderItemType {
   temporaryShipmentNumber?: number;
   colorIndex: number;
   rowIndex: string;
+  isLastColumn: boolean;
 }

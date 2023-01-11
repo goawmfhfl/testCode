@@ -16,45 +16,82 @@ const optionsInitialValue: Array<{
 const contructOrderItem = (orderItem: Array<OrdersType>) => {
   const hasOrderItems = !!orderItem && !!orderItem.length;
   if (!hasOrderItems) return;
+
   const newOrderItems: Array<OrdersType> = [];
-  const colorBox = {
-    index: 0,
+  const tableRowStyleInfo = {
+    rowIndex: 0,
   };
 
-  orderItem.map((orderItem) => {
-    const { id, product, options } = orderItem;
+  orderItem.map((order, index) => {
+    const { product, options, merchantItemUid, merchantUid, isBundleShipment } =
+      order;
+    const eachOrderItemStyleIfno = {
+      columnOrder: 0,
+      isLastColumn: false,
+    };
+
+    const hasNewOrderItems = !!newOrderItems && !!newOrderItems.length;
     const hasOptions = !!options && !!options.length;
 
     if (hasOptions) {
       options.reduce((optionResult, option) => {
+        eachOrderItemStyleIfno.columnOrder += 1;
         const hasOptions =
           !!option && !!option.components && !!option.components.length;
-
         if (!hasOptions) return;
 
-        const findObject = newOrderItems.findIndex((item) => item.id === id);
+        const previousMerchantUid = hasNewOrderItems
+          ? newOrderItems[newOrderItems.length - 1].merchantUid
+          : "";
+        const previousMerchantItemUid = hasNewOrderItems
+          ? newOrderItems[newOrderItems.length - 1].merchantItemUid
+          : "";
+        const previousIsBundleShipment = hasNewOrderItems
+          ? newOrderItems[newOrderItems.length - 1].isBundleShipment
+          : "";
 
         if (newOrderItems.length === 0) {
-          colorBox.index = 0;
+          tableRowStyleInfo.rowIndex = 0;
         }
 
-        if (findObject === -1 && newOrderItems.length !== 0) {
-          colorBox.index += 1;
+        if (newOrderItems.length !== 0 && merchantUid !== previousMerchantUid) {
+          tableRowStyleInfo.rowIndex += 1;
         }
 
-        if (colorBox.index >= 3) {
-          colorBox.index = 0;
+        if (
+          newOrderItems.length !== 0 &&
+          merchantUid === previousMerchantUid &&
+          merchantItemUid !== previousMerchantItemUid &&
+          previousIsBundleShipment !== isBundleShipment
+        ) {
+          tableRowStyleInfo.rowIndex += 1;
+        }
+
+        if (tableRowStyleInfo.rowIndex >= 3) {
+          tableRowStyleInfo.rowIndex = 0;
+        }
+
+        if (options.length === eachOrderItemStyleIfno.columnOrder) {
+          eachOrderItemStyleIfno.isLastColumn = true;
+        }
+
+        if (newOrderItems.length !== 0 && merchantUid === previousMerchantUid) {
+          newOrderItems[newOrderItems.length - 1].isLastColumn = false;
+        }
+
+        if (orderItem.length - 1 === index) {
+          eachOrderItemStyleIfno.isLastColumn = false;
         }
 
         if (option.isRequired) {
           newOrderItems.push({
-            ...orderItem,
+            ...order,
             rowIndex: uuidv4(),
             options: [option],
-            colorIndex: colorBox.index,
+            colorIndex: tableRowStyleInfo.rowIndex,
+            isLastColumn: eachOrderItemStyleIfno.isLastColumn,
           });
         }
-
         if (!option.isRequired) {
           const resetProducts = reconstructRequiredProducts(
             product,
@@ -63,7 +100,7 @@ const contructOrderItem = (orderItem: Array<OrdersType>) => {
           const resetOption = reconstructRequiredOption(options);
 
           newOrderItems.push({
-            ...orderItem,
+            ...order,
             rowIndex: uuidv4(),
             originalPrice: null,
             discountAppliedPrice: null,
@@ -71,33 +108,61 @@ const contructOrderItem = (orderItem: Array<OrdersType>) => {
             options: resetOption,
             shipmentPrice: null,
             shipmentDistantPrice: null,
-            colorIndex: colorBox.index,
+            colorIndex: tableRowStyleInfo.rowIndex,
+            isLastColumn: eachOrderItemStyleIfno.isLastColumn,
           });
         }
 
         return optionResult;
       }, optionsInitialValue);
     }
-
     if (!hasOptions) {
-      const findObject = newOrderItems.findIndex((item) => item.id === id);
+      const previousMerchantUid = hasNewOrderItems
+        ? newOrderItems[newOrderItems.length - 1].merchantUid
+        : "";
+      const previousMerchantItemUid = hasNewOrderItems
+        ? newOrderItems[newOrderItems.length - 1].merchantItemUid
+        : "";
+      const previousIsBundleShipment = hasNewOrderItems
+        ? newOrderItems[newOrderItems.length - 1].isBundleShipment
+        : "";
 
       if (newOrderItems.length === 0) {
-        colorBox.index = 0;
+        tableRowStyleInfo.rowIndex = 0;
       }
 
-      if (findObject === -1 && newOrderItems.length !== 0) {
-        colorBox.index += 1;
+      if (newOrderItems.length !== 0 && merchantUid !== previousMerchantUid) {
+        tableRowStyleInfo.rowIndex += 1;
       }
 
-      if (colorBox.index >= 3) {
-        colorBox.index = 0;
+      if (
+        newOrderItems.length !== 0 &&
+        merchantUid === previousMerchantUid &&
+        merchantItemUid !== previousMerchantItemUid &&
+        previousIsBundleShipment !== isBundleShipment
+      ) {
+        tableRowStyleInfo.rowIndex += 1;
+      }
+
+      if (tableRowStyleInfo.rowIndex >= 3) {
+        tableRowStyleInfo.rowIndex = 0;
+      }
+
+      eachOrderItemStyleIfno.isLastColumn = true;
+
+      if (newOrderItems.length !== 0 && merchantUid === previousMerchantUid) {
+        newOrderItems[newOrderItems.length - 1].isLastColumn = false;
+      }
+
+      if (orderItem.length - 1 === index) {
+        eachOrderItemStyleIfno.isLastColumn = false;
       }
 
       newOrderItems.push({
-        ...orderItem,
+        ...order,
         rowIndex: uuidv4(),
-        colorIndex: colorBox.index,
+        colorIndex: tableRowStyleInfo.rowIndex,
+        isLastColumn: eachOrderItemStyleIfno.isLastColumn,
       });
     }
   });

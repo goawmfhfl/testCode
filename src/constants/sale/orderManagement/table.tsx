@@ -28,7 +28,6 @@ export const tableWidth = {
   totalPrice: 136,
   shipmentPrice: 64,
   shipmentDistantPrice: 136,
-
   totalPaymentAmount: 136,
 };
 

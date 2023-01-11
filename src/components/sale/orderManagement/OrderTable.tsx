@@ -645,6 +645,7 @@ const OrderTable = () => {
                 {
                   id,
                   rowIndex,
+                  merchantUid,
                   merchantItemUid,
                   productCode,
                   thumbnail,
@@ -653,10 +654,15 @@ const OrderTable = () => {
                   orderStatus,
                   isChecked,
                   colorIndex,
+                  isLastColumn,
                 },
                 index
               ) => (
-                <Tr key={rowIndex} colorIndex={colorIndex}>
+                <Tr
+                  key={rowIndex}
+                  colorIndex={colorIndex}
+                  isLastColumn={isLastColumn}
+                >
                   <Td type={TableType.SCROLL} width={fixTableType[0].width}>
                     <Checkbox
                       onChange={changeSingleCheckBoxHandler(index)}
@@ -664,10 +670,10 @@ const OrderTable = () => {
                     />
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[1].width}>
-                    {merchantItemUid}
+                    {merchantUid}
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[2].width}>
-                    {productCode}
+                    {merchantItemUid}
                   </Td>
 
                   <ProductNameTd
@@ -787,10 +793,15 @@ const OrderTable = () => {
                   isShipmentInfoEdit,
                   temporaryShipmentCompany,
                   temporaryShipmentNumber,
+                  isLastColumn,
                 },
                 index
               ) => (
-                <Tr key={rowIndex} colorIndex={colorIndex}>
+                <Tr
+                  key={rowIndex}
+                  colorIndex={colorIndex}
+                  isLastColumn={isLastColumn}
+                >
                   <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
                     {claimStatus}
                   </Td>

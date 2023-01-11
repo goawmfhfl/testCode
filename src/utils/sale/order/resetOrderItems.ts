@@ -15,6 +15,8 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       id: orderId,
       colorIndex,
       rowIndex,
+      isLastColumn,
+      merchantUid,
       merchantItemUid,
       product,
       user,
@@ -30,6 +32,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       claimStatus,
     } = orderByid[id];
 
+    const resetMerchantUid = merchantUid ? merchantUid : "-";
     const resetMerchantItemUid = merchantItemUid ? merchantItemUid : "-";
     const resetProductCode = product?.code ? product.code : "-";
     const resetOrderProduct = product?.name ? product.name : "-";
@@ -108,6 +111,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
 
     return {
       id: orderId,
+      merchantUid: resetMerchantUid,
       merchantItemUid: resetMerchantItemUid,
       productCode: resetProductCode,
       thumbnail: resetProductThumbnail,
@@ -141,6 +145,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       temporaryShipmentNumber,
       colorIndex,
       rowIndex,
+      isLastColumn,
     };
   });
   return result;
