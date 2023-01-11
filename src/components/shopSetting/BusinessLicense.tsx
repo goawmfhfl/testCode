@@ -141,6 +141,8 @@ const HasInfoContainer = styled(InfoContainer)`
 `;
 
 const InfoList = styled.ul`
+  width: 100%;
+
   display: flex;
   flex-direction: column;
   margin-bottom: 12px;
