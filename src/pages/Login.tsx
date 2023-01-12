@@ -20,7 +20,8 @@ import { useNavigate } from "react-router-dom";
 import { Pathnames } from "@constants/index";
 import { GET_SHOP_INFO } from "@graphql/queries/getShopInfo";
 import { showHasServerErrorModal } from "@cache/productManagement";
-import { loadingSpinnerVisibilityVar } from "@cache/index";
+import { loadingSpinnerVisibilityVar, modalVar } from "@cache/index";
+import BusinessLicenseModal from "@components/shopSetting/BusinessLicenseModal";
 
 interface LoginFormType {
   id: string;
@@ -146,13 +147,26 @@ const Login = () => {
         return;
       }
 
-      if (result.data.getShopInfo.shop.registered) {
-        navigate(Pathnames.Product);
+      const { businessRegistrationNumber, businessName } =
+        result.data.getShopInfo.shop;
+
+      if (Boolean(businessRegistrationNumber) && !Boolean(businessName)) {
+        modalVar({
+          ...modalVar(),
+          isVisible: true,
+          component: <BusinessLicenseModal preventCancel={true} />,
+        });
+
+        navigate(Pathnames.Shop);
 
         return;
       }
 
-      navigate(Pathnames.Shop);
+      if (result.data.getShopInfo.shop.registered) {
+        navigate(Pathnames.Product);
+      } else {
+        navigate(Pathnames.Shop);
+      }
     }
 
     if (!isLoginSucceed) {

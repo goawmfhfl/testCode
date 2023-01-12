@@ -11,19 +11,32 @@ import Button from "@components/common/Button";
 import {
   loadingSpinnerVisibilityVar,
   modalVar,
+  saveShopButtonRefVar,
   systemModalVar,
 } from "@cache/index";
 import { businessLicenseVar } from "@cache/shopSettings";
+import { preventNaNValues } from "@utils/index";
 
-const BusinessLicenseModal = () => {
+interface Props {
+  preventCancel?: boolean;
+}
+
+const BusinessLicenseModal = ({ preventCancel }: Props) => {
   const [businessInformation, setBusinessInformation] = useState({
     representativeName: "",
     openingDate: "",
     businessNumber: ["", "", ""],
+    businessName: "",
+    location: "",
   });
 
-  const { representativeName, openingDate, businessNumber } =
-    businessInformation;
+  const {
+    representativeName,
+    openingDate,
+    businessNumber,
+    businessName,
+    location,
+  } = businessInformation;
 
   const handleChangeInput =
     (inputName: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,6 +48,8 @@ const BusinessLicenseModal = () => {
             representativeName: string;
             openingDate: string;
             businessNumber: Array<string>;
+            businessName: string;
+            location: string;
           }) => {
             const newBusinessNumber = [...prev.businessNumber];
 
@@ -58,28 +73,6 @@ const BusinessLicenseModal = () => {
 
   const handleSaveButtonClick = async () => {
     try {
-      if (
-        !representativeName ||
-        !openingDate ||
-        businessNumber.join("").length < 10
-      ) {
-        systemModalVar({
-          ...systemModalVar(),
-          isVisible: true,
-          icon: exclamationmarkSrc,
-          description: <>입력값을 다시 확인해주세요.</>,
-          confirmButtonText: "확인",
-          confirmButtonClickHandler: () => {
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: false,
-            });
-          },
-        });
-
-        return;
-      }
-
       loadingSpinnerVisibilityVar(true);
 
       // 1. 사업자등록정보 진위확인
@@ -116,7 +109,13 @@ const BusinessLicenseModal = () => {
           ...systemModalVar(),
           isVisible: true,
           icon: exclamationmarkSrc,
-          description: <>유효하지 않은 정보입니다.</>,
+          description: (
+            <>
+              대표자명, 개업일자, 사업자등록번호 중 <br />
+              올바르지 않은 정보가 있습니다. <br />
+              다시 입력해주세요.
+            </>
+          ),
           confirmButtonText: "확인",
           confirmButtonClickHandler: () => {
             systemModalVar({
@@ -130,12 +129,6 @@ const BusinessLicenseModal = () => {
 
         return;
       }
-
-      businessLicenseVar({
-        ...businessLicenseVar(),
-        representativeName, // 대표자명 고정
-        businessRegistrationNumber: result.data.data[0].b_no, // 사업자등록번호 고정
-      });
 
       // 2. 통신사업자 번호 확인 (통신판매업번호 파악)
       const parameter = {
@@ -219,8 +212,7 @@ const BusinessLicenseModal = () => {
           description: (
             <>
               사업자등록증과 통신판매업신고증이 <br />
-              등록되었습니다. <br />
-              등록을 위해 확인 버튼을 눌러주세요.
+              등록되었습니다.
             </>
           ),
           confirmButtonVisibility: true,
@@ -237,24 +229,24 @@ const BusinessLicenseModal = () => {
 
             const latestBusinessLicense = data.items[0];
 
-            const {
-              coNm,
-              bizrno,
-              crno,
-              simTxtnTrgtYnDesc,
-              rdnAddr,
-              prmsnMgtNo,
-            } = latestBusinessLicense;
+            const { bizrno, crno, simTxtnTrgtYnDesc, prmsnMgtNo } =
+              latestBusinessLicense;
 
             businessLicenseVar({
               isConfirmed: true,
-              representativeName: coNm,
+              representativeName,
+              businessName,
               businessRegistrationNumber: bizrno,
               corporateRegistrationNumber: crno,
               isSimpleTaxpayers: simTxtnTrgtYnDesc,
-              companyLocation: rdnAddr,
+              companyLocation: location,
               onlineSalesLicense: prmsnMgtNo,
             });
+
+            // save button ref . click
+            if (preventCancel) {
+              saveShopButtonRefVar().click();
+            }
           },
           cancelButtonVisibility: true,
           cancelButtonClickHandler: () => {
@@ -268,7 +260,7 @@ const BusinessLicenseModal = () => {
         return;
       }
 
-      // 3. 사업자등록 상태조회 확인 (간이과세자 여부 파악)
+      // 3. 사업자등록 상태조회 확인 (통신판매업 등록이 안된 사업자의 경우, 간이과세자 여부 파악)
       const businessStatusResult: {
         data: {
           data: Array<{
@@ -306,9 +298,8 @@ const BusinessLicenseModal = () => {
           icon: "",
           description: (
             <>
-              간이사업자로 사업자정보가 <br />
-              등록되었습니다. <br />
-              등록을 위해 확인 버튼을 눌러주세요.
+              사업자등록증이 <br />
+              등록되었습니다.
             </>
           ),
           confirmButtonVisibility: true,
@@ -324,13 +315,20 @@ const BusinessLicenseModal = () => {
             });
 
             businessLicenseVar({
-              ...businessLicenseVar(),
               isConfirmed: true,
-              corporateRegistrationNumber: "-",
+              representativeName,
+              businessName,
+              businessRegistrationNumber: businessNumber.join(""),
+              corporateRegistrationNumber: "해당사항 없음",
               isSimpleTaxpayers: "대상",
-              companyLocation: "-",
-              onlineSalesLicense: "-",
+              companyLocation: location,
+              onlineSalesLicense: "해당사항 없음",
             });
+
+            // save button ref . click
+            if (preventCancel) {
+              saveShopButtonRefVar().click();
+            }
           },
           cancelButtonVisibility: true,
           cancelButtonClickHandler: () => {
@@ -351,6 +349,8 @@ const BusinessLicenseModal = () => {
       representativeName: "",
       openingDate: "",
       businessNumber: ["", "", ""],
+      businessName: "",
+      location: "",
     });
 
     modalVar({
@@ -359,28 +359,53 @@ const BusinessLicenseModal = () => {
     });
   };
 
+  const hasInputFulfilled =
+    Boolean(representativeName) &&
+    Boolean(openingDate) &&
+    businessNumber.join("").length === 10 &&
+    Boolean(businessName) &&
+    Boolean(location);
   return (
     <Container>
-      <CloseButton
-        src={closeIconSource}
-        onClick={() =>
-          modalVar({
-            ...modalVar(),
-            isVisible: false,
-          })
-        }
-      />
+      {!preventCancel && (
+        <CloseButton
+          src={closeIconSource}
+          onClick={() =>
+            modalVar({
+              ...modalVar(),
+              isVisible: false,
+            })
+          }
+        />
+      )}
 
       <Title>사업자등록증/통신판매업신고증 등록하기</Title>
 
-      <NoticeContainer icon={exclamationmarkSrc}>
-        전기통신매체, 광고물 등을 통해 소비자와 직접 상거래가 이루어지는 사업을
-        하려면
-        <br />
-        통신판매업 신고를 해야 합니다.
-      </NoticeContainer>
+      {preventCancel ? (
+        <NoticeContainer icon={exclamationmarkSrc}>
+          사업자등록증 등록 문제가 있어 복구하였습니다. 복구 과정에서 등록
+          방법을 변경하여 <br />
+          일부 데이터를 다시 받기 위해 사업자등록증 등록을 재진행 해주시기
+          바랍니다.
+        </NoticeContainer>
+      ) : (
+        <NoticeContainer icon={exclamationmarkSrc}>
+          전기통신매체, 광고물 등을 통해 소비자와 직접 상거래가 이루어지는
+          사업을 하려면
+          <br />
+          통신판매업 신고를 해야 합니다.
+        </NoticeContainer>
+      )}
 
       <InfoContainer>
+        <InputContainer>
+          <Label>법인명(상호명)</Label>
+          <Input
+            onChange={handleChangeInput("businessName")}
+            value={businessName}
+          />
+        </InputContainer>
+
         <InputContainer>
           <Label>대표자명</Label>
           <Input
@@ -396,6 +421,7 @@ const BusinessLicenseModal = () => {
             value={openingDate}
             placeholder="YYYYMMDD"
             maxLength={8}
+            onKeyDown={preventNaNValues}
           />
         </InputContainer>
 
@@ -407,20 +433,28 @@ const BusinessLicenseModal = () => {
               onChange={handleChangeInput("businessNumber-0")}
               value={businessNumber[0]}
               maxLength={3}
+              onKeyDown={preventNaNValues}
             />
             -
             <Input
               onChange={handleChangeInput("businessNumber-1")}
               value={businessNumber[1]}
               maxLength={2}
+              onKeyDown={preventNaNValues}
             />
             -
             <Input
               onChange={handleChangeInput("businessNumber-2")}
               value={businessNumber[2]}
               maxLength={5}
+              onKeyDown={preventNaNValues}
             />
           </BusinessNumber>
+        </InputContainer>
+
+        <InputContainer className="long">
+          <Label>사업장 소재지</Label>
+          <Input onChange={handleChangeInput("location")} value={location} />
         </InputContainer>
       </InfoContainer>
 
@@ -432,13 +466,16 @@ const BusinessLicenseModal = () => {
           className="positive"
           // eslint-disable-next-line
           onClick={handleSaveButtonClick}
+          disabled={!hasInputFulfilled}
         >
-          저장
+          등록
         </Button>
 
-        <Button size="small" full={false} onClick={handleCancelButtonClick}>
-          취소
-        </Button>
+        {!preventCancel && (
+          <Button size="small" full={false} onClick={handleCancelButtonClick}>
+            취소
+          </Button>
+        )}
       </ButtonContainer>
     </Container>
   );
@@ -498,6 +535,7 @@ const InfoContainer = styled.div`
 `;
 
 const InputContainer = styled.div`
+  width: 100%;
   height: 32px;
   display: flex;
   align-items: center;
@@ -506,6 +544,12 @@ const InputContainer = styled.div`
     padding: 9px 8px 9px 8px;
     width: 168px;
     height: 32px;
+  }
+
+  &.long {
+    & > input {
+      width: 325px;
+    }
   }
 `;
 
