@@ -36,6 +36,7 @@ export const SHIPMENT_CONDITIONAL_PRICE = "SHIPMENT_CONDITIONAL_PRICE";
 
 export const businessLicenseVar = makeVar<BusinessLicenseVariables>({
   isConfirmed: false,
+  businessName: "",
   representativeName: "",
   businessRegistrationNumber: "",
   corporateRegistrationNumber: "",

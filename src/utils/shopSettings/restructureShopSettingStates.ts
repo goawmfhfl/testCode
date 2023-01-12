@@ -62,6 +62,7 @@ const restructureShopSettingStates = (
   ];
 
   const {
+    businessName,
     representativeName,
     businessRegistrationNumber,
     corporateRegistrationNumber,
@@ -118,6 +119,7 @@ const restructureShopSettingStates = (
       : null,
 
     ...tempShipmentInputs,
+    businessName,
     representativeName,
     businessRegistrationNumber,
     corporateRegistrationNumber,

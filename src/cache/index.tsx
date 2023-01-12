@@ -78,6 +78,7 @@ export const DetailNoticeVar = makeVar<{
 
 export const GNBReferenceVar = makeVar<HTMLElement | null>(null);
 export const contentsContainerReferenceVar = makeVar<HTMLElement | null>(null);
+export const saveShopButtonRefVar = makeVar<HTMLElement | null>(null);
 
 function closeSystemModal() {
   systemModalVar({

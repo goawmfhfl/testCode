@@ -56,10 +56,11 @@ export interface SafetyCertificationVariables {
 
 export interface BusinessLicenseVariables {
   isConfirmed: boolean;
+  businessName: string;
   representativeName: string;
   businessRegistrationNumber: string;
   corporateRegistrationNumber: string;
-  isSimpleTaxpayers: string;
+  isSimpleTaxpayers: string | boolean;
   companyLocation: string;
   onlineSalesLicense: string;
 }
@@ -90,6 +91,7 @@ export interface SaveShopSettingsInputType {
   shipmentConditionalPrice: number | null;
 
   representativeName: string;
+  businessName: string;
   businessRegistrationNumber: string;
   corporateRegistrationNumber: string;
   isSimpleTaxpayers: boolean;

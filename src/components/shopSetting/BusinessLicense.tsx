@@ -38,7 +38,7 @@ const BusinessLicense = () => {
   };
 
   const {
-    representativeName,
+    businessName,
     businessRegistrationNumber,
     corporateRegistrationNumber,
     isSimpleTaxpayers,
@@ -60,7 +60,7 @@ const BusinessLicense = () => {
           <InfoList>
             <Info>
               <Text>법인명(상호명)</Text>
-              <Text>{representativeName}</Text>
+              <Text>{businessName}</Text>
             </Info>
             <Info>
               <Text>사업자등록번호 </Text>

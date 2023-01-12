@@ -23,6 +23,7 @@ export interface ShopInfo {
   shipmentExchangePrice: number;
   shipmentType: ShipmentChargeType;
   representativeName: string;
+  businessName: string;
   businessRegistrationNumber: string;
   corporateRegistrationNumber: string;
   isSimpleTaxpayers: boolean;
@@ -64,6 +65,7 @@ export const GET_SHOP_INFO = gql`
         shipmentReturnPrice
         shipmentExchangePrice
         shipmentType
+        businessName
         representativeName
         businessRegistrationNumber
         corporateRegistrationNumber

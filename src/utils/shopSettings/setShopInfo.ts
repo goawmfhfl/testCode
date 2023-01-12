@@ -46,6 +46,7 @@ export default function setShopInfo(
     shipmentExchangePrice,
     shipmentType,
     representativeName,
+    businessName,
     businessRegistrationNumber,
     corporateRegistrationNumber,
     isSimpleTaxpayers,
@@ -112,6 +113,7 @@ export default function setShopInfo(
 
   if (
     representativeName &&
+    businessName &&
     businessRegistrationNumber &&
     corporateRegistrationNumber &&
     isSimpleTaxpayers !== null &&
@@ -121,6 +123,7 @@ export default function setShopInfo(
     businessLicenseVar({
       isConfirmed: true,
       representativeName,
+      businessName,
       businessRegistrationNumber,
       corporateRegistrationNumber,
       isSimpleTaxpayers: isSimpleTaxpayers ? "대상" : "대상 아님",
