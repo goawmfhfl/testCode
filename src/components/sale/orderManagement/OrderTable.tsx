@@ -33,7 +33,7 @@ import {
 } from "@models/sale/order";
 
 import resetOrderItems from "@utils/sale/order/resetOrderItems";
-import contructOrderItem from "@utils/sale/order/contructOrderItem";
+import constructOrderItem from "@utils/sale/order/constructOrderItem";
 import { preventNaNValues } from "@utils/index";
 
 import {
@@ -520,7 +520,7 @@ const OrderTable = () => {
     totalPageLengthVar(totalResults);
 
     const nomalizedOrderItem: NormalizedListType =
-      contructOrderItem(totalOrderItems);
+      constructOrderItem(totalOrderItems);
 
     const orderItems: Array<ResetOrderItemType> =
       resetOrderItems(nomalizedOrderItem);

@@ -82,14 +82,18 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       getOptions(options);
     const resetQuantity = quantity ? quantity : resetOptionQuantity;
     const resetPrice = originalPrice
-      ? `${originalPrice.toLocaleString("ko-KR")}`
+      ? `${(resetQuantity * originalPrice).toLocaleString("ko-KR")}`
       : "-";
     const resetDiscountPrice = discountAppliedPrice
-      ? `${(discountAppliedPrice - originalPrice).toLocaleString("ko-KR")}`
+      ? `${(
+          (discountAppliedPrice - originalPrice) *
+          resetQuantity
+        ).toLocaleString("ko-KR")}`
       : "-";
+
     const totalPrice = getTotalPrice(
-      originalPrice,
-      discountAppliedPrice,
+      resetPrice,
+      resetDiscountPrice,
       resetOptionPrice
     );
     const resetShipmentPrice = shipmentPrice
@@ -181,20 +185,28 @@ const getTotalPaymentAmount = (
 };
 
 const getTotalPrice = (
-  originalPrice: number,
-  discountAppliedPrice: number,
+  price: string,
+  discountPrice: string,
   optionPrice: string
 ) => {
-  const price = discountAppliedPrice ? discountAppliedPrice : originalPrice;
+  const resetoriginalPrice =
+    price !== "-" && Number(price.replace(",", ""))
+      ? Number(price.replace(",", ""))
+      : 0;
+  const resetDiscountPrice =
+    discountPrice !== "-" && Number(discountPrice.replace(",", ""))
+      ? Number(discountPrice.replace(",", ""))
+      : 0;
   const resetOptionPrice =
     optionPrice !== "-" && Number(optionPrice.replace(",", ""))
       ? Number(optionPrice.replace(",", ""))
       : 0;
 
-  if (!price && !resetOptionPrice) {
+  if (!resetoriginalPrice && !resetDiscountPrice && !resetOptionPrice) {
     return "-";
   }
-  const result = price + resetOptionPrice;
+
+  const result = resetoriginalPrice + resetOptionPrice + resetDiscountPrice;
 
   return `${result.toLocaleString("ko-KR")}`;
 };
@@ -241,8 +253,9 @@ const getOptions = (
       }
 
       result.resetOptionPrice = price
-        ? `${price.toLocaleString("ko-KR")}`
+        ? `${(price * quantity).toLocaleString("ko-KR")}`
         : "-";
+
       result.resetOptionQuantity = quantity;
 
       return result;

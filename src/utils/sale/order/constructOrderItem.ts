@@ -13,7 +13,7 @@ const optionsInitialValue: Array<{
   isRequired: boolean;
 }> = [];
 
-const contructOrderItem = (orderItem: Array<OrdersType>) => {
+const constructOrderItem = (orderItem: Array<OrdersType>) => {
   const hasOrderItems = !!orderItem && !!orderItem.length;
   if (!hasOrderItems) return;
 
@@ -93,11 +93,11 @@ const contructOrderItem = (orderItem: Array<OrdersType>) => {
           });
         }
         if (!option.isRequired) {
-          const resetProducts = reconstructRequiredProducts(
+          const resetProducts = reconstructNotRequiredProducts(
             product,
             option.components
           );
-          const resetOption = reconstructRequiredOption(options);
+          const resetOption = reconstructNotRequiredOption(options);
 
           newOrderItems.push({
             ...order,
@@ -178,7 +178,7 @@ const contructOrderItem = (orderItem: Array<OrdersType>) => {
   };
 };
 
-const reconstructRequiredProducts = (
+const reconstructNotRequiredProducts = (
   product: {
     code: string;
     thumbnail: string;
@@ -207,7 +207,7 @@ const reconstructRequiredProducts = (
   };
 };
 
-const reconstructRequiredOption = (
+const reconstructNotRequiredOption = (
   option: Array<{
     id: number;
     components: Array<{
@@ -232,4 +232,4 @@ const reconstructRequiredOption = (
   }, optionsInitialValue);
 };
 
-export default contructOrderItem;
+export default constructOrderItem;
