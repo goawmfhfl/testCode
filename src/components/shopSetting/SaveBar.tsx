@@ -10,6 +10,7 @@ import {
   sectionReferenceVar,
   sectionFulfillmentVar,
   loadingSpinnerVisibilityVar,
+  saveShopButtonRefVar,
 } from "@cache/index";
 import {
   HAS_SET_CONDITIONAL_FREE_SHIPMENT,
@@ -451,6 +452,7 @@ const SaveBar = () => {
           // eslint-disable-next-line
           onClick={handleSubmitButtonClick(submissionType)}
           disabled={isLoadingSubmission}
+          ref={(newRef: HTMLElement) => saveShopButtonRefVar(newRef)}
         >
           {hasShopRegistered ? "저장" : "등록"}
         </SubmitButton>
