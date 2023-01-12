@@ -39,6 +39,7 @@ export const GET_PRODUCTS_BY_ID = gql`
         endDiscountDate
         quantity
 
+        isSelectiveOptionInUse
         options {
           id
           index

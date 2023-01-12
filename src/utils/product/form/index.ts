@@ -95,13 +95,15 @@ export function getRequiredOptions(formContext: UseFormReturn) {
 export function getSelectiveOptions(formContext: UseFormReturn) {
   const { watch } = formContext;
 
-  const { optionHeaders, optionRows } = selectiveOptionVar().adaptedOption;
+  const { optionRows } = selectiveOptionVar().adaptedOption;
 
   const selectiveOptions = optionRows.map(({ id, option }, index) => {
-    const components = option.map((value, index) => ({
-      name: optionHeaders[index].header,
+    const [name, value] = option;
+
+    const components = {
+      name,
       value,
-    }));
+    };
 
     const optionStock = watch(`optionStock-${id}`) as number;
     const optionPrice = watch(`optionPrice-${id}`) as number;

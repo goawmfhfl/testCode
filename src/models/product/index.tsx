@@ -58,6 +58,7 @@ export interface TemporarySaveProductInputType {
 
   quantity: number;
 
+  isSelectiveOptionInUse: boolean;
   optionCombinations: Array<{
     components: Array<{ name: string; value: string }>;
     price: number;
@@ -108,6 +109,8 @@ export interface CreateProductInputType {
   startDiscountDate: Date;
   endDiscountDate: Date;
   quantity: number;
+
+  isSelectiveOptionInUse: boolean;
   optionCombinations: Array<{
     components: Array<{ name: string; value: string }>;
     price: number;
@@ -168,6 +171,7 @@ export interface ProductType {
   endDiscountDate: Date;
   quantity: number;
 
+  isSelectiveOptionInUse: boolean;
   options: Array<OptionCombination>;
 
   manufacturingLeadTime: {

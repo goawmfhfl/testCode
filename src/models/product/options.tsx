@@ -1,6 +1,8 @@
 export interface OptionInputType {
   id: string;
   disabled?: boolean;
+  optionName?: string;
+  optionValue?: string;
 }
 
 export interface OptionHeaderType {

@@ -72,6 +72,7 @@ export default function restructureProductRegistrationStates(
   const hasSelectiveOption = watch(HAS_SELECTIVE_OPTION) as boolean;
   const requiredOptions = getRequiredOptions(formContext);
   const selectiveOptions = getSelectiveOptions(formContext);
+
   const productOptions = [];
   if (hasRequiredOption) productOptions.push(...requiredOptions);
   if (hasSelectiveOption) productOptions.push(...selectiveOptions);
@@ -121,6 +122,8 @@ export default function restructureProductRegistrationStates(
         ? new Date(endDiscountDate)
         : null,
     quantity: quantity ? Number(quantity) : null,
+
+    isSelectiveOptionInUse: hasSelectiveOption,
     optionCombinations:
       !hasRequiredOption && !hasSelectiveOption ? null : productOptions,
     manufacturingLeadTime: isCustomProduct ? manufacturingLeadTime : null,

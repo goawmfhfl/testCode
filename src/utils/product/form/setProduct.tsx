@@ -28,7 +28,10 @@ import {
   requiredOptionVar,
   selectiveOptionVar,
 } from "@cache/productForm/productOptions";
-import { restructureOptions } from "./options";
+import {
+  restructureOptions,
+  restructureSelectiveOptions,
+} from "@utils/product/form/options";
 import { tagListVar } from "@cache/productForm/searchTag";
 import { SearchTag, TagTypes } from "@models/product/searchTag";
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
@@ -50,6 +53,7 @@ const setProduct = (
     startDiscountDate,
     endDiscountDate,
     quantity,
+    isSelectiveOptionInUse,
     options,
     uploadedFileUrls,
     manufacturingLeadTime,
@@ -119,13 +123,17 @@ const setProduct = (
     );
   }
 
+  if (isSelectiveOptionInUse !== null) {
+    setValue(HAS_SELECTIVE_OPTION, isSelectiveOptionInUse);
+  }
+
   if (options && options.length) {
     const sortedOptions = options.sort((a, b) => a.index - b.index);
 
     const requiredOptions = sortedOptions.filter((ops) => ops.isRequired);
 
     if (requiredOptions.length) {
-      if (isNaN(quantity)) {
+      if (quantity === null) {
         setValue(HAS_REQUIRED_OPTION, true);
       } else {
         setValue(HAS_REQUIRED_OPTION, false);
@@ -161,29 +169,15 @@ const setProduct = (
     const selectiveOptions = sortedOptions.filter((ops) => !ops.isRequired);
 
     if (selectiveOptions.length) {
-      if (isNaN(quantity)) {
-        setValue(HAS_SELECTIVE_OPTION, true);
-      } else {
-        setValue(HAS_SELECTIVE_OPTION, false);
-      }
-
       const { optionInputList, adaptedOption } =
-        restructureOptions(selectiveOptions);
+        restructureSelectiveOptions(selectiveOptions);
 
       selectiveOptionVar({
         optionInputList,
         adaptedOption,
       });
 
-      optionInputList.forEach(({ id }, index) => {
-        const optionName = adaptedOption.optionHeaders[index].header;
-
-        const optionValue = [
-          ...new Set(
-            adaptedOption.optionRows.map(({ option }) => option[index])
-          ),
-        ].join(", ");
-
+      optionInputList.forEach(({ id, optionName, optionValue }) => {
         setValue(`selectiveOptionName-${id}`, optionName);
         setValue(`selectiveOptionValue-${id}`, optionValue);
       });
