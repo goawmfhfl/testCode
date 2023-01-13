@@ -386,6 +386,7 @@ const ProductTable = () => {
                     width={tableData[1].width}
                     as={"a"}
                     href={`${ServiceUrls.Consumer}/product/${productId}`}
+                    target={"_blank"}
                   >
                     {productId}
                   </Td>
