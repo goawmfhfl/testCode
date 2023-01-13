@@ -16,78 +16,109 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
   const hasOrderItems = !!orderItem && !!orderItem.length;
   if (!hasOrderItems) return;
   const newOrderItems: Array<OrdersType> = [];
-  const bundleOrders: {
-    bundleOrderList: Array<Array<OrdersType>>;
-    temporarybundleOrderList: Array<OrdersType>;
+  const bundleOrder: {
+    bundleOrders: Array<Array<OrdersType>>;
+    temporaryBundleOrders: Array<OrdersType>;
   } = {
-    bundleOrderList: [],
-    temporarybundleOrderList: [],
+    bundleOrders: [],
+    temporaryBundleOrders: [],
   };
 
   const flag = {
     orderItemsRowIndex: 0,
   };
 
-  orderItem.map((order, index) => {
+  orderItem.forEach((order, index) => {
     const previousOrder =
-      index > 0 ? orderItem[index - 1].merchantUid : "first";
+      index > 0 ? orderItem[index - 1].merchantUid : "minusIndex";
     const currentOrder = order.merchantUid;
     const nextOrder =
       index === orderItem.length - 1
-        ? "last"
+        ? "overIndex"
         : orderItem[index + 1].merchantUid;
 
-    if (nextOrder === "last") {
+    if (nextOrder === "overIndex") {
       if (previousOrder === currentOrder) {
-        bundleOrders.temporarybundleOrderList.push(order);
+        bundleOrder.temporaryBundleOrders.push(order);
       }
 
-      if (bundleOrders.temporarybundleOrderList.length > 1) {
-        bundleOrders.bundleOrderList.push(
-          bundleOrders.temporarybundleOrderList
-        );
-        bundleOrders.temporarybundleOrderList = [];
+      if (bundleOrder.temporaryBundleOrders.length > 1) {
+        bundleOrder.bundleOrders.push(bundleOrder.temporaryBundleOrders);
+        bundleOrder.temporaryBundleOrders = [];
       }
 
       return;
     }
 
     if (previousOrder === currentOrder) {
-      bundleOrders.temporarybundleOrderList.push(order);
+      bundleOrder.temporaryBundleOrders.push(order);
+
       return;
     }
 
     if (
       previousOrder !== currentOrder &&
       currentOrder === nextOrder &&
-      bundleOrders.temporarybundleOrderList.length !== 0
+      bundleOrder.temporaryBundleOrders.length !== 0
     ) {
-      bundleOrders.bundleOrderList.push(bundleOrders.temporarybundleOrderList);
-      bundleOrders.temporarybundleOrderList = [];
-      bundleOrders.temporarybundleOrderList.push(order);
+      bundleOrder.bundleOrders.push(bundleOrder.temporaryBundleOrders);
+      bundleOrder.temporaryBundleOrders = [];
+      bundleOrder.temporaryBundleOrders.push(order);
 
       return;
     }
 
     if (currentOrder === nextOrder) {
-      bundleOrders.temporarybundleOrderList.push(order);
+      bundleOrder.temporaryBundleOrders.push(order);
+
       return;
     }
 
     if (
       previousOrder !== currentOrder &&
-      bundleOrders.temporarybundleOrderList.length !== 0
+      bundleOrder.temporaryBundleOrders.length !== 0
     ) {
-      bundleOrders.bundleOrderList.push(bundleOrders.temporarybundleOrderList);
-      bundleOrders.temporarybundleOrderList = [];
+      bundleOrder.bundleOrders.push(bundleOrder.temporaryBundleOrders);
+      bundleOrder.temporaryBundleOrders = [];
 
       if (currentOrder === nextOrder) {
-        bundleOrders.temporarybundleOrderList.push(order);
+        bundleOrder.temporaryBundleOrders.push(order);
       }
     }
   });
 
-  orderItem.map((order, index) => {
+  bundleOrder.bundleOrders.forEach((orders) => {
+    orders.forEach((_, index) => {
+      const firstOrder = orders[0];
+      const nextOrder =
+        index === orders.length - 1 ? "overIndex" : orders[index + 1];
+
+      if (nextOrder === "overIndex") return;
+
+      if (index === 0) {
+        const findFirstOrderIndex = orderItem.findIndex(
+          ({ merchantUid, merchantItemUid }) =>
+            merchantUid === firstOrder.merchantUid &&
+            merchantItemUid === firstOrder.merchantItemUid
+        );
+
+        orderItem[findFirstOrderIndex].shipmentPrice =
+          getFirstShipmentPrice(orders);
+        orderItem[findFirstOrderIndex].shipmentDistantPrice =
+          getFirstShipmentDistantPrice(orders);
+      }
+
+      const findNextOrderIndex = orderItem.findIndex(
+        ({ merchantUid, merchantItemUid }) =>
+          merchantUid === nextOrder.merchantUid &&
+          merchantItemUid === nextOrder.merchantItemUid
+      );
+      orderItem[findNextOrderIndex].shipmentPrice = 0;
+      orderItem[findNextOrderIndex].shipmentDistantPrice = 0;
+    });
+  });
+
+  orderItem.forEach((order, index) => {
     const { product, options, merchantItemUid, merchantUid, isBundleShipment } =
       order;
     const eachOrderItemStyleIfno = {
@@ -295,6 +326,19 @@ const reconstructNotRequiredOption = (
 
     return result;
   }, optionsInitialValue);
+};
+
+const getFirstShipmentPrice = (orders: Array<OrdersType>) => {
+  return orders.reduce((result, { shipmentPrice }) => {
+    return (result = Math.max(result, shipmentPrice));
+  }, 0);
+};
+
+const getFirstShipmentDistantPrice = (orders: Array<OrdersType>) => {
+  return orders.reduce((result, { shipmentDistantPrice }) => {
+    if (shipmentDistantPrice) return (result = shipmentDistantPrice);
+    if (!shipmentDistantPrice) return (result = 0);
+  }, 0);
 };
 
 export default constructOrderItem;
