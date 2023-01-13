@@ -33,7 +33,7 @@ import {
 } from "@models/sale/order";
 
 import resetOrderItems from "@utils/sale/order/resetOrderItems";
-import contructOrderItem from "@utils/sale/order/contructOrderItem";
+import constructOrderItem from "@utils/sale/order/constructOrderItem";
 import { preventNaNValues } from "@utils/index";
 
 import {
@@ -520,7 +520,7 @@ const OrderTable = () => {
     totalPageLengthVar(totalResults);
 
     const nomalizedOrderItem: NormalizedListType =
-      contructOrderItem(totalOrderItems);
+      constructOrderItem(totalOrderItems);
 
     const orderItems: Array<ResetOrderItemType> =
       resetOrderItems(nomalizedOrderItem);
@@ -639,21 +639,30 @@ const OrderTable = () => {
           </Th>
         </ThContainer>
         <TdContainer>
-          {hasOrderItems &&
-            orderItems.map(
+          {!loading &&
+            orderItems?.map(
               (
                 {
                   id,
+                  rowIndex,
+                  merchantUid,
                   merchantItemUid,
                   productCode,
+                  thumbnail,
                   orderProduct,
                   userName,
                   orderStatus,
                   isChecked,
+                  colorIndex,
+                  isLastColumn,
                 },
                 index
               ) => (
-                <Tr key={id}>
+                <Tr
+                  key={rowIndex}
+                  colorIndex={colorIndex}
+                  isLastColumn={isLastColumn}
+                >
                   <Td type={TableType.SCROLL} width={fixTableType[0].width}>
                     <Checkbox
                       onChange={changeSingleCheckBoxHandler(index)}
@@ -661,14 +670,21 @@ const OrderTable = () => {
                     />
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[1].width}>
-                    {merchantItemUid}
+                    {merchantUid}
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[2].width}>
-                    {productCode}
+                    {merchantItemUid}
                   </Td>
-                  <Td type={TableType.SCROLL} width={fixTableType[3].width}>
-                    {orderProduct}
-                  </Td>
+
+                  <ProductNameTd
+                    type={TableType.SCROLL}
+                    width={fixTableType[3].width}
+                  >
+                    <ProductThumbNailWrapper>
+                      <ProductThumbNail src={thumbnail} />
+                    </ProductThumbNailWrapper>
+                    <ProductName>{orderProduct}</ProductName>
+                  </ProductNameTd>
                   <Td type={TableType.SCROLL} width={fixTableType[4].width}>
                     {userName}
                   </Td>
@@ -736,14 +752,22 @@ const OrderTable = () => {
           <Th type={TableType.SCROLL} width={scrollTableType[17].width}>
             {scrollTableType[17].label}
           </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[18].width}>
+            {scrollTableType[18].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[19].width}>
+            {scrollTableType[19].label}
+          </Th>
         </ThContainer>
 
         <TdContainer>
-          {hasOrderItems &&
-            orderItems.map(
+          {!loading &&
+            orderItems?.map(
               (
                 {
                   id,
+                  rowIndex,
+                  colorIndex,
                   claimStatus,
                   orderStatus,
                   orderShipmentInfosId,
@@ -761,16 +785,23 @@ const OrderTable = () => {
                   quantity,
                   price,
                   optionPrice,
+                  discountPrice,
                   totalPrice,
                   shipmentPrice,
                   shipmentDistantPrice,
+                  totalPaymentAmount,
                   isShipmentInfoEdit,
                   temporaryShipmentCompany,
                   temporaryShipmentNumber,
+                  isLastColumn,
                 },
                 index
               ) => (
-                <Tr key={id}>
+                <Tr
+                  key={rowIndex}
+                  colorIndex={colorIndex}
+                  isLastColumn={isLastColumn}
+                >
                   <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
                     {claimStatus}
                   </Td>
@@ -886,6 +917,8 @@ const OrderTable = () => {
                                 size="small"
                                 width="55px"
                                 onClick={handleEditButtonClick(id)}
+                                backgroundColor={"#fff"}
+                                borderColor={"#BBC0C6"}
                                 type="button"
                               >
                                 수정
@@ -915,7 +948,7 @@ const OrderTable = () => {
                             }
                             onKeyDown={preventNaNValues}
                           />
-                          <Button
+                          <SubmitButton
                             size="small"
                             disabled={orderStatus === "새주문"}
                             width={"55px"}
@@ -924,10 +957,12 @@ const OrderTable = () => {
                               temporaryShipmentCompany,
                               temporaryShipmentNumber
                             )}
+                            backgroundColor={"#fff"}
+                            borderColor={"#BBC0C6"}
                             type="button"
                           >
                             발송
-                          </Button>
+                          </SubmitButton>
                         </ShipmnetNumberContainer>
                       )}
                     </ShipmnetNumberTd>
@@ -957,9 +992,12 @@ const OrderTable = () => {
                   <Td type={TableType.SCROLL} width={scrollTableType[10].width}>
                     {userPhoneNumber}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[11].width}>
-                    {option}
-                  </Td>
+                  <OptionTd
+                    type={TableType.SCROLL}
+                    width={scrollTableType[11].width}
+                  >
+                    <OptionWrapper>{option}</OptionWrapper>
+                  </OptionTd>
                   <Td type={TableType.SCROLL} width={scrollTableType[12].width}>
                     <Quantity quantity={quantity}>{quantity}</Quantity>
                   </Td>
@@ -970,13 +1008,19 @@ const OrderTable = () => {
                     {optionPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[15].width}>
-                    {totalPrice}
+                    {discountPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[16].width}>
-                    {shipmentPrice}
+                    {totalPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[17].width}>
+                    {shipmentPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[18].width}>
                     {shipmentDistantPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[19].width}>
+                    {totalPaymentAmount}
                   </Td>
                 </Tr>
               )
@@ -984,13 +1028,12 @@ const OrderTable = () => {
         </TdContainer>
       </ScrollTable>
 
-      {orderItems?.length === 0 && !loading && (
+      {!hasOrderItems && (
         <NoDataContainer type={TableType.SCROLL}>
           {query && (
             <>
               검색어와 일치하는
-              <br />
-              주문이 없습니다.
+              <br />y 주문이 없습니다.
             </>
           )}
 
@@ -1009,7 +1052,39 @@ const OrderTable = () => {
   );
 };
 
-const ShipmentColumn = styled(Td)``;
+const ProductNameTd = styled(Td)`
+  justify-content: flex-start;
+  padding: 8px 0px;
+`;
+
+const ProductThumbNailWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-width: 56px;
+  height: 80px;
+
+  border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
+`;
+
+const ProductThumbNail = styled.img`
+  width: 24px;
+  height: 24px;
+`;
+
+const ProductName = styled.span`
+  display: block;
+
+  padding: 0 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const ShipmentColumn = styled(Td)`
+  padding: 0px;
+`;
 
 const Dropdown = styled(SelectInput)`
   padding-right: 16px;
@@ -1038,12 +1113,12 @@ const ShipmentCompanyTd = styled.div<{ width: number }>`
 `;
 
 const ShipmnetNumberTd = styled.div<{ width: number }>`
-  width: ${({ width }) => `${width}px`};
-  overflow: hidden;
-
   display: flex;
   justify-content: center;
   align-items: center;
+
+  width: ${({ width }) => `${width}px`};
+  overflow: hidden;
 `;
 
 const ShipmnetNumberContainer = styled.div`
@@ -1070,6 +1145,20 @@ const ShipmentTemplateInput = styled.input`
   display: none;
 `;
 
+const OptionTd = styled(Td)`
+  margin: 0 auto;
+`;
+
+const OptionWrapper = styled.span`
+  text-align: center;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+`;
+
 const Quantity = styled.span<{ quantity: number }>`
   color: ${({ theme: { palette }, quantity }) =>
     quantity > 1 ? palette.red900 : palette.black};
@@ -1077,6 +1166,10 @@ const Quantity = styled.span<{ quantity: number }>`
 
 const ButtonContainer = styled.div`
   display: flex;
+`;
+
+const SubmitButton = styled(Button)`
+  border-left: none;
 `;
 
 export default OrderTable;

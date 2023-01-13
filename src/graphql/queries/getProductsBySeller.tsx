@@ -13,9 +13,13 @@ export interface ProductsType {
   originalPrice: number;
   discountAmount?: number;
   discountMethod?: string;
-  status: ProductStatus;
   thumbnail: string;
   quantity: number;
+  status: ProductStatus;
+  options: Array<{
+    quantity: number;
+    isRequired: boolean;
+  }>;
 }
 
 export interface GetProductsBySellerType {
@@ -67,6 +71,10 @@ export const GET_PRODUCTS_BY_SELLER = gql`
         quantity
         thumbnail
         status
+        options {
+          quantity
+          isRequired
+        }
       }
     }
   }

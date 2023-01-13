@@ -12,6 +12,11 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
 
   const result = orderAllIds.map((id) => {
     const {
+      id: orderId,
+      colorIndex,
+      rowIndex,
+      isLastColumn,
+      merchantUid,
       merchantItemUid,
       product,
       user,
@@ -27,115 +32,81 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       claimStatus,
     } = orderByid[id];
 
-    // 주문번호
+    const resetMerchantUid = merchantUid ? merchantUid : "-";
     const resetMerchantItemUid = merchantItemUid ? merchantItemUid : "-";
-
-    // 상품 주문번호
     const resetProductCode = product?.code ? product.code : "-";
-
-    // 주문 상품
     const resetOrderProduct = product?.name ? product.name : "-";
-
-    // 구매자 명
+    const resetProductThumbnail = product?.thumbnail ? product.thumbnail : "-";
     const resetUserName = user?.name ? user.name : "-";
-
-    // 주문 상태
     const resetOrderStatus = orderStatus?.name
       ? orderStatusNameType[orderStatus.name]
       : "-";
-
-    // 클레임 상태
     const resetClaimStatus = claimStatus?.name ? claimStatus.name : "-";
-
-    // 배송정보 Id
-
     const resetOrderShipmentInfosId = orderShipmentInfos
       ? orderShipmentInfos.filter(
           (info) => info.status === ShipmentStatus.SHIPPING
         )[0]?.id
       : null;
-
-    // 택배사
     const resetShipmentCompany = orderShipmentInfos
       ? orderShipmentInfos.filter(
           (info) => info.status === ShipmentStatus.SHIPPING
         )[0]?.shipmentCompany
       : null;
-
-    // 운송장번호
     const resetShipmentNumber = orderShipmentInfos
       ? orderShipmentInfos.filter(
           (info) => info.status === ShipmentStatus.SHIPPING
         )[0]?.shipmentNumber
       : null;
-
-    // 결제일
     const resetPayments = user?.payments?.createdAt
       ? user.payments.createdAt
       : "-";
 
-    // 수취인
     const resetRecipientName = orderByShop?.order?.recipientName
       ? orderByShop.order.recipientName
       : "-";
-
-    // 수취인 전화번호
     const resetRecipientPhoneNumber = orderByShop?.order?.recipientPhoneNumber
       ? orderByShop.order.recipientPhoneNumber
       : "-";
-
-    // 수취인 주소
     const resetRecipientAddress = orderByShop?.order?.recipientAddress
       ? orderByShop.order.recipientAddress
       : "-";
-
-    // 우편번호
     const resetPostCode = orderByShop?.order?.postCode
       ? orderByShop.order.postCode
       : "-";
-
-    // 배송메세지
     const resetShipmentMemo = orderByShop?.order?.shipmentMemo
       ? orderByShop.order.shipmentMemo
       : "-";
-
-    // 구매자 아이디
     const resetUserEmail = user?.email ? user.email : "-";
-
-    // 구매자 전화번호
     const resetUserPhoneNumber = user?.phoneNumber ? user.phoneNumber : "-";
-
-    // 옵션
-    const resetOption = "-";
-
-    // 상품개수
-    const resetQuantity = quantity ? quantity : 0;
-
-    // 상품가
+    const { resetOptions, resetOptionPrice, resetOptionQuantity } =
+      getOptions(options);
+    const resetQuantity = quantity ? quantity : resetOptionQuantity;
     const resetPrice = originalPrice
-      ? `${originalPrice.toLocaleString("ko-KR")}`
+      ? `${(resetQuantity * originalPrice).toLocaleString("ko-KR")}`
+      : "-";
+    const resetDiscountPrice = discountAppliedPrice
+      ? `${(
+          (discountAppliedPrice - originalPrice) *
+          resetQuantity
+        ).toLocaleString("ko-KR")}`
       : "-";
 
-    // 옵션가
-    const resetOptionPrice = "-";
-
-    // 상품별 총 금액
-    const resetTotalPrice = getTotalPrice(
-      originalPrice,
-      discountAppliedPrice,
-      shipmentDistantPrice,
-      shipmentPrice
+    const totalPrice = getTotalPrice(
+      resetPrice,
+      resetDiscountPrice,
+      resetOptionPrice
     );
-
-    // 배송비
     const resetShipmentPrice = shipmentPrice
       ? `${shipmentPrice.toLocaleString("ko-KR")}`
       : "-";
-
-    // 제주/도서 추가배송비
     const resetShipmentDistantPrice = shipmentDistantPrice
       ? `${shipmentDistantPrice.toLocaleString("ko-KR")}`
       : "-";
+    const totalPaymentAmount = getTotalPaymentAmount(
+      totalPrice,
+      resetShipmentPrice,
+      resetShipmentDistantPrice
+    );
 
     const isChecked = false;
     const isShipmentInfoEdit = false;
@@ -143,83 +114,158 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
     const temporaryShipmentNumber = resetShipmentNumber || 0;
 
     return {
-      id,
-      // 주문번호
+      id: orderId,
+      merchantUid: resetMerchantUid,
       merchantItemUid: resetMerchantItemUid,
-      // 상품 주문번호
       productCode: resetProductCode,
-      // 주문 상품
-      thumbnail: product?.thumbnail ? product?.thumbnail : "-",
+      thumbnail: resetProductThumbnail,
       orderProduct: resetOrderProduct,
-      // 구매자 명
       userName: resetUserName,
-      // 주문 상태
       orderStatus: resetOrderStatus,
-      // 클레임 상태
       claimStatus: resetClaimStatus,
-      // 배송정보 아이디
       orderShipmentInfosId: resetOrderShipmentInfosId,
-      // 택배사
       shipmentCompany: resetShipmentCompany,
-      // 운송장번호
       shipmentNumber: resetShipmentNumber,
-      // 결제일
       payments: resetPayments,
-      // 수취인
       recipientName: resetRecipientName,
-      // 수취인 전화번호
       recipientPhoneNumber: resetRecipientPhoneNumber,
-      // 수취인 주소
       recipientAddress: resetRecipientAddress,
-      // 우편번호
       postCode: resetPostCode,
-      // 배송메세지
       shipmentMemo: resetShipmentMemo,
-      // 구매자 아이디
       userEmail: resetUserEmail,
-      // 구매자 전화번호
       userPhoneNumber: resetUserPhoneNumber,
-      // 옵션
-      option: resetOption,
-      // 상품개수
+      option: resetOptions,
       quantity: resetQuantity,
-      // 상품가
       price: resetPrice,
-      // 옵션가
       optionPrice: resetOptionPrice,
-      // 상품별 총 금액
-      totalPrice: resetTotalPrice,
-      // 배송비
+      discountPrice: resetDiscountPrice,
+      totalPrice,
       shipmentPrice: resetShipmentPrice,
-      // 제주/도서 추가배송비
       shipmentDistantPrice: resetShipmentDistantPrice,
+      totalPaymentAmount,
       isChecked,
       isShipmentInfoEdit,
       temporaryShipmentCompany,
       temporaryShipmentNumber,
+      colorIndex,
+      rowIndex,
+      isLastColumn,
     };
   });
   return result;
 };
 
-const getTotalPrice = (
-  originalPrice: number,
-  discountAppliedPrice: number,
-  shipmentDistantPrice: number,
-  shipmentPrice: number
+const getTotalPaymentAmount = (
+  totalPrice: string,
+  resetShipmentPrice: string,
+  resetShipmentDistantPrice: string
 ) => {
-  const shipmentDistantPay = shipmentDistantPrice || 0;
-  const shipmentPay = shipmentPrice || 0;
-
-  if (discountAppliedPrice) {
-    const totalPrice = discountAppliedPrice + shipmentPay + shipmentDistantPay;
-    return `${totalPrice.toLocaleString("ko-KR")}`;
+  if (!totalPrice) {
+    return "-";
   }
 
-  if (originalPrice) {
-    const totalPrice = originalPrice + shipmentPay + shipmentDistantPay;
-    return `${totalPrice.toLocaleString("ko-KR")}`;
+  const resetTotalPrice =
+    totalPrice !== "-" && Number(totalPrice.replace(",", ""))
+      ? Number(totalPrice.replace(",", ""))
+      : 0;
+  const shipmentPrice =
+    resetShipmentPrice !== "-" && Number(resetShipmentPrice.replace(",", ""))
+      ? Number(resetShipmentPrice.replace(",", ""))
+      : 0;
+
+  const shipmentDistantPrice =
+    resetShipmentDistantPrice !== "-" &&
+    Number(resetShipmentDistantPrice.replace(",", ""))
+      ? Number(resetShipmentDistantPrice.replace(",", ""))
+      : 0;
+
+  const result = resetTotalPrice + shipmentPrice + shipmentDistantPrice;
+
+  return result ? `${result.toLocaleString("ko-KR")}` : "-";
+};
+
+const getTotalPrice = (
+  price: string,
+  discountPrice: string,
+  optionPrice: string
+) => {
+  const resetoriginalPrice =
+    price !== "-" && Number(price.replace(",", ""))
+      ? Number(price.replace(",", ""))
+      : 0;
+  const resetDiscountPrice =
+    discountPrice !== "-" && Number(discountPrice.replace(",", ""))
+      ? Number(discountPrice.replace(",", ""))
+      : 0;
+  const resetOptionPrice =
+    optionPrice !== "-" && Number(optionPrice.replace(",", ""))
+      ? Number(optionPrice.replace(",", ""))
+      : 0;
+
+  if (!resetoriginalPrice && !resetDiscountPrice && !resetOptionPrice) {
+    return "-";
   }
+
+  const result = resetoriginalPrice + resetOptionPrice + resetDiscountPrice;
+
+  return `${result.toLocaleString("ko-KR")}`;
+};
+
+const getOptions = (
+  options: Array<{
+    components?: Array<{ name: string; value: string }>;
+    quantity: number;
+    price: number;
+    isRequired: boolean;
+  }>
+) => {
+  const hasOptions = !!options && !!options.length;
+  if (!hasOptions) {
+    return {
+      resetOptions: "-",
+      resetOptionPrice: "-",
+      resetOptionQuantity: 0,
+    };
+  }
+
+  return options.reduce(
+    (result, { components, price, quantity }) => {
+      const hasComponents = !!components && !!components.length;
+
+      if (hasComponents) {
+        result.resetOptions += components.reduce(
+          (components, { name, value }) => {
+            if (components) {
+              components += `/ ${name} : ${value} `;
+            }
+            if (!components) {
+              components = `${name} : ${value} `;
+            }
+
+            return components;
+          },
+          ""
+        );
+      }
+
+      if (!hasComponents) {
+        result.resetOptions = "-";
+      }
+
+      result.resetOptionPrice = price
+        ? `${(price * quantity).toLocaleString("ko-KR")}`
+        : "-";
+
+      result.resetOptionQuantity = quantity;
+
+      return result;
+    },
+    {
+      resetOptions: "",
+      resetOptionPrice: "-",
+      resetOptionQuantity: 0,
+    }
+  );
 };
 
 export default resetOrderItems;
