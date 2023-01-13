@@ -14,7 +14,7 @@ async function addImageOnServer(
 ): Promise<{ url: string; size: number }> {
   try {
     const formData = new FormData();
-    formData.append("files", imageFile);
+    formData.append("files", imageFile, encodeURIComponent(imageFile.name));
 
     const response: { data: Array<{ url: string; size: number }> } =
       await axios.post(`${process.env.REACT_APP_SERVER_URI}/upload`, formData);
