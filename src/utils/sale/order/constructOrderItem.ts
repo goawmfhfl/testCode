@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from "uuid";
-
 import { OrdersType } from "@models/sale/order";
 
 const optionsInitialValue: Array<{
@@ -16,11 +15,77 @@ const optionsInitialValue: Array<{
 const constructOrderItem = (orderItem: Array<OrdersType>) => {
   const hasOrderItems = !!orderItem && !!orderItem.length;
   if (!hasOrderItems) return;
-
   const newOrderItems: Array<OrdersType> = [];
-  const tableRowStyleInfo = {
-    rowIndex: 0,
+  const bundleOrders: {
+    bundleOrderList: Array<Array<OrdersType>>;
+    temporarybundleOrderList: Array<OrdersType>;
+  } = {
+    bundleOrderList: [],
+    temporarybundleOrderList: [],
   };
+
+  const flag = {
+    orderItemsRowIndex: 0,
+  };
+
+  orderItem.map((order, index) => {
+    const previousOrder =
+      index > 0 ? orderItem[index - 1].merchantUid : "first";
+    const currentOrder = order.merchantUid;
+    const nextOrder =
+      index === orderItem.length - 1
+        ? "last"
+        : orderItem[index + 1].merchantUid;
+
+    if (nextOrder === "last") {
+      if (previousOrder === currentOrder) {
+        bundleOrders.temporarybundleOrderList.push(order);
+      }
+
+      if (bundleOrders.temporarybundleOrderList.length > 1) {
+        bundleOrders.bundleOrderList.push(
+          bundleOrders.temporarybundleOrderList
+        );
+        bundleOrders.temporarybundleOrderList = [];
+      }
+
+      return;
+    }
+
+    if (previousOrder === currentOrder) {
+      bundleOrders.temporarybundleOrderList.push(order);
+      return;
+    }
+
+    if (
+      previousOrder !== currentOrder &&
+      currentOrder === nextOrder &&
+      bundleOrders.temporarybundleOrderList.length !== 0
+    ) {
+      bundleOrders.bundleOrderList.push(bundleOrders.temporarybundleOrderList);
+      bundleOrders.temporarybundleOrderList = [];
+      bundleOrders.temporarybundleOrderList.push(order);
+
+      return;
+    }
+
+    if (currentOrder === nextOrder) {
+      bundleOrders.temporarybundleOrderList.push(order);
+      return;
+    }
+
+    if (
+      previousOrder !== currentOrder &&
+      bundleOrders.temporarybundleOrderList.length !== 0
+    ) {
+      bundleOrders.bundleOrderList.push(bundleOrders.temporarybundleOrderList);
+      bundleOrders.temporarybundleOrderList = [];
+
+      if (currentOrder === nextOrder) {
+        bundleOrders.temporarybundleOrderList.push(order);
+      }
+    }
+  });
 
   orderItem.map((order, index) => {
     const { product, options, merchantItemUid, merchantUid, isBundleShipment } =
@@ -51,11 +116,11 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
           : "";
 
         if (newOrderItems.length === 0) {
-          tableRowStyleInfo.rowIndex = 0;
+          flag.orderItemsRowIndex = 0;
         }
 
         if (newOrderItems.length !== 0 && merchantUid !== previousMerchantUid) {
-          tableRowStyleInfo.rowIndex += 1;
+          flag.orderItemsRowIndex += 1;
         }
 
         if (
@@ -64,11 +129,11 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
           merchantItemUid !== previousMerchantItemUid &&
           previousIsBundleShipment !== isBundleShipment
         ) {
-          tableRowStyleInfo.rowIndex += 1;
+          flag.orderItemsRowIndex += 1;
         }
 
-        if (tableRowStyleInfo.rowIndex >= 3) {
-          tableRowStyleInfo.rowIndex = 0;
+        if (flag.orderItemsRowIndex >= 3) {
+          flag.orderItemsRowIndex = 0;
         }
 
         if (options.length === eachOrderItemStyleIfno.columnOrder) {
@@ -88,7 +153,7 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
             ...order,
             rowIndex: uuidv4(),
             options: [option],
-            colorIndex: tableRowStyleInfo.rowIndex,
+            colorIndex: flag.orderItemsRowIndex,
             isLastColumn: eachOrderItemStyleIfno.isLastColumn,
           });
         }
@@ -108,7 +173,7 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
             options: resetOption,
             shipmentPrice: null,
             shipmentDistantPrice: null,
-            colorIndex: tableRowStyleInfo.rowIndex,
+            colorIndex: flag.orderItemsRowIndex,
             isLastColumn: eachOrderItemStyleIfno.isLastColumn,
           });
         }
@@ -128,11 +193,11 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
         : "";
 
       if (newOrderItems.length === 0) {
-        tableRowStyleInfo.rowIndex = 0;
+        flag.orderItemsRowIndex = 0;
       }
 
       if (newOrderItems.length !== 0 && merchantUid !== previousMerchantUid) {
-        tableRowStyleInfo.rowIndex += 1;
+        flag.orderItemsRowIndex += 1;
       }
 
       if (
@@ -141,11 +206,11 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
         merchantItemUid !== previousMerchantItemUid &&
         previousIsBundleShipment !== isBundleShipment
       ) {
-        tableRowStyleInfo.rowIndex += 1;
+        flag.orderItemsRowIndex += 1;
       }
 
-      if (tableRowStyleInfo.rowIndex >= 3) {
-        tableRowStyleInfo.rowIndex = 0;
+      if (flag.orderItemsRowIndex >= 3) {
+        flag.orderItemsRowIndex = 0;
       }
 
       eachOrderItemStyleIfno.isLastColumn = true;
@@ -161,7 +226,7 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
       newOrderItems.push({
         ...order,
         rowIndex: uuidv4(),
-        colorIndex: tableRowStyleInfo.rowIndex,
+        colorIndex: flag.orderItemsRowIndex,
         isLastColumn: eachOrderItemStyleIfno.isLastColumn,
       });
     }
