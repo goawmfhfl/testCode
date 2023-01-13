@@ -101,13 +101,25 @@ export const TdContainer = styled.div`
   border-radius: 0px 0px 7px 7px;
 `;
 
-export const Tr = styled.div`
+export const Tr = styled.div<{ colorIndex?: number; isLastColumn?: boolean }>`
   display: flex;
   width: 100%;
-  border-bottom: 1px solid ${({ theme: { palette } }) => palette.grey500};
+  border-bottom: ${({ theme: { palette }, isLastColumn }) => {
+    if (isLastColumn) return `5px solid ${palette.grey500}`;
+    if (!isLastColumn) return `1px solid ${palette.grey500}`;
+  }};
+
+  background-color: ${({ theme: { palette }, colorIndex }) => {
+    if (colorIndex === 0) return palette.white;
+    if (colorIndex === 1) return palette.yellow100;
+    if (colorIndex === 2) return palette.blue100;
+  }};
 `;
 
-export const Td = styled.div<{ width: number; type: TableType }>`
+export const Td = styled.div<{
+  width: number;
+  type: TableType;
+}>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -117,14 +129,14 @@ export const Td = styled.div<{ width: number; type: TableType }>`
     if (type === TableType.SCROLL) return `${width}px`;
   }};
 
-  height: 40px;
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 
   &:last-child {
     border-right: none;
   }
 
-  overflow: hidden;
+  height: 80px;
+  padding: 8px;
 
   font-family: "Spoqa Han Sans Neo";
   font-size: 10px;

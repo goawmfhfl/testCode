@@ -51,7 +51,8 @@ import {
   NormalizedType,
   CaculatedProductsType,
 } from "@models/product/management";
-import { caculateProducts } from "@utils/product/management/caculateProducts";
+import caculateProducts from "@utils/product/management/caculateProducts";
+import { ServiceUrls } from "@constants/index";
 
 const ProductTable = () => {
   const { loading, error, data, getProducts } = useLazyProducts();
@@ -379,7 +380,14 @@ const ProductTable = () => {
                       checked={isChecked}
                     />
                   </Td>
-                  <Td type={TableType.FIX} width={tableData[1].width}>
+
+                  <Td
+                    type={TableType.FIX}
+                    width={tableData[1].width}
+                    as={"a"}
+                    href={`${ServiceUrls.Consumer}/product/${productId}`}
+                    target={"_blank"}
+                  >
                     {productId}
                   </Td>
                   <ProductNameTd
@@ -478,7 +486,7 @@ const ProductThumbNailWrapper = styled.div`
   align-items: center;
 
   min-width: 56px;
-  height: 40px;
+  height: 80px;
 
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;

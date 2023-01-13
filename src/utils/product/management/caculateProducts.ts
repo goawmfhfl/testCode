@@ -4,7 +4,7 @@ import { NormalizedType } from "@models/product/management";
 
 import { getDiscountedPrice } from "@utils/calculator";
 
-export const caculateProducts = (recontructProducts: NormalizedType) => {
+const caculateProducts = (recontructProducts: NormalizedType) => {
   const productsAllIds: Array<number> = recontructProducts?.products?.allIds;
   const productByids: { [key: number]: ProductsType } =
     recontructProducts?.products?.byId;
@@ -20,6 +20,7 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
       status,
       thumbnail,
       quantity,
+      options,
     } = productByids[id];
 
     const productName = name ? name : "-";
@@ -53,6 +54,8 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
           ).toLocaleString("ko-KR") + " ₩"
         : "";
 
+    const resetQuantity = getQuantity(quantity, options);
+
     const finalSellngPrice = discountAppliedPrice
       ? discountAppliedPrice
       : originalPriceToWonSign;
@@ -69,7 +72,7 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
       originalPriceToWonSign,
       discountedRate,
       finalSellngPrice,
-      quantity: quantity ? quantity : 0,
+      quantity: resetQuantity,
       status,
       isChecked,
     };
@@ -77,3 +80,24 @@ export const caculateProducts = (recontructProducts: NormalizedType) => {
 
   return result;
 };
+
+const getQuantity = (
+  quantity: number,
+  options: Array<{ quantity: number; isRequired: boolean }>
+) => {
+  const hasQuantity = !!quantity;
+  const hasOptions = !!options && !!options.length;
+
+  if (!hasQuantity && !hasOptions) return 0;
+  if (hasQuantity && !hasOptions) return quantity;
+  if (!hasQuantity && hasOptions) {
+    return options.reduce((result, { quantity, isRequired }) => {
+      if (isRequired) {
+        result += quantity;
+      }
+      return result;
+    }, 0);
+  }
+};
+
+export default caculateProducts;

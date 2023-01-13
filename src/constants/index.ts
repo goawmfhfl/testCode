@@ -119,6 +119,10 @@ export enum Pathnames {
   Error = "/error",
 }
 
+export enum ServiceUrls {
+  Consumer = "https://www.chopsticks.market",
+}
+
 export enum HeaderNames {
   Order = "주문관리",
   Cancel = "취소관리",
