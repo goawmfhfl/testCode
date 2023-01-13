@@ -52,6 +52,7 @@ import {
   CaculatedProductsType,
 } from "@models/product/management";
 import caculateProducts from "@utils/product/management/caculateProducts";
+import { ServiceUrls } from "@constants/index";
 
 const ProductTable = () => {
   const { loading, error, data, getProducts } = useLazyProducts();
@@ -379,7 +380,13 @@ const ProductTable = () => {
                       checked={isChecked}
                     />
                   </Td>
-                  <Td type={TableType.FIX} width={tableData[1].width}>
+
+                  <Td
+                    type={TableType.FIX}
+                    width={tableData[1].width}
+                    as={"a"}
+                    href={`${ServiceUrls.Consumer}/product/${productId}`}
+                  >
                     {productId}
                   </Td>
                   <ProductNameTd
