@@ -395,7 +395,7 @@ const ProductTable = () => {
                     width={tableData[2].width}
                   >
                     <ProductThumbNailWrapper>
-                      <ProductThumbNail src={thumbnail} />
+                      <ProductThumbNail src={encodeURI(thumbnail)} />
                     </ProductThumbNailWrapper>
                     <ProductName>
                       <Link to={`/product/${productId}`}>{productName}</Link>
