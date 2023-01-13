@@ -124,8 +124,7 @@ export default function restructureProductRegistrationStates(
     quantity: quantity ? Number(quantity) : null,
 
     isSelectiveOptionInUse: hasSelectiveOption,
-    optionCombinations:
-      !hasRequiredOption && !hasSelectiveOption ? null : productOptions,
+    optionCombinations: productOptions,
     manufacturingLeadTime: isCustomProduct ? manufacturingLeadTime : null,
     shipmentId: shipmentId ? Number(shipmentId) : null,
     isBundleShipment: shipmentId ? null : isBundleShipment === "가능",
