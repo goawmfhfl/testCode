@@ -16,6 +16,7 @@ import {
 } from "@cache/index";
 import { businessLicenseVar } from "@cache/shopSettings";
 import { preventNaNValues } from "@utils/index";
+import { compareDesc } from "date-fns";
 
 interface Props {
   preventCancel?: boolean;
@@ -157,6 +158,7 @@ const BusinessLicenseModal = ({ preventCancel }: Props) => {
                 rdnAddr: string;
                 prmsnMgtNo: string;
                 mngStateNm: string;
+                prmsnYmd: string;
               }>;
             }
           | string;
@@ -187,6 +189,21 @@ const BusinessLicenseModal = ({ preventCancel }: Props) => {
       }
 
       if (data?.items && data.items.length) {
+        data.items.sort((a, b) => {
+          return compareDesc(
+            new Date(
+              Number(a.prmsnYmd.slice(0, 4)),
+              Number(a.prmsnYmd.slice(4, 6)),
+              Number(a.prmsnYmd.slice(0, 4))
+            ),
+            new Date(
+              Number(b.prmsnYmd.slice(0, 4)),
+              Number(b.prmsnYmd.slice(4, 6)),
+              Number(b.prmsnYmd.slice(0, 4))
+            )
+          );
+        });
+
         if (data.items[0]?.mngStateNm !== "정상영업") {
           systemModalVar({
             ...systemModalVar(),
@@ -399,7 +416,7 @@ const BusinessLicenseModal = ({ preventCancel }: Props) => {
 
       <InfoContainer>
         <InputContainer>
-          <Label>법인명(상호명)</Label>
+          <Label>상호명(법인명)</Label>
           <Input
             onChange={handleChangeInput("businessName")}
             value={businessName}
