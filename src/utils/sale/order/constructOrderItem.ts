@@ -15,6 +15,7 @@ const optionsInitialValue: Array<{
 const constructOrderItem = (orderItem: Array<OrdersType>) => {
   const hasOrderItems = !!orderItem && !!orderItem.length;
   if (!hasOrderItems) return;
+
   const newOrderItems: Array<OrdersType> = [];
   const bundleOrder: {
     bundleOrders: Array<Array<OrdersType>>;
@@ -23,14 +24,17 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
     bundleOrders: [],
     temporaryBundleOrders: [],
   };
-
-  const flag = {
-    orderItemsRowIndex: 0,
+  const tableStyleInfo: {
+    colorIndex: number;
+    rowColorIndexList: Array<number>;
+  } = {
+    colorIndex: 0,
+    rowColorIndexList: [],
   };
 
   orderItem.forEach((order, index) => {
     const previousOrder =
-      index > 0 ? orderItem[index - 1].merchantUid : "minusIndex";
+      index > 0 ? orderItem[index - 1].merchantUid : "firstIndex";
     const currentOrder = order.merchantUid;
     const nextOrder =
       index === orderItem.length - 1
@@ -119,8 +123,60 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
   });
 
   orderItem.forEach((order, index) => {
-    const { product, options, merchantItemUid, merchantUid, isBundleShipment } =
-      order;
+    const previousMerchantUid =
+      index > 0 ? orderItem[index - 1].merchantUid : "firstIndex";
+    const currentMerchantUid = order.merchantUid;
+
+    const prevousIsBundleShipments =
+      index > 0 ? orderItem[index - 1].isBundleShipment : "firstIndex";
+    const currentIsBundleShipments = order.isBundleShipment;
+
+    if (
+      previousMerchantUid === "firstIndex" &&
+      prevousIsBundleShipments === "firstIndex"
+    ) {
+      tableStyleInfo.rowColorIndexList.push(tableStyleInfo.colorIndex);
+      return;
+    }
+    if (previousMerchantUid !== currentMerchantUid) {
+      if (tableStyleInfo.colorIndex === 2) {
+        tableStyleInfo.colorIndex = 0;
+        tableStyleInfo.rowColorIndexList.push(tableStyleInfo.colorIndex);
+        return;
+      }
+
+      if (tableStyleInfo.colorIndex !== 2) {
+        tableStyleInfo.colorIndex += 1;
+        tableStyleInfo.rowColorIndexList.push(tableStyleInfo.colorIndex);
+        return;
+      }
+    }
+
+    if (previousMerchantUid === currentMerchantUid) {
+      if (
+        prevousIsBundleShipments === true &&
+        currentIsBundleShipments === true
+      ) {
+        tableStyleInfo.rowColorIndexList.push(tableStyleInfo.colorIndex);
+        return;
+      } else {
+        if (tableStyleInfo.colorIndex === 2) {
+          tableStyleInfo.colorIndex = 0;
+          tableStyleInfo.rowColorIndexList.push(tableStyleInfo.colorIndex);
+          return;
+        }
+
+        if (tableStyleInfo.colorIndex !== 2) {
+          tableStyleInfo.colorIndex += 1;
+          tableStyleInfo.rowColorIndexList.push(tableStyleInfo.colorIndex);
+          return;
+        }
+      }
+    }
+  });
+
+  orderItem.forEach((order, index) => {
+    const { product, options, merchantUid } = order;
     const eachOrderItemStyleIfno = {
       columnOrder: 0,
       isLastColumn: false,
@@ -139,33 +195,6 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
         const previousMerchantUid = hasNewOrderItems
           ? newOrderItems[newOrderItems.length - 1].merchantUid
           : "";
-        const previousMerchantItemUid = hasNewOrderItems
-          ? newOrderItems[newOrderItems.length - 1].merchantItemUid
-          : "";
-        const previousIsBundleShipment = hasNewOrderItems
-          ? newOrderItems[newOrderItems.length - 1].isBundleShipment
-          : "";
-
-        if (newOrderItems.length === 0) {
-          flag.orderItemsRowIndex = 0;
-        }
-
-        if (newOrderItems.length !== 0 && merchantUid !== previousMerchantUid) {
-          flag.orderItemsRowIndex += 1;
-        }
-
-        if (
-          newOrderItems.length !== 0 &&
-          merchantUid === previousMerchantUid &&
-          merchantItemUid !== previousMerchantItemUid &&
-          previousIsBundleShipment !== isBundleShipment
-        ) {
-          flag.orderItemsRowIndex += 1;
-        }
-
-        if (flag.orderItemsRowIndex >= 3) {
-          flag.orderItemsRowIndex = 0;
-        }
 
         if (options.length === eachOrderItemStyleIfno.columnOrder) {
           eachOrderItemStyleIfno.isLastColumn = true;
@@ -184,7 +213,7 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
             ...order,
             rowIndex: uuidv4(),
             options: [option],
-            colorIndex: flag.orderItemsRowIndex,
+            colorIndex: tableStyleInfo.rowColorIndexList[index],
             isLastColumn: eachOrderItemStyleIfno.isLastColumn,
           });
         }
@@ -204,7 +233,7 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
             options: resetOption,
             shipmentPrice: null,
             shipmentDistantPrice: null,
-            colorIndex: flag.orderItemsRowIndex,
+            colorIndex: tableStyleInfo.rowColorIndexList[index],
             isLastColumn: eachOrderItemStyleIfno.isLastColumn,
           });
         }
@@ -216,33 +245,6 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
       const previousMerchantUid = hasNewOrderItems
         ? newOrderItems[newOrderItems.length - 1].merchantUid
         : "";
-      const previousMerchantItemUid = hasNewOrderItems
-        ? newOrderItems[newOrderItems.length - 1].merchantItemUid
-        : "";
-      const previousIsBundleShipment = hasNewOrderItems
-        ? newOrderItems[newOrderItems.length - 1].isBundleShipment
-        : "";
-
-      if (newOrderItems.length === 0) {
-        flag.orderItemsRowIndex = 0;
-      }
-
-      if (newOrderItems.length !== 0 && merchantUid !== previousMerchantUid) {
-        flag.orderItemsRowIndex += 1;
-      }
-
-      if (
-        newOrderItems.length !== 0 &&
-        merchantUid === previousMerchantUid &&
-        merchantItemUid !== previousMerchantItemUid &&
-        previousIsBundleShipment !== isBundleShipment
-      ) {
-        flag.orderItemsRowIndex += 1;
-      }
-
-      if (flag.orderItemsRowIndex >= 3) {
-        flag.orderItemsRowIndex = 0;
-      }
 
       eachOrderItemStyleIfno.isLastColumn = true;
 
@@ -257,7 +259,7 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
       newOrderItems.push({
         ...order,
         rowIndex: uuidv4(),
-        colorIndex: flag.orderItemsRowIndex,
+        colorIndex: tableStyleInfo.rowColorIndexList[index],
         isLastColumn: eachOrderItemStyleIfno.isLastColumn,
       });
     }
