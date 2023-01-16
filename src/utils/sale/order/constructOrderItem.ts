@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { OrdersType } from "@models/sale/order";
+import { cloneDeep } from "lodash";
 
 const optionsInitialValue: Array<{
   id: number;
@@ -16,7 +17,11 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
   const hasOrderItems = !!orderItem && !!orderItem.length;
   if (!hasOrderItems) return;
 
-  const newOrderItems: Array<OrdersType> = [];
+  const newOrderItems: Array<OrdersType> = cloneDeep(orderItem).sort(
+    compareBundleShipment
+  );
+  const reconstructOrderItems: Array<OrdersType> = [];
+
   const bundleOrder: {
     bundleOrders: Array<Array<OrdersType>>;
     temporaryBundleOrders: Array<OrdersType>;
@@ -32,14 +37,14 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
     rowColorIndexList: [],
   };
 
-  orderItem.forEach((order, index) => {
+  newOrderItems.forEach((order, index) => {
     const previousOrder =
-      index > 0 ? orderItem[index - 1].merchantUid : "firstIndex";
+      index > 0 ? newOrderItems[index - 1].merchantUid : "firstIndex";
     const currentOrder = order.merchantUid;
     const nextOrder =
-      index === orderItem.length - 1
+      index === newOrderItems.length - 1
         ? "overIndex"
-        : orderItem[index + 1].merchantUid;
+        : newOrderItems[index + 1].merchantUid;
 
     if (nextOrder === "overIndex") {
       if (previousOrder === currentOrder) {
@@ -100,35 +105,35 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
       if (nextOrder === "overIndex") return;
 
       if (index === 0) {
-        const findFirstOrderIndex = orderItem.findIndex(
+        const findFirstOrderIndex = newOrderItems.findIndex(
           ({ merchantUid, merchantItemUid }) =>
             merchantUid === firstOrder.merchantUid &&
             merchantItemUid === firstOrder.merchantItemUid
         );
 
-        orderItem[findFirstOrderIndex].shipmentPrice =
+        newOrderItems[findFirstOrderIndex].shipmentPrice =
           getFirstShipmentPrice(orders);
-        orderItem[findFirstOrderIndex].shipmentDistantPrice =
+        newOrderItems[findFirstOrderIndex].shipmentDistantPrice =
           getFirstShipmentDistantPrice(orders);
       }
 
-      const findNextOrderIndex = orderItem.findIndex(
+      const findNextOrderIndex = newOrderItems.findIndex(
         ({ merchantUid, merchantItemUid }) =>
           merchantUid === nextOrder.merchantUid &&
           merchantItemUid === nextOrder.merchantItemUid
       );
-      orderItem[findNextOrderIndex].shipmentPrice = 0;
-      orderItem[findNextOrderIndex].shipmentDistantPrice = 0;
+      newOrderItems[findNextOrderIndex].shipmentPrice = 0;
+      newOrderItems[findNextOrderIndex].shipmentDistantPrice = 0;
     });
   });
 
-  orderItem.forEach((order, index) => {
+  newOrderItems.forEach((order, index) => {
     const previousMerchantUid =
-      index > 0 ? orderItem[index - 1].merchantUid : "firstIndex";
+      index > 0 ? newOrderItems[index - 1].merchantUid : "firstIndex";
     const currentMerchantUid = order.merchantUid;
 
     const prevousIsBundleShipments =
-      index > 0 ? orderItem[index - 1].isBundleShipment : "firstIndex";
+      index > 0 ? newOrderItems[index - 1].isBundleShipment : "firstIndex";
     const currentIsBundleShipments = order.isBundleShipment;
 
     if (
@@ -175,14 +180,15 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
     }
   });
 
-  orderItem.forEach((order, index) => {
+  newOrderItems.forEach((order, index) => {
     const { product, options, merchantUid } = order;
     const eachOrderItemStyleIfno = {
       columnOrder: 0,
       isLastColumn: false,
     };
 
-    const hasNewOrderItems = !!newOrderItems && !!newOrderItems.length;
+    const hasReconstructOrderItems =
+      !!reconstructOrderItems && !!reconstructOrderItems.length;
     const hasOptions = !!options && !!options.length;
 
     if (hasOptions) {
@@ -192,24 +198,28 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
           !!option && !!option.components && !!option.components.length;
         if (!hasOptions) return;
 
-        const previousMerchantUid = hasNewOrderItems
-          ? newOrderItems[newOrderItems.length - 1].merchantUid
+        const previousMerchantUid = hasReconstructOrderItems
+          ? reconstructOrderItems[reconstructOrderItems.length - 1].merchantUid
           : "";
 
         if (options.length === eachOrderItemStyleIfno.columnOrder) {
           eachOrderItemStyleIfno.isLastColumn = true;
         }
 
-        if (newOrderItems.length !== 0 && merchantUid === previousMerchantUid) {
-          newOrderItems[newOrderItems.length - 1].isLastColumn = false;
+        if (
+          reconstructOrderItems.length !== 0 &&
+          merchantUid === previousMerchantUid
+        ) {
+          reconstructOrderItems[reconstructOrderItems.length - 1].isLastColumn =
+            false;
         }
 
-        if (orderItem.length - 1 === index) {
+        if (newOrderItems.length - 1 === index) {
           eachOrderItemStyleIfno.isLastColumn = false;
         }
 
         if (option.isRequired) {
-          newOrderItems.push({
+          reconstructOrderItems.push({
             ...order,
             rowIndex: uuidv4(),
             options: [option],
@@ -224,7 +234,7 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
           );
           const resetOption = reconstructNotRequiredOption(options);
 
-          newOrderItems.push({
+          reconstructOrderItems.push({
             ...order,
             rowIndex: uuidv4(),
             originalPrice: null,
@@ -242,21 +252,25 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
       }, optionsInitialValue);
     }
     if (!hasOptions) {
-      const previousMerchantUid = hasNewOrderItems
-        ? newOrderItems[newOrderItems.length - 1].merchantUid
+      const previousMerchantUid = hasReconstructOrderItems
+        ? reconstructOrderItems[reconstructOrderItems.length - 1].merchantUid
         : "";
 
       eachOrderItemStyleIfno.isLastColumn = true;
 
-      if (newOrderItems.length !== 0 && merchantUid === previousMerchantUid) {
-        newOrderItems[newOrderItems.length - 1].isLastColumn = false;
+      if (
+        reconstructOrderItems.length !== 0 &&
+        merchantUid === previousMerchantUid
+      ) {
+        reconstructOrderItems[reconstructOrderItems.length - 1].isLastColumn =
+          false;
       }
 
-      if (orderItem.length - 1 === index) {
+      if (newOrderItems.length - 1 === index) {
         eachOrderItemStyleIfno.isLastColumn = false;
       }
 
-      newOrderItems.push({
+      reconstructOrderItems.push({
         ...order,
         rowIndex: uuidv4(),
         colorIndex: tableStyleInfo.rowColorIndexList[index],
@@ -267,8 +281,8 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
 
   return {
     orders: {
-      allIds: newOrderItems.map((order) => order.rowIndex),
-      byId: newOrderItems.reduce((byId, order) => {
+      allIds: reconstructOrderItems.map((order) => order.rowIndex),
+      byId: reconstructOrderItems.reduce((byId, order) => {
         byId[order.rowIndex] = order;
         return byId;
       }, {}),
@@ -341,6 +355,12 @@ const getFirstShipmentDistantPrice = (orders: Array<OrdersType>) => {
     if (shipmentDistantPrice) return (result = shipmentDistantPrice);
     if (!shipmentDistantPrice) return (result = 0);
   }, 0);
+};
+const compareBundleShipment = (a: OrdersType, b: OrdersType) => {
+  if (a.merchantUid !== b.merchantUid) return 0;
+  if (a.isBundleShipment && !b.isBundleShipment) return -1;
+  if (!a.isBundleShipment && b.isBundleShipment) return 1;
+  return 0;
 };
 
 export default constructOrderItem;
