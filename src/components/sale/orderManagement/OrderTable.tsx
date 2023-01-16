@@ -655,18 +655,18 @@ const OrderTable = () => {
                   orderStatus,
                   isChecked,
                   colorIndex,
-                  isLastColumn,
-                  hasCheckbox,
+                  isLastRow,
+                  isFirstRow,
                 },
                 index
               ) => (
                 <Tr
                   key={rowIndex}
                   colorIndex={colorIndex}
-                  isLastColumn={isLastColumn}
+                  isLastRow={isLastRow}
                 >
                   <Td type={TableType.SCROLL} width={fixTableType[0].width}>
-                    {hasCheckbox && (
+                    {isFirstRow && (
                       <Checkbox
                         onChange={changeSingleCheckBoxHandler(index)}
                         checked={isChecked}
@@ -797,14 +797,15 @@ const OrderTable = () => {
                   isShipmentInfoEdit,
                   temporaryShipmentCompany,
                   temporaryShipmentNumber,
-                  isLastColumn,
+                  isLastRow,
+                  isFirstRow,
                 },
                 index
               ) => (
                 <Tr
                   key={rowIndex}
                   colorIndex={colorIndex}
-                  isLastColumn={isLastColumn}
+                  isLastRow={isLastRow}
                 >
                   <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
                     {claimStatus}
@@ -825,149 +826,163 @@ const OrderTable = () => {
                       readOnly={true}
                     />
                     <ShipmentCompanyTd width={scrollTableType[1].width}>
-                      {shipmentCompany ? (
-                        isShipmentInfoEdit ? (
-                          <Dropdown
-                            onChange={changeShipmentCompanyHandler(index)}
-                            arrowSrc={triangleArrowSvg}
-                            value={temporaryShipmentCompany}
-                            sizing={"medium"}
-                            width={"104px"}
-                            disabled={orderStatus === "새주문"}
-                          >
-                            <Option hidden value="default">
-                              택배사
-                            </Option>
-                            {shipmentCompanys.map(({ Code, Name }) => (
-                              <Option key={Code} value={Code}>
-                                {Name}
+                      {isFirstRow ? (
+                        <>
+                          {shipmentCompany ? (
+                            isShipmentInfoEdit ? (
+                              <Dropdown
+                                onChange={changeShipmentCompanyHandler(index)}
+                                arrowSrc={triangleArrowSvg}
+                                value={temporaryShipmentCompany}
+                                sizing={"medium"}
+                                width={"104px"}
+                                disabled={orderStatus === "새주문"}
+                              >
+                                <Option hidden value="default">
+                                  택배사
+                                </Option>
+                                {shipmentCompanys.map(({ Code, Name }) => (
+                                  <Option key={Code} value={Code}>
+                                    {Name}
+                                  </Option>
+                                ))}
+                              </Dropdown>
+                            ) : (
+                              <>
+                                <ShipmentTemplateInput
+                                  type="text"
+                                  id="t_code"
+                                  name="t_code"
+                                  value={shipmentCompany}
+                                  readOnly={true}
+                                />
+                                {shipmentCompanyCode[shipmentCompany]}
+                              </>
+                            )
+                          ) : (
+                            <Dropdown
+                              onChange={changeShipmentCompanyHandler(index)}
+                              arrowSrc={triangleArrowSvg}
+                              value={temporaryShipmentCompany}
+                              sizing={"medium"}
+                              width={"104px"}
+                              disabled={orderStatus === "새주문"}
+                            >
+                              <Option hidden value="default">
+                                택배사
                               </Option>
-                            ))}
-                          </Dropdown>
-                        ) : (
-                          <>
-                            <ShipmentTemplateInput
-                              type="text"
-                              id="t_code"
-                              name="t_code"
-                              value={shipmentCompany}
-                              readOnly={true}
-                            />
-                            {shipmentCompanyCode[shipmentCompany]}
-                          </>
-                        )
+                              {shipmentCompanys.map(({ Code, Name }) => (
+                                <Option key={Code} value={Code}>
+                                  {Name}
+                                </Option>
+                              ))}
+                            </Dropdown>
+                          )}
+                        </>
                       ) : (
-                        <Dropdown
-                          onChange={changeShipmentCompanyHandler(index)}
-                          arrowSrc={triangleArrowSvg}
-                          value={temporaryShipmentCompany}
-                          sizing={"medium"}
-                          width={"104px"}
-                          disabled={orderStatus === "새주문"}
-                        >
-                          <Option hidden value="default">
-                            택배사
-                          </Option>
-                          {shipmentCompanys.map(({ Code, Name }) => (
-                            <Option key={Code} value={Code}>
-                              {Name}
-                            </Option>
-                          ))}
-                        </Dropdown>
+                        "-"
                       )}
                     </ShipmentCompanyTd>
                     <ShipmnetNumberTd width={scrollTableType[2].width}>
-                      {shipmentNumber ? (
-                        isShipmentInfoEdit ? (
-                          <ShipmnetNumberContainer>
-                            <EditShipmentNumberInput
-                              onChange={changeShipmentNumberHandler(index)}
-                              disabled={orderStatus === "새주문"}
-                              width={"145px"}
-                              onKeyDown={preventNaNValues}
-                              value={
-                                temporaryShipmentNumber === 0
-                                  ? ""
-                                  : temporaryShipmentNumber
-                              }
-                            />
-                            <Button
-                              type="button"
-                              size="small"
-                              width="55px"
-                              onClick={handleSaveButtonClick(
-                                id,
-                                orderShipmentInfosId,
-                                temporaryShipmentCompany,
-                                temporaryShipmentNumber,
-                                ShipmentStatus.SHIPPING
-                              )}
-                            >
-                              저장
-                            </Button>
-                          </ShipmnetNumberContainer>
-                        ) : (
-                          <ShipmnetNumberContainer>
-                            <ShipmnetNumber>{shipmentNumber}</ShipmnetNumber>
-                            <ShipmentTemplateInput
-                              type="text"
-                              id="t_invoice"
-                              name="t_invoice"
-                              value={shipmentNumber}
-                              readOnly={true}
-                            />
-                            <ButtonContainer>
-                              <Button
+                      {isFirstRow ? (
+                        <>
+                          {shipmentNumber ? (
+                            isShipmentInfoEdit ? (
+                              <ShipmnetNumberContainer>
+                                <EditShipmentNumberInput
+                                  onChange={changeShipmentNumberHandler(index)}
+                                  disabled={orderStatus === "새주문"}
+                                  width={"145px"}
+                                  onKeyDown={preventNaNValues}
+                                  value={
+                                    temporaryShipmentNumber === 0
+                                      ? ""
+                                      : temporaryShipmentNumber
+                                  }
+                                />
+                                <Button
+                                  type="button"
+                                  size="small"
+                                  width="55px"
+                                  onClick={handleSaveButtonClick(
+                                    id,
+                                    orderShipmentInfosId,
+                                    temporaryShipmentCompany,
+                                    temporaryShipmentNumber,
+                                    ShipmentStatus.SHIPPING
+                                  )}
+                                >
+                                  저장
+                                </Button>
+                              </ShipmnetNumberContainer>
+                            ) : (
+                              <ShipmnetNumberContainer>
+                                <ShipmnetNumber>
+                                  {shipmentNumber}
+                                </ShipmnetNumber>
+                                <ShipmentTemplateInput
+                                  type="text"
+                                  id="t_invoice"
+                                  name="t_invoice"
+                                  value={shipmentNumber}
+                                  readOnly={true}
+                                />
+                                <ButtonContainer>
+                                  <Button
+                                    size="small"
+                                    width="55px"
+                                    onClick={handleEditButtonClick(id)}
+                                    backgroundColor={"#fff"}
+                                    borderColor={"#BBC0C6"}
+                                    type="button"
+                                  >
+                                    수정
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    width="55px"
+                                    backgroundColor={"#414A5B"}
+                                    color={"#fff"}
+                                    type="submit"
+                                  >
+                                    조회
+                                  </Button>
+                                </ButtonContainer>
+                              </ShipmnetNumberContainer>
+                            )
+                          ) : (
+                            <ShipmnetNumberContainer>
+                              <ShipmnetNumberInput
+                                onChange={changeShipmentNumberHandler(index)}
+                                disabled={orderStatus === "새주문"}
+                                width={"145px"}
+                                value={
+                                  temporaryShipmentNumber === 0
+                                    ? ""
+                                    : temporaryShipmentNumber
+                                }
+                                onKeyDown={preventNaNValues}
+                              />
+                              <SubmitButton
                                 size="small"
-                                width="55px"
-                                onClick={handleEditButtonClick(id)}
+                                disabled={orderStatus === "새주문"}
+                                width={"55px"}
+                                onClick={handleSendButtonClick(
+                                  id,
+                                  temporaryShipmentCompany,
+                                  temporaryShipmentNumber
+                                )}
                                 backgroundColor={"#fff"}
                                 borderColor={"#BBC0C6"}
                                 type="button"
                               >
-                                수정
-                              </Button>
-                              <Button
-                                size="small"
-                                width="55px"
-                                backgroundColor={"#414A5B"}
-                                color={"#fff"}
-                                type="submit"
-                              >
-                                조회
-                              </Button>
-                            </ButtonContainer>
-                          </ShipmnetNumberContainer>
-                        )
+                                발송
+                              </SubmitButton>
+                            </ShipmnetNumberContainer>
+                          )}
+                        </>
                       ) : (
-                        <ShipmnetNumberContainer>
-                          <ShipmnetNumberInput
-                            onChange={changeShipmentNumberHandler(index)}
-                            disabled={orderStatus === "새주문"}
-                            width={"145px"}
-                            value={
-                              temporaryShipmentNumber === 0
-                                ? ""
-                                : temporaryShipmentNumber
-                            }
-                            onKeyDown={preventNaNValues}
-                          />
-                          <SubmitButton
-                            size="small"
-                            disabled={orderStatus === "새주문"}
-                            width={"55px"}
-                            onClick={handleSendButtonClick(
-                              id,
-                              temporaryShipmentCompany,
-                              temporaryShipmentNumber
-                            )}
-                            backgroundColor={"#fff"}
-                            borderColor={"#BBC0C6"}
-                            type="button"
-                          >
-                            발송
-                          </SubmitButton>
-                        </ShipmnetNumberContainer>
+                        "-"
                       )}
                     </ShipmnetNumberTd>
                   </ShipmentColumn>

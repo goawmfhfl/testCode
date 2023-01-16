@@ -13,9 +13,6 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
   const result = orderAllIds.map((id) => {
     const {
       id: orderId,
-      colorIndex,
-      rowIndex,
-      isLastColumn,
       merchantUid,
       merchantItemUid,
       product,
@@ -30,7 +27,10 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       orderShipmentInfos,
       orderStatus,
       claimStatus,
-      hasCheckbox,
+      colorIndex,
+      rowIndex,
+      isLastRow,
+      isFirstRow,
     } = orderByid[id];
 
     const resetMerchantUid = merchantUid ? merchantUid : "-";
@@ -150,8 +150,8 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       temporaryShipmentNumber,
       colorIndex,
       rowIndex,
-      isLastColumn,
-      hasCheckbox,
+      isLastRow,
+      isFirstRow,
     };
   });
   return result;

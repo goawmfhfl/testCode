@@ -23,8 +23,8 @@ export interface GetOrdersBySellerInputType {
 export interface OrdersType {
   rowIndex?: string;
   colorIndex?: number;
-  isLastColumn?: boolean;
-  hasCheckbox: boolean;
+  isLastRow?: boolean;
+  isFirstRow: boolean;
 
   id: number;
   merchantUid: string;
@@ -216,6 +216,6 @@ export interface ResetOrderItemType {
   temporaryShipmentNumber?: number;
   colorIndex: number;
   rowIndex: string;
-  isLastColumn: boolean;
-  hasCheckbox: boolean;
+  isLastRow: boolean;
+  isFirstRow: boolean;
 }

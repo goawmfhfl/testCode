@@ -184,9 +184,9 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
   newOrderItems.forEach((order, index) => {
     const { product, options, merchantUid } = order;
     const orderItemStyleInfo = {
-      columnOrder: 0,
-      isLastColumn: false,
-      hasCheckbox: false,
+      rowOrders: 0,
+      isLastRow: false,
+      isFirstRow: false,
     };
 
     const hasReconstructOrderItems =
@@ -199,34 +199,34 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
           !!option && !!option.components && !!option.components.length;
         if (!hasOptions) return;
 
-        orderItemStyleInfo.columnOrder += 1;
+        orderItemStyleInfo.rowOrders += 1;
 
         const previousMerchantUid = hasReconstructOrderItems
           ? reconstructOrderItems[reconstructOrderItems.length - 1].merchantUid
           : "";
 
-        if (options.length === orderItemStyleInfo.columnOrder) {
-          orderItemStyleInfo.isLastColumn = true;
+        if (options.length === orderItemStyleInfo.rowOrders) {
+          orderItemStyleInfo.isLastRow = true;
         }
 
         if (
           reconstructOrderItems.length !== 0 &&
           merchantUid === previousMerchantUid
         ) {
-          reconstructOrderItems[reconstructOrderItems.length - 1].isLastColumn =
+          reconstructOrderItems[reconstructOrderItems.length - 1].isLastRow =
             false;
         }
 
         if (newOrderItems.length - 1 === index) {
-          orderItemStyleInfo.isLastColumn = false;
+          orderItemStyleInfo.isLastRow = false;
         }
 
-        if (orderItemStyleInfo.columnOrder === 1) {
-          orderItemStyleInfo.hasCheckbox = true;
+        if (orderItemStyleInfo.rowOrders === 1) {
+          orderItemStyleInfo.isFirstRow = true;
         }
 
-        if (orderItemStyleInfo.columnOrder !== 1) {
-          orderItemStyleInfo.hasCheckbox = false;
+        if (orderItemStyleInfo.rowOrders !== 1) {
+          orderItemStyleInfo.isFirstRow = false;
         }
 
         if (option.isRequired) {
@@ -235,8 +235,8 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
             rowIndex: uuidv4(),
             options: [option],
             colorIndex: tableStyleInfo.rowColorIndexList[index],
-            isLastColumn: orderItemStyleInfo.isLastColumn,
-            hasCheckbox: orderItemStyleInfo.hasCheckbox,
+            isLastRow: orderItemStyleInfo.isLastRow,
+            isFirstRow: orderItemStyleInfo.isFirstRow,
           });
         }
         if (!option.isRequired) {
@@ -256,8 +256,8 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
             shipmentPrice: null,
             shipmentDistantPrice: null,
             colorIndex: tableStyleInfo.rowColorIndexList[index],
-            isLastColumn: orderItemStyleInfo.isLastColumn,
-            hasCheckbox: orderItemStyleInfo.hasCheckbox,
+            isLastRow: orderItemStyleInfo.isLastRow,
+            isFirstRow: orderItemStyleInfo.isFirstRow,
           });
         }
 
@@ -269,27 +269,27 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
         ? reconstructOrderItems[reconstructOrderItems.length - 1].merchantUid
         : "";
 
-      orderItemStyleInfo.isLastColumn = true;
-      orderItemStyleInfo.hasCheckbox = true;
+      orderItemStyleInfo.isLastRow = true;
+      orderItemStyleInfo.isFirstRow = true;
 
       if (
         reconstructOrderItems.length !== 0 &&
         merchantUid === previousMerchantUid
       ) {
-        reconstructOrderItems[reconstructOrderItems.length - 1].isLastColumn =
+        reconstructOrderItems[reconstructOrderItems.length - 1].isLastRow =
           false;
       }
 
       if (newOrderItems.length - 1 === index) {
-        orderItemStyleInfo.isLastColumn = false;
+        orderItemStyleInfo.isLastRow = false;
       }
 
       reconstructOrderItems.push({
         ...order,
         rowIndex: uuidv4(),
         colorIndex: tableStyleInfo.rowColorIndexList[index],
-        isLastColumn: orderItemStyleInfo.isLastColumn,
-        hasCheckbox: orderItemStyleInfo.hasCheckbox,
+        isLastRow: orderItemStyleInfo.isLastRow,
+        isFirstRow: orderItemStyleInfo.isFirstRow,
       });
     }
   });
