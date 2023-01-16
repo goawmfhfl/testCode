@@ -30,6 +30,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       orderShipmentInfos,
       orderStatus,
       claimStatus,
+      hasCheckbox,
     } = orderByid[id];
 
     const resetMerchantUid = merchantUid ? merchantUid : "-";
@@ -150,6 +151,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       colorIndex,
       rowIndex,
       isLastColumn,
+      hasCheckbox,
     };
   });
   return result;

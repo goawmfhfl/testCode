@@ -24,6 +24,7 @@ export interface OrdersType {
   rowIndex?: string;
   colorIndex?: number;
   isLastColumn?: boolean;
+  hasCheckbox: boolean;
 
   id: number;
   merchantUid: string;
@@ -216,4 +217,5 @@ export interface ResetOrderItemType {
   colorIndex: number;
   rowIndex: string;
   isLastColumn: boolean;
+  hasCheckbox: boolean;
 }

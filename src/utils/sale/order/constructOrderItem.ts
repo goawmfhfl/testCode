@@ -29,6 +29,7 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
     bundleOrders: [],
     temporaryBundleOrders: [],
   };
+
   const tableStyleInfo: {
     colorIndex: number;
     rowColorIndexList: Array<number>;
@@ -182,9 +183,10 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
 
   newOrderItems.forEach((order, index) => {
     const { product, options, merchantUid } = order;
-    const eachOrderItemStyleIfno = {
+    const orderItemStyleInfo = {
       columnOrder: 0,
       isLastColumn: false,
+      hasCheckbox: false,
     };
 
     const hasReconstructOrderItems =
@@ -193,17 +195,18 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
 
     if (hasOptions) {
       options.reduce((optionResult, option) => {
-        eachOrderItemStyleIfno.columnOrder += 1;
         const hasOptions =
           !!option && !!option.components && !!option.components.length;
         if (!hasOptions) return;
+
+        orderItemStyleInfo.columnOrder += 1;
 
         const previousMerchantUid = hasReconstructOrderItems
           ? reconstructOrderItems[reconstructOrderItems.length - 1].merchantUid
           : "";
 
-        if (options.length === eachOrderItemStyleIfno.columnOrder) {
-          eachOrderItemStyleIfno.isLastColumn = true;
+        if (options.length === orderItemStyleInfo.columnOrder) {
+          orderItemStyleInfo.isLastColumn = true;
         }
 
         if (
@@ -215,7 +218,15 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
         }
 
         if (newOrderItems.length - 1 === index) {
-          eachOrderItemStyleIfno.isLastColumn = false;
+          orderItemStyleInfo.isLastColumn = false;
+        }
+
+        if (orderItemStyleInfo.columnOrder === 1) {
+          orderItemStyleInfo.hasCheckbox = true;
+        }
+
+        if (orderItemStyleInfo.columnOrder !== 1) {
+          orderItemStyleInfo.hasCheckbox = false;
         }
 
         if (option.isRequired) {
@@ -224,7 +235,8 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
             rowIndex: uuidv4(),
             options: [option],
             colorIndex: tableStyleInfo.rowColorIndexList[index],
-            isLastColumn: eachOrderItemStyleIfno.isLastColumn,
+            isLastColumn: orderItemStyleInfo.isLastColumn,
+            hasCheckbox: orderItemStyleInfo.hasCheckbox,
           });
         }
         if (!option.isRequired) {
@@ -244,7 +256,8 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
             shipmentPrice: null,
             shipmentDistantPrice: null,
             colorIndex: tableStyleInfo.rowColorIndexList[index],
-            isLastColumn: eachOrderItemStyleIfno.isLastColumn,
+            isLastColumn: orderItemStyleInfo.isLastColumn,
+            hasCheckbox: orderItemStyleInfo.hasCheckbox,
           });
         }
 
@@ -256,7 +269,8 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
         ? reconstructOrderItems[reconstructOrderItems.length - 1].merchantUid
         : "";
 
-      eachOrderItemStyleIfno.isLastColumn = true;
+      orderItemStyleInfo.isLastColumn = true;
+      orderItemStyleInfo.hasCheckbox = true;
 
       if (
         reconstructOrderItems.length !== 0 &&
@@ -267,14 +281,15 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
       }
 
       if (newOrderItems.length - 1 === index) {
-        eachOrderItemStyleIfno.isLastColumn = false;
+        orderItemStyleInfo.isLastColumn = false;
       }
 
       reconstructOrderItems.push({
         ...order,
         rowIndex: uuidv4(),
         colorIndex: tableStyleInfo.rowColorIndexList[index],
-        isLastColumn: eachOrderItemStyleIfno.isLastColumn,
+        isLastColumn: orderItemStyleInfo.isLastColumn,
+        hasCheckbox: orderItemStyleInfo.hasCheckbox,
       });
     }
   });
@@ -356,6 +371,7 @@ const getFirstShipmentDistantPrice = (orders: Array<OrdersType>) => {
     if (!shipmentDistantPrice) return (result = 0);
   }, 0);
 };
+
 const compareBundleShipment = (a: OrdersType, b: OrdersType) => {
   if (a.merchantUid !== b.merchantUid) return 0;
   if (a.isBundleShipment && !b.isBundleShipment) return -1;

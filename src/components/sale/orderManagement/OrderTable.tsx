@@ -133,6 +133,7 @@ const OrderTable = () => {
   });
 
   const [orderItems, setOrderItems] = useState<Array<ResetOrderItemType>>([]);
+
   const [shipmentCompanys, setShipmentCompanys] = useState<
     Array<{
       Code: string;
@@ -655,6 +656,7 @@ const OrderTable = () => {
                   isChecked,
                   colorIndex,
                   isLastColumn,
+                  hasCheckbox,
                 },
                 index
               ) => (
@@ -664,10 +666,12 @@ const OrderTable = () => {
                   isLastColumn={isLastColumn}
                 >
                   <Td type={TableType.SCROLL} width={fixTableType[0].width}>
-                    <Checkbox
-                      onChange={changeSingleCheckBoxHandler(index)}
-                      checked={isChecked}
-                    />
+                    {hasCheckbox && (
+                      <Checkbox
+                        onChange={changeSingleCheckBoxHandler(index)}
+                        checked={isChecked}
+                      />
+                    )}
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[1].width}>
                     {merchantUid}
