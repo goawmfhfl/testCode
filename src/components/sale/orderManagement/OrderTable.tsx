@@ -982,7 +982,9 @@ const OrderTable = () => {
                     {recipientPhoneNumber}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[6].width}>
-                    {recipientAddress}
+                    <RecipientAddressWrapper>
+                      {recipientAddress}
+                    </RecipientAddressWrapper>
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[7].width}>
                     {postCode}
@@ -1081,9 +1083,12 @@ const ProductName = styled.span`
   display: block;
 
   padding: 0 6px;
+
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
 `;
 
 const ShipmentColumn = styled(Td)`
@@ -1160,6 +1165,14 @@ const OptionWrapper = styled.span`
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+`;
+
+const RecipientAddressWrapper = styled.span`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
 `;
 
