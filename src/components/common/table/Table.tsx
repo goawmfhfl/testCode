@@ -101,12 +101,12 @@ export const TdContainer = styled.div`
   border-radius: 0px 0px 7px 7px;
 `;
 
-export const Tr = styled.div<{ colorIndex?: number; isLastColumn?: boolean }>`
+export const Tr = styled.div<{ colorIndex?: number; isLastRow?: boolean }>`
   display: flex;
   width: 100%;
-  border-bottom: ${({ theme: { palette }, isLastColumn }) => {
-    if (isLastColumn) return `5px solid ${palette.grey500}`;
-    if (!isLastColumn) return `1px solid ${palette.grey500}`;
+  border-bottom: ${({ theme: { palette }, isLastRow }) => {
+    if (isLastRow) return `5px solid ${palette.grey500}`;
+    if (!isLastRow) return `1px solid ${palette.grey500}`;
   }};
 
   background-color: ${({ theme: { palette }, colorIndex }) => {

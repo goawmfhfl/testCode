@@ -12,7 +12,11 @@ import {
 } from "@constants/sale/orderManagement/table";
 import { ShipmentStatus, shipmentCompanyCode } from "@constants/sale";
 
-import { filterOptionVar } from "@cache/sale/order";
+import {
+  filterOptionVar,
+  orderItemsVar,
+  resetOrderItemVar,
+} from "@cache/sale/order";
 import {
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
@@ -32,7 +36,7 @@ import {
   SendOrderItemsType,
 } from "@models/sale/order";
 
-import resetOrderItems from "@utils/sale/order/resetOrderItems";
+import getResetOrderItems from "@utils/sale/order/getResetOrderItems";
 import constructOrderItem from "@utils/sale/order/constructOrderItem";
 import { preventNaNValues } from "@utils/index";
 
@@ -132,7 +136,8 @@ const OrderTable = () => {
     ],
   });
 
-  const [orderItems, setOrderItems] = useState<Array<ResetOrderItemType>>([]);
+  const resetOrderItem =
+    useReactiveVar<Array<ResetOrderItemType>>(resetOrderItemVar);
 
   const [shipmentCompanys, setShipmentCompanys] = useState<
     Array<{
@@ -146,7 +151,7 @@ const OrderTable = () => {
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
 
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newOrderItems = cloneDeep(orderItems);
+    const newOrderItems = cloneDeep(resetOrderItem);
     checkAllBoxStatusVar(e.target.checked);
 
     if (e.target.checked) {
@@ -154,8 +159,7 @@ const OrderTable = () => {
         ...orderItem,
         isChecked: true,
       }));
-
-      setOrderItems(checkAllOrderItem);
+      resetOrderItemVar(checkAllOrderItem);
       checkedOrderItemsVar(checkAllOrderItem);
     }
 
@@ -165,57 +169,46 @@ const OrderTable = () => {
         isChecked: false,
       }));
 
-      setOrderItems(checkAllOrderItem);
+      resetOrderItemVar(checkAllOrderItem);
       checkedOrderItemsVar([]);
     }
   };
 
   const changeSingleCheckBoxHandler =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newOrderItems = cloneDeep(orderItems);
+      const newOrderItems = cloneDeep(resetOrderItem);
+      const targetOrderItemId = newOrderItems[index].id;
 
       if (e.target.checked) {
-        const checkedOrderItem = { ...newOrderItems[index], isChecked: true };
-        checkedOrderItemsVar([...checkedOrderItems, checkedOrderItem]);
+        const targetOrderItems = newOrderItems.filter(
+          ({ id }) => id === targetOrderItemId
+        );
+        const checkTargetOrderItems = targetOrderItems.map((orderItem) => ({
+          ...orderItem,
+          isChecked: true,
+        }));
 
+        checkedOrderItemsVar([...checkedOrderItems, ...checkTargetOrderItems]);
         newOrderItems[index].isChecked = true;
-        setOrderItems(newOrderItems);
       }
 
       if (!e.target.checked) {
-        const hasCheckedList = checkedOrderItems.filter(
-          (orderItem) => orderItem.id === newOrderItems[index].id
+        const filteredOrderItems = checkedOrderItems.filter(
+          (orderItem) => orderItem.id !== targetOrderItemId
         );
-
-        if (hasCheckedList) {
-          const checkedListIndex = checkedOrderItems.findIndex(
-            (orderItem) => orderItem.id === newOrderItems[index].id
-          );
-
-          const deletedCheckedList = [
-            ...checkedOrderItems.slice(0, checkedListIndex),
-            ...checkedOrderItems.slice(checkedListIndex + 1),
-          ];
-
-          checkedOrderItemsVar(deletedCheckedList);
-
-          newOrderItems[index].isChecked = false;
-
-          setOrderItems(newOrderItems);
-        }
-
+        checkedOrderItemsVar(filteredOrderItems);
         newOrderItems[index].isChecked = false;
-        setOrderItems(newOrderItems);
       }
+      resetOrderItemVar(newOrderItems);
     };
 
   const changeShipmentNumberHandler =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newOrderItems = cloneDeep(orderItems);
+      const newOrderItems = cloneDeep(resetOrderItem);
       const newCheckedOrderItems = cloneDeep(checkedOrderItems);
 
       newOrderItems[index].temporaryShipmentNumber = Number(e.target.value);
-      setOrderItems(newOrderItems);
+      resetOrderItemVar(newOrderItems);
 
       if (newCheckedOrderItems.length > 0) {
         const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
@@ -234,11 +227,11 @@ const OrderTable = () => {
 
   const changeShipmentCompanyHandler =
     (index: number) => (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const newOrderItems = cloneDeep(orderItems);
+      const newOrderItems = cloneDeep(resetOrderItem);
       const newCheckedOrderItems = cloneDeep(checkedOrderItems);
 
       newOrderItems[index].temporaryShipmentCompany = e.target.value;
-      setOrderItems(newOrderItems);
+      resetOrderItemVar(newOrderItems);
 
       if (newCheckedOrderItems.length > 0) {
         const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
@@ -423,8 +416,8 @@ const OrderTable = () => {
                   confirmButtonVisibility: true,
                   cancelButtonVisibility: false,
                   confirmButtonClickHandler: () => {
-                    const newOrderItems = cloneDeep(orderItems);
-                    const findOrderItmeIndex = orderItems.findIndex(
+                    const newOrderItems = cloneDeep(resetOrderItem);
+                    const findOrderItmeIndex = newOrderItems.findIndex(
                       ({ id }) => id === orderItemId
                     );
                     newOrderItems[findOrderItmeIndex].isShipmentInfoEdit =
@@ -434,7 +427,7 @@ const OrderTable = () => {
                     newOrderItems[findOrderItmeIndex].shipmentNumber =
                       shipmentNumber;
 
-                    setOrderItems(newOrderItems);
+                    resetOrderItemVar(newOrderItems);
 
                     systemModalVar({
                       ...systemModalVar(),
@@ -460,18 +453,17 @@ const OrderTable = () => {
     };
 
   const handleEditButtonClick = (id: number) => () => {
-    const newOrderItems = cloneDeep(orderItems);
+    const newOrderItems = cloneDeep(resetOrderItem);
 
     const findOrderItmeIndex = newOrderItems.findIndex(
       (orderItem) => orderItem.id === id
     );
     newOrderItems[findOrderItmeIndex].isShipmentInfoEdit = true;
-    setOrderItems(newOrderItems);
+    resetOrderItemVar(newOrderItems);
   };
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
+    void (async () => {
       await getOrderItem({
         variables: {
           input: {
@@ -523,13 +515,10 @@ const OrderTable = () => {
     const nomalizedOrderItem: NormalizedListType =
       constructOrderItem(totalOrderItems);
 
-    const orderItems: Array<ResetOrderItemType> =
-      resetOrderItems(nomalizedOrderItem);
-
-    setOrderItems(orderItems);
-
+    const resetOrderItems: Array<ResetOrderItemType> =
+      getResetOrderItems(nomalizedOrderItem);
+    resetOrderItemVar(resetOrderItems);
     checkedOrderItemsVar([]);
-    checkAllBoxStatusVar(false);
   }, [data]);
 
   useEffect(() => {
@@ -570,8 +559,7 @@ const OrderTable = () => {
   }, [error]);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
+    void (async () => {
       try {
         const parameter = {
           params: { t_key: process.env.REACT_APP_SWEETTRAKER_API_KEY },
@@ -611,7 +599,7 @@ const OrderTable = () => {
     })();
   }, []);
 
-  const hasOrderItems = !loading && !error && !!orderItems?.length;
+  const hasOrderItems = !loading && !error && !!resetOrderItem?.length;
 
   return (
     <TableContainer type={TableType.SCROLL} hasData={hasOrderItems}>
@@ -641,7 +629,7 @@ const OrderTable = () => {
         </ThContainer>
         <TdContainer>
           {!loading &&
-            orderItems?.map(
+            resetOrderItem?.map(
               (
                 {
                   id,
@@ -766,7 +754,7 @@ const OrderTable = () => {
 
         <TdContainer>
           {!loading &&
-            orderItems?.map(
+            resetOrderItem?.map(
               (
                 {
                   id,
@@ -890,6 +878,7 @@ const OrderTable = () => {
                             isShipmentInfoEdit ? (
                               <ShipmnetNumberContainer>
                                 <EditShipmentNumberInput
+                                  type="text"
                                   onChange={changeShipmentNumberHandler(index)}
                                   disabled={orderStatus === "새주문"}
                                   width={"145px"}
