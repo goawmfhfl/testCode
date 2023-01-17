@@ -164,6 +164,8 @@ const BusinessLicenseModal = ({ preventCancel }: Props) => {
           | string;
       };
 
+      console.log(data);
+
       loadingSpinnerVisibilityVar(false);
 
       if (typeof data === "string") {
@@ -204,14 +206,52 @@ const BusinessLicenseModal = ({ preventCancel }: Props) => {
           );
         });
 
-        if (data.items[0]?.mngStateNm !== "정상영업") {
+        if (data.items[0]?.mngStateNm === "정상영업") {
           systemModalVar({
             ...systemModalVar(),
             isVisible: true,
-            icon: exclamationmarkSrc,
-            description: <>유효하지 않은 사업자 등록 정보입니다.</>,
-            confirmButtonText: "확인",
+            icon: "",
+            description: (
+              <>
+                사업자등록증과 통신판매업신고증이 <br />
+                등록되었습니다.
+              </>
+            ),
+            confirmButtonVisibility: true,
             confirmButtonClickHandler: () => {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+
+              modalVar({
+                ...modalVar(),
+                isVisible: false,
+              });
+
+              const latestBusinessLicense = data.items[0];
+
+              const { bizrno, crno, simTxtnTrgtYnDesc, prmsnMgtNo } =
+                latestBusinessLicense;
+
+              businessLicenseVar({
+                isConfirmed: true,
+                representativeName,
+                businessName,
+                businessRegistrationNumber: bizrno,
+                corporateRegistrationNumber: crno,
+                isSimpleTaxpayers: simTxtnTrgtYnDesc,
+                companyLocation: location,
+                onlineSalesLicense: prmsnMgtNo,
+              });
+
+              // save button ref . click
+              if (preventCancel) {
+                saveShopButtonRefVar().click();
+              }
+            },
+            cancelButtonVisibility: true,
+            cancelButtonClickHandler: () => {
               systemModalVar({
                 ...systemModalVar(),
                 isVisible: false,
@@ -221,60 +261,6 @@ const BusinessLicenseModal = ({ preventCancel }: Props) => {
 
           return;
         }
-
-        systemModalVar({
-          ...systemModalVar(),
-          isVisible: true,
-          icon: "",
-          description: (
-            <>
-              사업자등록증과 통신판매업신고증이 <br />
-              등록되었습니다.
-            </>
-          ),
-          confirmButtonVisibility: true,
-          confirmButtonClickHandler: () => {
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: false,
-            });
-
-            modalVar({
-              ...modalVar(),
-              isVisible: false,
-            });
-
-            const latestBusinessLicense = data.items[0];
-
-            const { bizrno, crno, simTxtnTrgtYnDesc, prmsnMgtNo } =
-              latestBusinessLicense;
-
-            businessLicenseVar({
-              isConfirmed: true,
-              representativeName,
-              businessName,
-              businessRegistrationNumber: bizrno,
-              corporateRegistrationNumber: crno,
-              isSimpleTaxpayers: simTxtnTrgtYnDesc,
-              companyLocation: location,
-              onlineSalesLicense: prmsnMgtNo,
-            });
-
-            // save button ref . click
-            if (preventCancel) {
-              saveShopButtonRefVar().click();
-            }
-          },
-          cancelButtonVisibility: true,
-          cancelButtonClickHandler: () => {
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: false,
-            });
-          },
-        });
-
-        return;
       }
 
       // 3. 사업자등록 상태조회 확인 (통신판매업 등록이 안된 사업자의 경우, 간이과세자 여부 파악)
@@ -355,7 +341,23 @@ const BusinessLicenseModal = ({ preventCancel }: Props) => {
             });
           },
         });
+
+        return;
       }
+
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        icon: exclamationmarkSrc,
+        description: <>유효하지 않은 사업자 등록 정보입니다.</>,
+        confirmButtonText: "확인",
+        confirmButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
+      });
     } catch (error) {
       console.log("error", error);
     }
