@@ -124,8 +124,7 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
 
   const handleSubmitButtonClick = () => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      (async () => {
+      void (async () => {
         loadingSpinnerVisibilityVar(true);
         const {
           data: {
@@ -133,7 +132,7 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
           },
         } = await cancelOrderItems({
           variables: {
-            input: { components },
+            input: { components: components },
           },
         });
 
@@ -170,6 +169,8 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
           });
         }
         if (error) {
+          console.log("error", error);
+
           loadingSpinnerVisibilityVar(false);
           showHasServerErrorModal(error, "주문 취소");
         }

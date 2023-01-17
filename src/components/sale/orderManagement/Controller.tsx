@@ -35,25 +35,27 @@ import { CONFIRM_ORDERITMES_BY_SELLER } from "@graphql/mutations/confirmOrderIte
 import {
   ConfirmOrderItemsBySellerInputType,
   ConfirmOrderItemsBySellerType,
+  ResetOrderItemType,
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
-import { CANCEL_ORDERITEMS_BY_SELLER } from "@graphql/mutations/cancelOrderItemsBySeller";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import { showHasServerErrorModal } from "@cache/productManagement";
 import AskReasonModal from "@components/sale/orderManagement/AskReasonModal";
 import { getHasCheckedOrderStatus } from "@utils/sale/order/getHasCheckedOrderStatus";
+import getCheckedOrderItemIds from "@utils/sale/order/getCheckedOrderItemIds";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
-  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
-  const checkedOrderItemIds = checkedOrderItems.map(({ id }) => id);
+  const checkedOrderItems =
+    useReactiveVar<Array<ResetOrderItemType>>(checkedOrderItemsVar);
+  const checkedOrderItemIds = getCheckedOrderItemIds(checkedOrderItems);
 
   const {
     isPaymentCompletedChecked,
@@ -161,8 +163,7 @@ const Controller = () => {
       cancelButtonVisibility: true,
       confirmButtonClickHandler: () => {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          (async () => {
+          void (async () => {
             loadingSpinnerVisibilityVar(true);
             const {
               data: {
@@ -293,8 +294,7 @@ const Controller = () => {
       confirmButtonVisibility: true,
       confirmButtonClickHandler: () => {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          (async () => {
+          void (async () => {
             loadingSpinnerVisibilityVar(true);
 
             const components = checkedOrderItems.map(
