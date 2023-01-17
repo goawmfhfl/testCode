@@ -47,12 +47,18 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
         ? "overIndex"
         : newOrderItems[index + 1].merchantUid;
 
-    if (nextOrder === "overIndex") {
-      if (previousOrder === currentOrder) {
+    const isLastOrder = nextOrder === "overIndex";
+    const isTemporaryBundleOrderFullfilled =
+      bundleOrder.temporaryBundleOrders.length > 1;
+    const isPreviousOrderAndCurrentOrderBundle = previousOrder === currentOrder;
+    const isCurrentOrderAndNextOrderBundle = currentOrder === nextOrder;
+
+    if (isLastOrder) {
+      if (isPreviousOrderAndCurrentOrderBundle) {
         bundleOrder.temporaryBundleOrders.push(order);
       }
 
-      if (bundleOrder.temporaryBundleOrders.length > 1) {
+      if (isTemporaryBundleOrderFullfilled) {
         bundleOrder.bundleOrders.push(bundleOrder.temporaryBundleOrders);
         bundleOrder.temporaryBundleOrders = [];
       }
@@ -60,40 +66,29 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
       return;
     }
 
-    if (previousOrder === currentOrder) {
+    if (isPreviousOrderAndCurrentOrderBundle) {
       bundleOrder.temporaryBundleOrders.push(order);
 
       return;
     }
 
-    if (
-      previousOrder !== currentOrder &&
-      currentOrder === nextOrder &&
-      bundleOrder.temporaryBundleOrders.length !== 0
-    ) {
-      bundleOrder.bundleOrders.push(bundleOrder.temporaryBundleOrders);
-      bundleOrder.temporaryBundleOrders = [];
-      bundleOrder.temporaryBundleOrders.push(order);
-
-      return;
-    }
-
-    if (currentOrder === nextOrder) {
-      bundleOrder.temporaryBundleOrders.push(order);
-
-      return;
-    }
-
-    if (
-      previousOrder !== currentOrder &&
-      bundleOrder.temporaryBundleOrders.length !== 0
-    ) {
-      bundleOrder.bundleOrders.push(bundleOrder.temporaryBundleOrders);
-      bundleOrder.temporaryBundleOrders = [];
-
-      if (currentOrder === nextOrder) {
+    if (!isPreviousOrderAndCurrentOrderBundle) {
+      if (isCurrentOrderAndNextOrderBundle) {
         bundleOrder.temporaryBundleOrders.push(order);
       }
+
+      if (isTemporaryBundleOrderFullfilled) {
+        bundleOrder.bundleOrders.push(bundleOrder.temporaryBundleOrders);
+        bundleOrder.temporaryBundleOrders = [];
+      }
+
+      return;
+    }
+
+    if (isCurrentOrderAndNextOrderBundle) {
+      bundleOrder.temporaryBundleOrders.push(order);
+
+      return;
     }
   });
 
