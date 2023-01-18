@@ -66,23 +66,7 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
 
     if (isPreviousAndCurrentOrderItemBundle) {
       tableLayoutCalculator.temporaryBundleOrderItems.push(orderItem);
-      newOrderItems[index].colorIndex = tableLayoutCalculator.colorIndex;
 
-      if (isPreviousAndCurrentShipmentTypeNotSame) {
-        if (tableLayoutCalculator.colorIndex !== 2) {
-          newOrderItems[index].colorIndex = tableLayoutCalculator.colorIndex;
-          tableLayoutCalculator.colorIndex += 1;
-        }
-
-        if (tableLayoutCalculator.colorIndex === 2) {
-          newOrderItems[index].colorIndex = 2;
-          tableLayoutCalculator.colorIndex = 0;
-        }
-      }
-
-      if (isCurrentAndNextOrderItemBundle) {
-        return;
-      }
       if (!isCurrentAndNextOrderItemBundle) {
         if (tableLayoutCalculator.temporaryBundleOrderItems.length > 1) {
           tableLayoutCalculator.bundleOrderItems.push(
@@ -90,26 +74,39 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
           );
           tableLayoutCalculator.temporaryBundleOrderItems = [];
         }
-        return;
+      }
+
+      newOrderItems[index].colorIndex = tableLayoutCalculator.colorIndex;
+
+      if (isPreviousAndCurrentShipmentTypeNotSame) {
+        if (tableLayoutCalculator.colorIndex !== 2) {
+          tableLayoutCalculator.colorIndex += 1;
+          newOrderItems[index].colorIndex = tableLayoutCalculator.colorIndex;
+          return;
+        }
+
+        if (tableLayoutCalculator.colorIndex === 2) {
+          newOrderItems[index].colorIndex = 0;
+          tableLayoutCalculator.colorIndex = 0;
+          return;
+        }
       }
     }
 
     if (!isPreviousAndCurrentOrderItemBundle) {
+      if (isCurrentAndNextOrderItemBundle) {
+        tableLayoutCalculator.temporaryBundleOrderItems.push(orderItem);
+      }
+
       if (tableLayoutCalculator.colorIndex !== 2) {
         tableLayoutCalculator.colorIndex += 1;
         newOrderItems[index].colorIndex = tableLayoutCalculator.colorIndex;
+        return;
       }
 
       if (tableLayoutCalculator.colorIndex === 2) {
-        newOrderItems[index].colorIndex = 2;
+        newOrderItems[index].colorIndex = 0;
         tableLayoutCalculator.colorIndex = 0;
-      }
-
-      if (isCurrentAndNextOrderItemBundle) {
-        tableLayoutCalculator.temporaryBundleOrderItems.push(orderItem);
-        return;
-      }
-      if (!isCurrentAndNextOrderItemBundle) {
         return;
       }
     }
