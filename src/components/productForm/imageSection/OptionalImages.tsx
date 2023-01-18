@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
+import { useEffect } from "react";
 import styled from "styled-components/macro";
-import { useEffect, useRef } from "react";
-import { useFormContext } from "react-hook-form";
 import { useReactiveVar } from "@apollo/client";
 
 import ProductImageContainer from "@components/productForm/imageSection/common/ProductImageContainer";
@@ -9,117 +8,91 @@ import ProductImage from "@components/productForm/imageSection/common/ProductIma
 import AddImageInputWrapper from "@components/productForm/imageSection/common/AddImageInputWrapper";
 import AddImageInput from "@components/productForm/imageSection/common/AddImageInput";
 
-import { UploadFileType } from "@models/index";
-import { ProductImageType } from "@models/product/productImages";
-
 import { optionalImagesVar } from "@cache/productForm/productImages";
+import { systemModalVar } from "@cache/index";
 import {
   addImageOnServer,
   removeImageFromServer,
-  RemoveImageErrorType,
-  validateImageSize,
   validateImageDimensionRatio,
-  encodeLastComponent,
+  validateImageSize,
 } from "@utils/index";
-import { systemModalVar } from "@cache/index";
+import { ProductImageType } from "@models/product/productImages";
+import { UploadFileType } from "@models/index";
 
 const ProductImageSection = () => {
   const optionalImages = useReactiveVar(optionalImagesVar);
 
-  const { register, unregister, watch } = useFormContext();
+  const handleImageInputChange =
+    (id: string) => async (e: React.ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault();
 
-  const optionalImageValues: Array<FileList> | Array<null> = watch(
-    optionalImages.map(({ id }) => id)
-  );
+      const file = e.target.files[0];
 
-  const previousProductImageValuesRef = useRef<Array<FileList> | null>(null);
+      console.log(file);
 
-  useEffect(() => {
-    if (!previousProductImageValuesRef.current) {
-      previousProductImageValuesRef.current = optionalImageValues;
+      const isImageRatioFulfilled = await validateImageDimensionRatio(file, {
+        width: 1,
+        height: 1,
+      });
 
-      return;
-    }
+      if (!isImageRatioFulfilled) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: <>등록 가능한 이미지 비율은 1:1 입니다.</>,
+        });
 
-    /*
-
-      새로운 사진이 추가되거나 기존 사진이 변경되었을 때,
-      변경된 이미지 데이터만을 확인하여 서버에 새롭게 등록하고 (+ 기존 이미지는 서버에서 삭제)
-      등록된 url을 컴포넌트 내부의 상태(optionalImages)에 반영하여
-      등록된 이미지가 새롭게 렌더링 될 수 있도록 합니다.
-
-    */
-
-    optionalImageValues.map(
-      async (productImageValue: FileList, index: number) => {
-        if (!productImageValue?.length) return;
-
-        try {
-          const previousImageValue: FileList | null =
-            previousProductImageValuesRef.current[index];
-          const hasImageChanged: boolean =
-            productImageValue !== previousImageValue &&
-            Boolean(productImageValue[0]);
-
-          if (!hasImageChanged) {
-            return;
-          }
-
-          const isImageRatioFulfilled = await validateImageDimensionRatio(
-            productImageValue[0],
-            { width: 1, height: 1 }
-          );
-
-          if (!isImageRatioFulfilled) {
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: true,
-              description: <>등록 가능한 이미지 비율은 1:1 입니다.</>,
-            });
-
-            return;
-          }
-
-          if (!validateImageSize(productImageValue[0], 2 * 1000 * 1000)) {
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: true,
-              description: <>등록 가능한 파일 크기는 2MB 입니다.</>,
-            });
-
-            return;
-          }
-
-          if (optionalImages[index].url) {
-            const removeImageResult: {
-              result: string;
-              error: RemoveImageErrorType;
-            } = await removeImageFromServer(optionalImages[index].url);
-
-            if (removeImageResult.error) {
-              console.log(removeImageResult.error);
-            }
-          }
-
-          const {
-            url: addedImageUrl,
-          }: {
-            url: string;
-          } = await addImageOnServer(productImageValue[0]);
-
-          const newOptionalImages = [...optionalImagesVar()];
-
-          newOptionalImages[index].url = addedImageUrl;
-
-          optionalImagesVar([...newOptionalImages]);
-        } catch (error) {
-          console.log(error);
-        }
+        return;
       }
-    );
 
-    previousProductImageValuesRef.current = optionalImageValues;
-  }, [optionalImageValues]);
+      if (!validateImageSize(file, 2 * 1000 * 1000)) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: <>등록 가능한 파일 크기는 2MB 입니다.</>,
+        });
+
+        return;
+      }
+
+      const { url } = await addImageOnServer(file);
+
+      const imageIndex = optionalImages.findIndex((image) => image.id === id);
+
+      if (optionalImages[imageIndex].url) {
+        const result = await removeImageFromServer(
+          optionalImages[imageIndex].url
+        );
+
+        console.log("이미 있던 사진 삭제결과", result);
+      }
+
+      const newOptionalImages = [...optionalImagesVar()];
+
+      newOptionalImages[imageIndex] = {
+        ...newOptionalImages[imageIndex],
+        url,
+      };
+
+      optionalImagesVar(newOptionalImages);
+    };
+
+  const handleRemoveButtonClick = (url: string) => async () => {
+    const result = await removeImageFromServer(url);
+
+    console.log("삭제 결과", result);
+
+    const imageIndex = optionalImages.findIndex((image) => image.url === url);
+
+    const newOptionalImages = [...optionalImagesVar()];
+
+    newOptionalImages[imageIndex] = {
+      ...newOptionalImages[imageIndex],
+      url: "",
+    };
+
+    optionalImagesVar(newOptionalImages);
+  };
 
   useEffect(() => {
     const hasAllImagesUploaded: boolean = optionalImages.reduce(
@@ -144,42 +117,6 @@ const ProductImageSection = () => {
     optionalImagesVar(newOptionalImages);
   }, [optionalImages]);
 
-  const handleProductImageRemoveButtonClick = async (targetId: string) => {
-    const productImage: ProductImageType = optionalImages.find(
-      (image) => image.id === targetId
-    );
-
-    // 1. productImages에서 해당 객체를 제거한다
-    const filteredOptionalImages = optionalImagesVar().filter(
-      ({ id }) => id !== targetId
-    );
-
-    optionalImagesVar([...filteredOptionalImages]);
-
-    // 2. react hook form에서 인풋 데이터를 제거한다
-    unregister(targetId);
-
-    // 3. 서버에 요청을 보내 해당 이미지 데이터를 삭제한다
-    const removeImageResult: {
-      result: string;
-      error: RemoveImageErrorType;
-    } = await removeImageFromServer(productImage.url);
-
-    if (removeImageResult.error) {
-      console.log(removeImageResult.error);
-    }
-  };
-
-  {
-    /*
-
-        1. input 값을 업데이트하여 react hook form 내부 상태(productImageValues) 업데이트
-        2. watching하여 새롭게 변화한 값을 서버에 등록
-        3. 등록된 url을 컴포넌트 상태(optionalImages)로 저장하고 렌더링
-
-      */
-  }
-
   return (
     <Container>
       <OptionalImageHeader>추가 이미지</OptionalImageHeader>
@@ -197,18 +134,17 @@ const ProductImageSection = () => {
             >
               {url ? (
                 <ProductImage
-                  id={id}
-                  imageSource={encodeLastComponent(url)}
-                  handleRemoveButtonClick={() => {
-                    // eslint-disable-next-line
-                    (async () => {
-                      await handleProductImageRemoveButtonClick(id);
-                    })();
-                  }}
+                  imageSource={url}
+                  // eslint-disable-next-line
+                  handleRemoveButtonClick={handleRemoveButtonClick(url)}
                 />
               ) : (
                 <AddImageInputWrapper>
-                  <AddImageInput id={id} {...register(id)} />
+                  <AddImageInput
+                    id={id}
+                    // eslint-disable-next-line
+                    onChange={handleImageInputChange(id)}
+                  />
                 </AddImageInputWrapper>
               )}
             </OptionalImageContainer>
