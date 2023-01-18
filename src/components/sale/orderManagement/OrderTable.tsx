@@ -283,8 +283,7 @@ const OrderTable = () => {
         confirmButtonVisibility: true,
         confirmButtonClickHandler: () => {
           try {
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            (async () => {
+            void (async () => {
               loadingSpinnerVisibilityVar(true);
 
               const {
@@ -867,6 +866,8 @@ const OrderTable = () => {
                             </Dropdown>
                           )}
                         </>
+                      ) : shipmentCompany ? (
+                        shipmentCompanyCode[shipmentCompany]
                       ) : (
                         "-"
                       )}
@@ -970,6 +971,8 @@ const OrderTable = () => {
                             </ShipmnetNumberContainer>
                           )}
                         </>
+                      ) : shipmentNumber ? (
+                        shipmentNumber
                       ) : (
                         "-"
                       )}
