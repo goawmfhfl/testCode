@@ -2,32 +2,31 @@ import styled from "styled-components/macro";
 
 import changeImageIconSrc from "@icons/changeImage.svg";
 import removeImageIconSrc from "@icons/removeImage.svg";
-import { useFormContext } from "react-hook-form";
 
 interface ProductImageProps {
-  id: string;
   imageSource: string;
   thumbnail?: boolean;
   handleRemoveButtonClick?: () => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const ProductImage = ({
-  id,
   imageSource,
   thumbnail,
   handleRemoveButtonClick,
+  onChange,
 }: ProductImageProps) => {
-  const { register } = useFormContext();
-
   return (
     <Container backgroundImageSource={imageSource}>
       {thumbnail && <ThumbnailTag>썸네일</ThumbnailTag>}
+
       <RemoveImageButton
         src={removeImageIconSrc}
         onClick={handleRemoveButtonClick}
       />
+
       <ChangeImageButtonWrapper backgroundImageSource={changeImageIconSrc}>
-        <ChangeImageButton id={id} {...register(id)} />
+        <ChangeImageButton onChange={onChange} />
       </ChangeImageButtonWrapper>
     </Container>
   );
@@ -87,7 +86,10 @@ const ChangeImageButtonWrapper = styled.label<{
   cursor: pointer;
 `;
 
-const ChangeImageButton = styled.input.attrs({ type: "file" })`
+const ChangeImageButton = styled.input.attrs({
+  type: "file",
+  accept: "image/jpg,image/png,image/jpeg",
+})`
   display: none;
 `;
 
