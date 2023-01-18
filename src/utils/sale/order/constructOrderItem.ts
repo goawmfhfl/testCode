@@ -22,158 +22,133 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
   );
   const reconstructOrderItems: Array<OrdersType> = [];
 
-  const bundleOrder: {
-    bundleOrders: Array<Array<OrdersType>>;
-    temporaryBundleOrders: Array<OrdersType>;
-  } = {
-    bundleOrders: [],
-    temporaryBundleOrders: [],
-  };
-
-  const tableStyleInfo: {
+  const tableLayoutCalculator: {
     colorIndex: number;
-    rowColorIndexList: Array<number>;
+    bundleOrderItems: Array<Array<OrdersType>>;
+    temporaryBundleOrderItems: Array<OrdersType>;
   } = {
     colorIndex: 0,
-    rowColorIndexList: [],
+    bundleOrderItems: [],
+    temporaryBundleOrderItems: [],
   };
 
-  newOrderItems.forEach((order, index) => {
-    const previousOrder =
-      index > 0 ? newOrderItems[index - 1].merchantUid : "firstIndex";
-    const currentOrder = order.merchantUid;
-    const nextOrder =
-      index === newOrderItems.length - 1
-        ? "overIndex"
-        : newOrderItems[index + 1].merchantUid;
+  newOrderItems.forEach((orderItem, index, array) => {
+    const previousOrderItem =
+      0 < index ? array[index - 1].merchantUid : "firstIndex";
 
-    const isLastOrder = nextOrder === "overIndex";
-    const isTemporaryBundleOrderFullfilled =
-      bundleOrder.temporaryBundleOrders.length > 1;
-    const isPreviousOrderAndCurrentOrderBundle = previousOrder === currentOrder;
-    const isCurrentOrderAndNextOrderBundle = currentOrder === nextOrder;
+    const currentOrderItem = orderItem.merchantUid;
 
-    if (isLastOrder) {
-      if (isPreviousOrderAndCurrentOrderBundle) {
-        bundleOrder.temporaryBundleOrders.push(order);
+    const nextOrderItem =
+      index === array.length - 1 ? "lastIndex" : array[index + 1].merchantUid;
+
+    const previousIsBundleShipment =
+      0 < index ? array[index - 1].isBundleShipment : "firstIndex";
+
+    const currentIsBundleShipment = orderItem.isBundleShipment;
+
+    const isPreviousAndCurrentShipmentTypeNotSame =
+      (previousIsBundleShipment && !currentIsBundleShipment) ||
+      (!previousIsBundleShipment && !currentIsBundleShipment);
+
+    const isPreviousAndCurrentOrderItemBundle =
+      previousOrderItem === currentOrderItem;
+    const isCurrentAndNextOrderItemBundle = currentOrderItem === nextOrderItem;
+
+    if (previousOrderItem === "firstIndex") {
+      newOrderItems[index].colorIndex = 0;
+
+      if (isCurrentAndNextOrderItemBundle) {
+        tableLayoutCalculator.temporaryBundleOrderItems.push(orderItem);
+        return;
       }
-
-      if (isTemporaryBundleOrderFullfilled) {
-        bundleOrder.bundleOrders.push(bundleOrder.temporaryBundleOrders);
-        bundleOrder.temporaryBundleOrders = [];
-      }
-
       return;
     }
 
-    if (isPreviousOrderAndCurrentOrderBundle) {
-      bundleOrder.temporaryBundleOrders.push(order);
+    if (isPreviousAndCurrentOrderItemBundle) {
+      tableLayoutCalculator.temporaryBundleOrderItems.push(orderItem);
+      newOrderItems[index].colorIndex = tableLayoutCalculator.colorIndex;
 
-      return;
-    }
+      if (isPreviousAndCurrentShipmentTypeNotSame) {
+        if (tableLayoutCalculator.colorIndex !== 2) {
+          newOrderItems[index].colorIndex = tableLayoutCalculator.colorIndex;
+          tableLayoutCalculator.colorIndex += 1;
+        }
 
-    if (!isPreviousOrderAndCurrentOrderBundle) {
-      if (isCurrentOrderAndNextOrderBundle) {
-        bundleOrder.temporaryBundleOrders.push(order);
+        if (tableLayoutCalculator.colorIndex === 2) {
+          newOrderItems[index].colorIndex = 2;
+          tableLayoutCalculator.colorIndex = 0;
+        }
       }
 
-      if (isTemporaryBundleOrderFullfilled) {
-        bundleOrder.bundleOrders.push(bundleOrder.temporaryBundleOrders);
-        bundleOrder.temporaryBundleOrders = [];
+      if (isCurrentAndNextOrderItemBundle) {
+        return;
       }
-
-      return;
+      if (!isCurrentAndNextOrderItemBundle) {
+        if (tableLayoutCalculator.temporaryBundleOrderItems.length > 1) {
+          tableLayoutCalculator.bundleOrderItems.push(
+            tableLayoutCalculator.temporaryBundleOrderItems
+          );
+          tableLayoutCalculator.temporaryBundleOrderItems = [];
+        }
+        return;
+      }
     }
 
-    if (isCurrentOrderAndNextOrderBundle) {
-      bundleOrder.temporaryBundleOrders.push(order);
+    if (!isPreviousAndCurrentOrderItemBundle) {
+      if (tableLayoutCalculator.colorIndex !== 2) {
+        tableLayoutCalculator.colorIndex += 1;
+        newOrderItems[index].colorIndex = tableLayoutCalculator.colorIndex;
+      }
 
-      return;
+      if (tableLayoutCalculator.colorIndex === 2) {
+        newOrderItems[index].colorIndex = 2;
+        tableLayoutCalculator.colorIndex = 0;
+      }
+
+      if (isCurrentAndNextOrderItemBundle) {
+        tableLayoutCalculator.temporaryBundleOrderItems.push(orderItem);
+        return;
+      }
+      if (!isCurrentAndNextOrderItemBundle) {
+        return;
+      }
     }
   });
 
-  bundleOrder.bundleOrders.forEach((orders) => {
-    orders.forEach((_, index) => {
-      const firstOrder = orders[0];
-      const nextOrder =
-        index === orders.length - 1 ? "overIndex" : orders[index + 1];
+  tableLayoutCalculator.bundleOrderItems.forEach((orderItems) => {
+    orderItems.forEach((orderItem, index, array) => {
+      const previousOrderItem = index > 0 ? array[index - 1] : "firstIndex";
 
-      if (nextOrder === "overIndex") return;
+      const findCurrentOrderIndex = newOrderItems.findIndex(
+        ({ merchantUid, merchantItemUid }) =>
+          merchantUid === orderItem.merchantUid &&
+          merchantItemUid === orderItem.merchantItemUid
+      );
 
       if (index === 0) {
-        const findFirstOrderIndex = newOrderItems.findIndex(
+        newOrderItems[findCurrentOrderIndex].shipmentPrice =
+          getFirstShipmentPrice(array);
+        newOrderItems[findCurrentOrderIndex].shipmentDistantPrice =
+          getFirstShipmentDistantPrice(array);
+        return;
+      }
+
+      if (index > 0 && previousOrderItem !== "firstIndex") {
+        const findPreviousOrderItemIndex = newOrderItems.findIndex(
           ({ merchantUid, merchantItemUid }) =>
-            merchantUid === firstOrder.merchantUid &&
-            merchantItemUid === firstOrder.merchantItemUid
+            merchantUid === previousOrderItem.merchantUid &&
+            merchantItemUid === previousOrderItem.merchantItemUid
         );
 
-        newOrderItems[findFirstOrderIndex].shipmentPrice =
-          getFirstShipmentPrice(orders);
-        newOrderItems[findFirstOrderIndex].shipmentDistantPrice =
-          getFirstShipmentDistantPrice(orders);
+        if (findPreviousOrderItemIndex === findCurrentOrderIndex) {
+          newOrderItems[findCurrentOrderIndex + index].shipmentPrice = 0;
+          newOrderItems[findCurrentOrderIndex + index].shipmentDistantPrice = 0;
+        } else {
+          newOrderItems[findCurrentOrderIndex].shipmentPrice = 0;
+          newOrderItems[findCurrentOrderIndex].shipmentDistantPrice = 0;
+        }
       }
-
-      const findNextOrderIndex = newOrderItems.findIndex(
-        ({ merchantUid, merchantItemUid }) =>
-          merchantUid === nextOrder.merchantUid &&
-          merchantItemUid === nextOrder.merchantItemUid
-      );
-      newOrderItems[findNextOrderIndex].shipmentPrice = 0;
-      newOrderItems[findNextOrderIndex].shipmentDistantPrice = 0;
     });
-  });
-
-  newOrderItems.forEach((order, index) => {
-    const previousMerchantUid =
-      index > 0 ? newOrderItems[index - 1].merchantUid : "firstIndex";
-    const currentMerchantUid = order.merchantUid;
-
-    const prevousIsBundleShipments =
-      index > 0 ? newOrderItems[index - 1].isBundleShipment : "firstIndex";
-    const currentIsBundleShipments = order.isBundleShipment;
-
-    if (
-      previousMerchantUid === "firstIndex" &&
-      prevousIsBundleShipments === "firstIndex"
-    ) {
-      tableStyleInfo.rowColorIndexList.push(tableStyleInfo.colorIndex);
-      return;
-    }
-    if (previousMerchantUid !== currentMerchantUid) {
-      if (tableStyleInfo.colorIndex === 2) {
-        tableStyleInfo.colorIndex = 0;
-        tableStyleInfo.rowColorIndexList.push(tableStyleInfo.colorIndex);
-        return;
-      }
-
-      if (tableStyleInfo.colorIndex !== 2) {
-        tableStyleInfo.colorIndex += 1;
-        tableStyleInfo.rowColorIndexList.push(tableStyleInfo.colorIndex);
-        return;
-      }
-    }
-
-    if (previousMerchantUid === currentMerchantUid) {
-      if (
-        prevousIsBundleShipments === true &&
-        currentIsBundleShipments === true
-      ) {
-        tableStyleInfo.rowColorIndexList.push(tableStyleInfo.colorIndex);
-        return;
-      } else {
-        if (tableStyleInfo.colorIndex === 2) {
-          tableStyleInfo.colorIndex = 0;
-          tableStyleInfo.rowColorIndexList.push(tableStyleInfo.colorIndex);
-          return;
-        }
-
-        if (tableStyleInfo.colorIndex !== 2) {
-          tableStyleInfo.colorIndex += 1;
-          tableStyleInfo.rowColorIndexList.push(tableStyleInfo.colorIndex);
-          return;
-        }
-      }
-    }
   });
 
   newOrderItems.forEach((order, index) => {
@@ -229,7 +204,6 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
             ...order,
             rowIndex: uuidv4(),
             options: [option],
-            colorIndex: tableStyleInfo.rowColorIndexList[index],
             isLastRow: orderItemStyleInfo.isLastRow,
             isFirstRow: orderItemStyleInfo.isFirstRow,
           });
@@ -250,7 +224,6 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
             options: resetOption,
             shipmentPrice: null,
             shipmentDistantPrice: null,
-            colorIndex: tableStyleInfo.rowColorIndexList[index],
             isLastRow: orderItemStyleInfo.isLastRow,
             isFirstRow: orderItemStyleInfo.isFirstRow,
           });
@@ -282,7 +255,6 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
       reconstructOrderItems.push({
         ...order,
         rowIndex: uuidv4(),
-        colorIndex: tableStyleInfo.rowColorIndexList[index],
         isLastRow: orderItemStyleInfo.isLastRow,
         isFirstRow: orderItemStyleInfo.isFirstRow,
       });
