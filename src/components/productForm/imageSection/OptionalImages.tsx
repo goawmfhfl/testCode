@@ -137,6 +137,8 @@ const ProductImageSection = () => {
                   imageSource={url}
                   // eslint-disable-next-line
                   handleRemoveButtonClick={handleRemoveButtonClick(url)}
+                  // eslint-disable-next-line
+                  onChange={handleImageInputChange(id)}
                 />
               ) : (
                 <AddImageInputWrapper>
