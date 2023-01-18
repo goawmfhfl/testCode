@@ -97,7 +97,7 @@ const RequiredImages = () => {
     <Container>
       <ThumbnailImageContainer>
         <ThumbnailImageHeader>썸네일</ThumbnailImageHeader>
-        <ProductImageContainer key={thumbnailImage.id}>
+        <ProductImageContainer key={`thumbnail-${thumbnailImage.id}`}>
           {thumbnailImage.url ? (
             <ProductImage
               imageSource={thumbnailImage.url}
@@ -128,7 +128,7 @@ const RequiredImages = () => {
               <ProductImageContainer key={`requiredImage-${id}`}>
                 {url ? (
                   <ProductImage
-                    imageSource={encodeLastComponent(url)}
+                    imageSource={url}
                     // eslint-disable-next-line
                     handleRemoveButtonClick={handleRemoveButtonClick(url)}
                     // eslint-disable-next-line

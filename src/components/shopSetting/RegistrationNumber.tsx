@@ -222,7 +222,7 @@ const AttachedPhotocopy = styled.div<{ src: string }>`
   width: 160px;
   height: 160px;
 
-  background-image: ${({ src }) => `url("${src}")`};
+  background-image: ${({ src }) => `url("${encodeURI(src)}")`};
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
