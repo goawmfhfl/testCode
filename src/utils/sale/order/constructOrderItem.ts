@@ -148,9 +148,9 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
     });
   });
 
-  newOrderItems.forEach((order, index) => {
+  newOrderItems.forEach((order, index, array) => {
     const { product, options, merchantUid } = order;
-    const orderItemStyleInfo = {
+    const tableLayoutCalculator = {
       rowOrders: 0,
       isLastRow: false,
       isFirstRow: false,
@@ -166,14 +166,14 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
           !!option && !!option.components && !!option.components.length;
         if (!hasOptions) return;
 
-        orderItemStyleInfo.rowOrders += 1;
+        tableLayoutCalculator.rowOrders += 1;
 
         const previousMerchantUid = hasReconstructOrderItems
           ? reconstructOrderItems[reconstructOrderItems.length - 1].merchantUid
           : "";
 
-        if (options.length === orderItemStyleInfo.rowOrders) {
-          orderItemStyleInfo.isLastRow = true;
+        if (options.length === tableLayoutCalculator.rowOrders) {
+          tableLayoutCalculator.isLastRow = true;
         }
 
         if (
@@ -184,16 +184,16 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
             false;
         }
 
-        if (newOrderItems.length - 1 === index) {
-          orderItemStyleInfo.isLastRow = false;
+        if (array.length - 1 === index) {
+          tableLayoutCalculator.isLastRow = false;
         }
 
-        if (orderItemStyleInfo.rowOrders === 1) {
-          orderItemStyleInfo.isFirstRow = true;
+        if (tableLayoutCalculator.rowOrders === 1) {
+          tableLayoutCalculator.isFirstRow = true;
         }
 
-        if (orderItemStyleInfo.rowOrders !== 1) {
-          orderItemStyleInfo.isFirstRow = false;
+        if (tableLayoutCalculator.rowOrders !== 1) {
+          tableLayoutCalculator.isFirstRow = false;
         }
 
         if (option.isRequired) {
@@ -201,8 +201,8 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
             ...order,
             rowIndex: uuidv4(),
             options: [option],
-            isLastRow: orderItemStyleInfo.isLastRow,
-            isFirstRow: orderItemStyleInfo.isFirstRow,
+            isLastRow: tableLayoutCalculator.isLastRow,
+            isFirstRow: tableLayoutCalculator.isFirstRow,
           });
         }
         if (!option.isRequired) {
@@ -221,8 +221,8 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
             options: resetOption,
             shipmentPrice: null,
             shipmentDistantPrice: null,
-            isLastRow: orderItemStyleInfo.isLastRow,
-            isFirstRow: orderItemStyleInfo.isFirstRow,
+            isLastRow: tableLayoutCalculator.isLastRow,
+            isFirstRow: tableLayoutCalculator.isFirstRow,
           });
         }
 
@@ -234,8 +234,8 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
         ? reconstructOrderItems[reconstructOrderItems.length - 1].merchantUid
         : "";
 
-      orderItemStyleInfo.isLastRow = true;
-      orderItemStyleInfo.isFirstRow = true;
+      tableLayoutCalculator.isLastRow = true;
+      tableLayoutCalculator.isFirstRow = true;
 
       if (
         reconstructOrderItems.length !== 0 &&
@@ -245,15 +245,15 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
           false;
       }
 
-      if (newOrderItems.length - 1 === index) {
-        orderItemStyleInfo.isLastRow = false;
+      if (array.length - 1 === index) {
+        tableLayoutCalculator.isLastRow = false;
       }
 
       reconstructOrderItems.push({
         ...order,
         rowIndex: uuidv4(),
-        isLastRow: orderItemStyleInfo.isLastRow,
-        isFirstRow: orderItemStyleInfo.isFirstRow,
+        isLastRow: tableLayoutCalculator.isLastRow,
+        isFirstRow: tableLayoutCalculator.isFirstRow,
       });
     }
   });
