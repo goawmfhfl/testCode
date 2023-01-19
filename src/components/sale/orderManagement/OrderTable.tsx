@@ -379,10 +379,8 @@ const OrderTable = () => {
         cancelButtonVisibility: true,
         confirmButtonClickHandler: () => {
           try {
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            (async () => {
+            void (async () => {
               loadingSpinnerVisibilityVar(true);
-
               const {
                 data: {
                   editShipmentNumber: { ok, error },
@@ -416,15 +414,24 @@ const OrderTable = () => {
                   cancelButtonVisibility: false,
                   confirmButtonClickHandler: () => {
                     const newOrderItems = cloneDeep(resetOrderItem);
+
                     const findOrderItmeIndex = newOrderItems.findIndex(
                       ({ id }) => id === orderItemId
                     );
+                    const filterdOrderItems = newOrderItems.filter(
+                      (orderItem) => orderItem.id === orderItemId
+                    );
+
                     newOrderItems[findOrderItmeIndex].isShipmentInfoEdit =
                       false;
-                    newOrderItems[findOrderItmeIndex].shipmentCompany =
-                      shipmentCompany;
-                    newOrderItems[findOrderItmeIndex].shipmentNumber =
-                      shipmentNumber;
+
+                    filterdOrderItems.forEach((_, index) => {
+                      newOrderItems[
+                        findOrderItmeIndex + index
+                      ].shipmentCompany = shipmentCompany;
+                      newOrderItems[findOrderItmeIndex + index].shipmentNumber =
+                        shipmentNumber;
+                    });
 
                     resetOrderItemVar(newOrderItems);
 
