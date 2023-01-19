@@ -10,7 +10,7 @@ import {
 } from "@cache/productForm/productOptions";
 import { tagListVar } from "@cache/productForm/searchTag";
 
-import { UploadedFileInfos } from "@models/product/index";
+import { OptionCombination, UploadedFileInfos } from "@models/product/index";
 import { TagTypes } from "@models/product/searchTag";
 import { descriptionImagesVar } from "@cache/productForm/descriptionImages";
 import { CategoryNames } from "@constants/category";
@@ -66,7 +66,9 @@ export function getCategoryName(formContext: UseFormReturn): CategoryNames {
   return last(categories);
 }
 
-export function getRequiredOptions(formContext: UseFormReturn) {
+export function getRequiredOptions(
+  formContext: UseFormReturn
+): Array<OptionCombination> {
   const { watch } = formContext;
 
   const { optionHeaders, optionRows } = requiredOptionVar().adaptedOption;
@@ -92,7 +94,9 @@ export function getRequiredOptions(formContext: UseFormReturn) {
   return requiredOptions;
 }
 
-export function getSelectiveOptions(formContext: UseFormReturn) {
+export function getSelectiveOptions(
+  formContext: UseFormReturn
+): Array<OptionCombination> {
   const { watch } = formContext;
 
   const { optionRows } = selectiveOptionVar().adaptedOption;
@@ -100,10 +104,12 @@ export function getSelectiveOptions(formContext: UseFormReturn) {
   const selectiveOptions = optionRows.map(({ id, option }, index) => {
     const [name, value] = option;
 
-    const components = {
-      name,
-      value,
-    };
+    const components = [
+      {
+        name,
+        value,
+      },
+    ];
 
     const optionStock = watch(`optionStock-${id}`) as number;
     const optionPrice = watch(`optionPrice-${id}`) as number;

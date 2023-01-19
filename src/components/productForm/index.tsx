@@ -32,6 +32,8 @@ import {
   sectionFulfillmentVar,
   sectionFulfillmentInitialValue,
 } from "@cache/index";
+import { serversideProductVar } from "@cache/productForm";
+import { ProductOutput } from "@models/product";
 
 const ProductForm = () => {
   useEffect(() => {
@@ -39,6 +41,7 @@ const ProductForm = () => {
   }, []);
 
   const initializeFormStatus = () => {
+    serversideProductVar({} as ProductOutput);
     unfulfilledInputListVar([]);
     sectionFulfillmentVar(sectionFulfillmentInitialValue);
   };

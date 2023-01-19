@@ -35,7 +35,7 @@ import {
   IS_B_MARKET_PRODUCT,
 } from "@cache/productForm";
 
-import { ColorType } from "@models/product";
+import { ColorType, OptionCombination, ProductInput } from "@models/product";
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 import { DiscountMethod } from "@models/product";
 
@@ -47,9 +47,9 @@ import {
   getTagInfos,
 } from "@utils/product/form/index";
 
-export default function restructureProductRegistrationStates(
+export default function constructProductInput(
   formContext: UseFormReturn
-) {
+): ProductInput {
   const { watch } = formContext;
 
   const name = watch(TITLE) as string;
@@ -73,7 +73,7 @@ export default function restructureProductRegistrationStates(
   const requiredOptions = getRequiredOptions(formContext);
   const selectiveOptions = getSelectiveOptions(formContext);
 
-  const productOptions = [];
+  const productOptions = [] as Array<OptionCombination>;
   if (hasRequiredOption) productOptions.push(...requiredOptions);
   if (hasSelectiveOption) productOptions.push(...selectiveOptions);
 
