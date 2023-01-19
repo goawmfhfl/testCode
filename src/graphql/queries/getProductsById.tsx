@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
 
-import { ProductType } from "@models/product/index";
+import { ProductOutput } from "@models/product/index";
 
 export interface GetProductsByIdType {
   getProductById: {
     ok: boolean;
     error: string;
-    product: ProductType;
+    product: ProductOutput;
   };
 }
 
@@ -64,10 +64,7 @@ export const GET_PRODUCTS_BY_ID = gql`
         precaution
         authorization
         personInCharge
-        thumbnail
-        isExclusive
         isBmarket
-        isMdPick
         shipment {
           id
         }

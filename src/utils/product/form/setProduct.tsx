@@ -3,7 +3,7 @@ import { UseFormReset, UseFormSetValue } from "react-hook-form";
 
 import {
   ProductFormValues,
-  ProductType,
+  ProductOutput,
   ProductCategory,
 } from "@models/product";
 
@@ -17,6 +17,7 @@ import {
   HAS_REQUIRED_OPTION,
   HAS_SELECTIVE_OPTION,
   HAS_TAG_INFOS,
+  serversideProductVar,
 } from "@cache/productForm";
 import { UploadFileType } from "@models/index";
 import {
@@ -37,10 +38,12 @@ import { SearchTag, TagTypes } from "@models/product/searchTag";
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 
 const setProduct = (
-  product: ProductType,
+  product: ProductOutput,
   reset: UseFormReset<ProductFormValues>,
   setValue: UseFormSetValue<ProductFormValues>
 ) => {
+  serversideProductVar(product);
+
   const {
     name,
     isBmarket,
@@ -208,7 +211,7 @@ const setProduct = (
     setValue(CATEGORY_THIRD, thirdCategory);
   }
 
-  if (uploadedFileUrls && uploadedFileUrls.length) {
+  if (uploadedFileUrls && uploadedFileUrls?.length) {
     const thumbnail = uploadedFileUrls.find(
       (uploadedFile) => uploadedFile.type === UploadFileType.PRODUCT_THUMBNAIL
     );

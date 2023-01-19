@@ -20,16 +20,15 @@ import {
   HAS_SELECTIVE_OPTION,
   HAS_TAG_INFOS,
   TITLE,
+  serversideProductVar,
 } from "@cache/productForm";
 import { shipmentTemplatesVar } from "@cache/productForm/shipmentTemplate";
 import { Pathnames, productRegistrationSectionMapper } from "@constants/index";
 
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
-import {
-  CreateProductInputType,
-  TemporarySaveProductInputType,
-} from "@models/product/index";
+import { ProductInput, TemporarySaveProductInput } from "@models/product/index";
 
+import compareProduct from "@utils/product/form/compareProduct";
 import validateInputFulfillment from "@utils/product/form/validateInputFulfillment";
 import constructProductInput from "@utils/product/form/constructProductInput";
 import {
@@ -71,7 +70,9 @@ const SaveBar = () => {
         }>;
       },
       {
-        input: TemporarySaveProductInputType;
+        input: TemporarySaveProductInput & {
+          productId: number;
+        };
       }
     >(TEMPORARY_SAVE_PRODUCT);
 
@@ -92,7 +93,9 @@ const SaveBar = () => {
         };
       },
       {
-        input: CreateProductInputType;
+        input: ProductInput & {
+          productId: number;
+        };
       }
     >(CREATE_PRODUCT);
 
@@ -103,13 +106,17 @@ const SaveBar = () => {
     loadingSpinnerVisibilityVar(true);
 
     try {
-      const input = constructProductInput(formContext);
+      const input: ProductInput = constructProductInput(formContext);
+
+      console.log("보낼 떄", input);
+
+      compareProduct(input, serversideProductVar());
 
       const result = await temporarySaveProduct({
         variables: {
           input: {
             ...input,
-            productId: Number(productId) || null,
+            productId: Number(productId),
           },
         },
       });
@@ -199,6 +206,7 @@ const SaveBar = () => {
     async (e: React.MouseEvent<HTMLButtonElement>) => {
       try {
         e.preventDefault();
+
         const input = constructProductInput(formContext);
 
         const isDiscounted = watch(IS_DISCOUNTED) as boolean;

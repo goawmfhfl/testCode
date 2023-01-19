@@ -1,3 +1,8 @@
+import { makeVar } from "@apollo/client";
+import { ProductOutput } from "@models/product";
+
+export const serversideProductVar = makeVar<ProductOutput>(null);
+
 export const TITLE = "TITLE";
 export const IS_B_MARKET_PRODUCT = "IS_B_MARKET_PRODUCT";
 export const CATEGORY_FIRST = "CATEGORY_FIRST";

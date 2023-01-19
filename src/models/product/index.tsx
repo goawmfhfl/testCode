@@ -3,7 +3,14 @@ import { ProductStatus } from "@constants/product";
 import { UploadFileType } from "@models/index";
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
 
+export interface ProductCategory {
+  name: string;
+  parent: ProductCategory;
+  children: Array<ProductCategory>;
+}
+
 export interface UploadedFileInfos {
+  id?: number;
   url: string;
   type: UploadFileType;
 }
@@ -41,128 +48,24 @@ export enum DiscountMethod {
   WON = "WON",
 }
 
-export interface TemporarySaveProductInputType {
-  productId?: null | number;
-  name: string;
-  categoryName: CategoryNames;
-  uploadedFileInfos: Array<UploadedFileInfos>;
-  description: string;
-  colors: Array<{
-    name: ColorType;
-  }>;
-  originalPrice: number;
-  discountAmount: number;
-  discountMethod: string;
-  startDiscountDate: Date;
-  endDiscountDate: Date;
-
-  quantity: number;
-
-  isSelectiveOptionInUse: boolean;
-  optionCombinations: Array<{
-    components: Array<{ name: string; value: string }>;
-    price: number;
-    quantity: number;
-    isRequired: boolean;
-  }>;
-
-  manufacturingLeadTime: {
-    min: number;
-    max: number;
-  };
-
-  shipmentId?: number;
-  isBundleShipment?: boolean;
-  shipmentType?: ShipmentChargeType;
-  shipmentPrice?: number;
-  shipmentDistantPrice?: number;
-  shipmentReturnPrice?: number;
-  shipmentExchangePrice?: number;
-
-  specName: string;
-  material: string;
-  weight: string;
-  size: string;
-  manufacturer: string;
-  precaution: string;
-  authorization: string;
-  personInCharge: string;
-
-  tagInfos: Array<{
-    name: string;
-    isExposed: boolean;
-  }>;
-}
-
-export interface CreateProductInputType {
-  productId?: number;
-  name: string;
-  categoryName: CategoryNames;
-  uploadedFileInfos: Array<UploadedFileInfos>;
-  description: string;
-  colors: Array<{
-    name: ColorType;
-  }>;
-  originalPrice: number;
-  discountAmount: number;
-  discountMethod: string;
-  startDiscountDate: Date;
-  endDiscountDate: Date;
-  quantity: number;
-
-  isSelectiveOptionInUse: boolean;
-  optionCombinations: Array<{
-    components: Array<{ name: string; value: string }>;
-    price: number;
-    quantity: number;
-    isRequired: boolean;
-  }>;
-
-  manufacturingLeadTime: {
-    min: number;
-    max: number;
-  };
-  shipmentId?: number;
-  isBundleShipment?: boolean;
-  shipmentType?: ShipmentChargeType;
-  shipmentPrice?: number;
-  shipmentDistantPrice?: number;
-  shipmentReturnPrice?: number;
-  shipmentExchangePrice?: number;
-
-  specName: string;
-  material: string;
-  weight: string;
-  size: string;
-  manufacturer: string;
-  precaution: string;
-  authorization: string;
-  personInCharge: string;
-
-  tagInfos: Array<{
-    name: string;
-    isExposed: boolean;
-  }>;
-}
-
 export interface OptionCombination {
-  index: number;
+  id?: number;
+  index?: number;
   components: Array<{ name: string; value: string }>;
   price: number;
   quantity: number;
   isRequired: boolean;
 }
 
-export interface ProductType {
+export interface ProductInput {
   name: string;
+  categoryName: CategoryNames;
   isBmarket: boolean;
   description: string;
+  uploadedFileInfos: Array<UploadedFileInfos>;
   colors: Array<{
     name: ColorType;
   }>;
-  status: ProductStatus;
-  createdAt: Date;
-  updatedAt: Date;
 
   originalPrice: number;
   discountAmount: number;
@@ -172,16 +75,14 @@ export interface ProductType {
   quantity: number;
 
   isSelectiveOptionInUse: boolean;
-  options: Array<OptionCombination>;
+  optionCombinations: Array<OptionCombination>;
 
   manufacturingLeadTime: {
     min: number;
     max: number;
   };
 
-  shipment: {
-    id: number;
-  };
+  shipmentId?: number;
   isBundleShipment?: boolean;
   shipmentType?: ShipmentChargeType;
   shipmentPrice?: number;
@@ -198,9 +99,22 @@ export interface ProductType {
   authorization: string;
   personInCharge: string;
 
-  category: ProductCategory;
+  tagInfos: Array<{
+    name: string;
+    isExposed: boolean;
+  }>;
+}
 
-  productToTags?: Array<{
+export type TemporarySaveProductInput = Partial<ProductInput>;
+
+export type ProductOutput = Omit<
+  ProductInput,
+  "uploadedFileInfos" | "categoryName" | "optionCombinations" | "tagInfos"
+> & {
+  category: ProductCategory;
+  uploadedFileUrls: Array<UploadedFileInfos>;
+  options: Array<OptionCombination>;
+  productToTags: Array<{
     id: number;
     index: number;
     createdAt: Date;
@@ -209,19 +123,13 @@ export interface ProductType {
     isExposed: boolean;
     tag: { id: number; name: string };
   }>;
-
-  uploadedFileUrls: Array<{
+  shipment: {
     id: number;
-    url: string;
-    type: UploadFileType;
-  }>;
-}
-
-export interface ProductCategory {
-  name: string;
-  parent: ProductCategory;
-  children: Array<ProductCategory>;
-}
+  };
+  status: ProductStatus;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 export interface ProductFormValues {
   TITLE: string;

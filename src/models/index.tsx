@@ -26,15 +26,8 @@ export interface CategoriesType {
   name: CategoryNames;
   type: CategoryType;
 
-  parent?: Array<{
-    name: CategoryNames;
-    type: CategoryType;
-  }>;
-
-  children?: Array<{
-    name: CategoryNames;
-    type: CategoryType;
-  }>;
+  parent?: Array<CategoriesType>;
+  children?: Array<CategoriesType>;
 }
 
 export interface CommonFilterOptionType {

@@ -2,12 +2,12 @@ import { OperationVariables, QueryResult, useQuery } from "@apollo/client";
 
 import { GET_PRODUCTS_BY_ID } from "@graphql/queries/getProductsById";
 import { QueryResponse } from "@models/index";
-import { ProductType } from "@models/product";
+import { ProductOutput } from "@models/product";
 
 type ProductResult = QueryResult<
   {
     getProductById: QueryResponse<{
-      product: ProductType;
+      product: ProductOutput;
     }>;
   },
   OperationVariables
