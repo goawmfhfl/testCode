@@ -113,9 +113,13 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
   });
 
   tableLayoutCalculator.bundleOrderItems.forEach((orderItems) => {
-    orderItems.forEach((orderItem, index, array) => {
-      const previousOrderItem = index > 0 ? array[index - 1] : "firstIndex";
+    const bundleOrders = orderItems.filter(
+      ({ isBundleShipment }) => isBundleShipment === true
+    );
+    const hasBundleOrders = !!bundleOrders && !!bundleOrders.length;
+    if (!hasBundleOrders) return;
 
+    bundleOrders.forEach((orderItem, index, array) => {
       const findCurrentOrderIndex = newOrderItems.findIndex(
         ({ merchantUid, merchantItemUid }) =>
           merchantUid === orderItem.merchantUid &&
@@ -124,26 +128,15 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
 
       if (index === 0) {
         newOrderItems[findCurrentOrderIndex].shipmentPrice =
-          getFirstShipmentPrice(array);
+          getShipmentPrice(array);
         newOrderItems[findCurrentOrderIndex].shipmentDistantPrice =
-          getFirstShipmentDistantPrice(array);
+          getShipmentDistantPrice(array);
         return;
       }
 
-      if (index > 0 && previousOrderItem !== "firstIndex") {
-        const findPreviousOrderItemIndex = newOrderItems.findIndex(
-          ({ merchantUid, merchantItemUid }) =>
-            merchantUid === previousOrderItem.merchantUid &&
-            merchantItemUid === previousOrderItem.merchantItemUid
-        );
-
-        if (findPreviousOrderItemIndex === findCurrentOrderIndex) {
-          newOrderItems[findCurrentOrderIndex + index].shipmentPrice = 0;
-          newOrderItems[findCurrentOrderIndex + index].shipmentDistantPrice = 0;
-        } else {
-          newOrderItems[findCurrentOrderIndex].shipmentPrice = 0;
-          newOrderItems[findCurrentOrderIndex].shipmentDistantPrice = 0;
-        }
+      if (index > 0) {
+        newOrderItems[findCurrentOrderIndex].shipmentPrice = 0;
+        newOrderItems[findCurrentOrderIndex].shipmentDistantPrice = 0;
       }
     });
   });
@@ -323,13 +316,13 @@ const reconstructNotRequiredOption = (
   }, optionsInitialValue);
 };
 
-const getFirstShipmentPrice = (orders: Array<OrdersType>) => {
+const getShipmentPrice = (orders: Array<OrdersType>) => {
   return orders.reduce((result, { shipmentPrice }) => {
     return (result = Math.max(result, shipmentPrice));
   }, 0);
 };
 
-const getFirstShipmentDistantPrice = (orders: Array<OrdersType>) => {
+const getShipmentDistantPrice = (orders: Array<OrdersType>) => {
   return orders.reduce((result, { shipmentDistantPrice }) => {
     if (shipmentDistantPrice) return (result = shipmentDistantPrice);
     if (!shipmentDistantPrice) return (result = 0);
