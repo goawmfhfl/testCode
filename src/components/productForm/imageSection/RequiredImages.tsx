@@ -8,12 +8,9 @@ import AddImageInputWrapper from "@components/productForm/imageSection/common/Ad
 import AddImageInput from "@components/productForm/imageSection/common/AddImageInput";
 
 import {
-  addImageOnServer,
-  removeImageFromServer,
-  RemoveImageErrorType,
+  convertFileToBase64,
   validateImageDimensionRatio,
   validateImageSize,
-  encodeLastComponent,
 } from "@utils/index";
 import { requiredImagesVar } from "@cache/productForm/productImages";
 import { systemModalVar } from "@cache/index";
@@ -54,33 +51,19 @@ const RequiredImages = () => {
         return;
       }
 
-      const { url } = await addImageOnServer(file);
+      const url = await convertFileToBase64(file);
 
       const imageIndex = requiredImages.findIndex((image) => image.id === id);
 
-      if (requiredImages[imageIndex].url) {
-        const result = await removeImageFromServer(
-          requiredImages[imageIndex].url
-        );
-
-        console.log("이미 있던 사진 삭제결과", result);
-      }
-
       const newRequiredImages = [...requiredImagesVar()];
-
       newRequiredImages[imageIndex] = {
         ...newRequiredImages[imageIndex],
         url,
       };
-
       requiredImagesVar(newRequiredImages);
     };
 
-  const handleRemoveButtonClick = (url: string) => async () => {
-    const result = await removeImageFromServer(url);
-
-    console.log("삭제 결과", result);
-
+  const handleRemoveButtonClick = (url: string) => () => {
     const imageIndex = requiredImages.findIndex((image) => image.url === url);
 
     const newRequiredImages = [...requiredImagesVar()];
@@ -106,7 +89,7 @@ const RequiredImages = () => {
                 thumbnailImage.url
               )}
               // eslint-disable-next-line
-              onChange={handleImageInputChange(thumbnailImage.id)}
+              handleImageInputChange={handleImageInputChange(thumbnailImage.id)}
             />
           ) : (
             <AddImageInputWrapper>
@@ -132,7 +115,7 @@ const RequiredImages = () => {
                     // eslint-disable-next-line
                     handleRemoveButtonClick={handleRemoveButtonClick(url)}
                     // eslint-disable-next-line
-                    onChange={handleImageInputChange(id)}
+                    handleImageInputChange={handleImageInputChange(id)}
                   />
                 ) : (
                   <AddImageInputWrapper>

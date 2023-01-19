@@ -13,12 +13,7 @@ import {
   sectionFulfillmentVar,
   systemModalVar,
 } from "@cache/index";
-import {
-  addImageOnServer,
-  validateImageDimensionRatio,
-  encodeLastComponent,
-} from "@utils/index";
-import deleteImageUrl from "@utils/shopSettings/deleteImageUrl";
+import { convertFileToBase64, validateImageDimensionRatio } from "@utils/index";
 
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
@@ -109,12 +104,10 @@ const ShopInfo = () => {
         return;
       }
 
-      const { url } = await addImageOnServer(targetImage);
+      const url = await convertFileToBase64(targetImage);
 
       if (version === "mobileImage") {
         if (mobileImage) {
-          await deleteImageUrl(mobileImage);
-
           shopImagesVar({
             ...shopImagesVar(),
             mobileImage: "",
@@ -129,8 +122,6 @@ const ShopInfo = () => {
 
       if (version === "pcImage") {
         if (pcImage) {
-          await deleteImageUrl(pcImage);
-
           shopImagesVar({
             ...shopImagesVar(),
             pcImage: "",
@@ -148,16 +139,9 @@ const ShopInfo = () => {
   };
 
   const handleDeleteButtonClick =
-    (imageUrl: string) => async (e: React.MouseEvent<HTMLImageElement>) => {
+    (imageUrl: string) => (e: React.MouseEvent<HTMLImageElement>) => {
       e.preventDefault();
       e.stopPropagation();
-
-      const { ok } = await deleteImageUrl(imageUrl);
-
-      if (!ok) {
-        alert("이미지 삭제에 실패하였습니다");
-        return;
-      }
 
       if (imageUrl === mobileImage) {
         shopImagesVar({
@@ -208,7 +192,7 @@ const ShopInfo = () => {
 
               {mobileImage ? (
                 <AddedMobileImageContainer>
-                  <AddedMobileImage src={encodeLastComponent(mobileImage)} />
+                  <AddedMobileImage src={encodeURI(mobileImage)} />
 
                   <DeleteButton
                     src={closeIconSource}
@@ -255,7 +239,7 @@ const ShopInfo = () => {
 
               {pcImage ? (
                 <AddedPcImageContainer>
-                  <AddedPcImage src={encodeLastComponent(pcImage)} />
+                  <AddedPcImage src={encodeURI(pcImage)} />
                   <DeleteButton
                     src={closeIconSource}
                     // eslint-disable-next-line

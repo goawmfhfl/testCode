@@ -11,8 +11,7 @@ import AddImageInput from "@components/productForm/imageSection/common/AddImageI
 import { optionalImagesVar } from "@cache/productForm/productImages";
 import { systemModalVar } from "@cache/index";
 import {
-  addImageOnServer,
-  removeImageFromServer,
+  convertFileToBase64,
   validateImageDimensionRatio,
   validateImageSize,
 } from "@utils/index";
@@ -27,8 +26,6 @@ const ProductImageSection = () => {
       e.preventDefault();
 
       const file = e.target.files[0];
-
-      console.log(file);
 
       const isImageRatioFulfilled = await validateImageDimensionRatio(file, {
         width: 1,
@@ -55,17 +52,9 @@ const ProductImageSection = () => {
         return;
       }
 
-      const { url } = await addImageOnServer(file);
+      const url = await convertFileToBase64(file);
 
       const imageIndex = optionalImages.findIndex((image) => image.id === id);
-
-      if (optionalImages[imageIndex].url) {
-        const result = await removeImageFromServer(
-          optionalImages[imageIndex].url
-        );
-
-        console.log("이미 있던 사진 삭제결과", result);
-      }
 
       const newOptionalImages = [...optionalImagesVar()];
 
@@ -77,11 +66,7 @@ const ProductImageSection = () => {
       optionalImagesVar(newOptionalImages);
     };
 
-  const handleRemoveButtonClick = (url: string) => async () => {
-    const result = await removeImageFromServer(url);
-
-    console.log("삭제 결과", result);
-
+  const handleRemoveButtonClick = (url: string) => () => {
     const imageIndex = optionalImages.findIndex((image) => image.url === url);
 
     const newOptionalImages = [...optionalImagesVar()];
@@ -138,7 +123,7 @@ const ProductImageSection = () => {
                   // eslint-disable-next-line
                   handleRemoveButtonClick={handleRemoveButtonClick(url)}
                   // eslint-disable-next-line
-                  onChange={handleImageInputChange(id)}
+                  handleImageInputChange={handleImageInputChange(id)}
                 />
               ) : (
                 <AddImageInputWrapper>

@@ -1,35 +1,15 @@
-import axios from "axios";
-
 import ProductImageContainer from "@components/productForm/imageSection/common/ProductImageContainer";
-import ProductImage from "@components/productForm/descriptionImageSection/ProductImage";
+import ProductImage from "@components/productForm/imageSection/common/ProductImage";
 import AddImageInput from "@components/productForm/imageSection/common/AddImageInput";
 import AddImageInputWrapper from "@components/productForm/imageSection/common/AddImageInputWrapper";
 
 import { descriptionImagesVar } from "@cache/productForm/descriptionImages";
-import deleteImageUrl from "@utils/shopSettings/deleteImageUrl";
-import {
-  addImageOnServer,
-  bytesToMegaBytes,
-  encodeLastComponent,
-} from "@utils/index";
+import { bytesToMegaBytes, convertFileToBase64 } from "@utils/index";
 
 const DescriptionImage = ({ id, url }: { id: string; url: string }) => {
   const handleImageChange =
     (id: string) => async (e: React.ChangeEvent<HTMLInputElement>) => {
-      // 1. 찾는다, 있으면 지운다
-      const selectedImageIndex = descriptionImagesVar().findIndex((img) => {
-        return img.id === id;
-      });
-
-      const previous = descriptionImagesVar()[selectedImageIndex];
-
-      if (previous.url) {
-        await deleteImageUrl(previous.url);
-      }
-
-      // 2. 업로드
       const [image] = e.target.files;
-
       const size: number = image.size;
 
       const previousSize: number = descriptionImagesVar().reduce(
@@ -49,25 +29,33 @@ const DescriptionImage = ({ id, url }: { id: string; url: string }) => {
         return;
       }
 
-      const { url } = await addImageOnServer(image);
+      const url = await convertFileToBase64(image);
 
-      // 3. 업데이트
+      const selectedImageIndex = descriptionImagesVar().findIndex((img) => {
+        return img.id === id;
+      });
+
       const updated = [...descriptionImagesVar()];
       updated[selectedImageIndex].url = url;
       updated[selectedImageIndex].size = size;
 
       descriptionImagesVar(updated);
-
-      return;
     };
+
+  const handleRemoveImageButton = (url: string) => () => {
+    descriptionImagesVar([
+      ...descriptionImagesVar().filter((img) => img.url !== url),
+    ]);
+  };
 
   return (
     <ProductImageContainer>
       {url ? (
         <ProductImageContainer>
           <ProductImage
-            src={url}
-            handleChangeButtonClick={handleImageChange(id)}
+            imageSource={url}
+            handleImageInputChange={handleImageChange(id)}
+            handleRemoveButtonClick={handleRemoveImageButton(url)}
           />
         </ProductImageContainer>
       ) : (

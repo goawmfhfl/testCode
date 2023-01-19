@@ -5,28 +5,27 @@ import removeImageIconSrc from "@icons/removeImage.svg";
 
 interface ProductImageProps {
   imageSource: string;
-  thumbnail?: boolean;
   handleRemoveButtonClick?: () => void;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleImageInputChange: (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => Promise<void>;
 }
 
 const ProductImage = ({
   imageSource,
-  thumbnail,
   handleRemoveButtonClick,
-  onChange,
+  handleImageInputChange,
 }: ProductImageProps) => {
   return (
     <Container backgroundImageSource={imageSource}>
-      {thumbnail && <ThumbnailTag>썸네일</ThumbnailTag>}
-
       <RemoveImageButton
         src={removeImageIconSrc}
         onClick={handleRemoveButtonClick}
       />
 
       <ChangeImageButtonWrapper backgroundImageSource={changeImageIconSrc}>
-        <ChangeImageButton onChange={onChange} />
+        {/* eslint-disable-next-line */}
+        <ChangeImageButton onChange={handleImageInputChange} />
       </ChangeImageButtonWrapper>
     </Container>
   );
@@ -47,24 +46,6 @@ const Container = styled.div<{
   margin-right: 8px;
 
   position: relative;
-`;
-
-const ThumbnailTag = styled.span`
-  padding: 8px 10px;
-  background-color: ${({ theme: { palette } }) => palette.grey700};
-  color: ${({ theme: { palette } }) => palette.white};
-  border-radius: 7px;
-
-  font-size: 12px;
-  font-family: "Spoqa Han Sans Neo";
-  font-weight: 300;
-
-  position: absolute;
-  top: 8px;
-  left: 8px;
-
-  display: flex;
-  align-items: center;
 `;
 
 const ChangeImageButtonWrapper = styled.label<{

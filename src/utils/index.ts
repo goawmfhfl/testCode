@@ -1,12 +1,27 @@
-import { Pathnames, UnfulfilledStatus } from "@constants/index";
-import { UploadFileType } from "@models/index";
 import axios from "axios";
-import { last } from "lodash";
+
+import { UnfulfilledStatus } from "@constants/index";
 
 export interface RemoveImageErrorType {
   code: string;
   message: string;
   statusCode: string;
+}
+
+function convertFileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+
+    reader.onload = function () {
+      resolve(reader.result as string);
+    };
+
+    reader.onerror = function (error) {
+      reject(error);
+    };
+  });
 }
 
 async function addImageOnServer(
@@ -173,18 +188,8 @@ function validatePassword(password: string) {
   return regex.test(password);
 }
 
-function encodeLastComponent(url: string) {
-  const splited = url.split("/");
-
-  const lastComponent = last(splited);
-  splited.pop();
-
-  const result = splited.join("/") + "/" + encodeURIComponent(lastComponent);
-
-  return result;
-}
-
 export {
+  convertFileToBase64,
   addImageOnServer,
   removeImageFromServer,
   validateImageDimensionRatio,
@@ -197,7 +202,6 @@ export {
   bytesToMegaBytes,
   preventNaNValues,
   validatePassword,
-  encodeLastComponent,
   createUnfulfilledInput,
   validateNumber,
 };

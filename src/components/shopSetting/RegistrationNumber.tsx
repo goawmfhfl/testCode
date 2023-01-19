@@ -6,13 +6,12 @@ import {
   REGISTRATION_NUMBER_PREFIX,
   REGISTRATION_NUMBER_SUFFIX,
 } from "@cache/shopSettings";
-import deleteImageUrl from "@utils/shopSettings/deleteImageUrl";
 
 import exclamationmarkSource from "@icons/exclamationmark.svg";
 import exclamationIconGreySource from "@icons/exclamation-grey.svg";
 import NoticeContainer from "@components/common/NoticeContainer";
 import TextInput from "@components/common/input/TextInput";
-import { addImageOnServer, encodeLastComponent } from "@utils/index";
+import { convertFileToBase64 } from "@utils/index";
 
 const RegistrationNumber = () => {
   const { register, setValue, watch } = useFormContext();
@@ -22,15 +21,8 @@ const RegistrationNumber = () => {
   ) => {
     if (!e.target.files.length) return;
 
-    const previous = watch(PHOTOCOPY) as string;
     const [image] = e.target.files;
-
-    if (previous) {
-      await deleteImageUrl(previous);
-    }
-
-    const { url } = await addImageOnServer(image);
-    console.log("등록 결과", url);
+    const url = await convertFileToBase64(image);
 
     setValue(PHOTOCOPY, url);
   };
@@ -81,7 +73,7 @@ const RegistrationNumber = () => {
 
           {attachedPhotocopy && (
             <AttachedPhotocopyWrapper>
-              <AttachedPhotocopy src={encodeLastComponent(attachedPhotocopy)} />
+              <AttachedPhotocopy src={attachedPhotocopy} />
 
               <NoticeContainer icon={exclamationIconGreySource}>
                 미리보기 용으로만 블러처리되며 첨부된 이미지는 <br />
