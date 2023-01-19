@@ -8,26 +8,16 @@ export const getTodayTimeValue = () => {
   return today;
 };
 
-export const getHHMMSSdateFormat = (date: string) => {
-  const formatDate = new Date(date);
+export const getDateFormat = (date: string) => {
+  const KOREA_TIME_ZONE = new Date(date).getTime() - 3240 * 10000;
 
-  const dateToTimeString = formatDate.toTimeString();
+  const YYYY_MM_DD_HH_MM_SS = new Date(date)
+    .toISOString()
+    .replace("T", " ")
+    .replace(/\..*/, "");
 
-  const format = dateToTimeString.split(" ")[0];
+  const YYYY_MM_DD = new Date(date).toISOString().split("T")[0];
+  const HH_MM_SS = new Date(KOREA_TIME_ZONE).toTimeString().split(" ")[0];
 
-  return format;
-};
-
-export const getYYMMDDdateFormat = (date: string) => {
-  const formatDate = new Date(date);
-
-  const year = formatDate.getFullYear();
-
-  const month = `0${1 + formatDate.getMonth()}`.slice(-2);
-
-  const day = `0${formatDate.getDate()}`.slice(-2);
-
-  const format = `${year}.${month}.${day}`;
-
-  return format;
+  return { YYYY_MM_DD_HH_MM_SS, YYYY_MM_DD, HH_MM_SS };
 };

@@ -1,5 +1,6 @@
 import { NormalizedListType } from "@models/sale/order";
 import { orderStatusNameType, ShipmentStatus } from "@constants/sale";
+import { getDateFormat } from "@utils/date";
 
 const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
   const hasOrderItems = !!recontructOrderItem && !!recontructOrderItem.orders;
@@ -39,6 +40,12 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
     const resetOrderProduct = product?.name ? product.name : "-";
     const resetProductThumbnail = product?.thumbnail ? product.thumbnail : "-";
     const resetUserName = user?.name ? user.name : "-";
+    const resetPaidAt = orderByShop?.order
+      ? `${getDateFormat(orderByShop?.order.paidAt).YYYY_MM_DD} / ${
+          getDateFormat(orderByShop?.order.paidAt).HH_MM_SS
+        }`
+      : "-";
+
     const resetOrderStatus = orderStatus?.name
       ? orderStatusNameType[orderStatus.name]
       : "-";
@@ -58,9 +65,6 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
           (info) => info.status === ShipmentStatus.SHIPPING
         )[0]?.shipmentNumber
       : null;
-    const resetPayments = user?.payments?.createdAt
-      ? user.payments.createdAt
-      : "-";
 
     const resetRecipientName = orderByShop?.order?.recipientName
       ? orderByShop.order.recipientName
@@ -127,7 +131,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       orderShipmentInfosId: resetOrderShipmentInfosId,
       shipmentCompany: resetShipmentCompany,
       shipmentNumber: resetShipmentNumber,
-      payments: resetPayments,
+      paidAt: resetPaidAt,
       recipientName: resetRecipientName,
       recipientPhoneNumber: resetRecipientPhoneNumber,
       recipientAddress: resetRecipientAddress,

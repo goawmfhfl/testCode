@@ -510,12 +510,12 @@ const OrderTable = () => {
       return;
     }
 
+    orderItemsVar(totalOrderItems);
     pageNumberListVar(
       Array(totalPages)
         .fill(null)
         .map((_, index) => index + 1)
     );
-
     totalPageLengthVar(totalResults);
 
     const nomalizedOrderItem: NormalizedListType =
@@ -771,7 +771,7 @@ const OrderTable = () => {
                   orderShipmentInfosId,
                   shipmentCompany,
                   shipmentNumber,
-                  payments,
+                  paidAt,
                   recipientName,
                   recipientPhoneNumber,
                   recipientAddress,
@@ -987,7 +987,7 @@ const OrderTable = () => {
                   </ShipmentColumn>
 
                   <Td type={TableType.SCROLL} width={scrollTableType[3].width}>
-                    {payments}
+                    {paidAt}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[4].width}>
                     {recipientName}

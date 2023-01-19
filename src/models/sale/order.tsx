@@ -39,10 +39,8 @@ export interface OrdersType {
     name: string;
     email: string;
     phoneNumber: string;
-    payments: {
-      createdAt: string;
-    };
   };
+
   orderByShop: {
     order: {
       recipientName: string;
@@ -193,7 +191,7 @@ export interface ResetOrderItemType {
   orderShipmentInfosId?: number;
   shipmentCompany?: string;
   shipmentNumber?: number;
-  payments: string;
+  paidAt: string;
   recipientName: string;
   recipientPhoneNumber: string;
   recipientAddress: string;
