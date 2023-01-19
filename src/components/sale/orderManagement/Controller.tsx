@@ -46,7 +46,7 @@ import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import { showHasServerErrorModal } from "@cache/productManagement";
 import AskReasonModal from "@components/sale/orderManagement/AskReasonModal";
 import { getHasCheckedOrderStatus } from "@utils/sale/order/getHasCheckedOrderStatus";
-import getCheckedOrderItemIds from "@utils/sale/order/getCheckedOrderItemIds";
+import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -55,7 +55,8 @@ const Controller = () => {
 
   const checkedOrderItems =
     useReactiveVar<Array<ResetOrderItemType>>(checkedOrderItemsVar);
-  const checkedOrderItemIds = getCheckedOrderItemIds(checkedOrderItems);
+  const reconstructCheckedOrderItems =
+    getReconstructCheckedOrderItems(checkedOrderItems);
 
   const {
     isPaymentCompletedChecked,
@@ -63,7 +64,7 @@ const Controller = () => {
     isShippingChecked,
     isShippingCompletedChecked,
     isCancelRequestChecked,
-  } = getHasCheckedOrderStatus(checkedOrderItems);
+  } = getHasCheckedOrderStatus(reconstructCheckedOrderItems);
 
   const [temporaryQuery, setTemporaryQuery] = useState("");
 
@@ -163,6 +164,10 @@ const Controller = () => {
       cancelButtonVisibility: true,
       confirmButtonClickHandler: () => {
         try {
+          const checkedOrderItemIds = reconstructCheckedOrderItems.map(
+            ({ id }) => id
+          );
+
           void (async () => {
             loadingSpinnerVisibilityVar(true);
             const {
@@ -246,11 +251,11 @@ const Controller = () => {
     }
 
     const { isShipmentCompanyFullFilled, isShipmentNumberFullFilled } =
-      checkedOrderItems.reduce(
+      reconstructCheckedOrderItems.reduce(
         (result, { temporaryShipmentCompany, temporaryShipmentNumber }) => {
-          if (temporaryShipmentCompany === "")
+          if (!temporaryShipmentCompany)
             result.isShipmentCompanyFullFilled = false;
-          if (temporaryShipmentNumber === null)
+          if (!temporaryShipmentNumber)
             result.isShipmentCompanyFullFilled = false;
 
           return result;
@@ -297,7 +302,7 @@ const Controller = () => {
           void (async () => {
             loadingSpinnerVisibilityVar(true);
 
-            const components = checkedOrderItems.map(
+            const components = reconstructCheckedOrderItems.map(
               ({ id, temporaryShipmentCompany, temporaryShipmentNumber }) => ({
                 orderItemId: id,
                 shipmentCompany: temporaryShipmentCompany,

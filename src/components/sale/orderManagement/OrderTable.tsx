@@ -37,8 +37,8 @@ import {
 } from "@models/sale/order";
 
 import getResetOrderItems from "@utils/sale/order/getResetOrderItems";
-import constructOrderItem from "@utils/sale/order/constructOrderItem";
 import { preventNaNValues } from "@utils/index";
+import constructOrderItem from "@utils/sale/order/constructOrderItem";
 
 import {
   checkAllBoxStatusVar,
@@ -672,7 +672,7 @@ const OrderTable = () => {
                     width={fixTableType[3].width}
                   >
                     <ProductThumbNailWrapper>
-                      <ProductThumbNail src={thumbnail} />
+                      <ProductThumbNail src={encodeURI(thumbnail)} />
                     </ProductThumbNailWrapper>
                     <ProductName>{orderProduct}</ProductName>
                   </ProductNameTd>
