@@ -74,7 +74,11 @@ const SaveBar = () => {
           productId: number;
         };
       }
-    >(TEMPORARY_SAVE_PRODUCT);
+    >(TEMPORARY_SAVE_PRODUCT, {
+      onCompleted() {
+        loadingSpinnerVisibilityVar(false);
+      },
+    });
 
   const [
     editProduct,
@@ -106,11 +110,7 @@ const SaveBar = () => {
     loadingSpinnerVisibilityVar(true);
 
     try {
-      const input: ProductInput = constructProductInput(formContext);
-
-      console.log("보낼 떄", input);
-
-      compareProduct(input, serversideProductVar());
+      const input: ProductInput = await constructProductInput(formContext);
 
       const result = await temporarySaveProduct({
         variables: {
@@ -122,8 +122,6 @@ const SaveBar = () => {
       });
 
       if (result.data.temporarySaveProduct.error) {
-        loadingSpinnerVisibilityVar(false);
-
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
@@ -170,12 +168,8 @@ const SaveBar = () => {
           cancelButtonVisibility: false,
         });
 
-        loadingSpinnerVisibilityVar(false);
-
         return;
       }
-
-      loadingSpinnerVisibilityVar(false);
 
       if (result.data.temporarySaveProduct.ok) {
         systemModalVar({
@@ -188,6 +182,8 @@ const SaveBar = () => {
               ...systemModalVar(),
               isVisible: false,
             });
+
+            location.reload();
           },
           cancelButtonVisibility: false,
         });
@@ -207,7 +203,7 @@ const SaveBar = () => {
       try {
         e.preventDefault();
 
-        const input = constructProductInput(formContext);
+        const input = await constructProductInput(formContext);
 
         const isDiscounted = watch(IS_DISCOUNTED) as boolean;
         const hasTemplateSelected = shipmentTemplatesVar().find(

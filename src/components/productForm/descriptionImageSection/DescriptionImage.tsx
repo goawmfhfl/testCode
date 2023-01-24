@@ -36,6 +36,8 @@ const DescriptionImage = ({ id, url }: { id: string; url: string }) => {
       });
 
       const updated = [...descriptionImagesVar()];
+      updated[selectedImageIndex].file = image;
+      updated[selectedImageIndex].filename = image.name;
       updated[selectedImageIndex].url = url;
       updated[selectedImageIndex].size = size;
 

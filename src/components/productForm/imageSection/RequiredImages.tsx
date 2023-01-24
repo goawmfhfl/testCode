@@ -58,18 +58,21 @@ const RequiredImages = () => {
       const newRequiredImages = [...requiredImagesVar()];
       newRequiredImages[imageIndex] = {
         ...newRequiredImages[imageIndex],
+        file,
+        filename: file.name,
         url,
       };
       requiredImagesVar(newRequiredImages);
     };
 
-  const handleRemoveButtonClick = (url: string) => () => {
-    const imageIndex = requiredImages.findIndex((image) => image.url === url);
+  const handleRemoveButtonClick = (id: string) => () => {
+    const imageIndex = requiredImages.findIndex((image) => image.id === id);
 
     const newRequiredImages = [...requiredImagesVar()];
 
     newRequiredImages[imageIndex] = {
       ...newRequiredImages[imageIndex],
+      filename: "",
       url: "",
     };
 
@@ -86,7 +89,7 @@ const RequiredImages = () => {
               imageSource={thumbnailImage.url}
               // eslint-disable-next-line
               handleRemoveButtonClick={handleRemoveButtonClick(
-                thumbnailImage.url
+                thumbnailImage.id
               )}
               // eslint-disable-next-line
               handleImageInputChange={handleImageInputChange(thumbnailImage.id)}
@@ -113,7 +116,7 @@ const RequiredImages = () => {
                   <ProductImage
                     imageSource={url}
                     // eslint-disable-next-line
-                    handleRemoveButtonClick={handleRemoveButtonClick(url)}
+                    handleRemoveButtonClick={handleRemoveButtonClick(id)}
                     // eslint-disable-next-line
                     handleImageInputChange={handleImageInputChange(id)}
                   />

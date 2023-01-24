@@ -47,9 +47,9 @@ import {
   getTagInfos,
 } from "@utils/product/form/index";
 
-export default function constructProductInput(
+export default async function constructProductInput(
   formContext: UseFormReturn
-): ProductInput {
+): Promise<ProductInput> {
   const { watch } = formContext;
 
   const name = watch(TITLE) as string;
@@ -108,7 +108,7 @@ export default function constructProductInput(
     isBmarket,
     categoryName: getCategoryName(formContext),
     description,
-    uploadedFileInfos: combineProductFormImages(),
+    uploadedFileInfos: await combineProductFormImages(),
     colors: colors.map((color) => ({ name: color })),
     originalPrice: originalPrice ? Number(originalPrice) : null,
     discountAmount: isDiscounted ? Number(discountAmount) : null,

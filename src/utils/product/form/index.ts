@@ -18,27 +18,91 @@ import {
   CATEGORY_FIRST,
   CATEGORY_SECOND,
   CATEGORY_THIRD,
+  serversideProductVar,
 } from "@cache/productForm";
+import { isBase64Url } from "@utils/index";
+import { addImageOnServer, removeImageFromServer } from "@utils/index";
 
-export function combineProductFormImages(): Array<UploadedFileInfos> {
-  const requiredImages = requiredImagesVar().map(({ type, url }) => ({
-    type,
-    url,
-  }));
-
-  const optionalImages = optionalImagesVar().map(({ type, url }) => ({
-    type,
-    url,
-  }));
-
-  const descriptionImages = descriptionImagesVar().map(({ type, url }) => ({
-    type,
-    url,
-  }));
-
-  return [...requiredImages, ...optionalImages, ...descriptionImages].filter(
-    (image) => image.url
+export async function combineProductFormImages(): Promise<
+  Array<UploadedFileInfos>
+> {
+  const requiredImages = requiredImagesVar().map(
+    ({ type, filename, file, url }) => ({
+      type,
+      filename,
+      file,
+      url,
+    })
   );
+
+  const optionalImages = optionalImagesVar().map(
+    ({ type, filename, file, url }) => ({
+      type,
+      filename,
+      file,
+      url,
+    })
+  );
+
+  const descriptionImages = descriptionImagesVar().map(
+    ({ type, filename, file, url }) => ({
+      type,
+      filename,
+      file,
+      url,
+    })
+  );
+
+  const combinedImages = [
+    ...requiredImages,
+    ...optionalImages,
+    ...descriptionImages,
+  ].filter((image) => image.url);
+
+  const serversideImages = serversideProductVar().uploadedFileUrls;
+
+  if (serversideImages) {
+    const removedImagesFromClientSide = serversideImages.filter(
+      (serversideImage) => {
+        const hasRemovedByClientSide = !combinedImages.find(
+          (clientsideImage) => clientsideImage.url === serversideImage.url
+        );
+
+        return hasRemovedByClientSide;
+      }
+    );
+
+    await removeImageFromServer(removedImagesFromClientSide);
+  }
+
+  const imagesNotRegistered = combinedImages.filter((img) => {
+    const isRegistered = !isBase64Url(img.url);
+
+    if (isRegistered) return false;
+
+    return true;
+  });
+
+  const registeredUrls = await addImageOnServer(
+    imagesNotRegistered.map(({ file }) => {
+      return file;
+    })
+  );
+
+  const registeredCombinedImages = combinedImages.map((img) => {
+    if (isBase64Url(img.url)) {
+      const registeredImage = registeredUrls.shift();
+
+      return {
+        ...img,
+        url: registeredImage.url,
+      };
+    }
+
+    return img;
+  });
+
+  return registeredCombinedImages.map(({ type, url }) => ({ type, url }));
 }
 
 export function getCategoryName(formContext: UseFormReturn): CategoryNames {

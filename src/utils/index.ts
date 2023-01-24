@@ -1,11 +1,22 @@
 import axios from "axios";
 
 import { UnfulfilledStatus } from "@constants/index";
+import { UploadedFileInfos } from "@models/product";
 
 export interface RemoveImageErrorType {
   code: string;
   message: string;
   statusCode: string;
+}
+
+function isBase64Url(url: string) {
+  try {
+    window.atob(url.split(",")[1]);
+
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function convertFileToBase64(file: File): Promise<string> {
@@ -24,23 +35,46 @@ function convertFileToBase64(file: File): Promise<string> {
   });
 }
 
+function convertBase64ToFile(url: string, fileName: string) {
+  const arr = url.split(",");
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bufferString = window.atob(arr[1]);
+  let n = bufferString.length;
+  const u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bufferString.charCodeAt(n);
+  }
+
+  return new File([u8arr], fileName, { type: mime });
+}
+
 async function addImageOnServer(
-  imageFile: File
-): Promise<{ url: string; size: number }> {
+  imageFiles: Array<File>
+): Promise<Array<{ url: string; size: number }>> {
   try {
     const formData = new FormData();
-    formData.append("files", imageFile, encodeURIComponent(imageFile.name));
+
+    console.log("들어온 것", imageFiles);
+
+    imageFiles.forEach((file) => {
+      formData.append("files", file, encodeURIComponent(file.name));
+    });
+
+    console.log(formData["files"]);
 
     const response: { data: Array<{ url: string; size: number }> } =
       await axios.post(`${process.env.REACT_APP_SERVER_URI}/upload`, formData);
 
-    return response.data[0];
+    console.log("등록 결과", [...response.data]);
+
+    return response.data;
   } catch (error) {
     console.log("Error: 이미지 서버 등록 에러", error);
   }
 }
 
-async function removeImageFromServer(url: string): Promise<{
+async function removeImageFromServer(urls: Array<UploadedFileInfos>): Promise<{
   result: string;
   error: RemoveImageErrorType;
 }> {
@@ -53,7 +87,7 @@ async function removeImageFromServer(url: string): Promise<{
     };
   } = await axios.delete(`${process.env.REACT_APP_SERVER_URI}/upload`, {
     data: {
-      url,
+      urls,
     },
   });
 
@@ -189,7 +223,9 @@ function validatePassword(password: string) {
 }
 
 export {
+  isBase64Url,
   convertFileToBase64,
+  convertBase64ToFile,
   addImageOnServer,
   removeImageFromServer,
   validateImageDimensionRatio,

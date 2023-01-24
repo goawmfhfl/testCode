@@ -11,6 +11,7 @@ export interface ProductCategory {
 
 export interface UploadedFileInfos {
   id?: number;
+  filename?: string;
   url: string;
   type: UploadFileType;
 }

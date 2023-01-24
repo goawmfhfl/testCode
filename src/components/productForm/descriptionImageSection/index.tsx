@@ -21,6 +21,7 @@ const ProductDescriptionSection = () => {
         ...descriptionImagesVar(),
         {
           id: uuidv4(),
+          filename: "",
           url: "",
           size: 0,
           type: UploadFileType.PRODUCT_DETAIL_PAGE,

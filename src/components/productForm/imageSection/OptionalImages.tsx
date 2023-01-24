@@ -60,19 +60,22 @@ const ProductImageSection = () => {
 
       newOptionalImages[imageIndex] = {
         ...newOptionalImages[imageIndex],
+        file,
+        filename: file.name,
         url,
       };
 
       optionalImagesVar(newOptionalImages);
     };
 
-  const handleRemoveButtonClick = (url: string) => () => {
-    const imageIndex = optionalImages.findIndex((image) => image.url === url);
+  const handleRemoveButtonClick = (id: string) => () => {
+    const imageIndex = optionalImages.findIndex((image) => image.id === id);
 
     const newOptionalImages = [...optionalImagesVar()];
 
     newOptionalImages[imageIndex] = {
       ...newOptionalImages[imageIndex],
+      filename: "",
       url: "",
     };
 
@@ -94,6 +97,7 @@ const ProductImageSection = () => {
     if (optionalImages.length < 5) {
       newOptionalImages.push({
         id: uuidv4(),
+        filename: "",
         url: "",
         type: UploadFileType.PRODUCT_OPTIONAL,
       });
@@ -107,7 +111,7 @@ const ProductImageSection = () => {
       <OptionalImageHeader>추가 이미지</OptionalImageHeader>
 
       <OptionalImageList>
-        {optionalImages.map(({ id, url }, index, arr) => {
+        {optionalImages.map(({ id, url }, index) => {
           const isFirstRow = index < 5;
           const isRightEnd = (index + 1) % 5 === 0;
 
@@ -121,7 +125,7 @@ const ProductImageSection = () => {
                 <ProductImage
                   imageSource={url}
                   // eslint-disable-next-line
-                  handleRemoveButtonClick={handleRemoveButtonClick(url)}
+                  handleRemoveButtonClick={handleRemoveButtonClick(id)}
                   // eslint-disable-next-line
                   handleImageInputChange={handleImageInputChange(id)}
                 />
