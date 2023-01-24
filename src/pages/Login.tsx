@@ -184,17 +184,17 @@ const Login = () => {
     });
   };
 
-  const handleKakaoLoginButtonClick = async () => {
-    await Kakao.Auth.login({
-      scope: "",
-      success: function (response: {}) {
-        console.log(response);
-      },
-      fail: function (error: {}) {
-        console.log(error);
-      },
-    });
-  };
+  // const handleKakaoLoginButtonClick = async () => {
+  //   await Kakao.Auth.login({
+  //     scope: "",
+  //     success: function (response: {}) {
+  //       console.log(response);
+  //     },
+  //     fail: function (error: {}) {
+  //       console.log(error);
+  //     },
+  //   });
+  // };
 
   useEffect(() => {
     const isLoading = isLoginLoading || isShopLoading;
