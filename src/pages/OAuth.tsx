@@ -4,26 +4,22 @@ import styled from "styled-components/macro";
 const OAuth = () => {
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    const naverLogin = new naver.LoginWithNaverId({
-      clientId: "CZm3jInQ9yUhzPJCFM_j",
-      callbackUrl: "http://localhost:3000/oauth/naver",
-      isPopup: true,
-      callbackHandle: true,
-    });
+    // const naverLogin = new naver.LoginWithNaverId({
+    //   clientId: "CZm3jInQ9yUhzPJCFM_j",
+    //   callbackUrl: "http://localhost:3000/oauth/naver",
+    //   isPopup: true,
+    //   callbackHandle: true,
+    // });
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    naverLogin.init();
-
-    console.log(naverLogin);
+    // naverLogin.init();
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    const accessToken = naverLogin.accessToken.accessToken as string;
+    // const accessToken = naverLogin.accessToken.accessToken as string;
 
-    console.log(accessToken);
-
-    if (!accessToken) {
-      console.log("액세스 토큰을 받아오는 것에 실패하였습니다");
-    }
+    // if (!accessToken) {
+    //   console.log("액세스 토큰을 받아오는 것에 실패하였습니다");
+    // }
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
