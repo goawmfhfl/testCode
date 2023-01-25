@@ -146,8 +146,12 @@ const ProductDiscount = () => {
               placeholderText="할인 종료일을 선택해주세요"
               dateFormat="yyyy-MM-dd"
               onChange={(selectedDate: Date) => {
+                const dayAdded = new Date(
+                  new Date(selectedDate).getTime() + (60 * 60 * 24 - 1) * 1000
+                );
+
                 const isAfterDiscountStarts =
-                  compareAsc(discountStartsAt, selectedDate) > -1;
+                  compareAsc(discountStartsAt, dayAdded) > -1;
 
                 if (isAfterDiscountStarts) {
                   alert("할인 시작일보다 늦은 날짜를 선택해주세요");
@@ -155,7 +159,7 @@ const ProductDiscount = () => {
                   return;
                 }
 
-                setValue(DISCOUNT_ENDS_AT, selectedDate);
+                setValue(DISCOUNT_ENDS_AT, dayAdded);
               }}
               disabled={!hasDiscountSpan || !isDiscounted || !discountStartsAt}
             />
@@ -187,11 +191,11 @@ const ProductDiscount = () => {
             <>
               {"("}
               {discountStartsAt
-                ? format(new Date(discountStartsAt), "yyyy-MM-dd")
+                ? format(new Date(discountStartsAt), "yyyy-MM-dd HH:mm:ss")
                 : "-"}{" "}
               부터{" "}
               {discountEndsAt
-                ? format(new Date(discountEndsAt), "yyyy-MM-dd")
+                ? format(new Date(discountEndsAt), "yyyy-MM-dd HH:mm:ss")
                 : "-"}{" "}
               까지 할인됩니다.
               {")"}
