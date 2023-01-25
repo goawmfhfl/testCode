@@ -47,6 +47,7 @@ export const GET_ORDERS_BY_SELLER = gql`
         originalPrice
         shipmentPrice
         shipmentDistantPrice
+        shipmentType
         orderShipmentInfos {
           id
           shipmentNumber

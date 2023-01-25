@@ -6,6 +6,7 @@ import {
   OrderStatusName,
   OrderStatusType,
   ShipmentStatus,
+  ShipmentType,
 } from "@constants/sale";
 
 export interface GetOrdersBySellerInputType {
@@ -67,6 +68,7 @@ export interface OrdersType {
   originalPrice: number;
   shipmentPrice: number;
   shipmentDistantPrice: number;
+  shipmentType: ShipmentType;
   orderShipmentInfos: Array<{
     id: number;
     shipmentNumber: number;

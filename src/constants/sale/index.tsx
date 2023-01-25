@@ -49,6 +49,12 @@ export enum Cause {
   SELLER = "SELLER",
 }
 
+export enum ShipmentType {
+  FREE = "FREE",
+  CHARGE = "CHARGE",
+  CONDITIONAL_FREE = "CONDITIONAL_FREE",
+}
+
 export enum OrderStatusName {
   PAYMENT_COMPLETED = "PAYMENT_COMPLETED",
   PREPARING = "PREPARING",

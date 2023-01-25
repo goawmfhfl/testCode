@@ -1,12 +1,14 @@
 import { NormalizedListType } from "@models/sale/order";
-import { orderStatusNameType, ShipmentStatus } from "@constants/sale";
+import {
+  orderStatusNameType,
+  ShipmentStatus,
+  ShipmentType,
+} from "@constants/sale";
 import { getDateFormat } from "@utils/date";
 
 const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
   const hasOrderItems = !!recontructOrderItem && !!recontructOrderItem.orders;
   if (!hasOrderItems) return;
-
-  if (!recontructOrderItem || !recontructOrderItem.orders) return;
 
   const orderAllIds = recontructOrderItem?.orders.allIds;
   const orderByid = recontructOrderItem?.orders.byId;
@@ -25,6 +27,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       originalPrice,
       shipmentPrice,
       shipmentDistantPrice,
+      shipmentType,
       orderShipmentInfos,
       orderStatus,
       claimStatus,
@@ -101,9 +104,8 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       resetDiscountPrice,
       resetOptionPrice
     );
-    const resetShipmentPrice = shipmentPrice
-      ? `${shipmentPrice.toLocaleString("ko-KR")}`
-      : "-";
+
+    const resetShipmentPrice = getShipmentPrice(shipmentPrice, shipmentType);
     const resetShipmentDistantPrice = shipmentDistantPrice
       ? `${shipmentDistantPrice.toLocaleString("ko-KR")}`
       : "-";
@@ -272,6 +274,17 @@ const getOptions = (
       resetOptionQuantity: 0,
     }
   );
+};
+
+const getShipmentPrice = (
+  shipmentPrice: number,
+  shipmentType: ShipmentType
+) => {
+  if (!shipmentPrice) return "-";
+  if (shipmentType === ShipmentType.FREE) return "-";
+  if (shipmentType === ShipmentType.CHARGE)
+    return `${shipmentPrice.toLocaleString("ko-KR")}`;
+  if (shipmentType === ShipmentType.CONDITIONAL_FREE) return "-";
 };
 
 export default resetOrderItems;
