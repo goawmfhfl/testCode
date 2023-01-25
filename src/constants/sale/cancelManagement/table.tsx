@@ -1,7 +1,7 @@
 export const tableWidth = {
   index: 1182,
-  left: 612,
-  right: 2600,
+  left: 708,
+  right: 2824,
 
   //체크박스
   checkBox: 36,
@@ -9,7 +9,7 @@ export const tableWidth = {
   // 주문번호
   merchantitemUid: 128,
 
-  // 상품 주문번호
+  // 상품 주 문번호
   productCode: 128,
 
   // 주문 상품
@@ -25,7 +25,7 @@ export const tableWidth = {
   claimStatus: 96,
 
   // 결제일
-  paymentDay: 128,
+  paidAt: 128,
 
   // 취소요청일
   requestCancelDay: 128,
@@ -43,13 +43,16 @@ export const tableWidth = {
   option: 136,
 
   //상품개수
-  quantity: 64,
+  quantity: 80,
 
-  //상품가
-  price: 64,
+  //상품가격
+  price: 80,
 
   //옵션가
-  optionPrice: 64,
+  optionPrice: 80,
+
+  //상품별 할인액
+  discountPrice: 136,
 
   //상품별 총 금액
   totalPrice: 136,
@@ -60,8 +63,11 @@ export const tableWidth = {
   // 제주/도서 추가배송비
   shipmentDistantPrice: 136,
 
+  // 총 결제 금액
+  totalPaymentAmount: 136,
+
   // 총 환불 금액
-  totalRefundPrice: 136,
+  totalRefundAmount: 136,
 
   // 구매자 아이디
   userEmail: 144,
@@ -122,68 +128,74 @@ export const fixTableType = [
     width: tableWidth.orderStatus,
     value: "orderStatus",
   },
+  {
+    id: 6,
+    label: "클래임 상태",
+    width: tableWidth.claimStatus,
+    value: "claimStatus",
+  },
 ];
 
 export const scrollTableType = [
   {
     id: 0,
-    label: "클래임 상태",
-    width: tableWidth.claimStatus,
-    value: "claimStatus",
+    label: "결제일",
+    width: tableWidth.paidAt,
+    value: "paidAt",
   },
   {
     id: 1,
-    label: "결제일",
-    width: tableWidth.paymentDay,
-    value: "paymentDay",
-  },
-  {
-    id: 2,
     label: "취소요청일",
     width: tableWidth.requestCancelDay,
     value: "requestCancelDay",
   },
   {
-    id: 3,
+    id: 2,
     label: "대표사유",
     width: tableWidth.reason,
     value: "reason",
   },
   {
-    id: 4,
+    id: 3,
     label: "상세사유",
     width: tableWidth.detailReason,
     value: "detailReason",
   },
   {
-    id: 5,
+    id: 4,
     label: "취소 완료일",
     width: tableWidth.cancelCompletedDay,
     value: "cancelCompletedDay",
   },
   {
-    id: 6,
+    id: 5,
     label: "옵션",
     width: tableWidth.option,
     value: "option",
   },
   {
-    id: 7,
+    id: 6,
     label: "상품개수",
     width: tableWidth.quantity,
     value: "quantity",
   },
   {
-    id: 8,
-    label: "상품가",
+    id: 7,
+    label: "상품가격",
     width: tableWidth.price,
     value: "price",
   },
   {
-    id: 9,
-    label: "옵션가",
+    id: 8,
+    label: "옵션가격",
     width: tableWidth.optionPrice,
     value: "optionPrice",
+  },
+  {
+    id: 9,
+    label: "상품별 할인액",
+    width: tableWidth.discountPrice,
+    value: "discountPrice",
   },
   {
     id: 10,
@@ -205,48 +217,56 @@ export const scrollTableType = [
   },
   {
     id: 13,
-    label: "총 환불 금액",
-    width: tableWidth.totalRefundPrice,
-    value: "totalRefundPrice",
+    label: "총 결제 금액",
+    width: tableWidth.totalPaymentAmount,
+    value: "totalPaymentAmount",
   },
+
   {
     id: 14,
+    label: "총 환불 금액",
+    width: tableWidth.totalRefundAmount,
+    value: "totalRefundAmount",
+  },
+
+  {
+    id: 15,
     label: "구매자 아이디",
     width: tableWidth.userEmail,
     value: "userEmail",
   },
   {
-    id: 15,
+    id: 16,
     label: "구매자 전화번호",
     width: tableWidth.userPhoneNumber,
     value: "userPhoneNumber",
   },
   {
-    id: 16,
+    id: 17,
     label: "수취인",
     width: tableWidth.recipientName,
     value: "recipientName",
   },
   {
-    id: 17,
+    id: 18,
     label: "수취인 전화번호",
     width: tableWidth.recipientPhoneNumber,
     value: "recipientPhoneNumber",
   },
   {
-    id: 18,
+    id: 19,
     label: "취소 거절일",
     width: tableWidth.rejectCancelDay,
     value: "rejectCancelDay",
   },
   {
-    id: 19,
+    id: 20,
     label: "거절대표사유",
     width: tableWidth.rejectReason,
     value: "rejectReason",
   },
   {
-    id: 20,
+    id: 21,
     label: "거절상세사유",
     width: tableWidth.detailRejectReason,
     value: "detailRejectReason",

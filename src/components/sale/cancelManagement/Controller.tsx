@@ -111,14 +111,14 @@ const Controller = () => {
           onClick={handleCancelRequestButtonClick}
           disabled={statusName === OrderStatusName.CANCEL_COMPLETED}
         >
-          취소 요청
+          최소 승인
         </ControlButton>
         <ControlButton
           size="small"
           onClick={handleCancelCompletedButtonClick}
           disabled={statusName === OrderStatusName.CANCEL_COMPLETED}
         >
-          취소 완료
+          취소 거절
         </ControlButton>
       </ActiveButtonContainer>
       <FilterContainer>

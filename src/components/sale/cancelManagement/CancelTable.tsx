@@ -69,79 +69,8 @@ const CancelTable = () => {
 
   const [orders, setOrders] = useState<Array<ResetCancelOrders>>([]);
 
-  const checkedOrders = useReactiveVar(checkedOrdersVar);
-  const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
-
-  const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newOrders = cloneDeep(orders);
-    checkAllBoxStatusVar(e.target.checked);
-
-    if (e.target.checked) {
-      const checkOrders = newOrders.map((orderItem) => ({
-        ...orderItem,
-        isChecked: true,
-      }));
-
-      setOrders(checkOrders);
-      checkedOrdersVar(checkOrders);
-    }
-
-    if (!e.target.checked) {
-      const checkAllOrderItem = newOrders.map((orderItem) => ({
-        ...orderItem,
-        isChecked: false,
-      }));
-
-      setOrders(checkAllOrderItem);
-      checkedOrdersVar([]);
-    }
-  };
-
-  const changeSingleCheckBoxHandler =
-    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newOrders = cloneDeep(orders);
-
-      if (e.target.checked) {
-        const checkedOrderItem = { ...newOrders[index], isChecked: true };
-        checkedOrdersVar([...checkedOrders, checkedOrderItem]);
-
-        newOrders[index].isChecked = true;
-        setOrders(newOrders);
-      }
-
-      if (!e.target.checked) {
-        const hasCheckedList = checkedOrders.filter(
-          (orderItem) => orderItem.id === newOrders[index].id
-        );
-
-        if (hasCheckedList) {
-          const checkedListIndex = checkedOrders.findIndex(
-            (orderItem) => orderItem.id === newOrders[index].id
-          );
-
-          const deletedCheckedList = [
-            ...checkedOrders.slice(0, checkedListIndex),
-            ...checkedOrders.slice(checkedListIndex + 1),
-          ];
-
-          checkedOrdersVar(deletedCheckedList);
-
-          newOrders[index].isChecked = false;
-          setOrders(newOrders);
-        }
-
-        newOrders[index].isChecked = false;
-        setOrders(newOrders);
-      }
-    };
-
-  const handleEditReasonButtonClick = () => {
-    return "";
-  };
-
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
+    void (async () => {
       await getOrders({
         variables: {
           input: {
@@ -244,12 +173,12 @@ const CancelTable = () => {
 
   return (
     <TableContainer type={TableType.SCROLL} hasData={false}>
-      <FixedTable width={tableWidth.left}>
+      <FixedTable>
         <ThContainer>
           <Th type={TableType.SCROLL} width={fixTableType[0].width}>
             <Checkbox
-              onChange={changeAllCheckBoxHandler}
-              checked={checkAllBoxStatus}
+            // onChange={changeAllCheckBoxHandler}
+            // checked={checkAllBoxStatus}
             />
           </Th>
           <Th type={TableType.SCROLL} width={fixTableType[1].width}>
@@ -266,6 +195,9 @@ const CancelTable = () => {
           </Th>
           <Th type={TableType.SCROLL} width={fixTableType[5].width}>
             {fixTableType[5].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={fixTableType[6].width}>
+            {fixTableType[6].label}
           </Th>
         </ThContainer>
         <TdContainer>
@@ -286,8 +218,8 @@ const CancelTable = () => {
                 <Tr key={id}>
                   <Td type={TableType.SCROLL} width={fixTableType[0].width}>
                     <Checkbox
-                      onChange={changeSingleCheckBoxHandler(index)}
-                      checked={isChecked}
+                    // onChange={changeSingleCheckBoxHandler(index)}
+                    // checked={isChecked}
                     />
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[1].width}>
@@ -304,6 +236,9 @@ const CancelTable = () => {
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[5].width}>
                     {orderStatus}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[6].width}>
+                    {"claimStatus"}
                   </Td>
                 </Tr>
               )
@@ -375,6 +310,9 @@ const CancelTable = () => {
           <Th type={TableType.SCROLL} width={scrollTableType[20].width}>
             {scrollTableType[20].label}
           </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[21].width}>
+            {scrollTableType[21].label}
+          </Th>
         </ThContainer>
 
         <TdContainer>
@@ -409,19 +347,17 @@ const CancelTable = () => {
               ) => (
                 <Tr key={id}>
                   <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
-                    {claimStatus}
+                    {"paidAt"}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[1].width}>
-                    {payments}
-                  </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[2].width}>
                     {cancelRequestDay}
                   </Td>
                   <ReasonTd
                     type={TableType.SCROLL}
-                    width={scrollTableType[3].width}
+                    width={scrollTableType[2].width}
                   >
                     <Reason>{mainReasonType[mainReason as string]}</Reason>
+
                     <Button
                       type={"button"}
                       size={"small"}
@@ -431,26 +367,29 @@ const CancelTable = () => {
                       수정
                     </Button>
                   </ReasonTd>
+                  <Td type={TableType.SCROLL} width={scrollTableType[3].width}>
+                    상세사유
+                  </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[4].width}>
-                    {detaildReason}
+                    cancelCompletedAt
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[5].width}>
-                    {cancelCompletedDay}
+                    option
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[6].width}>
-                    {"컬러: 레드/크기:s"}
-                  </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[7].width}>
                     <Quantity quantity={quantity}>{quantity}</Quantity>
                   </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[7].width}>
+                    상품 가격
+                  </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[8].width}>
-                    {price}
+                    옵션 가격
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[9].width}>
-                    {optionPrice}
+                    상품별 할인액
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[10].width}>
-                    {totalPrice}
+                    상품별 총 금액
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[11].width}>
                     {shipmentPrice}
@@ -459,26 +398,29 @@ const CancelTable = () => {
                     {shipmentDistantPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[13].width}>
-                    {totalRefundPrice}
+                    총 결제 금액
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[14].width}>
-                    {userEmail}
+                    총 환불 금액
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[15].width}>
-                    {userPhoneNumber}
+                    {userEmail}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[16].width}>
-                    {recipientName}
+                    {userPhoneNumber}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[17].width}>
-                    {recipientPhoneNumber}
+                    {recipientName}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[18].width}>
-                    {cancelRefusalDay}
+                    {recipientPhoneNumber}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[19].width}>
+                    취소거절일
                   </Td>
                   <ReasonTd
                     type={TableType.SCROLL}
-                    width={scrollTableType[19].width}
+                    width={scrollTableType[20].width}
                   >
                     <Reason>
                       {mainReasonType[refusalMainReason as string]}
@@ -492,8 +434,8 @@ const CancelTable = () => {
                       수정
                     </Button>
                   </ReasonTd>
-                  <Td type={TableType.SCROLL} width={scrollTableType[20].width}>
-                    {refusalDetaildReason}
+                  <Td type={TableType.SCROLL} width={scrollTableType[21].width}>
+                    거절상세사유
                   </Td>
                 </Tr>
               )
