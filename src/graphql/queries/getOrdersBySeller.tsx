@@ -23,6 +23,11 @@ export const GET_ORDERS_BY_SELLER = gql`
           phoneNumber
         }
         orderByShop {
+          bundleShipmentPrice
+          bundleShipmentDistantPrice
+          bundleShipmentType
+          bundleOrderItemTotalPrice
+          shipmentConditionalPrice
           order {
             recipientName
             recipientPhoneNumber

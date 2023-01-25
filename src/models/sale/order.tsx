@@ -43,6 +43,12 @@ export interface OrdersType {
   };
 
   orderByShop: {
+    bundleShipmentPrice: number;
+    bundleShipmentDistantPrice: number;
+    bundleShipmentType: ShipmentType;
+    bundleOrderItemTotalPrice: number;
+    shipmentConditionalPrice: number;
+
     order: {
       recipientName: string;
       recipientPhoneNumber: string;

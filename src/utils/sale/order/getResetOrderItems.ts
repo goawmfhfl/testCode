@@ -28,6 +28,7 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       shipmentPrice,
       shipmentDistantPrice,
       shipmentType,
+      isBundleShipment,
       orderShipmentInfos,
       orderStatus,
       claimStatus,
@@ -105,7 +106,13 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       resetOptionPrice
     );
 
-    const resetShipmentPrice = getShipmentPrice(shipmentPrice, shipmentType);
+    const resetShipmentPrice = getShipmentPrice(
+      isBundleShipment,
+      shipmentPrice,
+      shipmentType,
+      orderByShop
+    );
+
     const resetShipmentDistantPrice = shipmentDistantPrice
       ? `${shipmentDistantPrice.toLocaleString("ko-KR")}`
       : "-";
@@ -277,14 +284,45 @@ const getOptions = (
 };
 
 const getShipmentPrice = (
+  isBundleShipment: boolean,
   shipmentPrice: number,
-  shipmentType: ShipmentType
+  shipmentType: ShipmentType,
+  orderByShop: {
+    bundleShipmentPrice: number;
+    bundleShipmentDistantPrice: number;
+    bundleShipmentType: ShipmentType;
+    bundleOrderItemTotalPrice: number;
+    shipmentConditionalPrice: number;
+  }
 ) => {
   if (!shipmentPrice) return "-";
-  if (shipmentType === ShipmentType.FREE) return "-";
-  if (shipmentType === ShipmentType.CHARGE)
-    return `${shipmentPrice.toLocaleString("ko-KR")}`;
-  if (shipmentType === ShipmentType.CONDITIONAL_FREE) return "-";
+
+  if (isBundleShipment) {
+    if (shipmentType === ShipmentType.FREE) {
+      return "-";
+    }
+    if (shipmentType === ShipmentType.CHARGE) {
+      return `${shipmentPrice.toLocaleString("ko-KR")}`;
+    }
+  }
+
+  if (!isBundleShipment && !!orderByShop) {
+    if (orderByShop.bundleShipmentType === ShipmentType.FREE) {
+      return "-";
+    }
+    if (orderByShop.bundleShipmentType === ShipmentType.CHARGE) {
+      return `${orderByShop.bundleShipmentPrice.toLocaleString("ko-KR")}`;
+    }
+    if (orderByShop.bundleShipmentType === ShipmentType.CONDITIONAL_FREE) {
+      const isShipmentPriceFree =
+        orderByShop.bundleOrderItemTotalPrice >
+        orderByShop.shipmentConditionalPrice;
+
+      return isShipmentPriceFree
+        ? "-"
+        : `${orderByShop.bundleShipmentPrice.toLocaleString("ko-KR")}`;
+    }
+  }
 };
 
 export default resetOrderItems;
