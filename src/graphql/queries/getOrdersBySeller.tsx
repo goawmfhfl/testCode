@@ -79,10 +79,11 @@ export const GET_CANCEL_ORDERS_BY_SELLER = gql`
       totalResults
       totalOrderItems {
         id
+        merchantUid
         merchantItemUid
+        isBundleShipment
 
         product {
-          code
           thumbnail
           name
         }
@@ -91,37 +92,49 @@ export const GET_CANCEL_ORDERS_BY_SELLER = gql`
           name
           email
           phoneNumber
-          payments {
-            createdAt
-          }
         }
 
         orderByShop {
+          bundleShipmentPrice
+          bundleShipmentDistantPrice
+          bundleShipmentType
+          bundleOrderItemTotalPrice
+          shipmentConditionalPrice
           order {
             recipientName
             recipientPhoneNumber
+            postCode
+            paidAt
           }
         }
-
+        statusReasons {
+          createdAt
+          amount
+          mainReason
+          detailedReason
+          status
+        }
         options {
+          id
           components {
             name
             value
           }
           price
+          quantity
+          isRequired
         }
         quantity
         discountAppliedPrice
         originalPrice
         shipmentPrice
         shipmentDistantPrice
+        shipmentType
 
-        statusReasons {
+        orderShipmentInfos {
           id
-          createdAt
-          amount
-          mainReason
-          detailedReason
+          shipmentNumber
+          shipmentCompany
           status
         }
         orderStatus {

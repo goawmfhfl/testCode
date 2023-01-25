@@ -642,7 +642,6 @@ const OrderTable = () => {
                   rowIndex,
                   merchantUid,
                   merchantItemUid,
-                  productCode,
                   thumbnail,
                   orderProduct,
                   userName,

@@ -264,7 +264,6 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
 
 const reconstructNotRequiredProducts = (
   product: {
-    code: string;
     thumbnail: string;
     name: string;
   },
@@ -285,7 +284,6 @@ const reconstructNotRequiredProducts = (
   }, "");
 
   return {
-    code: product.code,
     thumbnail: product.thumbnail,
     name: optionName,
   };

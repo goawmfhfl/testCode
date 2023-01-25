@@ -22,20 +22,21 @@ export interface GetOrdersBySellerInputType {
 }
 
 export interface OrdersType {
-  rowIndex?: string;
-  colorIndex?: number;
-  isLastRow?: boolean;
+  rowIndex: string;
+  colorIndex: number;
+  isLastRow: boolean;
   isFirstRow: boolean;
 
   id: number;
   merchantUid: string;
   merchantItemUid: string;
   isBundleShipment: boolean;
+
   product: {
-    code: string;
     thumbnail: string;
     name: string;
   };
+
   user: {
     name: string;
     email: string;
@@ -53,11 +54,12 @@ export interface OrdersType {
       recipientName: string;
       recipientPhoneNumber: string;
       recipientAddress: string;
-      postCode?: number;
+      postCode: number;
       shipmentMemo?: string;
       paidAt: string;
     };
   };
+
   options: Array<{
     id: number;
     components: Array<{
@@ -81,6 +83,7 @@ export interface OrdersType {
     shipmentCompany: string;
     status: ShipmentStatus;
   }>;
+
   orderStatus: {
     name: OrderStatusName;
   };
@@ -190,7 +193,6 @@ export interface ResetOrderItemType {
   id: number;
   merchantUid: string;
   merchantItemUid: string;
-  productCode: string;
   thumbnail: string;
   orderProduct: string;
   userName: string;

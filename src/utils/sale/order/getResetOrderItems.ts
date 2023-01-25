@@ -40,7 +40,6 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
 
     const resetMerchantUid = merchantUid ? merchantUid : "-";
     const resetMerchantItemUid = merchantItemUid ? merchantItemUid : "-";
-    const resetProductCode = product?.code ? product.code : "-";
     const resetOrderProduct = product?.name ? product.name : "-";
     const resetProductThumbnail = product?.thumbnail ? product.thumbnail : "-";
     const resetUserName = user?.name ? user.name : "-";
@@ -131,7 +130,6 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       id: orderId,
       merchantUid: resetMerchantUid,
       merchantItemUid: resetMerchantItemUid,
-      productCode: resetProductCode,
       thumbnail: resetProductThumbnail,
       orderProduct: resetOrderProduct,
       userName: resetUserName,

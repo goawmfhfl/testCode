@@ -1,18 +1,24 @@
 import {
+  MainReason,
   OrderSearchType,
   OrderStatusGroup,
   OrderStatusName,
   OrderStatusType,
-  MainReason,
+  ShipmentType,
 } from "@constants/sale";
 
 export interface CancelOrdersType {
-  id: number;
+  rowIndex?: string;
+  colorIndex?: number;
+  isLastRow?: boolean;
+  isFirstRow?: boolean;
 
+  id: number;
+  merchantUid: string;
   merchantItemUid: string;
+  isBundleShipment: boolean;
 
   product: {
-    code: string;
     thumbnail: string;
     name: string;
   };
@@ -21,38 +27,9 @@ export interface CancelOrdersType {
     name: string;
     email: string;
     phoneNumber: string;
-    payments: {
-      createdAt: string;
-    };
   };
-
-  orderByShop: {
-    order: {
-      recipientName: string;
-      recipientPhoneNumber: string;
-    };
-  };
-
-  options: Array<{
-    components: Array<{
-      name: string;
-      value: string;
-    }>;
-    price: number;
-  }>;
-
-  quantity: number;
-
-  discountAppliedPrice: number;
-
-  originalPrice: number;
-
-  shipmentPrice: number;
-
-  shipmentDistantPrice: number;
 
   statusReasons: Array<{
-    id: number;
     createdAt: string;
     amount: number;
     mainReason: MainReason;
@@ -60,10 +37,42 @@ export interface CancelOrdersType {
     status: OrderStatusName;
   }>;
 
+  orderByShop: {
+    bundleShipmentPrice: number;
+    bundleShipmentDistantPrice: number;
+    bundleShipmentType: ShipmentType;
+    bundleOrderItemTotalPrice: number;
+    shipmentConditionalPrice: number;
+
+    order: {
+      recipientName: string;
+      recipientPhoneNumber: string;
+      postCode: number;
+      paidAt: string;
+    };
+  };
+
+  options: Array<{
+    id: number;
+    components: Array<{
+      name: string;
+      value: string;
+    }>;
+    quantity: number;
+    price: number;
+    isRequired: boolean;
+  }>;
+
+  quantity: number;
+  discountAppliedPrice: number;
+  originalPrice: number;
+  shipmentPrice: number;
+  shipmentDistantPrice: number;
+  shipmentType: ShipmentType;
+
   orderStatus: {
     name: OrderStatusName;
   };
-
   claimStatus: {
     name: OrderStatusName;
   };
