@@ -5,9 +5,10 @@ import {
   OrderSearchType,
 } from "@constants/sale";
 import { FilterOptionVarType } from "@models/sale";
-import { ResetCancelOrders } from "@models/sale/cancel";
+import { ResetCancelOrderItems } from "@models/sale/cancel";
 
-export const checkedOrdersVar = makeVar<Array<ResetCancelOrders>>([]);
+export const checkedOrdersVar = makeVar<Array<ResetCancelOrderItems>>([]);
+export const cancleOrderItemsVar = makeVar<Array<ResetCancelOrderItems>>([]);
 
 export const filterOptionVar = makeVar<FilterOptionVarType>({
   type: OrderSearchType.RECIPIENT_NAME,

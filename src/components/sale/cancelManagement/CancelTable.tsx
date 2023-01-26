@@ -4,7 +4,11 @@ import { useMutation, useReactiveVar } from "@apollo/client";
 import { cloneDeep } from "lodash";
 import { TableType } from "@models/index";
 
-import { checkedOrdersVar, filterOptionVar } from "@cache/sale/cancel";
+import {
+  cancleOrderItemsVar,
+  checkedOrdersVar,
+  filterOptionVar,
+} from "@cache/sale/cancel";
 import {
   checkAllBoxStatusVar,
   commonFilterOptionVar,
@@ -31,8 +35,11 @@ import {
 
 import { checkedOrderItemsVar } from "@cache/sale";
 import useLazyCancelOrders from "@hooks/order/useLazyCancelOrders";
-import contructCancelOrders from "@utils/sale/cancel/contructCancelOrders";
-import resetCancelOrders from "@utils/sale/cancel/resetCancelOrders";
+
+import { NormalizedType, ResetCancelOrderItems } from "@models/sale/cancel";
+import { OrderItems } from "@models/sale";
+
+import constructOrderItem from "@utils/sale/constructOrderItem";
 
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 
@@ -55,11 +62,7 @@ import {
 } from "@components/common/input/Dropdown";
 import Button from "@components/common/Button";
 import { Input } from "@components/common/input/TextInput";
-import {
-  CancelOrdersType,
-  NormalizedType,
-  ResetCancelOrders,
-} from "@models/sale/cancel";
+import getResetOrderItems from "@utils/sale/cancel/getResetOrderItems";
 
 const CancelTable = () => {
   const { getOrders, error, loading, data } = useLazyCancelOrders();
@@ -67,7 +70,7 @@ const CancelTable = () => {
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
-  const [orders, setOrders] = useState<Array<ResetCancelOrders>>([]);
+  const cancleOrderItems = useReactiveVar(cancleOrderItemsVar);
 
   useEffect(() => {
     void (async () => {
@@ -97,7 +100,7 @@ const CancelTable = () => {
     }: {
       totalPages: number;
       totalResults: number;
-      totalOrderItems: Array<CancelOrdersType>;
+      totalOrderItems: Array<OrderItems>;
     } = data.getOrdersBySeller;
 
     const isLastPageChanged = totalPages < page;
@@ -119,14 +122,13 @@ const CancelTable = () => {
 
     totalPageLengthVar(totalResults);
 
-    const recontructCancelOrders: NormalizedType =
-      contructCancelOrders(totalOrderItems);
+    const reconstructCancelOrderItem: NormalizedType =
+      constructOrderItem(totalOrderItems);
 
-    const cancelOrders: Array<ResetCancelOrders> = resetCancelOrders(
-      recontructCancelOrders
+    const resetOrderItems: Array<ResetCancelOrderItems> = getResetOrderItems(
+      reconstructCancelOrderItem
     );
-
-    setOrders(cancelOrders);
+    cancleOrderItemsVar(resetOrderItems);
 
     checkedOrderItemsVar([]);
     checkAllBoxStatusVar(false);
@@ -169,10 +171,15 @@ const CancelTable = () => {
     }
   }, [error]);
 
-  const hasOrders = !loading && !error && !!orders?.length;
+  const hasCancelOrderItems = !!cancleOrderItems && !!cancleOrderItems.length;
+  const isFetchingOrderItemsFailed =
+    !!loading || !!error || hasCancelOrderItems;
 
   return (
-    <TableContainer type={TableType.SCROLL} hasData={false}>
+    <TableContainer
+      type={TableType.SCROLL}
+      hasData={isFetchingOrderItemsFailed}
+    >
       <FixedTable>
         <ThContainer>
           <Th type={TableType.SCROLL} width={fixTableType[0].width}>
@@ -201,36 +208,53 @@ const CancelTable = () => {
           </Th>
         </ThContainer>
         <TdContainer>
-          {hasOrders &&
-            orders.map(
+          {!loading &&
+            cancleOrderItems?.map(
               (
                 {
                   id,
+                  merchantUid,
                   merchantItemUid,
-                  productCode,
-                  orderProduct,
+                  productName,
+                  thumbnail,
                   userName,
                   orderStatus,
+                  claimStatus,
+
+                  colorIndex,
+                  rowIndex,
+                  isLastRow,
+                  isFirstRow,
                   isChecked,
                 },
                 index
               ) => (
-                <Tr key={id}>
+                <Tr
+                  key={rowIndex}
+                  colorIndex={colorIndex}
+                  isLastRow={isLastRow}
+                >
                   <Td type={TableType.SCROLL} width={fixTableType[0].width}>
                     <Checkbox
-                    // onChange={changeSingleCheckBoxHandler(index)}
-                    // checked={isChecked}
+                      // onChange={changeSingleCheckBoxHandler(index)}
+                      checked={isChecked}
                     />
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[1].width}>
-                    {merchantItemUid}
+                    {merchantUid}
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[2].width}>
-                    {productCode}
+                    {merchantItemUid}
                   </Td>
-                  <Td type={TableType.SCROLL} width={fixTableType[3].width}>
-                    {orderProduct}
-                  </Td>
+                  <ProductNameTd
+                    type={TableType.SCROLL}
+                    width={fixTableType[3].width}
+                  >
+                    <ProductThumbNailWrapper>
+                      <ProductThumbNail src={encodeURI(thumbnail)} />
+                    </ProductThumbNailWrapper>
+                    <ProductName>{productName}</ProductName>
+                  </ProductNameTd>
                   <Td type={TableType.SCROLL} width={fixTableType[4].width}>
                     {userName}
                   </Td>
@@ -238,7 +262,7 @@ const CancelTable = () => {
                     {orderStatus}
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[6].width}>
-                    {"claimStatus"}
+                    {claimStatus}
                   </Td>
                 </Tr>
               )
@@ -316,47 +340,57 @@ const CancelTable = () => {
         </ThContainer>
 
         <TdContainer>
-          {hasOrders &&
-            orders.map(
+          {!loading &&
+            cancleOrderItems?.map(
               (
                 {
-                  id,
-                  claimStatus,
-                  payments,
-                  recipientName,
-                  recipientPhoneNumber,
-                  userEmail,
-                  userPhoneNumber,
-                  option,
-                  quantity,
-                  price,
+                  paidAt,
+                  requestCancelAt,
+                  mainReason,
+                  detailedReason,
+                  completedCancelAt,
+                  optionName,
+                  optionQuantity,
+                  originalPrice,
                   optionPrice,
+                  discountPrice,
                   totalPrice,
                   shipmentPrice,
                   shipmentDistantPrice,
-                  mainReason,
-                  detaildReason,
-                  refusalDetaildReason,
-                  refusalMainReason,
-                  cancelRequestDay,
-                  cancelRefusalDay,
-                  cancelCompletedDay,
-                  totalRefundPrice,
+                  totalPaymentAmount,
+                  userEmail,
+                  userPhoneNumber,
+                  recipientName,
+                  recipientPhoneNumber,
+                  totalRefundAmout,
+                  refusalCancelAt,
+                  refusalReason,
+                  refusalDateaildReason,
+
+                  colorIndex,
+                  rowIndex,
+                  isLastRow,
+                  isFirstRow,
+                  isChecked,
                 },
                 index
               ) => (
-                <Tr key={id}>
+                <Tr
+                  key={rowIndex}
+                  colorIndex={colorIndex}
+                  isLastRow={isLastRow}
+                >
                   <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
-                    {"paidAt"}
+                    {paidAt}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[1].width}>
-                    {cancelRequestDay}
+                    {requestCancelAt}
                   </Td>
                   <ReasonTd
                     type={TableType.SCROLL}
                     width={scrollTableType[2].width}
                   >
-                    <Reason>{mainReasonType[mainReason as string]}</Reason>
+                    <Reason>{mainReason}</Reason>
 
                     <Button
                       type={"button"}
@@ -368,28 +402,30 @@ const CancelTable = () => {
                     </Button>
                   </ReasonTd>
                   <Td type={TableType.SCROLL} width={scrollTableType[3].width}>
-                    상세사유
+                    {detailedReason}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[4].width}>
-                    cancelCompletedAt
+                    {completedCancelAt}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[5].width}>
-                    option
+                    {optionName}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[6].width}>
-                    <Quantity quantity={quantity}>{quantity}</Quantity>
+                    <Quantity quantity={optionQuantity}>
+                      {optionQuantity}
+                    </Quantity>
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[7].width}>
-                    상품 가격
+                    {originalPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[8].width}>
-                    옵션 가격
+                    {optionPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[9].width}>
-                    상품별 할인액
+                    {discountPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[10].width}>
-                    상품별 총 금액
+                    {totalPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[11].width}>
                     {shipmentPrice}
@@ -398,10 +434,10 @@ const CancelTable = () => {
                     {shipmentDistantPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[13].width}>
-                    총 결제 금액
+                    {totalPaymentAmount}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[14].width}>
-                    총 환불 금액
+                    {totalRefundAmout}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[15].width}>
                     {userEmail}
@@ -416,15 +452,13 @@ const CancelTable = () => {
                     {recipientPhoneNumber}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[19].width}>
-                    취소거절일
+                    {refusalCancelAt}
                   </Td>
                   <ReasonTd
                     type={TableType.SCROLL}
                     width={scrollTableType[20].width}
                   >
-                    <Reason>
-                      {mainReasonType[refusalMainReason as string]}
-                    </Reason>
+                    <Reason>{refusalReason}</Reason>
                     <Button
                       type={"button"}
                       size={"small"}
@@ -435,7 +469,7 @@ const CancelTable = () => {
                     </Button>
                   </ReasonTd>
                   <Td type={TableType.SCROLL} width={scrollTableType[21].width}>
-                    거절상세사유
+                    {refusalDateaildReason}
                   </Td>
                 </Tr>
               )
@@ -443,7 +477,9 @@ const CancelTable = () => {
         </TdContainer>
       </ScrollTable>
 
-      {orders.length === 0 && !loading && (
+      {loading && <Loading type={TableType.SCROLL} />}
+
+      {!hasCancelOrderItems && (
         <NoDataContainer type={TableType.SCROLL}>
           {query && (
             <>
@@ -462,11 +498,42 @@ const CancelTable = () => {
           )}
         </NoDataContainer>
       )}
-
-      {loading && <Loading type={TableType.SCROLL} />}
     </TableContainer>
   );
 };
+
+const ProductNameTd = styled(Td)`
+  justify-content: flex-start;
+  padding: 8px 0px;
+`;
+
+const ProductThumbNailWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-width: 40px;
+  height: 80px;
+
+  border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
+`;
+
+const ProductThumbNail = styled.img`
+  width: 24px;
+  height: 24px;
+`;
+
+const ProductName = styled.span`
+  display: block;
+
+  padding: 0 6px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+`;
 
 const ReasonTd = styled(Td)`
   display: flex;

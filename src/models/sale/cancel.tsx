@@ -7,76 +7,7 @@ import {
   ShipmentType,
 } from "@constants/sale";
 
-export interface CancelOrdersType {
-  rowIndex?: string;
-  colorIndex?: number;
-  isLastRow?: boolean;
-  isFirstRow?: boolean;
-
-  id: number;
-  merchantUid: string;
-  merchantItemUid: string;
-  isBundleShipment: boolean;
-
-  product: {
-    thumbnail: string;
-    name: string;
-  };
-
-  user: {
-    name: string;
-    email: string;
-    phoneNumber: string;
-  };
-
-  statusReasons: Array<{
-    createdAt: string;
-    amount: number;
-    mainReason: MainReason;
-    detailedReason: string;
-    status: OrderStatusName;
-  }>;
-
-  orderByShop: {
-    bundleShipmentPrice: number;
-    bundleShipmentDistantPrice: number;
-    bundleShipmentType: ShipmentType;
-    bundleOrderItemTotalPrice: number;
-    shipmentConditionalPrice: number;
-
-    order: {
-      recipientName: string;
-      recipientPhoneNumber: string;
-      postCode: number;
-      paidAt: string;
-    };
-  };
-
-  options: Array<{
-    id: number;
-    components: Array<{
-      name: string;
-      value: string;
-    }>;
-    quantity: number;
-    price: number;
-    isRequired: boolean;
-  }>;
-
-  quantity: number;
-  discountAppliedPrice: number;
-  originalPrice: number;
-  shipmentPrice: number;
-  shipmentDistantPrice: number;
-  shipmentType: ShipmentType;
-
-  orderStatus: {
-    name: OrderStatusName;
-  };
-  claimStatus: {
-    name: OrderStatusName;
-  };
-}
+import { OrderItems } from "@models/sale/index";
 
 export interface GetCancelOrdersBySellerType {
   getOrdersBySeller: {
@@ -84,7 +15,7 @@ export interface GetCancelOrdersBySellerType {
     error: string;
     totalPages: number;
     totalResults: number;
-    totalOrderItems: Array<CancelOrdersType>;
+    totalOrderItems: Array<OrderItems>;
   };
 }
 
@@ -100,39 +31,46 @@ export interface GetCancelOrdersBySellerInputType {
 
 export interface NormalizedType {
   orders: {
-    allIds: Array<number>;
-    byId: { [key: number]: CancelOrdersType };
+    allIds: Array<string>;
+    byId: { [key: string]: OrderItems };
   };
 }
 
-export interface ResetCancelOrders {
+export interface ResetCancelOrderItems {
   id: number;
+  merchantUid: string;
   merchantItemUid: string;
-  productCode: string;
   thumbnail: string;
-  orderProduct: string;
+  productName: string;
   userName: string;
-  mainReason: MainReason;
-  detaildReason: string;
-  refusalMainReason: MainReason;
-  refusalDetaildReason: string;
-  orderStatus: string;
   claimStatus: string;
-  payments: string;
-  recipientName: string;
-  recipientPhoneNumber: string;
+  orderStatus: string;
+  paidAt: string;
+  requestCancelAt: string;
+  mainReason: string;
+  detailedReason: string;
+  completedCancelAt: string;
+  optionName: string;
+  optionQuantity: number;
+  originalPrice: string;
+  optionPrice: string;
+  discountPrice: string;
+  totalPrice: string;
+  shipmentPrice: string;
+  shipmentDistantPrice: string;
+  totalPaymentAmount: string;
+  totalRefundAmout: string;
   userEmail: string;
   userPhoneNumber: string;
-  option: string;
-  quantity: number;
-  price: number;
-  optionPrice: string;
-  totalPrice: string;
-  shipmentPrice: number;
-  shipmentDistantPrice: number;
-  cancelRequestDay: string;
-  cancelRefusalDay: string;
-  cancelCompletedDay: string;
-  totalRefundPrice: number;
+  recipientName: string;
+  recipientPhoneNumber: string;
+  refusalCancelAt: string;
+  refusalReason: string;
+  refusalDateaildReason: string;
+
   isChecked: boolean;
+  colorIndex: number;
+  rowIndex: string;
+  isLastRow: boolean;
+  isFirstRow: boolean;
 }

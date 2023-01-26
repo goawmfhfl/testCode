@@ -38,7 +38,7 @@ import {
 
 import getResetOrderItems from "@utils/sale/order/getResetOrderItems";
 import { preventNaNValues } from "@utils/index";
-import constructOrderItem from "@utils/sale/order/constructOrderItem";
+import constructOrderItem from "@utils/sale/constructOrderItem";
 
 import {
   checkAllBoxStatusVar,
@@ -47,7 +47,7 @@ import {
 } from "@cache/index";
 
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
-import { OrdersType } from "@models/sale/order";
+import { OrderItems } from "@models/sale/index";
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
 import { EDIT_SHIPMENT_NUMBER } from "@graphql/mutations/editShipmentNumber";
 
@@ -496,7 +496,7 @@ const OrderTable = () => {
     }: {
       totalPages: number;
       totalResults: number;
-      totalOrderItems: Array<OrdersType>;
+      totalOrderItems: Array<OrderItems>;
     } = data.getOrdersBySeller;
 
     const isLastPageChanged = totalPages < page;

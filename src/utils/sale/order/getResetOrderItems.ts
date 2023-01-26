@@ -6,12 +6,13 @@ import {
 } from "@constants/sale";
 import { getDateFormat } from "@utils/date";
 
-const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
-  const hasOrderItems = !!recontructOrderItem && !!recontructOrderItem.orders;
+const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
+  const hasOrderItems =
+    !!reconstructOrderItems && !!reconstructOrderItems.orders;
   if (!hasOrderItems) return;
 
-  const orderAllIds = recontructOrderItem?.orders.allIds;
-  const orderByid = recontructOrderItem?.orders.byId;
+  const orderAllIds = reconstructOrderItems?.orders.allIds;
+  const orderByid = reconstructOrderItems?.orders.byId;
 
   const result = orderAllIds.map((id) => {
     const {
@@ -312,11 +313,11 @@ const getShipmentPrice = (
       return `${orderByShop.bundleShipmentPrice.toLocaleString("ko-KR")}`;
     }
     if (orderByShop.bundleShipmentType === ShipmentType.CONDITIONAL_FREE) {
-      const isShipmentPriceFree =
+      const isConditionalFree =
         orderByShop.bundleOrderItemTotalPrice >
         orderByShop.shipmentConditionalPrice;
 
-      return isShipmentPriceFree
+      return isConditionalFree
         ? "-"
         : `${orderByShop.bundleShipmentPrice.toLocaleString("ko-KR")}`;
     }
