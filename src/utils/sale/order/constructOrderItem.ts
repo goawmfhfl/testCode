@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { OrdersType } from "@models/sale/order";
 import { cloneDeep } from "lodash";
+import { ShipmentType } from "@constants/sale";
 
 const optionsInitialValue: Array<{
   id: number;
@@ -315,9 +316,39 @@ const reconstructNotRequiredOption = (
 };
 
 const getShipmentPrice = (orders: Array<OrdersType>) => {
-  return orders.reduce((result, { shipmentPrice }) => {
-    return (result = Math.max(result, shipmentPrice));
-  }, 0);
+  return orders.reduce(
+    (
+      result,
+      {
+        orderByShop: {
+          bundleShipmentPrice,
+          bundleShipmentType,
+          bundleOrderItemTotalPrice,
+          shipmentConditionalPrice,
+        },
+      }
+    ) => {
+      let shipmentPrice = 0;
+
+      if (bundleShipmentType === ShipmentType.FREE) {
+        shipmentPrice = 0;
+      }
+
+      if (bundleShipmentType === ShipmentType.CHARGE) {
+        shipmentPrice = bundleShipmentPrice;
+      }
+
+      if (bundleShipmentType === ShipmentType.CONDITIONAL_FREE) {
+        const isConditionalFree =
+          bundleOrderItemTotalPrice > shipmentConditionalPrice;
+
+        shipmentPrice = isConditionalFree ? 0 : bundleShipmentPrice;
+      }
+
+      return (result = Math.max(result, shipmentPrice));
+    },
+    0
+  );
 };
 
 const getShipmentDistantPrice = (orders: Array<OrdersType>) => {
