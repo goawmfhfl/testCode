@@ -64,23 +64,25 @@ const SaveBar = () => {
     }
   >(TEMPORARY_SAVE_SHOP_SETTINGS, {
     update(cache) {
-      const shopInfo = cache.readQuery<{ getShopInfo: ShopInfo }>({
-        query: GET_SHOP_INFO,
-      });
+      void (async () => {
+        const shopInfo = cache.readQuery<{ getShopInfo: ShopInfo }>({
+          query: GET_SHOP_INFO,
+        });
 
-      if (!shopInfo) return;
+        if (!shopInfo) return;
 
-      const update = {
-        ...shopInfo.getShopInfo,
-        ...restructureShopSettingStates(watch),
-      };
+        const update = {
+          ...shopInfo.getShopInfo,
+          ...(await restructureShopSettingStates(watch)),
+        };
 
-      cache.writeQuery({
-        query: GET_SHOP_INFO,
-        data: {
-          getShopInfo: update,
-        },
-      });
+        cache.writeQuery({
+          query: GET_SHOP_INFO,
+          data: {
+            getShopInfo: update,
+          },
+        });
+      })();
     },
   });
 
@@ -170,7 +172,7 @@ const SaveBar = () => {
   ) => {
     e.preventDefault();
 
-    const temporarySaveShopInput = restructureShopSettingStates(watch);
+    const temporarySaveShopInput = await restructureShopSettingStates(watch);
 
     const result = await temporarySaveShopSettings({
       variables: {
@@ -219,7 +221,7 @@ const SaveBar = () => {
         loadingSpinnerVisibilityVar(true);
         unfulfilledInputListVar([]);
 
-        const input = restructureShopSettingStates(watch);
+        const input = await restructureShopSettingStates(watch);
 
         const shipmentType = watch(SHIPMENT_PRICE_TYPE) as ShipmentChargeType;
         const isShipmentPriceFree = shipmentType === ShipmentChargeType.Free;

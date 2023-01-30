@@ -32,7 +32,7 @@ export interface ShopFormFields {
       PREFIX: string;
       SUFFIX: string;
     };
-    PHOTOCOPY: string;
+    PHOTOCOPY: { url: string; file: File };
   };
 }
 
@@ -44,8 +44,14 @@ export type InputValueTypes =
   | Array<{ url: string; type: UploadFileType }>;
 
 export interface ShopImageVariables {
-  mobileImage: string;
-  pcImage: string;
+  mobileImage: {
+    url: string;
+    file?: File;
+  };
+  pcImage: {
+    url: string;
+    file?: File;
+  };
 }
 
 export interface SafetyCertificationVariables {

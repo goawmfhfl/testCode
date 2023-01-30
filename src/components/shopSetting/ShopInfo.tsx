@@ -34,13 +34,13 @@ const ShopInfo = () => {
     event: ChangeEvent<HTMLInputElement>
   ) => {
     try {
-      const version = event.target.name;
-      const [targetImage] = event.target.files;
+      const type = event.target.name;
+      const [file] = event.target.files;
 
       // 이미지 비율 확인
-      if (version === "mobileImage") {
+      if (type === "mobileImage") {
         const isMobileImageRatioFulfilled = await validateImageDimensionRatio(
-          targetImage,
+          file,
           { width: 1, height: 1 }
         );
 
@@ -55,9 +55,9 @@ const ShopInfo = () => {
         }
       }
 
-      if (version === "pcImage") {
+      if (type === "pcImage") {
         const isPcImageRatioFulfilled = await validateImageDimensionRatio(
-          targetImage,
+          file,
           {
             width: 2,
             height: 1,
@@ -75,12 +75,12 @@ const ShopInfo = () => {
         }
       }
 
-      const { size } = targetImage;
+      const { size } = file;
 
       // 이미지 사이즈 확인
       const imageSizeAsMegabyte = size / 1000 / 1000;
 
-      if (version === "mobileImage" && imageSizeAsMegabyte > 3) {
+      if (type === "mobileImage" && imageSizeAsMegabyte > 3) {
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
@@ -92,7 +92,7 @@ const ShopInfo = () => {
         return;
       }
 
-      if (version === "pcImage" && imageSizeAsMegabyte > 5) {
+      if (type === "pcImage" && imageSizeAsMegabyte > 5) {
         systemModalVar({
           ...systemModalVar(),
           isVisible: true,
@@ -104,33 +104,25 @@ const ShopInfo = () => {
         return;
       }
 
-      const url = await convertFileToBase64(targetImage);
+      const url = await convertFileToBase64(file);
 
-      if (version === "mobileImage") {
-        if (mobileImage) {
-          shopImagesVar({
-            ...shopImagesVar(),
-            mobileImage: "",
-          });
-        }
-
+      if (type === "mobileImage") {
         shopImagesVar({
           ...shopImagesVar(),
-          mobileImage: url,
+          mobileImage: {
+            url,
+            file,
+          },
         });
       }
 
-      if (version === "pcImage") {
-        if (pcImage) {
-          shopImagesVar({
-            ...shopImagesVar(),
-            pcImage: "",
-          });
-        }
-
+      if (type === "pcImage") {
         shopImagesVar({
           ...shopImagesVar(),
-          pcImage: url,
+          pcImage: {
+            url,
+            file,
+          },
         });
       }
     } catch (error) {
@@ -143,17 +135,23 @@ const ShopInfo = () => {
       e.preventDefault();
       e.stopPropagation();
 
-      if (imageUrl === mobileImage) {
+      if (imageUrl === mobileImage.url) {
         shopImagesVar({
           ...shopImagesVar(),
-          mobileImage: "",
+          mobileImage: {
+            url: "",
+            file: null,
+          },
         });
       }
 
-      if (imageUrl === pcImage) {
+      if (imageUrl === pcImage.url) {
         shopImagesVar({
           ...shopImagesVar(),
-          pcImage: "",
+          pcImage: {
+            url: "",
+            file: null,
+          },
         });
       }
     };
@@ -190,14 +188,14 @@ const ShopInfo = () => {
                 파일 크기 : 3mb / 등록 가능 파일 확장자 : jpg, jpeg, png
               </ImageInputDescription>
 
-              {mobileImage ? (
+              {mobileImage.url ? (
                 <AddedMobileImageContainer>
-                  <AddedMobileImage src={encodeURI(mobileImage)} />
+                  <AddedMobileImage src={encodeURI(mobileImage.url)} />
 
                   <DeleteButton
                     src={closeIconSource}
                     // eslint-disable-next-line
-                    onClick={handleDeleteButtonClick(mobileImage)}
+                    onClick={handleDeleteButtonClick(mobileImage.url)}
                   />
 
                   <ChangeImageLabel htmlFor="mobileImage">
@@ -237,13 +235,13 @@ const ShopInfo = () => {
                 파일 크기 : 5mb / 등록 가능 파일 확장자 : jpg, jpeg, png
               </ImageInputDescription>
 
-              {pcImage ? (
+              {pcImage.url ? (
                 <AddedPcImageContainer>
-                  <AddedPcImage src={encodeURI(pcImage)} />
+                  <AddedPcImage src={encodeURI(pcImage.url)} />
                   <DeleteButton
                     src={closeIconSource}
                     // eslint-disable-next-line
-                    onClick={handleDeleteButtonClick(pcImage)}
+                    onClick={handleDeleteButtonClick(pcImage.url)}
                   />
                   <ChangeImageLabel htmlFor="pcImage">
                     <ImageInput

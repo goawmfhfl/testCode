@@ -21,6 +21,8 @@ import {
   REGISTRATION_NUMBER_SUFFIX,
   PHOTOCOPY,
   HAS_SET_CONDITIONAL_FREE_SHIPMENT,
+  serversideShopImagesVar,
+  serversideIdentificationPhotoCopy,
 } from "@cache/shopSettings";
 import { ShopFormFields } from "@models/shopSettings";
 import { UploadFileType } from "@models/index";
@@ -71,14 +73,36 @@ export default function setShopInfo(
   if (mobileImage && mobileImage.url) {
     shopImagesVar({
       ...shopImagesVar(),
-      mobileImage: mobileImage.url,
+      mobileImage: {
+        url: mobileImage.url,
+        file: null,
+      },
+    });
+
+    serversideShopImagesVar({
+      ...shopImagesVar(),
+      mobileImage: {
+        url: mobileImage.url,
+        file: null,
+      },
     });
   }
 
   if (pcImage && pcImage.url) {
     shopImagesVar({
       ...shopImagesVar(),
-      pcImage: pcImage.url,
+      pcImage: {
+        url: pcImage.url,
+        file: null,
+      },
+    });
+
+    serversideShopImagesVar({
+      ...shopImagesVar(),
+      pcImage: {
+        url: pcImage.url,
+        file: null,
+      },
     });
   }
 
@@ -141,7 +165,15 @@ export default function setShopInfo(
   }
 
   if (identificationCardCopyPhoto) {
-    setValue(PHOTOCOPY, identificationCardCopyPhoto);
+    setValue(PHOTOCOPY, {
+      url: identificationCardCopyPhoto,
+      file: null,
+    });
+
+    serversideIdentificationPhotoCopy({
+      url: identificationCardCopyPhoto,
+      file: null,
+    });
   }
 
   if (phoneNumber) {

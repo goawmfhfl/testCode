@@ -21,13 +21,21 @@ const RegistrationNumber = () => {
   ) => {
     if (!e.target.files.length) return;
 
-    const [image] = e.target.files;
-    const url = await convertFileToBase64(image);
+    const [file] = e.target.files;
+    const url = await convertFileToBase64(file);
 
-    setValue(PHOTOCOPY, url);
+    setValue(PHOTOCOPY, {
+      url,
+      file,
+    });
   };
 
-  const attachedPhotocopy = watch(PHOTOCOPY) as string;
+  const photoCopy = watch(PHOTOCOPY) as {
+    url: string;
+    file: File;
+  };
+
+  const attachedPhotocopy = photoCopy?.url;
 
   return (
     <Container>

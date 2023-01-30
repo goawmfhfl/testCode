@@ -22,13 +22,17 @@ import {
   PHOTOCOPY,
   phoneNumberVar,
   settlementAccountVar,
+  serversideShopImagesVar,
+  serversideIdentificationPhotoCopy,
 } from "@cache/shopSettings";
 
 import { ShipmentChargeType } from "@models/product/shipmentTemplate";
+import registerShopImages from "@utils/shopSettings/registerShopImages";
+import registerPhotoCopy from "@utils/shopSettings/registerPhotoCopy";
 
-const restructureShopSettingStates = (
+const restructureShopSettingStates = async (
   watch: UseFormWatch<Record<string, any>>
-): SaveShopSettingsInputType => {
+): Promise<SaveShopSettingsInputType> => {
   const description = watch(SHOP_INTRODUCTION) as string;
   const shipmentPolicy = watch(SHIPMENT_POLICY) as string;
   const returnPolicy = watch(RETURN_POLICY) as string;
@@ -50,13 +54,18 @@ const restructureShopSettingStates = (
   //   | number
   //   | null;
 
+  const registeredImages = await registerShopImages(
+    shopImagesVar(),
+    serversideShopImagesVar()
+  );
+
   const uploadedFileInfos = [
     {
-      url: shopImagesVar().mobileImage,
+      url: registeredImages.mobileImage.url,
       type: UploadFileType.SHOP_MOBILE,
     },
     {
-      url: shopImagesVar().pcImage,
+      url: registeredImages.pcImage.url,
       type: UploadFileType.SHOP_PC,
     },
   ];
@@ -75,7 +84,11 @@ const restructureShopSettingStates = (
   const registrationNumberSuffix = watch(REGISTRATION_NUMBER_SUFFIX) as string;
   const registrationNumber = `${registrationNumberPrefix}-${registrationNumberSuffix}`;
 
-  const photoCopy = (watch(PHOTOCOPY) as string) || null;
+  const photoCopy = (watch(PHOTOCOPY) as { url: string; file?: File }) || null;
+  const registeredPhotocopy = await registerPhotoCopy(
+    photoCopy,
+    serversideIdentificationPhotoCopy()
+  );
 
   const phoneNumber = phoneNumberVar();
 
@@ -127,7 +140,7 @@ const restructureShopSettingStates = (
     companyLocation,
     onlineSalesLicense,
     identificationCardNumber: registrationNumber,
-    identificationCardCopyPhoto: photoCopy,
+    identificationCardCopyPhoto: registeredPhotocopy,
     phoneNumber,
     bankAccountNumber,
     bankAccountHolder,

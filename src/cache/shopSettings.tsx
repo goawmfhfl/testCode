@@ -8,9 +8,26 @@ import {
   SettlementAccountVariables,
 } from "@models/shopSettings";
 
+export const serversideShopImagesVar = makeVar<ShopImageVariables>({
+  mobileImage: {
+    url: "",
+    file: null,
+  },
+  pcImage: {
+    url: "",
+    file: null,
+  },
+});
+
 export const shopImagesVar = makeVar<ShopImageVariables>({
-  mobileImage: "",
-  pcImage: "",
+  mobileImage: {
+    url: "",
+    file: null,
+  },
+  pcImage: {
+    url: "",
+    file: null,
+  },
 });
 
 export const SHOP_INTRODUCTION = "SHOP_INTRODUCTION";
@@ -50,6 +67,13 @@ export const REGISTRATION_NUMBER_PREFIX =
 export const REGISTRATION_NUMBER_SUFFIX =
   "IDENTIFICATION.REGISTRATION_NUMBER.SUFFIX";
 export const PHOTOCOPY = "IDENTIFICATION.PHOTOCOPY";
+export const serversideIdentificationPhotoCopy = makeVar<{
+  url: string;
+  file?: File;
+}>({
+  url: "",
+  file: null,
+});
 
 export const phoneNumberVar = makeVar<string>("");
 

@@ -55,18 +55,12 @@ async function addImageOnServer(
   try {
     const formData = new FormData();
 
-    console.log("들어온 것", imageFiles);
-
     imageFiles.forEach((file) => {
       formData.append("files", file, encodeURIComponent(file.name));
     });
 
-    console.log(formData["files"]);
-
     const response: { data: Array<{ url: string; size: number }> } =
       await axios.post(`${process.env.REACT_APP_SERVER_URI}/upload`, formData);
-
-    console.log("등록 결과", [...response.data]);
 
     return response.data;
   } catch (error) {
