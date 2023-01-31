@@ -9,6 +9,27 @@ import {
 
 import { OrderItems } from "@models/sale/index";
 
+export interface FilterOptionVarType {
+  type?: OrderSearchType;
+  statusName?: OrderStatusName;
+  statusType?: OrderStatusType;
+  statusGroup: OrderStatusGroup;
+}
+
+export interface EditStatusReasonBySellerType {
+  editStatusReasonBySeller: {
+    ok: boolean;
+    error?: string;
+  };
+}
+
+export interface EditStatusReasonBySellerInputType {
+  orderItemId: number;
+  mainReason: MainReason;
+  detailedReason: string;
+  orderStatusName: OrderStatusName;
+}
+
 export interface GetCancelOrdersBySellerType {
   getOrdersBySeller: {
     ok: boolean;

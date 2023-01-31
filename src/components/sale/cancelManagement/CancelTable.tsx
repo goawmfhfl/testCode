@@ -63,6 +63,8 @@ import {
 import Button from "@components/common/Button";
 import { Input } from "@components/common/input/TextInput";
 import getResetOrderItems from "@utils/sale/cancel/getResetOrderItems";
+import EditReasonModal from "@components/sale/cancelManagement/EditReasonModal";
+import EditRefusalReasonModal from "@components/sale/cancelManagement/EditRefusalReasonModal";
 
 const CancelTable = () => {
   const { getOrders, error, loading, data } = useLazyCancelOrders();
@@ -70,6 +72,19 @@ const CancelTable = () => {
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
+  const handleReasonModalClick = (orderItemId: number) => () => {
+    modalVar({
+      isVisible: true,
+      component: <EditReasonModal orderItemId={orderItemId} />,
+    });
+  };
+
+  const handleEditRefusalReasonModalClick = (orderItemId: number) => () => {
+    modalVar({
+      isVisible: true,
+      component: <EditRefusalReasonModal orderItemId={orderItemId} />,
+    });
+  };
   const cancleOrderItems = useReactiveVar(cancleOrderItemsVar);
 
   useEffect(() => {
@@ -344,6 +359,7 @@ const CancelTable = () => {
             cancleOrderItems?.map(
               (
                 {
+                  id,
                   paidAt,
                   requestCancelAt,
                   mainReason,
@@ -396,6 +412,7 @@ const CancelTable = () => {
                       type={"button"}
                       size={"small"}
                       width={"55px"}
+                      onClick={handleReasonModalClick(id)}
                       disabled={statusName === OrderStatusName.CANCEL_COMPLETED}
                     >
                       수정
@@ -464,6 +481,7 @@ const CancelTable = () => {
                       size={"small"}
                       width={"55px"}
                       disabled={statusName === OrderStatusName.CANCEL_COMPLETED}
+                      onClick={handleEditRefusalReasonModalClick(id)}
                     >
                       수정
                     </Button>

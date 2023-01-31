@@ -244,27 +244,27 @@ const getStatusReason = (
   }>
 ) => {
   const statusReasonInitailValue = {
-    requestCancelAt: "-",
-    mainReason: "-",
-    detailedReason: "-",
-    completedCancelAt: "-",
+    requestCancelAt: "",
+    mainReason: "",
+    detailedReason: "",
+    completedCancelAt: "",
     amount: 0,
-    refusalCancelAt: "-",
-    refusalReason: "-",
-    refusalDateaildReason: "-",
+    refusalCancelAt: "",
+    refusalReason: "",
+    refusalDateaildReason: "",
   };
 
   const hasStatusReason = !!statusReason && !!statusReason.length;
   if (!hasStatusReason) {
     return {
-      requestCancelAt: "-",
-      mainReason: "-",
-      detailedReason: "-",
-      completedCancelAt: "-",
+      requestCancelAt: "",
+      mainReason: "",
+      detailedReason: "",
+      completedCancelAt: "",
       amount: 0,
-      refusalCancelAt: "-",
-      refusalReason: "-",
-      refusalDateaildReason: "-",
+      refusalCancelAt: "",
+      refusalReason: "",
+      refusalDateaildReason: "",
     };
   }
 

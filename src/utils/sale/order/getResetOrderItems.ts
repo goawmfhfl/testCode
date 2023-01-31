@@ -116,6 +116,7 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
     const resetShipmentDistantPrice = shipmentDistantPrice
       ? `${shipmentDistantPrice.toLocaleString("ko-KR")}`
       : "-";
+
     const totalPaymentAmount = getTotalPaymentAmount(
       totalPrice,
       resetShipmentPrice,
