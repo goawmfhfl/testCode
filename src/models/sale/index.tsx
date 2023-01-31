@@ -88,6 +88,66 @@ export interface OrderItems {
   };
 }
 
+export interface ResetOrderItemType {
+  id: number;
+  merchantUid: string;
+  merchantItemUid: string;
+
+  thumbnail: string;
+  productName: string;
+
+  userName: string;
+  userEmail: string;
+  userPhoneNumber: string;
+  paidAt: string;
+
+  orderStatus: string;
+  claimStatus: string;
+
+  orderShipmentInfosId?: number;
+  shipmentCompany?: string;
+  shipmentNumber?: number;
+
+  recipientName: string;
+  recipientPhoneNumber: string;
+  recipientAddress?: string;
+  shipmentMemo?: string;
+
+  postCode?: string | number;
+  option?: string;
+  quantity?: number;
+  price?: string;
+  originalPrice?: string;
+  optionName?: string;
+  optionQuantity?: number;
+  optionPrice?: string | number;
+  totalPrice: string;
+  discountPrice: string | number;
+  shipmentPrice: string;
+  shipmentDistantPrice: string;
+
+  mainReason?: string;
+  detailedReason?: string;
+
+  totalPaymentAmount: string;
+  totalRefundAmout?: string;
+
+  requestCancelAt?: string;
+  completedCancelAt?: string;
+  refusalCancelAt?: string;
+  refusalReason?: string;
+  refusalDateaildReason?: string;
+
+  isChecked: boolean;
+  isShipmentInfoEdit?: boolean;
+  temporaryShipmentCompany?: string;
+  temporaryShipmentNumber?: number;
+  colorIndex: number;
+  rowIndex: string;
+  isLastRow: boolean;
+  isFirstRow: boolean;
+}
+
 export interface SkipQuantityType {
   id: number;
   label: string;

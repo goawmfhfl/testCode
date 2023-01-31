@@ -35,10 +35,12 @@ import { CONFIRM_ORDERITMES_BY_SELLER } from "@graphql/mutations/confirmOrderIte
 import {
   ConfirmOrderItemsBySellerInputType,
   ConfirmOrderItemsBySellerType,
-  ResetOrderItemType,
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
+
+import { ResetOrderItemType } from "@models/sale";
+
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
 

@@ -31,10 +31,10 @@ import {
   EditShipmentNumberInputType,
   EditShipmentNumberType,
   NormalizedListType,
-  ResetOrderItemType,
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
+import { ResetOrderItemType } from "@models/sale";
 
 import getResetOrderItems from "@utils/sale/order/getResetOrderItems";
 import { preventNaNValues } from "@utils/index";
@@ -643,7 +643,7 @@ const OrderTable = () => {
                   merchantUid,
                   merchantItemUid,
                   thumbnail,
-                  orderProduct,
+                  productName,
                   userName,
                   orderStatus,
                   isChecked,
@@ -680,7 +680,7 @@ const OrderTable = () => {
                     <ProductThumbNailWrapper>
                       <ProductThumbNail src={encodeURI(thumbnail)} />
                     </ProductThumbNailWrapper>
-                    <ProductName>{orderProduct}</ProductName>
+                    <ProductName>{productName}</ProductName>
                   </ProductNameTd>
                   <Td type={TableType.SCROLL} width={fixTableType[4].width}>
                     {userName}

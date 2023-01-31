@@ -5,7 +5,7 @@ import {
   OrderSearchType,
 } from "@constants/sale";
 import { FilterOptionVarType, OrderItems } from "@models/sale/index";
-import { ResetOrderItemType } from "@models/sale/order";
+import { ResetOrderItemType } from "@models/sale";
 
 export const filterOptionVar = makeVar<FilterOptionVarType>({
   type: OrderSearchType.RECIPIENT_NAME,

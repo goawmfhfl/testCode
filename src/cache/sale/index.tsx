@@ -1,6 +1,6 @@
 import { makeVar } from "@apollo/client";
 import { SaleMenuStatusType } from "@constants/sale";
-import { ResetOrderItemType } from "@models/sale/order";
+import { ResetOrderItemType } from "@models/sale";
 
 export const saleMenuStatusVar = makeVar<SaleMenuStatusType>(
   SaleMenuStatusType.ORDER

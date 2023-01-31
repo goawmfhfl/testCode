@@ -35,7 +35,9 @@ import {
 
 import useLazyCancelOrders from "@hooks/order/useLazyCancelOrders";
 
-import { NormalizedType, ResetCancelOrderItems } from "@models/sale/cancel";
+import { NormalizedType } from "@models/sale/cancel";
+import { ResetOrderItemType } from "@models/sale";
+
 import { OrderItems } from "@models/sale";
 
 import constructOrderItem from "@utils/sale/constructOrderItem";
@@ -194,7 +196,7 @@ const CancelTable = () => {
     const reconstructCancelOrderItem: NormalizedType =
       constructOrderItem(totalOrderItems);
 
-    const resetOrderItems: Array<ResetCancelOrderItems> = getResetOrderItems(
+    const resetOrderItems: Array<ResetOrderItemType> = getResetOrderItems(
       reconstructCancelOrderItem
     );
     cancleOrderItemsVar(resetOrderItems);
