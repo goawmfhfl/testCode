@@ -10,12 +10,21 @@ import {
   systemModalVar,
 } from "@cache/index";
 import { filterOptionVar } from "@cache/sale/cancel";
+import { checkedOrderItemsVar } from "@cache/sale";
+import { showHasServerErrorModal } from "@cache/productManagement";
 import {
-  Cause,
   MainReason,
-  optionListType,
+  refusalOptionListType,
   OrderStatusName,
 } from "@constants/sale";
+
+import {
+  EditStatusReasonBySellerInputType,
+  EditStatusReasonBySellerType,
+} from "@models/sale/cancel";
+
+import { GET_CANCEL_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+import { EDIT_STATUS_REASON_BY_SELLER } from "@graphql/mutations/editStatusReasonBySeller";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -28,15 +37,6 @@ import {
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
-import getWhoseResponsibility from "@utils/sale/order/getWhoseResponsibility";
-import { checkedOrderItemsVar } from "@cache/sale";
-import { showHasServerErrorModal } from "@cache/productManagement";
-import {
-  EditStatusReasonBySellerInputType,
-  EditStatusReasonBySellerType,
-} from "@models/sale/cancel";
-import { GET_CANCEL_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
-import { EDIT_STATUS_REASON_BY_SELLER } from "@graphql/mutations/editStatusReasonBySeller";
 
 const EditRefusalReasonModal = ({ orderItemId }: { orderItemId: number }) => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -114,7 +114,7 @@ const EditRefusalReasonModal = ({ orderItemId }: { orderItemId: number }) => {
         } = await editStatusReason({
           variables: {
             input: {
-              orderItemId: orderItemId,
+              orderItemId,
               mainReason: main,
               detailedReason: detail,
               orderStatusName: OrderStatusName.CANCEL_REQUEST,
@@ -210,10 +210,7 @@ const EditRefusalReasonModal = ({ orderItemId }: { orderItemId: number }) => {
           width={"160px"}
           onChange={changeReasonHandler}
         >
-          <Option value={MainReason.DEFAULT} hidden>
-            사유를 선택해주세요
-          </Option>
-          {optionListType.map(({ id, label, value }) => (
+          {refusalOptionListType.map(({ id, label, value }) => (
             <Option value={value} key={id}>
               {label}
             </Option>
@@ -236,6 +233,7 @@ const EditRefusalReasonModal = ({ orderItemId }: { orderItemId: number }) => {
           size={"small"}
           width={"55px"}
           onClick={handleSubmitButtonClick}
+          disabled={reason.main === MainReason.DEFAULT || !reason.detail}
         >
           확인
         </StyledButton>

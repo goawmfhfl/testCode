@@ -10,12 +10,7 @@ import {
   systemModalVar,
 } from "@cache/index";
 import { filterOptionVar } from "@cache/sale/cancel";
-import {
-  Cause,
-  MainReason,
-  optionListType,
-  OrderStatusName,
-} from "@constants/sale";
+import { MainReason, optionListType, OrderStatusName } from "@constants/sale";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -28,7 +23,6 @@ import {
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
-import getWhoseResponsibility from "@utils/sale/order/getWhoseResponsibility";
 import { checkedOrderItemsVar } from "@cache/sale";
 import { showHasServerErrorModal } from "@cache/productManagement";
 import {
@@ -117,7 +111,7 @@ const EditReasonModal = ({ orderItemId }: { orderItemId: number }) => {
               orderItemId: orderItemId,
               mainReason: main,
               detailedReason: detail,
-              orderStatusName: OrderStatusName.CANCEL_REQUEST,
+              orderStatusName: OrderStatusName.CANCEL_COMPLETED,
             },
           },
         });
@@ -238,6 +232,7 @@ const EditReasonModal = ({ orderItemId }: { orderItemId: number }) => {
           size={"small"}
           width={"55px"}
           onClick={handleSubmitButtonClick}
+          disabled={reason.main === MainReason.DEFAULT || !reason.detail}
         >
           확인
         </StyledButton>
