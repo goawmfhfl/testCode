@@ -406,20 +406,30 @@ const CancelTable = () => {
                     type={TableType.SCROLL}
                     width={scrollTableType[2].width}
                   >
-                    <Reason>{mainReason}</Reason>
+                    {(!isFirstRow || !mainReason) && <Reason>-</Reason>}
 
-                    <Button
-                      type={"button"}
-                      size={"small"}
-                      width={"55px"}
-                      onClick={handleReasonModalClick(id)}
-                      disabled={statusName === OrderStatusName.CANCEL_COMPLETED}
-                    >
-                      수정
-                    </Button>
+                    {isFirstRow && mainReason && (
+                      <>
+                        <Reason>{mainReason}</Reason>
+                        <Button
+                          type={"button"}
+                          size={"small"}
+                          width={"55px"}
+                          onClick={handleReasonModalClick(id)}
+                          disabled={
+                            statusName === OrderStatusName.CANCEL_COMPLETED
+                          }
+                        >
+                          수정
+                        </Button>
+                      </>
+                    )}
                   </ReasonTd>
                   <Td type={TableType.SCROLL} width={scrollTableType[3].width}>
-                    {detailedReason}
+                    {(!isFirstRow || !detailedReason) && <Reason>-</Reason>}
+                    {isFirstRow && detailedReason && (
+                      <Reason>{detailedReason}</Reason>
+                    )}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[4].width}>
                     {completedCancelAt}
@@ -475,19 +485,32 @@ const CancelTable = () => {
                     type={TableType.SCROLL}
                     width={scrollTableType[20].width}
                   >
-                    <Reason>{refusalReason}</Reason>
-                    <Button
-                      type={"button"}
-                      size={"small"}
-                      width={"55px"}
-                      disabled={statusName === OrderStatusName.CANCEL_COMPLETED}
-                      onClick={handleEditRefusalReasonModalClick(id)}
-                    >
-                      수정
-                    </Button>
+                    {(!isFirstRow || !refusalReason) && <Reason>-</Reason>}
+
+                    {isFirstRow && refusalReason && (
+                      <>
+                        <Reason>{refusalReason}</Reason>
+                        <Button
+                          type={"button"}
+                          size={"small"}
+                          width={"55px"}
+                          onClick={handleEditRefusalReasonModalClick(id)}
+                          disabled={
+                            statusName === OrderStatusName.CANCEL_COMPLETED
+                          }
+                        >
+                          수정
+                        </Button>
+                      </>
+                    )}
                   </ReasonTd>
                   <Td type={TableType.SCROLL} width={scrollTableType[21].width}>
-                    {refusalDateaildReason}
+                    {(!isFirstRow || !refusalDateaildReason) && (
+                      <Reason>-</Reason>
+                    )}
+                    {isFirstRow && refusalDateaildReason && (
+                      <Reason>{refusalDateaildReason}</Reason>
+                    )}
                   </Td>
                 </Tr>
               )
@@ -555,7 +578,6 @@ const ProductName = styled.span`
 
 const ReasonTd = styled(Td)`
   display: flex;
-  justify-content: space-between;
 
   padding: 0px 8px;
 `;
