@@ -6,7 +6,7 @@ import { TableType } from "@models/index";
 
 import {
   cancleOrderItemsVar,
-  checkedOrdersVar,
+  checkedOrderItemsVar,
   filterOptionVar,
 } from "@cache/sale/cancel";
 import {
@@ -33,7 +33,6 @@ import {
   OrderStatusName,
 } from "@constants/sale";
 
-import { checkedOrderItemsVar } from "@cache/sale";
 import useLazyCancelOrders from "@hooks/order/useLazyCancelOrders";
 
 import { NormalizedType, ResetCancelOrderItems } from "@models/sale/cancel";
@@ -72,6 +71,62 @@ const CancelTable = () => {
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
+  const cancleOrderItems = useReactiveVar(cancleOrderItemsVar);
+  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
+  const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
+
+  const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newOrderItems = cloneDeep(cancleOrderItems);
+    checkAllBoxStatusVar(e.target.checked);
+
+    if (e.target.checked) {
+      const checkAllOrderItem = newOrderItems.map((orderItem) => ({
+        ...orderItem,
+        isChecked: true,
+      }));
+      cancleOrderItemsVar(checkAllOrderItem);
+      checkedOrderItemsVar(checkAllOrderItem);
+    }
+
+    if (!e.target.checked) {
+      const checkAllOrderItem = newOrderItems.map((orderItem) => ({
+        ...orderItem,
+        isChecked: false,
+      }));
+
+      cancleOrderItemsVar(checkAllOrderItem);
+      checkedOrderItemsVar([]);
+    }
+  };
+
+  const changeSingleCheckBoxHandler =
+    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newOrderItems = cloneDeep(cancleOrderItems);
+      const targetOrderItemId = newOrderItems[index].id;
+
+      if (e.target.checked) {
+        const targetOrderItems = newOrderItems.filter(
+          ({ id }) => id === targetOrderItemId
+        );
+        const checkTargetOrderItems = targetOrderItems.map((orderItem) => ({
+          ...orderItem,
+          isChecked: true,
+        }));
+
+        checkedOrderItemsVar([...checkedOrderItems, ...checkTargetOrderItems]);
+        newOrderItems[index].isChecked = true;
+      }
+
+      if (!e.target.checked) {
+        const filteredOrderItems = checkedOrderItems.filter(
+          (orderItem) => orderItem.id !== targetOrderItemId
+        );
+        checkedOrderItemsVar(filteredOrderItems);
+        newOrderItems[index].isChecked = false;
+      }
+      cancleOrderItemsVar(newOrderItems);
+    };
+
   const handleReasonModalClick = (orderItemId: number) => () => {
     modalVar({
       isVisible: true,
@@ -85,7 +140,6 @@ const CancelTable = () => {
       component: <EditRefusalReasonModal orderItemId={orderItemId} />,
     });
   };
-  const cancleOrderItems = useReactiveVar(cancleOrderItemsVar);
 
   useEffect(() => {
     void (async () => {
@@ -199,8 +253,8 @@ const CancelTable = () => {
         <ThContainer>
           <Th type={TableType.SCROLL} width={fixTableType[0].width}>
             <Checkbox
-            // onChange={changeAllCheckBoxHandler}
-            // checked={checkAllBoxStatus}
+              onChange={changeAllCheckBoxHandler}
+              checked={checkAllBoxStatus}
             />
           </Th>
           <Th type={TableType.SCROLL} width={fixTableType[1].width}>
@@ -250,10 +304,12 @@ const CancelTable = () => {
                   isLastRow={isLastRow}
                 >
                   <Td type={TableType.SCROLL} width={fixTableType[0].width}>
-                    <Checkbox
-                      // onChange={changeSingleCheckBoxHandler(index)}
-                      checked={isChecked}
-                    />
+                    {isFirstRow && (
+                      <Checkbox
+                        onChange={changeSingleCheckBoxHandler(index)}
+                        checked={isChecked}
+                      />
+                    )}
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[1].width}>
                     {merchantUid}
