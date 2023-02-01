@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import styled from "styled-components/macro";
+import styled, { css } from "styled-components/macro";
 import { useMutation, useReactiveVar } from "@apollo/client";
 import { cloneDeep } from "lodash";
 import { TableType } from "@models/index";
@@ -464,11 +464,15 @@ const CancelTable = () => {
                     type={TableType.SCROLL}
                     width={scrollTableType[2].width}
                   >
-                    {(!isFirstRow || !mainReason) && <Reason>-</Reason>}
+                    {(!isFirstRow || !mainReason) && (
+                      <Reason isNeedJustifyCenter={true}>-</Reason>
+                    )}
 
                     {isFirstRow && mainReason && (
                       <>
-                        <Reason>{mainReason}</Reason>
+                        <Reason isNeedJustifyCenter={false}>
+                          {mainReason}
+                        </Reason>
                         <Button
                           type={"button"}
                           size={"small"}
@@ -484,9 +488,13 @@ const CancelTable = () => {
                     )}
                   </ReasonTd>
                   <Td type={TableType.SCROLL} width={scrollTableType[3].width}>
-                    {(!isFirstRow || !detailedReason) && <Reason>-</Reason>}
+                    {(!isFirstRow || !detailedReason) && (
+                      <Reason isNeedJustifyCenter={true}>-</Reason>
+                    )}
                     {isFirstRow && detailedReason && (
-                      <Reason>{detailedReason}</Reason>
+                      <Reason isNeedJustifyCenter={true}>
+                        {detailedReason}
+                      </Reason>
                     )}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[4].width}>
@@ -543,11 +551,15 @@ const CancelTable = () => {
                     type={TableType.SCROLL}
                     width={scrollTableType[20].width}
                   >
-                    {(!isFirstRow || !refusalReason) && <Reason>-</Reason>}
+                    {(!isFirstRow || !refusalReason) && (
+                      <Reason isNeedJustifyCenter={true}>-</Reason>
+                    )}
 
                     {isFirstRow && refusalReason && (
                       <>
-                        <Reason>{refusalReason}</Reason>
+                        <Reason isNeedJustifyCenter={false}>
+                          {refusalReason}
+                        </Reason>
                         <Button
                           type={"button"}
                           size={"small"}
@@ -564,10 +576,12 @@ const CancelTable = () => {
                   </ReasonTd>
                   <Td type={TableType.SCROLL} width={scrollTableType[21].width}>
                     {(!isFirstRow || !refusalDateaildReason) && (
-                      <Reason>-</Reason>
+                      <Reason isNeedJustifyCenter={true}>-</Reason>
                     )}
                     {isFirstRow && refusalDateaildReason && (
-                      <Reason>{refusalDateaildReason}</Reason>
+                      <Reason isNeedJustifyCenter={true}>
+                        {refusalDateaildReason}
+                      </Reason>
                     )}
                   </Td>
                 </Tr>
@@ -636,10 +650,18 @@ const ProductName = styled.span`
 
 const ReasonTd = styled(Td)`
   display: flex;
+  justify-content: space-between;
 
   padding: 0px 8px;
 `;
-const Reason = styled.span``;
+const Reason = styled.span<{ isNeedJustifyCenter: boolean }>`
+  ${({ isNeedJustifyCenter }) =>
+    isNeedJustifyCenter
+      ? css`
+          margin: 0 auto;
+        `
+      : css``}
+`;
 
 const Quantity = styled.span<{ quantity: number }>`
   color: ${({ theme: { palette }, quantity }) =>

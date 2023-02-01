@@ -1,4 +1,5 @@
 import {
+  Cause,
   MainReason,
   OrderSearchType,
   OrderStatusGroup,
@@ -6,6 +7,7 @@ import {
   OrderStatusType,
   ShipmentType,
 } from "@constants/sale";
+import { OrderCancel } from "@constants/sale/cancelManagement";
 
 import { OrderItems } from "@models/sale/index";
 
@@ -48,6 +50,23 @@ export interface GetCancelOrdersBySellerInputType {
   statusName?: OrderStatusName;
   statusType?: OrderStatusType;
   statusGroup: OrderStatusGroup;
+}
+
+export interface ConfirmOrDenyCancelBySellerType {
+  confirmOrDenyCancelBySeller: {
+    ok: boolean;
+    error?: string;
+  };
+}
+
+export interface ConfirmOrDenyCancelBySellerInputType {
+  components: Array<{
+    orderItemId: number;
+    mainReason: MainReason;
+    detailedReason: string;
+    cause: Cause;
+  }>;
+  status: OrderCancel;
 }
 
 export interface NormalizedType {
