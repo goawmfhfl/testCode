@@ -124,7 +124,7 @@ export interface ResetOrderItemType {
   totalPrice: string;
   discountPrice: string | number;
   shipmentPrice: string;
-  shipmentDistantPrice: string;
+  shipmentDistantPrice?: string | number;
 
   mainReason?: string;
   detailedReason?: string;

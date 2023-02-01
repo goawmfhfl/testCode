@@ -34,7 +34,7 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       discountAppliedPrice,
       originalPrice,
       shipmentPrice: individualShipmentPrice,
-      shipmentDistantPrice: individualShipmentDistantPrice,
+      shipmentDistantPrice,
       shipmentType,
       isBundleShipment,
       colorIndex,
@@ -87,8 +87,6 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       orderByShop
     );
 
-    const shipmentDistantPrice = 0;
-
     const totalPaymentAmount = getTotalPaymentAmount(
       originalPrice,
       discountAppliedPrice,
@@ -126,10 +124,9 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       shipmentPrice: shipmentPrice
         ? `${shipmentPrice.toLocaleString("ko-KR")}`
         : "-",
-      shipmentDistantPrice: "-",
-      // shipmentDistantPrice
-      //   ? `${shipmentDistantPrice.toLocaleString("ko-KR")}`
-      //   : "-",
+      shipmentDistantPrice: shipmentDistantPrice
+        ? `${shipmentDistantPrice.toLocaleString("ko-KR")}`
+        : "-",
       totalPaymentAmount: totalPaymentAmount
         ? `${totalPaymentAmount.toLocaleString("ko-KR")}`
         : "-",
@@ -138,7 +135,7 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       userPhoneNumber,
       recipientName,
       recipientPhoneNumber,
-      refusalCancelAt,
+      refusalCancelAt: refusalCancelAt ? refusalCancelAt : "-",
       refusalReason,
       refusalDateaildReason,
 
@@ -245,9 +242,9 @@ const getStatusReason = (
 ) => {
   const statusReasonInitailValue = {
     requestCancelAt: "",
+    completedCancelAt: "",
     mainReason: "",
     detailedReason: "",
-    completedCancelAt: "",
     amount: 0,
     refusalCancelAt: "",
     refusalReason: "",
@@ -258,9 +255,9 @@ const getStatusReason = (
   if (!hasStatusReason) {
     return {
       requestCancelAt: "",
+      completedCancelAt: "",
       mainReason: "",
       detailedReason: "",
-      completedCancelAt: "",
       amount: 0,
       refusalCancelAt: "",
       refusalReason: "",
@@ -270,7 +267,10 @@ const getStatusReason = (
 
   return statusReason.reduce(
     (result, { createdAt, amount, mainReason, detailedReason, status }) => {
-      if (status === OrderStatusName.CANCEL_REQUEST) {
+      if (
+        status === OrderStatusName.CANCEL_REQUEST ||
+        status === OrderStatusName.CANCEL_COMPLETED
+      ) {
         result.mainReason = mainReasonType[mainReason];
         result.detailedReason = detailedReason;
         result.requestCancelAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
@@ -279,7 +279,7 @@ const getStatusReason = (
       }
 
       if (status === OrderStatusName.CANCEL_COMPLETED) {
-        result.requestCancelAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
+        result.completedCancelAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
           getDateFormat(createdAt).HH_MM_SS
         }`;
         result.amount = amount;
@@ -373,7 +373,7 @@ const getShipmentPrice = (
 ) => {
   if (!shipmentPrice) return 0;
 
-  if (isBundleShipment) {
+  if (!isBundleShipment) {
     if (shipmentType === ShipmentType.FREE) {
       return 0;
     }
@@ -382,7 +382,7 @@ const getShipmentPrice = (
     }
   }
 
-  if (!isBundleShipment && !!orderByShop) {
+  if (isBundleShipment && !!orderByShop) {
     const {
       bundleShipmentType,
       bundleShipmentPrice,

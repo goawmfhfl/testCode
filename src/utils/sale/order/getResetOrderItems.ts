@@ -297,7 +297,7 @@ const getShipmentPrice = (
 ) => {
   if (!shipmentPrice) return "-";
 
-  if (isBundleShipment) {
+  if (!isBundleShipment) {
     if (shipmentType === ShipmentType.FREE) {
       return "-";
     }
@@ -306,7 +306,7 @@ const getShipmentPrice = (
     }
   }
 
-  if (!isBundleShipment && !!orderByShop) {
+  if (isBundleShipment && !!orderByShop) {
     if (orderByShop.bundleShipmentType === ShipmentType.FREE) {
       return "-";
     }
