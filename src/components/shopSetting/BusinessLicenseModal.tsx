@@ -16,6 +16,7 @@ import {
 } from "@cache/index";
 import { businessLicenseVar } from "@cache/shopSettings";
 import { preventNaNValues } from "@utils/index";
+import { showHasServerErrorModal } from "@cache/productManagement/index";
 import { compareDesc } from "date-fns";
 
 interface Props {
@@ -322,10 +323,10 @@ const BusinessLicenseModal = ({ preventCancel }: Props) => {
               representativeName,
               businessName,
               businessRegistrationNumber: businessNumber.join(""),
-              corporateRegistrationNumber: "해당사항 없음",
+              corporateRegistrationNumber: "대상 아님",
               isSimpleTaxpayers: "대상",
               companyLocation: location,
-              onlineSalesLicense: "해당사항 없음",
+              onlineSalesLicense: "대상 아님",
             });
 
             // save button ref . click
@@ -348,10 +349,43 @@ const BusinessLicenseModal = ({ preventCancel }: Props) => {
       systemModalVar({
         ...systemModalVar(),
         isVisible: true,
-        icon: exclamationmarkSrc,
-        description: <>유효하지 않은 사업자 등록 정보입니다.</>,
-        confirmButtonText: "확인",
+        icon: "",
+        description: (
+          <>
+            사업자등록증이 <br />
+            등록되었습니다.
+          </>
+        ),
+        confirmButtonVisibility: true,
         confirmButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+
+          modalVar({
+            ...modalVar(),
+            isVisible: false,
+          });
+
+          businessLicenseVar({
+            isConfirmed: true,
+            representativeName,
+            businessName,
+            businessRegistrationNumber: businessNumber.join(""),
+            corporateRegistrationNumber: "대상 아님",
+            isSimpleTaxpayers: "대상 아님",
+            companyLocation: location,
+            onlineSalesLicense: "대상 아님",
+          });
+
+          // save button ref . click
+          if (preventCancel) {
+            saveShopButtonRefVar().click();
+          }
+        },
+        cancelButtonVisibility: true,
+        cancelButtonClickHandler: () => {
           systemModalVar({
             ...systemModalVar(),
             isVisible: false,
@@ -360,6 +394,8 @@ const BusinessLicenseModal = ({ preventCancel }: Props) => {
       });
     } catch (error) {
       console.log("error", error);
+
+      showHasServerErrorModal("", "사업자 정보 인증");
     }
   };
 
