@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useReactiveVar, useMutation } from "@apollo/client";
 import styled from "styled-components/macro";
+import { useReactiveVar, useMutation } from "@apollo/client";
 
 import {
   modalVar,
@@ -11,7 +11,7 @@ import {
 } from "@cache/index";
 import { checkedOrderItemsVar } from "@cache/sale";
 import { showHasServerErrorModal } from "@cache/productManagement";
-import { filterOptionVar } from "@cache/sale/order";
+import { filterOptionVar, orderItemsVar } from "@cache/sale/order";
 
 import { Cause, MainReason } from "@constants/sale";
 
@@ -19,11 +19,15 @@ import {
   CancelOrderItemsBySellerInputType,
   CancelOrderItemsBySellerType,
 } from "@models/sale/order";
+import { ResetOrderItemType } from "@models/sale/index";
+
+import { OrderItems } from "@models/sale/index";
+
 import { CANCEL_ORDERITEMS_BY_SELLER } from "@graphql/mutations/cancelOrderItemsBySeller";
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 
 import getWhoseResponsibility from "@utils/sale/order/getWhoseResponsibility";
-import getCancelOrderItemsInput from "@utils/sale/order/getCancelOrderItemsInput";
+import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -36,6 +40,7 @@ import {
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
+import getCancelOrderItemComponents from "@utils/sale/order/getCancelOrderItemComponents";
 
 interface AskReasonModalType {
   option: Array<{
@@ -50,7 +55,16 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
-  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
+
+  const orderItems = useReactiveVar<Array<OrderItems>>(orderItemsVar);
+
+  console.log("orderItems", orderItems);
+
+  const checkedOrderItems =
+    useReactiveVar<Array<ResetOrderItemType>>(checkedOrderItemsVar);
+  const reconstructCheckedOrderItems =
+    getReconstructCheckedOrderItems(checkedOrderItems);
+  const checkedOrderItemIds = reconstructCheckedOrderItems.map(({ id }) => id);
 
   const [reason, setReason] = useState<{
     main: MainReason;
@@ -61,13 +75,6 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
     detail: "",
     cause: Cause.DEFAULT,
   });
-
-  const components = getCancelOrderItemsInput(
-    checkedOrderItems,
-    reason.main,
-    reason.detail,
-    reason.cause
-  );
 
   const [cancelOrderItems] = useMutation<
     CancelOrderItemsBySellerType,
@@ -126,16 +133,20 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
     try {
       void (async () => {
         loadingSpinnerVisibilityVar(true);
+        const components = getCancelOrderItemComponents(
+          checkedOrderItemIds,
+          reason
+        );
+
         const {
           data: {
-            cancelOrderItemsBySeller: { ok, error },
+            cancelOrderItemsBySeller: { ok, error, cancelAmount },
           },
         } = await cancelOrderItems({
           variables: {
-            input: { components: components },
+            input: { components },
           },
         });
-
         if (ok) {
           loadingSpinnerVisibilityVar(false);
           systemModalVar({
@@ -157,22 +168,48 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
                 ...modalVar(),
                 isVisible: false,
               });
-
               systemModalVar({
                 ...systemModalVar(),
                 isVisible: false,
               });
-
               checkedOrderItemsVar([]);
               checkAllBoxStatusVar(false);
             },
           });
         }
         if (error) {
-          console.log("error", error);
-
           loadingSpinnerVisibilityVar(false);
-          showHasServerErrorModal(error, "주문 취소");
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: (
+              <>
+                주문취소을(를) <br />
+                완료하지 못했습니다.
+                <br />
+                다시 시도 후 같은 문제가 발생할 시
+                <br />
+                찹스틱스에 문의해주세요
+                <br />
+                <br />
+                에러메시지:
+                <br />
+                {error}
+              </>
+            ),
+            confirmButtonVisibility: true,
+            cancelButtonVisibility: false,
+            confirmButtonClickHandler: () => {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+              modalVar({
+                ...modalVar(),
+                isVisible: false,
+              });
+            },
+          });
         }
       })();
     } catch (error) {

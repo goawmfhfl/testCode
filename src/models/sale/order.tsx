@@ -58,13 +58,13 @@ export interface CancelOrderItemsBySellerType {
   cancelOrderItemsBySeller: {
     ok: boolean;
     error?: string;
+    cancelAmount: number;
   };
 }
 
 export interface CancelOrderItemsBySellerInputType {
   components: Array<{
     orderItemId: number;
-    amount: number;
     mainReason: MainReason;
     detailedReason: string;
     cause: Cause;
