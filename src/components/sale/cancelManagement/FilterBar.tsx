@@ -37,16 +37,37 @@ const FilterBar = () => {
         page: 1,
       });
       paginationSkipVar(0);
-      filterOptionVar({
-        ...filterOptionVar(),
-        statusName: filterOptionName,
-        statusType: OrderStatusType.ORDER,
-      });
+
+      if (filterOptionName === null) {
+        filterOptionVar({
+          ...filterOptionVar(),
+          statusName: null,
+          statusType: null,
+          statusGroup: OrderStatusGroup.CANCEL,
+        });
+      }
+
+      if (filterOptionName === OrderStatusName.CANCEL_REQUEST) {
+        filterOptionVar({
+          ...filterOptionVar(),
+          statusName: filterOptionName,
+          statusType: OrderStatusType.CLAIM,
+          statusGroup: OrderStatusGroup.CANCEL,
+        });
+      }
+
+      if (filterOptionName === OrderStatusName.CANCEL_COMPLETED) {
+        filterOptionVar({
+          ...filterOptionVar(),
+          statusName: filterOptionName,
+          statusType: OrderStatusType.ORDER,
+          statusGroup: OrderStatusGroup.CANCEL,
+        });
+      }
     };
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
+    void (async () => {
       await getOrderStatus({
         variables: {
           input: {
