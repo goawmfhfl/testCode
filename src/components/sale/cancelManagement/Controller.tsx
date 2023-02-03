@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components/macro";
 import { useMutation, useReactiveVar } from "@apollo/client";
 
@@ -239,6 +239,17 @@ const Controller = () => {
 
     paginationSkipVar(0);
   };
+
+  useEffect(() => {
+    const debounce = setTimeout(() => {
+      return commonFilterOptionVar({
+        ...commonFilterOptionVar(),
+        query: temporaryQuery,
+      });
+    }, 500);
+
+    return () => clearTimeout(debounce);
+  }, [temporaryQuery]);
 
   return (
     <ControllerContainer>
