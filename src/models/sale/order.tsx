@@ -8,6 +8,7 @@ import {
   ShipmentStatus,
   ShipmentType,
 } from "@constants/sale";
+import { RequestRefundOrExchange } from "@constants/sale/orderManagement";
 import { OrderItems } from "@models/sale/index";
 
 export interface GetOrdersBySellerInputType {
@@ -110,6 +111,23 @@ export interface ConfirmOrderItemsBySellerType {
 
 export interface ConfirmOrderItemsBySellerInputType {
   orderItemIds: Array<number>;
+}
+
+export interface RequestRefundOrExchangeBySellerType {
+  requestRefundOrExchangeBySeller: {
+    ok: boolean;
+    error?: string;
+  };
+}
+
+export interface RequestRefundOrExchangeBySellerInputType {
+  components: Array<{
+    orderItemId: number;
+    mainReason: MainReason;
+    detailedReason: string;
+    cause: Cause;
+  }>;
+  status: RequestRefundOrExchange;
 }
 
 export interface NormalizedListType {

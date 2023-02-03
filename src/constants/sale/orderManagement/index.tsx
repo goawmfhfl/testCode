@@ -4,3 +4,8 @@ export enum OrderStatusType {
   SHIPPING = "SHIPPING",
   SHIPPING_COMPLETED = "SHIPPING_COMPLETED",
 }
+
+export enum RequestRefundOrExchange {
+  REFUND = "REFUND",
+  EXCHANGE = "EXCHANGE",
+}
