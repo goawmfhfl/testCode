@@ -243,8 +243,7 @@ const CancelTable = () => {
   }, [error]);
 
   const hasCancelOrderItems = !!cancleOrderItems && !!cancleOrderItems.length;
-  const isFetchingOrderItemsFailed =
-    !!loading || !!error || hasCancelOrderItems;
+  const isFetchingOrderItemsFailed = !loading && !error && hasCancelOrderItems;
 
   return (
     <TableContainer
