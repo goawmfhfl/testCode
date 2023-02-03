@@ -90,7 +90,7 @@ const getQuantity = (
 
   if (!hasQuantity && !hasOptions) return 0;
   if (hasQuantity && !hasOptions) return quantity;
-  if (!hasQuantity && hasOptions) {
+  if ((!hasQuantity && hasOptions) || (hasQuantity && hasOptions)) {
     return options.reduce((result, { quantity, isRequired }) => {
       if (isRequired) {
         result += quantity;
