@@ -53,7 +53,9 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
     const resetOrderStatus = orderStatus?.name
       ? orderStatusNameType[orderStatus.name]
       : "-";
-    const resetClaimStatus = claimStatus?.name ? claimStatus.name : "-";
+    const resetClaimStatus = claimStatus?.name
+      ? orderStatusNameType[claimStatus.name]
+      : "-";
     const resetOrderShipmentInfosId = orderShipmentInfos
       ? orderShipmentInfos.filter(
           (info) => info.status === ShipmentStatus.SHIPPING
