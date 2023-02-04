@@ -4,6 +4,7 @@ import { HeaderNames } from "@constants/index";
 import ContentsHeader from "@components/common/ContentsHeader";
 import FilterBar from "@components/sale/refundManagement/FilterBar";
 import Controller from "@components/sale/refundManagement/Controller";
+import RefundTable from "@components/sale/refundManagement/RefundTable";
 import Pagination from "@components/common/Pagination";
 
 const RefundManagement = () => {
@@ -12,6 +13,7 @@ const RefundManagement = () => {
       <ContentsHeader headerName={HeaderNames.Refund} />
       <FilterBar />
       <Controller />
+      <RefundTable />
       <Pagination />
     </Container>
   );
