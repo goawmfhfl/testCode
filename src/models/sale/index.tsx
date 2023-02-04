@@ -166,3 +166,10 @@ export interface SearchQueryType {
   label: string;
   value: string;
 }
+
+export interface NormalizedType {
+  orders: {
+    allIds: Array<string>;
+    byId: { [key: string]: OrderItems };
+  };
+}

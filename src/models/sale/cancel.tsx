@@ -68,10 +68,3 @@ export interface ConfirmOrDenyCancelBySellerInputType {
   }>;
   status: OrderCancel;
 }
-
-export interface NormalizedType {
-  orders: {
-    allIds: Array<string>;
-    byId: { [key: string]: OrderItems };
-  };
-}

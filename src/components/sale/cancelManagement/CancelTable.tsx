@@ -26,7 +26,7 @@ import {
 } from "@constants/sale/cancelManagement/table";
 import { OrderStatusName } from "@constants/sale";
 
-import { NormalizedType } from "@models/sale/cancel";
+import { NormalizedType } from "@models/sale/index";
 import { ResetOrderItemType } from "@models/sale";
 import { OrderItems } from "@models/sale";
 
@@ -48,6 +48,7 @@ import Loading from "@components/common/table/Loading";
 import NoDataContainer from "@components/common/table/NoDataContainer";
 import Button from "@components/common/Button";
 import getResetOrderItems from "@utils/sale/cancel/getResetOrderItems";
+import { Input } from "@components/common/input/TextInput";
 import EditReasonModal from "@components/sale/cancelManagement/EditReasonModal";
 import EditRefusalReasonModal from "@components/sale/cancelManagement/EditRefusalReasonModal";
 

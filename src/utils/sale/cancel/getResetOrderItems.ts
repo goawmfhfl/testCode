@@ -1,5 +1,5 @@
 import React from "react";
-import { NormalizedType } from "@models/sale/cancel";
+import { NormalizedType } from "@models/sale/index";
 import {
   MainReason,
   mainReasonType,
