@@ -257,7 +257,7 @@ export const scrollTableType = [
     value: "refusalMainReason",
   },
   {
-    id: 27,
+    id: 28,
     label: "거절상세사유",
     width: tableWidth.refusalDetaildReason,
     value: "refusalDetaildReason",
