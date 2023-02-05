@@ -204,7 +204,7 @@ const constructOrderItem = (orderItem: Array<OrderItems>) => {
             product,
             option.components
           );
-          const resetOption = reconstructNotRequiredOption(options);
+          const resetOption = reconstructNotRequiredOption(option);
 
           reconstructOrderItems.push({
             ...order,
@@ -212,7 +212,7 @@ const constructOrderItem = (orderItem: Array<OrderItems>) => {
             originalPrice: null,
             discountAppliedPrice: null,
             product: resetProducts,
-            options: resetOption,
+            options: [resetOption],
             shipmentPrice: null,
             shipmentDistantPrice: null,
             isLastRow: tableLayoutCalculator.isLastRow,
@@ -290,29 +290,25 @@ const reconstructNotRequiredProducts = (
   };
 };
 
-const reconstructNotRequiredOption = (
-  option: Array<{
-    id: number;
-    components: Array<{
-      name: string;
-      value: string;
-    }>;
-    quantity: number;
-    price: number;
-    isRequired: boolean;
-  }>
-) => {
-  return option.reduce((result, { id, quantity, price, isRequired }) => {
-    result.push({
-      id: id,
-      components: null,
-      quantity,
-      price,
-      isRequired,
-    });
+const reconstructNotRequiredOption = (option: {
+  id: number;
+  components: Array<{
+    name: string;
+    value: string;
+  }>;
+  quantity: number;
+  price: number;
+  isRequired: boolean;
+}) => {
+  const { id, quantity, price, isRequired } = option;
 
-    return result;
-  }, optionsInitialValue);
+  return {
+    id,
+    components: null,
+    quantity,
+    price,
+    isRequired,
+  };
 };
 
 const getShipmentPrice = (orders: Array<OrderItems>) => {

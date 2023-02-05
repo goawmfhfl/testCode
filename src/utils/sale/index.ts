@@ -2,9 +2,50 @@ import {
   MainReason,
   mainReasonType,
   OrderStatusName,
+  ShipmentStatus,
   ShipmentType,
 } from "@constants/sale";
-import { getDateFormat } from "@utils/date";
+import { DateType, getDateFormat } from "@utils/date";
+
+export const getPaymentsInfo = (
+  originalPrice: number,
+  discountAppliedPrice: number,
+  quantity: number,
+  optionPirce: number,
+  optionQuantity: number,
+  shipmentPrice: number,
+  shipmentDistantPrice: number
+) => {
+  originalPrice = originalPrice ?? 0;
+  discountAppliedPrice = discountAppliedPrice ?? 0;
+  quantity = quantity ?? 0;
+  optionPirce = optionPirce ?? 0;
+  optionQuantity = optionQuantity ?? 0;
+  shipmentPrice = shipmentPrice ?? 0;
+  shipmentDistantPrice = shipmentDistantPrice ?? 0;
+
+  const resetQuantity = quantity ? quantity : optionQuantity;
+
+  const resetOriginalPrice = originalPrice * resetQuantity;
+
+  const resetDiscountPrice =
+    (discountAppliedPrice - originalPrice) * resetQuantity;
+
+  const resetOptionPrice = optionPirce * optionQuantity;
+
+  const totalPrice = resetOriginalPrice + resetOptionPrice + resetDiscountPrice;
+
+  const totalPaymentAmount = totalPrice + shipmentPrice + shipmentDistantPrice;
+
+  return {
+    resetQuantity,
+    resetOriginalPrice,
+    resetDiscountPrice,
+    resetOptionPrice,
+    totalPrice,
+    totalPaymentAmount,
+  };
+};
 
 export const getStatusReason = (
   statusReason: Array<{
@@ -48,24 +89,24 @@ export const getStatusReason = (
       ) {
         result.mainReason = mainReasonType[mainReason];
         result.detailedReason = detailedReason;
-        result.requestCancelAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
-          getDateFormat(createdAt).HH_MM_SS
-        }`;
+        result.requestCancelAt = `${
+          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
+        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
       }
 
       if (status === OrderStatusName.CANCEL_COMPLETED) {
-        result.completedCancelAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
-          getDateFormat(createdAt).HH_MM_SS
-        }`;
+        result.completedCancelAt = `${
+          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
+        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
         result.amount = amount;
       }
 
       if (status === OrderStatusName.CANCEL_REFUSAL) {
         result.refusalReason = mainReasonType[mainReason];
         result.refusalDateaildReason = detailedReason;
-        result.refusalCancelAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
-          getDateFormat(createdAt).HH_MM_SS
-        }`;
+        result.refusalCancelAt = `${
+          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
+        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
       }
 
       return result;
@@ -93,6 +134,7 @@ export const getOption = (
   };
 
   const hasOption = !!options && !!options.length;
+
   if (!hasOption)
     return {
       optionName: "",
@@ -100,53 +142,49 @@ export const getOption = (
       optionQuantity: 0,
     };
 
-  return options.reduce((result, { components, quantity, price }) => {
-    result.optionName += components.reduce((component, { name, value }) => {
-      if (component) {
-        component += `/ ${name} : ${value} `;
+  if (hasOption) {
+    return options.reduce((result, { components, quantity, price }) => {
+      const hasComponents = !!components && !!components.length;
+
+      if (hasComponents) {
+        result.optionName += components.reduce((component, { name, value }) => {
+          if (component) {
+            component += `/ ${name} : ${value} `;
+          }
+          if (!component) {
+            component = `${name} : ${value} `;
+          }
+          return component;
+        }, "");
       }
-      if (!component) {
-        component = `${name} : ${value} `;
+
+      if (!hasComponents) {
+        result.optionName = "";
       }
-      return component;
-    }, "");
 
-    result.optionQuantity = quantity;
-    result.optionPrice = quantity * price;
+      result.optionQuantity = quantity;
+      result.optionPrice = price;
 
-    return result;
-  }, optioninitailValue);
-};
-
-export const getDiscountPrice = (
-  originalPrice: number,
-  discountAppliedPrice: number
-) => {
-  if (!discountAppliedPrice) return 0;
-
-  return discountAppliedPrice - originalPrice;
-};
-
-export const getTotalPrice = (
-  originalPrice: number,
-  discountAppliedPrice: number,
-  optionPrice: number
-) => {
-  return originalPrice + optionPrice + discountAppliedPrice;
+      return result;
+    }, optioninitailValue);
+  }
 };
 
 export const getShipmentPrice = (
   isBundleShipment: boolean,
   shipmentPrice: number,
   shipmentType: ShipmentType,
-  bundleShipmentPrice: number,
-  bundleShipmentType: ShipmentType,
-  bundleOrderItemTotalPrice: number,
-  shipmentConditionalPrice: number
+  orderByShop: {
+    bundleShipmentPrice: number;
+    bundleShipmentType: ShipmentType;
+    bundleOrderItemTotalPrice: number;
+    shipmentConditionalPrice: number;
+  }
 ) => {
-  if (!shipmentPrice) return 0;
+  const hasOrderByShop = !!orderByShop && !!orderByShop.bundleShipmentType;
 
   if (!isBundleShipment) {
+    shipmentPrice = shipmentPrice ?? 0;
     if (shipmentType === ShipmentType.FREE) {
       return 0;
     }
@@ -155,7 +193,14 @@ export const getShipmentPrice = (
     }
   }
 
-  if (isBundleShipment) {
+  if (isBundleShipment && hasOrderByShop) {
+    const {
+      bundleShipmentType,
+      bundleShipmentPrice,
+      bundleOrderItemTotalPrice,
+      shipmentConditionalPrice,
+    } = orderByShop;
+
     if (bundleShipmentType === ShipmentType.FREE) {
       return 0;
     }
@@ -171,18 +216,95 @@ export const getShipmentPrice = (
   }
 };
 
-export const getTotalPaymentAmount = (
-  originalPrice: number,
-  discountAppliedPrice: number,
-  optionPrice: number,
-  shipmentPrice: number,
-  shipmentDistantPrice: number
+export const getShipmentDistantPrice = (
+  isBundleShipment: boolean,
+  shipmentDistantPrice: number,
+  orderByShop: {
+    bundleShipmentDistantPrice: number;
+    bundleShipmentType: ShipmentType;
+  }
 ) => {
-  const result =
-    originalPrice +
-    discountAppliedPrice +
-    optionPrice +
-    shipmentPrice +
-    shipmentDistantPrice;
-  return result;
+  const hasOrderByShop = !!orderByShop && !!orderByShop.bundleShipmentType;
+
+  if (isBundleShipment && hasOrderByShop) {
+    return orderByShop.bundleShipmentDistantPrice ?? 0;
+  }
+
+  if (!isBundleShipment) {
+    return shipmentDistantPrice ?? 0;
+  }
+};
+
+export const getShipmentInfos = (
+  orderShipmentInfos: Array<{
+    id: number;
+    shipmentNumber: number;
+    shipmentCompany: string;
+    status: ShipmentStatus;
+  }>
+) => {
+  const orderShipmentInfoInitailValue: {
+    shippingOrderId?: number;
+    shipmentCompany?: string;
+    shipmentNumber?: number;
+    refundOrderId?: number;
+    refundShipmentCompany?: string;
+    refundShipmentNumber?: number;
+    exchangeOrderId?: number;
+    exchangeShipmentCompany?: string;
+    exchangeShipmentNumber?: number;
+    exchangeAgainOrderId?: number;
+    exchangeAgainShipmentCompany?: string;
+    exchangeAgainShipmentNumber?: number;
+  } = {
+    shippingOrderId: null,
+    shipmentCompany: null,
+    shipmentNumber: null,
+    refundOrderId: null,
+    refundShipmentCompany: null,
+    refundShipmentNumber: null,
+    exchangeOrderId: null,
+    exchangeShipmentCompany: null,
+    exchangeShipmentNumber: null,
+    exchangeAgainOrderId: null,
+    exchangeAgainShipmentCompany: null,
+    exchangeAgainShipmentNumber: null,
+  };
+  const hasOrderShipmentInfos =
+    !!orderShipmentInfos && !!orderShipmentInfos.length;
+
+  if (!hasOrderShipmentInfos) return orderShipmentInfoInitailValue;
+
+  if (hasOrderShipmentInfos) {
+    return orderShipmentInfos.reduce(
+      (result, { id, shipmentCompany, shipmentNumber, status }) => {
+        if (status === ShipmentStatus.SHIPPING) {
+          result.shippingOrderId = id;
+          (result.shipmentCompany = shipmentCompany),
+            (result.shipmentNumber = shipmentNumber);
+        }
+
+        if (status === ShipmentStatus.REFUND_PICK_UP) {
+          result.refundOrderId = id;
+          (result.refundShipmentCompany = shipmentCompany),
+            (result.refundShipmentNumber = shipmentNumber);
+        }
+
+        if (status === ShipmentStatus.EXCHANGE_PICK_UP) {
+          result.exchangeOrderId = id;
+          (result.exchangeShipmentCompany = shipmentCompany),
+            (result.exchangeShipmentNumber = shipmentNumber);
+        }
+
+        if (status === ShipmentStatus.EXCHANGE_PICK_UP_AGAIN) {
+          result.exchangeAgainOrderId = id;
+          (result.exchangeAgainShipmentCompany = shipmentCompany),
+            (result.exchangeAgainShipmentNumber = shipmentNumber);
+        }
+
+        return result;
+      },
+      orderShipmentInfoInitailValue
+    );
+  }
 };

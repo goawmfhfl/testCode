@@ -4,7 +4,7 @@ import {
   ShipmentStatus,
   ShipmentType,
 } from "@constants/sale";
-import { getDateFormat } from "@utils/date";
+import { DateType, getDateFormat } from "@utils/date";
 import {
   getStatusReason,
   getOption,
@@ -66,8 +66,8 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
     const resetProductThumbnail = thumbnail ? thumbnail : "-";
     const resetUserName = userName ? userName : "-";
     const resetPaidAt = paidAt
-      ? `${getDateFormat(paidAt).YYYY_MM_DD} / ${
-          getDateFormat(paidAt).HH_MM_SS
+      ? `${getDateFormat(paidAt, DateType.PAYMENT).YYYY_MM_DD} / ${
+          getDateFormat(paidAt, DateType.PAYMENT).HH_MM_SS
         }`
       : "-";
 
@@ -104,21 +104,15 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
     const { optionName, optionPrice, optionQuantity } = getOption(options);
 
     const resetQuantity = quantity ? quantity : optionQuantity;
-    const discountPrice = getDiscountPrice(originalPrice, discountAppliedPrice);
+    const discountPrice = 0;
 
-    const totalPrice = getTotalPrice(originalPrice, discountPrice, optionPrice);
+    const totalPrice = 0;
 
     const resetShipmentDistantPrice = shipmentDistantPrice
       ? `${shipmentDistantPrice.toLocaleString("ko-KR")}`
       : "-";
 
-    const totalPaymentAmount = getTotalPaymentAmount(
-      originalPrice,
-      discountPrice,
-      optionPrice,
-      shipmentPrice,
-      shipmentDistantPrice
-    );
+    const totalPaymentAmount = 0;
 
     const isChecked = false;
     const isShipmentInfoEdit = false;

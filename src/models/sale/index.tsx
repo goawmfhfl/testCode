@@ -38,7 +38,7 @@ export interface OrderItems {
     status: OrderStatusName;
   }>;
 
-  orderByShop: {
+  orderByShop?: {
     bundleShipmentPrice: number;
     bundleShipmentDistantPrice: number;
     bundleShipmentType: ShipmentType;
