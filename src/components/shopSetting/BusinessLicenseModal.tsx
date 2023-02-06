@@ -2,6 +2,7 @@ import { useState } from "react";
 import styled from "styled-components/macro";
 import axios from "axios";
 import { last } from "lodash";
+import { compareDesc } from "date-fns";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -17,7 +18,6 @@ import {
 import { businessLicenseVar } from "@cache/shopSettings";
 import { preventNaNValues } from "@utils/index";
 import { showHasServerErrorModal } from "@cache/productManagement/index";
-import { compareDesc } from "date-fns";
 
 interface Props {
   preventCancel?: boolean;

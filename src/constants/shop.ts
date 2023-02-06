@@ -12,3 +12,13 @@ export enum ConditionalFreeShipmentPolicy {
   Set = "Set",
   Unset = "Unset",
 }
+
+export enum BusinessInformations {
+  BusinessName = "businessName",
+  RepresentativeName = "representativeName",
+  BusinessRegistrationNumber = "businessRegistrationNumber",
+  CorporateRegistrationNumber = "corporateRegistrationNumber",
+  IsSimpleTaxpayers = "isSimpleTaxpayers",
+  CompanyLocation = "companyLocation",
+  OnlineSalesLicense = "onlineSalesLicense",
+}

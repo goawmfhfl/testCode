@@ -18,7 +18,10 @@ import {
   unfulfilledInputListVar,
 } from "@cache/shopSettings";
 import { shopSettingsSectionMapper } from "@constants/index";
-import { ConditionalFreeShipmentPolicy } from "@constants/shop";
+import {
+  BusinessInformations,
+  ConditionalFreeShipmentPolicy,
+} from "@constants/shop";
 import {
   TemporarySaveShopSettingsInputType,
   SaveShopSettingsInputType,
@@ -230,6 +233,7 @@ const SaveBar = () => {
             input.identificationCardNumber &&
               input.identificationCardNumber.length > 10
           ) && Boolean(input.identificationCardCopyPhoto);
+
         const isConditionalFreeShipmentUnset =
           watch(HAS_SET_CONDITIONAL_FREE_SHIPMENT) ===
           ConditionalFreeShipmentPolicy.Unset;
@@ -253,12 +257,20 @@ const SaveBar = () => {
           "safetyAuthenticationExpiredDate",
           "identificationCardNumber",
           "identificationCardCopyPhoto",
-          hasIdentificationCardAuthenticated && "representativeName",
-          hasIdentificationCardAuthenticated && "businessRegistrationNumber",
-          hasIdentificationCardAuthenticated && "corporateRegistrationNumber",
-          hasIdentificationCardAuthenticated && "isSimpleTaxpayers",
-          hasIdentificationCardAuthenticated && "companyLocation",
-          hasIdentificationCardAuthenticated && "onlineSalesLicense",
+          hasIdentificationCardAuthenticated &&
+            BusinessInformations.BusinessName,
+          hasIdentificationCardAuthenticated &&
+            BusinessInformations.RepresentativeName,
+          hasIdentificationCardAuthenticated &&
+            BusinessInformations.BusinessRegistrationNumber,
+          hasIdentificationCardAuthenticated &&
+            BusinessInformations.CorporateRegistrationNumber,
+          hasIdentificationCardAuthenticated &&
+            BusinessInformations.IsSimpleTaxpayers,
+          hasIdentificationCardAuthenticated &&
+            BusinessInformations.CompanyLocation,
+          hasIdentificationCardAuthenticated &&
+            BusinessInformations.OnlineSalesLicense,
           "shipmentType",
           "shipmentPrice",
           "shipmentDistantPrice",

@@ -48,7 +48,7 @@ const SettlementAccountModal = () => {
         method: "GET",
         params: {
           bankCode: accountInformation.bankCode,
-          accountNumber: accountInformation.accountNumber,
+          accountNumber: accountInformation.accountNumber.trim(),
         },
         headers: {
           "x-jwt": token,

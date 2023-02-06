@@ -1,12 +1,13 @@
 import { makeVar } from "@apollo/client";
-import { UnfulfilledStatus } from "@constants/index";
 
+import { UnfulfilledStatus } from "@constants/index";
 import {
   ShopImageVariables,
   SafetyCertificationVariables,
   BusinessLicenseVariables,
   SettlementAccountVariables,
 } from "@models/shopSettings";
+import { BusinessInformations } from "@constants/shop";
 
 export const serversideShopImagesVar = makeVar<ShopImageVariables>({
   mobileImage: {
@@ -53,13 +54,13 @@ export const SHIPMENT_CONDITIONAL_PRICE = "SHIPMENT_CONDITIONAL_PRICE";
 
 export const businessLicenseVar = makeVar<BusinessLicenseVariables>({
   isConfirmed: false,
-  businessName: "",
-  representativeName: "",
-  businessRegistrationNumber: "",
-  corporateRegistrationNumber: "",
-  isSimpleTaxpayers: "",
-  companyLocation: "",
-  onlineSalesLicense: "",
+  [BusinessInformations.BusinessName]: "",
+  [BusinessInformations.RepresentativeName]: "",
+  [BusinessInformations.BusinessRegistrationNumber]: "",
+  [BusinessInformations.CorporateRegistrationNumber]: "",
+  [BusinessInformations.IsSimpleTaxpayers]: "",
+  [BusinessInformations.CompanyLocation]: "",
+  [BusinessInformations.OnlineSalesLicense]: "",
 });
 
 export const REGISTRATION_NUMBER_PREFIX =
