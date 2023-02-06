@@ -4,8 +4,8 @@ import {
   OrderStatusGroup,
   OrderSearchType,
 } from "@constants/sale";
-import { FilterOptionVarType } from "@models/sale";
-import { OrdersType, ResetOrderItemType } from "@models/sale/order";
+import { FilterOptionVarType, OrderItems } from "@models/sale/index";
+import { ResetOrderItemType } from "@models/sale";
 
 export const filterOptionVar = makeVar<FilterOptionVarType>({
   type: OrderSearchType.RECIPIENT_NAME,
@@ -14,5 +14,5 @@ export const filterOptionVar = makeVar<FilterOptionVarType>({
   statusGroup: OrderStatusGroup.ORDER,
 });
 
-export const orderItemsVar = makeVar<Array<OrdersType>>([]);
+export const orderItemsVar = makeVar<Array<OrderItems>>([]);
 export const resetOrderItemVar = makeVar<Array<ResetOrderItemType>>([]);

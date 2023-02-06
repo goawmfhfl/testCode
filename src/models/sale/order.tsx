@@ -6,7 +6,10 @@ import {
   OrderStatusName,
   OrderStatusType,
   ShipmentStatus,
+  ShipmentType,
 } from "@constants/sale";
+import { RequestRefundOrExchange } from "@constants/sale/orderManagement";
+import { OrderItems } from "@models/sale/index";
 
 export interface GetOrdersBySellerInputType {
   input: {
@@ -20,74 +23,13 @@ export interface GetOrdersBySellerInputType {
   };
 }
 
-export interface OrdersType {
-  rowIndex?: string;
-  colorIndex?: number;
-  isLastRow?: boolean;
-  isFirstRow: boolean;
-
-  id: number;
-  merchantUid: string;
-  merchantItemUid: string;
-  isBundleShipment: boolean;
-  product: {
-    code: string;
-    thumbnail: string;
-    name: string;
-  };
-  user: {
-    name: string;
-    email: string;
-    phoneNumber: string;
-  };
-
-  orderByShop: {
-    order: {
-      recipientName: string;
-      recipientPhoneNumber: string;
-      recipientAddress: string;
-      postCode?: number;
-      shipmentMemo?: string;
-      paidAt: string;
-    };
-  };
-  options: Array<{
-    id: number;
-    components: Array<{
-      name: string;
-      value: string;
-    }>;
-    quantity: number;
-    price: number;
-    isRequired: boolean;
-  }>;
-
-  quantity: number;
-  discountAppliedPrice: number;
-  originalPrice: number;
-  shipmentPrice: number;
-  shipmentDistantPrice: number;
-  orderShipmentInfos: Array<{
-    id: number;
-    shipmentNumber: number;
-    shipmentCompany: string;
-    status: ShipmentStatus;
-  }>;
-  orderStatus: {
-    name: OrderStatusName;
-  };
-  claimStatus: {
-    name: OrderStatusName;
-  };
-}
-
 export interface GetOrdersBySellerType {
   getOrdersBySeller: {
     ok: boolean;
     error: string;
     totalPages: number;
     totalResults: number;
-    totalOrderItems: Array<OrdersType>;
+    totalOrderItems: Array<OrderItems>;
   };
 }
 
@@ -117,13 +59,13 @@ export interface CancelOrderItemsBySellerType {
   cancelOrderItemsBySeller: {
     ok: boolean;
     error?: string;
+    cancelAmount: number;
   };
 }
 
 export interface CancelOrderItemsBySellerInputType {
   components: Array<{
     orderItemId: number;
-    amount: number;
     mainReason: MainReason;
     detailedReason: string;
     cause: Cause;
@@ -171,49 +113,26 @@ export interface ConfirmOrderItemsBySellerInputType {
   orderItemIds: Array<number>;
 }
 
-export interface NormalizedListType {
-  orders: {
-    allIds: Array<string>;
-    byId: { [key: string]: OrdersType };
+export interface RequestRefundOrExchangeBySellerType {
+  requestRefundOrExchangeBySeller: {
+    ok: boolean;
+    error?: string;
   };
 }
 
-export interface ResetOrderItemType {
-  id: number;
-  merchantUid: string;
-  merchantItemUid: string;
-  productCode: string;
-  thumbnail: string;
-  orderProduct: string;
-  userName: string;
-  orderStatus: string;
-  claimStatus: string;
-  orderShipmentInfosId?: number;
-  shipmentCompany?: string;
-  shipmentNumber?: number;
-  paidAt: string;
-  recipientName: string;
-  recipientPhoneNumber: string;
-  recipientAddress: string;
-  postCode: string | number;
-  shipmentMemo: string;
-  userEmail: string;
-  userPhoneNumber: string;
-  option: string;
-  quantity: number;
-  price: string;
-  optionPrice: string | number;
-  totalPrice: string;
-  discountPrice: string | number;
-  shipmentPrice: string;
-  shipmentDistantPrice: string;
-  totalPaymentAmount: string;
-  isChecked: boolean;
-  isShipmentInfoEdit: boolean;
-  temporaryShipmentCompany: string;
-  temporaryShipmentNumber?: number;
-  colorIndex: number;
-  rowIndex: string;
-  isLastRow: boolean;
-  isFirstRow: boolean;
+export interface RequestRefundOrExchangeBySellerInputType {
+  components: Array<{
+    orderItemId: number;
+    mainReason: MainReason;
+    detailedReason: string;
+    cause: Cause;
+  }>;
+  status: RequestRefundOrExchange;
+}
+
+export interface NormalizedListType {
+  orders: {
+    allIds: Array<string>;
+    byId: { [key: string]: OrderItems };
+  };
 }

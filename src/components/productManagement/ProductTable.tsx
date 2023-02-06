@@ -168,8 +168,7 @@ const ProductTable = () => {
         ),
         confirmButtonClickHandler: () => {
           try {
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            (async () => {
+            void (async () => {
               loadingSpinnerVisibilityVar(true);
 
               const {
@@ -235,8 +234,7 @@ const ProductTable = () => {
     };
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
+    void (async () => {
       await getProducts({
         variables: { input: { page, skip, status, query } },
       });
@@ -478,6 +476,7 @@ const ProductTable = () => {
 
 const ProductNameTd = styled(Td)`
   justify-content: flex-start;
+  padding: 0;
 `;
 
 const ProductThumbNailWrapper = styled.div`
@@ -486,8 +485,7 @@ const ProductThumbNailWrapper = styled.div`
   align-items: center;
 
   min-width: 56px;
-  height: 80px;
-
+  height: 100%;
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 
@@ -499,7 +497,7 @@ const ProductThumbNail = styled.img`
 const ProductName = styled.span`
   display: block;
 
-  padding: 0 6px;
+  padding: 0 8px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

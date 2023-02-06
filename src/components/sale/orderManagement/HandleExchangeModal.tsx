@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useReactiveVar, useMutation } from "@apollo/client";
 import styled from "styled-components/macro";
+import { useReactiveVar, useMutation } from "@apollo/client";
 
 import {
   modalVar,
@@ -13,17 +13,18 @@ import { checkedOrderItemsVar } from "@cache/sale";
 import { showHasServerErrorModal } from "@cache/productManagement";
 import { filterOptionVar } from "@cache/sale/order";
 
-import { Cause, MainReason } from "@constants/sale";
-
+import { Cause, exchangeOptionListType, MainReason } from "@constants/sale";
+import { RequestRefundOrExchange } from "@constants/sale/orderManagement";
 import {
-  CancelOrderItemsBySellerInputType,
-  CancelOrderItemsBySellerType,
+  RequestRefundOrExchangeBySellerInputType,
+  RequestRefundOrExchangeBySellerType,
 } from "@models/sale/order";
-import { CANCEL_ORDERITEMS_BY_SELLER } from "@graphql/mutations/cancelOrderItemsBySeller";
+import { ResetOrderItemType } from "@models/sale/index";
+
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 
 import getWhoseResponsibility from "@utils/sale/order/getWhoseResponsibility";
-import getCancelOrderItemsInput from "@utils/sale/order/getCancelOrderItemsInput";
+import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -36,21 +37,19 @@ import {
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
+import getCancelOrderItemComponents from "@utils/sale/order/getCancelOrderItemComponents";
+import { REQEUST_REFUND_OR_EXCHANGE_BY_SELLER } from "@graphql/mutations/requestRefundOrExchangeBySeller";
 
-interface AskReasonModalType {
-  option: Array<{
-    id: number;
-    label: string;
-    value: MainReason;
-    cause: Cause;
-  }>;
-}
-
-const AskReasonModal = ({ option }: AskReasonModalType) => {
+const HandleRefundModal = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
-  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
+
+  const checkedOrderItems =
+    useReactiveVar<Array<ResetOrderItemType>>(checkedOrderItemsVar);
+  const reconstructCheckedOrderItems =
+    getReconstructCheckedOrderItems(checkedOrderItems);
+  const checkedOrderItemIds = reconstructCheckedOrderItems.map(({ id }) => id);
 
   const [reason, setReason] = useState<{
     main: MainReason;
@@ -62,19 +61,12 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
     cause: Cause.DEFAULT,
   });
 
-  const components = getCancelOrderItemsInput(
-    checkedOrderItems,
-    reason.main,
-    reason.detail,
-    reason.cause
-  );
-
-  const [cancelOrderItems] = useMutation<
-    CancelOrderItemsBySellerType,
+  const [requestRefundOrExchange] = useMutation<
+    RequestRefundOrExchangeBySellerType,
     {
-      input: CancelOrderItemsBySellerInputType;
+      input: RequestRefundOrExchangeBySellerInputType;
     }
-  >(CANCEL_ORDERITEMS_BY_SELLER, {
+  >(REQEUST_REFUND_OR_EXCHANGE_BY_SELLER, {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
@@ -126,16 +118,23 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
     try {
       void (async () => {
         loadingSpinnerVisibilityVar(true);
+        const components = getCancelOrderItemComponents(
+          checkedOrderItemIds,
+          reason
+        );
+
         const {
           data: {
-            cancelOrderItemsBySeller: { ok, error },
+            requestRefundOrExchangeBySeller: { ok, error },
           },
-        } = await cancelOrderItems({
+        } = await requestRefundOrExchange({
           variables: {
-            input: { components: components },
+            input: {
+              components,
+              status: RequestRefundOrExchange.EXCHANGE,
+            },
           },
         });
-
         if (ok) {
           loadingSpinnerVisibilityVar(false);
           systemModalVar({
@@ -143,11 +142,11 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
             isVisible: true,
             description: (
               <>
-                선택하신 주문이
+                선택하신 주문의
                 <br />
-                취소 완료되었습니다.
+                교환이 요청되었습니다.
                 <br />
-                (취소관리 - 취소완료에서 확인 가능)
+                (교환관리 - 교환요청에서 처리 가능)
               </>
             ),
             confirmButtonVisibility: true,
@@ -157,27 +156,53 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
                 ...modalVar(),
                 isVisible: false,
               });
-
               systemModalVar({
                 ...systemModalVar(),
                 isVisible: false,
               });
-
               checkedOrderItemsVar([]);
               checkAllBoxStatusVar(false);
             },
           });
         }
         if (error) {
-          console.log("error", error);
-
           loadingSpinnerVisibilityVar(false);
-          showHasServerErrorModal(error, "주문 취소");
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: (
+              <>
+                교환처리을(를) <br />
+                완료하지 못했습니다.
+                <br />
+                다시 시도 후 같은 문제가 발생할 시
+                <br />
+                찹스틱스에 문의해주세요
+                <br />
+                <br />
+                에러메시지:
+                <br />
+                {error}
+              </>
+            ),
+            confirmButtonVisibility: true,
+            cancelButtonVisibility: false,
+            confirmButtonClickHandler: () => {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+              modalVar({
+                ...modalVar(),
+                isVisible: false,
+              });
+            },
+          });
         }
       })();
     } catch (error) {
       loadingSpinnerVisibilityVar(false);
-      showHasServerErrorModal(error as string, "주문 취소");
+      showHasServerErrorModal(error as string, "교환 처리");
     }
   };
 
@@ -194,13 +219,11 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
   return (
     <Container>
       <CloseButton onClick={handleCloseButtonClick} src={closeIconSource} />
-      <Title>취소 처리하기</Title>
+      <Title>교환 처리하기</Title>
       <NoticeContainer icon={exclamationmarkSrc} width={"392px"}>
-        • &nbsp;취소 처리 전 반드시 소비자와 합의 후 처리해주시길 바랍니다.
-        <br />• &nbsp;여러 주문 선택 후 취소 처리하면 같은 대표사유 및 상세
-        사유로 취소
-        <br />
-        &nbsp;&nbsp;&nbsp;처리 됩니다.
+        • &nbsp;교환 처리 전 반드시 소비자와 합의 후 처리해주시길 바랍니다.
+        <br />• &nbsp;상품별 교환 처리는 가능하지만, 옵션별 교환 처리는
+        불가합니다.
       </NoticeContainer>
       <ReasonContainer>
         <Label>대표사유</Label>
@@ -214,7 +237,7 @@ const AskReasonModal = ({ option }: AskReasonModalType) => {
           <Option value={MainReason.DEFAULT} hidden>
             사유를 선택해주세요
           </Option>
-          {option.map(({ id, label, value }) => (
+          {exchangeOptionListType.map(({ id, label, value }) => (
             <Option value={value} key={id}>
               {label}
             </Option>
@@ -312,4 +335,4 @@ const ReasonDropdown = styled(Dropdown)`
   padding-right: 0;
 `;
 
-export default AskReasonModal;
+export default HandleRefundModal;

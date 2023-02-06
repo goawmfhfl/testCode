@@ -35,18 +35,22 @@ import { CONFIRM_ORDERITMES_BY_SELLER } from "@graphql/mutations/confirmOrderIte
 import {
   ConfirmOrderItemsBySellerInputType,
   ConfirmOrderItemsBySellerType,
-  ResetOrderItemType,
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
+
+import { ResetOrderItemType } from "@models/sale";
+
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import { showHasServerErrorModal } from "@cache/productManagement";
-import AskReasonModal from "@components/sale/orderManagement/AskReasonModal";
 import { getHasCheckedOrderStatus } from "@utils/sale/order/getHasCheckedOrderStatus";
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
+import HandleCancelOrderModal from "@components/sale/orderManagement/HandleCancelOrderModal";
+import HandleRefundModal from "@components/sale/orderManagement/HandleRefundModal";
+import HandleExchangeModal from "@components/sale/orderManagement/HandleExchangeModal";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -401,7 +405,7 @@ const Controller = () => {
 
         modalVar({
           isVisible: true,
-          component: <AskReasonModal option={optionListType} />,
+          component: <HandleCancelOrderModal option={optionListType} />,
         });
       },
     });
@@ -435,6 +439,25 @@ const Controller = () => {
       );
       return;
     }
+
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: <>반품처리 하시겠습니까?</>,
+      confirmButtonVisibility: true,
+      cancelButtonVisibility: true,
+      confirmButtonClickHandler: () => {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: false,
+        });
+
+        modalVar({
+          isVisible: true,
+          component: <HandleRefundModal />,
+        });
+      },
+    });
   };
 
   const handleExchangeButtonClick = () => {
@@ -465,6 +488,25 @@ const Controller = () => {
       );
       return;
     }
+
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: <>교환처리 하시겠습니까?</>,
+      confirmButtonVisibility: true,
+      cancelButtonVisibility: true,
+      confirmButtonClickHandler: () => {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: false,
+        });
+
+        modalVar({
+          isVisible: true,
+          component: <HandleExchangeModal />,
+        });
+      },
+    });
   };
 
   const changeSearchTypeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {

@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
-import { OrdersType } from "@models/sale/order";
+import { OrderItems } from "@models/sale/index";
 import { cloneDeep } from "lodash";
+import { ShipmentType } from "@constants/sale";
 
 const optionsInitialValue: Array<{
   id: number;
@@ -13,19 +14,19 @@ const optionsInitialValue: Array<{
   isRequired: boolean;
 }> = [];
 
-const constructOrderItem = (orderItem: Array<OrdersType>) => {
+const constructOrderItem = (orderItem: Array<OrderItems>) => {
   const hasOrderItems = !!orderItem && !!orderItem.length;
   if (!hasOrderItems) return;
 
-  const newOrderItems: Array<OrdersType> = cloneDeep(orderItem).sort(
+  const newOrderItems: Array<OrderItems> = cloneDeep(orderItem).sort(
     compareBundleShipment
   );
-  const reconstructOrderItems: Array<OrdersType> = [];
+  const reconstructOrderItems: Array<OrderItems> = [];
 
   const tableLayoutCalculator: {
     colorIndex: number;
-    bundleOrderItems: Array<Array<OrdersType>>;
-    temporaryBundleOrderItems: Array<OrdersType>;
+    bundleOrderItems: Array<Array<OrderItems>>;
+    temporaryBundleOrderItems: Array<OrderItems>;
   } = {
     colorIndex: 0,
     bundleOrderItems: [],
@@ -264,7 +265,6 @@ const constructOrderItem = (orderItem: Array<OrdersType>) => {
 
 const reconstructNotRequiredProducts = (
   product: {
-    code: string;
     thumbnail: string;
     name: string;
   },
@@ -285,7 +285,6 @@ const reconstructNotRequiredProducts = (
   }, "");
 
   return {
-    code: product.code,
     thumbnail: product.thumbnail,
     name: optionName,
   };
@@ -316,20 +315,50 @@ const reconstructNotRequiredOption = (
   }, optionsInitialValue);
 };
 
-const getShipmentPrice = (orders: Array<OrdersType>) => {
-  return orders.reduce((result, { shipmentPrice }) => {
-    return (result = Math.max(result, shipmentPrice));
-  }, 0);
+const getShipmentPrice = (orders: Array<OrderItems>) => {
+  return orders.reduce(
+    (
+      result,
+      {
+        orderByShop: {
+          bundleShipmentPrice,
+          bundleShipmentType,
+          bundleOrderItemTotalPrice,
+          shipmentConditionalPrice,
+        },
+      }
+    ) => {
+      let shipmentPrice = 0;
+
+      if (bundleShipmentType === ShipmentType.FREE) {
+        shipmentPrice = 0;
+      }
+
+      if (bundleShipmentType === ShipmentType.CHARGE) {
+        shipmentPrice = bundleShipmentPrice;
+      }
+
+      if (bundleShipmentType === ShipmentType.CONDITIONAL_FREE) {
+        const isConditionalFree =
+          bundleOrderItemTotalPrice > shipmentConditionalPrice;
+
+        shipmentPrice = isConditionalFree ? 0 : bundleShipmentPrice;
+      }
+
+      return (result = Math.max(result, shipmentPrice));
+    },
+    0
+  );
 };
 
-const getShipmentDistantPrice = (orders: Array<OrdersType>) => {
+const getShipmentDistantPrice = (orders: Array<OrderItems>) => {
   return orders.reduce((result, { shipmentDistantPrice }) => {
     if (shipmentDistantPrice) return (result = shipmentDistantPrice);
     if (!shipmentDistantPrice) return (result = 0);
   }, 0);
 };
 
-const compareBundleShipment = (a: OrdersType, b: OrdersType) => {
+const compareBundleShipment = (a: OrderItems, b: OrderItems) => {
   if (a.merchantUid !== b.merchantUid) return 0;
   if (a.isBundleShipment && !b.isBundleShipment) return -1;
   if (!a.isBundleShipment && b.isBundleShipment) return 1;

@@ -1,4 +1,4 @@
-import { ResetOrderItemType } from "@models/sale/order";
+import { ResetOrderItemType } from "@models/sale";
 
 const getReconstructCheckedOrderItems = (
   checkedOrderItems: Array<ResetOrderItemType>

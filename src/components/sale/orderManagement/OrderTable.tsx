@@ -31,14 +31,14 @@ import {
   EditShipmentNumberInputType,
   EditShipmentNumberType,
   NormalizedListType,
-  ResetOrderItemType,
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
+import { ResetOrderItemType } from "@models/sale";
 
 import getResetOrderItems from "@utils/sale/order/getResetOrderItems";
 import { preventNaNValues } from "@utils/index";
-import constructOrderItem from "@utils/sale/order/constructOrderItem";
+import constructOrderItem from "@utils/sale/constructOrderItem";
 
 import {
   checkAllBoxStatusVar,
@@ -47,7 +47,7 @@ import {
 } from "@cache/index";
 
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
-import { OrdersType } from "@models/sale/order";
+import { OrderItems } from "@models/sale/index";
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
 import { EDIT_SHIPMENT_NUMBER } from "@graphql/mutations/editShipmentNumber";
 
@@ -496,7 +496,7 @@ const OrderTable = () => {
     }: {
       totalPages: number;
       totalResults: number;
-      totalOrderItems: Array<OrdersType>;
+      totalOrderItems: Array<OrderItems>;
     } = data.getOrdersBySeller;
 
     const isLastPageChanged = totalPages < page;
@@ -642,9 +642,8 @@ const OrderTable = () => {
                   rowIndex,
                   merchantUid,
                   merchantItemUid,
-                  productCode,
                   thumbnail,
-                  orderProduct,
+                  productName,
                   userName,
                   orderStatus,
                   isChecked,
@@ -658,6 +657,7 @@ const OrderTable = () => {
                   key={rowIndex}
                   colorIndex={colorIndex}
                   isLastRow={isLastRow}
+                  height={80}
                 >
                   <Td type={TableType.SCROLL} width={fixTableType[0].width}>
                     {isFirstRow && (
@@ -681,7 +681,7 @@ const OrderTable = () => {
                     <ProductThumbNailWrapper>
                       <ProductThumbNail src={encodeURI(thumbnail)} />
                     </ProductThumbNailWrapper>
-                    <ProductName>{orderProduct}</ProductName>
+                    <ProductName>{productName}</ProductName>
                   </ProductNameTd>
                   <Td type={TableType.SCROLL} width={fixTableType[4].width}>
                     {userName}
@@ -800,6 +800,7 @@ const OrderTable = () => {
                   key={rowIndex}
                   colorIndex={colorIndex}
                   isLastRow={isLastRow}
+                  height={80}
                 >
                   <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
                     {claimStatus}
@@ -1074,7 +1075,7 @@ const OrderTable = () => {
 
 const ProductNameTd = styled(Td)`
   justify-content: flex-start;
-  padding: 8px 0px;
+  padding: 0px;
 `;
 
 const ProductThumbNailWrapper = styled.div`
@@ -1083,7 +1084,7 @@ const ProductThumbNailWrapper = styled.div`
   align-items: center;
 
   min-width: 56px;
-  height: 80px;
+  height: 100%;
 
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
@@ -1096,7 +1097,7 @@ const ProductThumbNail = styled.img`
 const ProductName = styled.span`
   display: block;
 
-  padding: 0 6px;
+  padding: 0 8px;
 
   overflow: hidden;
   text-overflow: ellipsis;

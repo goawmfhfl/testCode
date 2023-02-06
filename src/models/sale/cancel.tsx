@@ -1,72 +1,35 @@
 import {
+  Cause,
+  MainReason,
   OrderSearchType,
   OrderStatusGroup,
   OrderStatusName,
   OrderStatusType,
-  MainReason,
+  ShipmentType,
 } from "@constants/sale";
+import { OrderCancel } from "@constants/sale/cancelManagement";
 
-export interface CancelOrdersType {
-  id: number;
+import { OrderItems } from "@models/sale/index";
 
-  merchantItemUid: string;
+export interface FilterOptionVarType {
+  type?: OrderSearchType;
+  statusName?: OrderStatusName;
+  statusType?: OrderStatusType;
+  statusGroup: OrderStatusGroup;
+}
 
-  product: {
-    code: string;
-    thumbnail: string;
-    name: string;
+export interface EditStatusReasonBySellerType {
+  editStatusReasonBySeller: {
+    ok: boolean;
+    error?: string;
   };
+}
 
-  user: {
-    name: string;
-    email: string;
-    phoneNumber: string;
-    payments: {
-      createdAt: string;
-    };
-  };
-
-  orderByShop: {
-    order: {
-      recipientName: string;
-      recipientPhoneNumber: string;
-    };
-  };
-
-  options: Array<{
-    components: Array<{
-      name: string;
-      value: string;
-    }>;
-    price: number;
-  }>;
-
-  quantity: number;
-
-  discountAppliedPrice: number;
-
-  originalPrice: number;
-
-  shipmentPrice: number;
-
-  shipmentDistantPrice: number;
-
-  statusReasons: Array<{
-    id: number;
-    createdAt: string;
-    amount: number;
-    mainReason: MainReason;
-    detailedReason: string;
-    status: OrderStatusName;
-  }>;
-
-  orderStatus: {
-    name: OrderStatusName;
-  };
-
-  claimStatus: {
-    name: OrderStatusName;
-  };
+export interface EditStatusReasonBySellerInputType {
+  orderItemId: number;
+  mainReason: MainReason;
+  detailedReason: string;
+  orderStatusName: OrderStatusName;
 }
 
 export interface GetCancelOrdersBySellerType {
@@ -75,7 +38,7 @@ export interface GetCancelOrdersBySellerType {
     error: string;
     totalPages: number;
     totalResults: number;
-    totalOrderItems: Array<CancelOrdersType>;
+    totalOrderItems: Array<OrderItems>;
   };
 }
 
@@ -89,41 +52,26 @@ export interface GetCancelOrdersBySellerInputType {
   statusGroup: OrderStatusGroup;
 }
 
-export interface NormalizedType {
-  orders: {
-    allIds: Array<number>;
-    byId: { [key: number]: CancelOrdersType };
+export interface ConfirmOrDenyCancelBySellerType {
+  confirmOrDenyCancelBySeller: {
+    ok: boolean;
+    error?: string;
   };
 }
 
-export interface ResetCancelOrders {
-  id: number;
-  merchantItemUid: string;
-  productCode: string;
-  thumbnail: string;
-  orderProduct: string;
-  userName: string;
-  mainReason: MainReason;
-  detaildReason: string;
-  refusalMainReason: MainReason;
-  refusalDetaildReason: string;
-  orderStatus: string;
-  claimStatus: string;
-  payments: string;
-  recipientName: string;
-  recipientPhoneNumber: string;
-  userEmail: string;
-  userPhoneNumber: string;
-  option: string;
-  quantity: number;
-  price: number;
-  optionPrice: string;
-  totalPrice: string;
-  shipmentPrice: number;
-  shipmentDistantPrice: number;
-  cancelRequestDay: string;
-  cancelRefusalDay: string;
-  cancelCompletedDay: string;
-  totalRefundPrice: number;
-  isChecked: boolean;
+export interface ConfirmOrDenyCancelBySellerInputType {
+  components: Array<{
+    orderItemId: number;
+    mainReason: MainReason;
+    detailedReason: string;
+    cause: Cause;
+  }>;
+  status: OrderCancel;
+}
+
+export interface NormalizedType {
+  orders: {
+    allIds: Array<string>;
+    byId: { [key: string]: OrderItems };
+  };
 }

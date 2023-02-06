@@ -49,6 +49,12 @@ export enum Cause {
   SELLER = "SELLER",
 }
 
+export enum ShipmentType {
+  FREE = "FREE",
+  CHARGE = "CHARGE",
+  CONDITIONAL_FREE = "CONDITIONAL_FREE",
+}
+
 export enum OrderStatusName {
   PAYMENT_COMPLETED = "PAYMENT_COMPLETED",
   PREPARING = "PREPARING",
@@ -287,6 +293,12 @@ export enum MainReason {
   DAMAGED = "DAMAGED",
   MISINFORMED = "MISINFORMED",
   MISDELIVERY = "MISDELIVERY",
+  CUSTOM_MADE = "CUSTOM_MADE",
+  REFUSAL_BY_CUSTOMER_REQUEST = "REFUSAL_BY_CUSTOMER_REQUEST",
+  PRODUCT_ALREADY_READY = "PRODUCT_ALREADY_READY",
+  SENSE_TRACE_OF_USE = "SENSE_TRACE_OF_USE",
+  DAMAGED_BY_CUSTOMER = "DAMAGED_BY_CUSTOMER",
+  OTHER_REASONS = "OTHER_REASONS",
 }
 
 export const mainReasonType = {
@@ -300,6 +312,12 @@ export const mainReasonType = {
   DAMAGED: "상품 파손",
   MISINFORMED: "상품 정보 상이",
   MISDELIVERY: "오배송",
+  CUSTOM_MADE: "커스터마이즈 주문제작",
+  REFUSAL_BY_CUSTOMER_REQUEST: "고객 요청에 의한 거부",
+  PRODUCT_ALREADY_READY: "상품 준비 완료",
+  SENSE_TRACE_OF_USE: "사용 흔적이 보임",
+  DAMAGED_BY_CUSTOMER: "고객에 의해 파손됨",
+  OTHER_REASONS: "기타 사유",
 };
 
 export const optionListType: Array<{
@@ -358,6 +376,92 @@ export const optionListType: Array<{
   },
   {
     id: 8,
+    label: mainReasonType.MISDELIVERY,
+    value: MainReason.MISDELIVERY,
+    cause: Cause.SELLER,
+  },
+];
+
+export const refusalOptionListType: Array<{
+  id: number;
+  label: string;
+  value: MainReason;
+}> = [
+  {
+    id: 0,
+    label: mainReasonType.DEFAULT,
+    value: MainReason.DEFAULT,
+  },
+  {
+    id: 1,
+    label: mainReasonType.CUSTOM_MADE,
+    value: MainReason.CUSTOM_MADE,
+  },
+  {
+    id: 2,
+    label: mainReasonType.REFUSAL_BY_CUSTOMER_REQUEST,
+    value: MainReason.REFUSAL_BY_CUSTOMER_REQUEST,
+  },
+  {
+    id: 3,
+    label: mainReasonType.PRODUCT_ALREADY_READY,
+    value: MainReason.PRODUCT_ALREADY_READY,
+  },
+  {
+    id: 4,
+    label: mainReasonType.SENSE_TRACE_OF_USE,
+    value: MainReason.SENSE_TRACE_OF_USE,
+  },
+  {
+    id: 5,
+    label: mainReasonType.DAMAGED_BY_CUSTOMER,
+    value: MainReason.DAMAGED_BY_CUSTOMER,
+  },
+  {
+    id: 6,
+    label: mainReasonType.OTHER_REASONS,
+    value: MainReason.OTHER_REASONS,
+  },
+];
+
+export const exchangeOptionListType: Array<{
+  id: number;
+  label: string;
+  value: MainReason;
+  cause: Cause;
+}> = [
+  {
+    id: 0,
+    label: mainReasonType.DELAYED_SHIPMENT,
+    value: MainReason.DELAYED_SHIPMENT,
+    cause: Cause.SELLER,
+  },
+  {
+    id: 1,
+    label: mainReasonType.OMITTED_SHIPMENT,
+    value: MainReason.OMITTED_SHIPMENT,
+    cause: Cause.SELLER,
+  },
+  {
+    id: 2,
+    label: mainReasonType.OUT_OF_STOCK,
+    value: MainReason.OUT_OF_STOCK,
+    cause: Cause.SELLER,
+  },
+  {
+    id: 3,
+    label: mainReasonType.DAMAGED,
+    value: MainReason.DAMAGED,
+    cause: Cause.SELLER,
+  },
+  {
+    id: 4,
+    label: mainReasonType.MISINFORMED,
+    value: MainReason.MISINFORMED,
+    cause: Cause.SELLER,
+  },
+  {
+    id: 5,
     label: mainReasonType.MISDELIVERY,
     value: MainReason.MISDELIVERY,
     cause: Cause.SELLER,

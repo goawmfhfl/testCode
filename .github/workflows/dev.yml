@@ -31,6 +31,7 @@ jobs:
           REACT_APP_BIZM_PROFILE: ${{secrets.REACT_APP_BIZM_PROFILE}}
           REACT_APP_BIZM_PRODUCT_URL: ${{secrets.REACT_APP_BIZM_PRODUCT_URL}}
           REACT_APP_ECOLIFE_API_KEY: ${{secrets.REACT_APP_ECOLIFE_API_KEY}}
+          REACT_APP_SWEETTRAKER_API_KEY: ${{secrets.REACT_APP_SWEETTRAKER_API_KEY}}
 
       - name: Deploy
         env:

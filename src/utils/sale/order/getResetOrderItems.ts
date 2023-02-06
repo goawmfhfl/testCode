@@ -1,15 +1,18 @@
 import { NormalizedListType } from "@models/sale/order";
-import { orderStatusNameType, ShipmentStatus } from "@constants/sale";
-import { getDateFormat } from "@utils/date";
+import {
+  orderStatusNameType,
+  ShipmentStatus,
+  ShipmentType,
+} from "@constants/sale";
+import { DateType, getDateFormat } from "@utils/date";
 
-const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
-  const hasOrderItems = !!recontructOrderItem && !!recontructOrderItem.orders;
+const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
+  const hasOrderItems =
+    !!reconstructOrderItems && !!reconstructOrderItems.orders;
   if (!hasOrderItems) return;
 
-  if (!recontructOrderItem || !recontructOrderItem.orders) return;
-
-  const orderAllIds = recontructOrderItem?.orders.allIds;
-  const orderByid = recontructOrderItem?.orders.byId;
+  const orderAllIds = reconstructOrderItems?.orders.allIds;
+  const orderByid = reconstructOrderItems?.orders.byId;
 
   const result = orderAllIds.map((id) => {
     const {
@@ -25,6 +28,8 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       originalPrice,
       shipmentPrice,
       shipmentDistantPrice,
+      shipmentType,
+      isBundleShipment,
       orderShipmentInfos,
       orderStatus,
       claimStatus,
@@ -36,20 +41,23 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
 
     const resetMerchantUid = merchantUid ? merchantUid : "-";
     const resetMerchantItemUid = merchantItemUid ? merchantItemUid : "-";
-    const resetProductCode = product?.code ? product.code : "-";
-    const resetOrderProduct = product?.name ? product.name : "-";
+    const resetProductName = product?.name ? product.name : "-";
     const resetProductThumbnail = product?.thumbnail ? product.thumbnail : "-";
     const resetUserName = user?.name ? user.name : "-";
     const resetPaidAt = orderByShop?.order
-      ? `${getDateFormat(orderByShop?.order.paidAt).YYYY_MM_DD} / ${
-          getDateFormat(orderByShop?.order.paidAt).HH_MM_SS
+      ? `${
+          getDateFormat(orderByShop?.order.paidAt, DateType.PAYMENT).YYYY_MM_DD
+        } / ${
+          getDateFormat(orderByShop?.order.paidAt, DateType.PAYMENT).HH_MM_SS
         }`
       : "-";
 
     const resetOrderStatus = orderStatus?.name
       ? orderStatusNameType[orderStatus.name]
       : "-";
-    const resetClaimStatus = claimStatus?.name ? claimStatus.name : "-";
+    const resetClaimStatus = claimStatus?.name
+      ? orderStatusNameType[claimStatus.name]
+      : "-";
     const resetOrderShipmentInfosId = orderShipmentInfos
       ? orderShipmentInfos.filter(
           (info) => info.status === ShipmentStatus.SHIPPING
@@ -101,12 +109,18 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       resetDiscountPrice,
       resetOptionPrice
     );
-    const resetShipmentPrice = shipmentPrice
-      ? `${shipmentPrice.toLocaleString("ko-KR")}`
-      : "-";
+
+    const resetShipmentPrice = getShipmentPrice(
+      isBundleShipment,
+      shipmentPrice,
+      shipmentType,
+      orderByShop
+    );
+
     const resetShipmentDistantPrice = shipmentDistantPrice
       ? `${shipmentDistantPrice.toLocaleString("ko-KR")}`
       : "-";
+
     const totalPaymentAmount = getTotalPaymentAmount(
       totalPrice,
       resetShipmentPrice,
@@ -122,9 +136,8 @@ const resetOrderItems = (recontructOrderItem: NormalizedListType) => {
       id: orderId,
       merchantUid: resetMerchantUid,
       merchantItemUid: resetMerchantItemUid,
-      productCode: resetProductCode,
       thumbnail: resetProductThumbnail,
-      orderProduct: resetOrderProduct,
+      productName: resetProductName,
       userName: resetUserName,
       orderStatus: resetOrderStatus,
       claimStatus: resetClaimStatus,
@@ -272,6 +285,48 @@ const getOptions = (
       resetOptionQuantity: 0,
     }
   );
+};
+
+const getShipmentPrice = (
+  isBundleShipment: boolean,
+  shipmentPrice: number,
+  shipmentType: ShipmentType,
+  orderByShop: {
+    bundleShipmentPrice: number;
+    bundleShipmentDistantPrice: number;
+    bundleShipmentType: ShipmentType;
+    bundleOrderItemTotalPrice: number;
+    shipmentConditionalPrice: number;
+  }
+) => {
+  if (!shipmentPrice) return "-";
+
+  if (!isBundleShipment) {
+    if (shipmentType === ShipmentType.FREE) {
+      return "-";
+    }
+    if (shipmentType === ShipmentType.CHARGE) {
+      return `${shipmentPrice.toLocaleString("ko-KR")}`;
+    }
+  }
+
+  if (isBundleShipment && !!orderByShop) {
+    if (orderByShop.bundleShipmentType === ShipmentType.FREE) {
+      return "-";
+    }
+    if (orderByShop.bundleShipmentType === ShipmentType.CHARGE) {
+      return `${orderByShop.bundleShipmentPrice.toLocaleString("ko-KR")}`;
+    }
+    if (orderByShop.bundleShipmentType === ShipmentType.CONDITIONAL_FREE) {
+      const isConditionalFree =
+        orderByShop.bundleOrderItemTotalPrice >
+        orderByShop.shipmentConditionalPrice;
+
+      return isConditionalFree
+        ? "-"
+        : `${orderByShop.bundleShipmentPrice.toLocaleString("ko-KR")}`;
+    }
+  }
 };
 
 export default resetOrderItems;
