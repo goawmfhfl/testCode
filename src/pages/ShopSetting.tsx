@@ -40,7 +40,7 @@ import SettlementAccount from "@components/shopSetting/SettlementAccount";
 import RegistrationNumber from "@components/shopSetting/RegistrationNumber";
 import { showHasServerErrorModal } from "@cache/productManagement";
 import useAuthGuard from "@hooks/useAuthGuard";
-import { unfulfilledInputListVar } from "@cache/shopSettings";
+import { phoneNumberVar, unfulfilledInputListVar } from "@cache/shopSettings";
 
 const ShopSetting = () => {
   useAuthGuard();
@@ -115,6 +115,9 @@ const ShopSetting = () => {
     const { createdAt, updatedAt, registered } = shopData.getShopInfo.shop;
 
     const hasShopSettingUpdated = createdAt !== updatedAt;
+
+    // 등록 등 여부에 관계없이 항상 전화번호는 가져온다
+    phoneNumberVar(shopData.getShopInfo.shop.phoneNumber);
 
     if (registered) {
       hasSetStoredSettings.current = true;
