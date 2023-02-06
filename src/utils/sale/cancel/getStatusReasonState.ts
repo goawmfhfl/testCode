@@ -1,5 +1,5 @@
 import { OrderStatusName, MainReason } from "@constants/sale";
-import { getDateFormat } from "@utils/date";
+import { DateType, getDateFormat } from "@utils/date";
 
 const getStatusReasonState = (
   statusReasons: Array<{
@@ -28,22 +28,22 @@ const getStatusReasonState = (
       if (status === OrderStatusName.CANCEL_REQUEST) {
         result.mainReason = mainReason;
         result.detaildReason = detailedReason;
-        result.cancelRequestDay = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
-          getDateFormat(createdAt).HH_MM_SS
-        }`;
+        result.cancelRequestDay = `${
+          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
+        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
         result.totalRefundPrice = amount;
       }
       if (status === OrderStatusName.CANCEL_REFUSAL) {
         result.refusalMainReason = mainReason;
         result.refusalDetaildReason = detailedReason;
-        result.cancelRefusalDay = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
-          getDateFormat(createdAt).HH_MM_SS
-        }`;
+        result.cancelRefusalDay = `${
+          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
+        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
       }
       if (status === OrderStatusName.CANCEL_COMPLETED) {
-        result.cancelCompletedDay = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
-          getDateFormat(createdAt).HH_MM_SS
-        }`;
+        result.cancelCompletedDay = `${
+          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
+        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
       }
 
       return result;

@@ -4,7 +4,7 @@ import {
   ShipmentStatus,
   ShipmentType,
 } from "@constants/sale";
-import { getDateFormat } from "@utils/date";
+import { DateType, getDateFormat } from "@utils/date";
 
 const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
   const hasOrderItems =
@@ -45,8 +45,10 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
     const resetProductThumbnail = product?.thumbnail ? product.thumbnail : "-";
     const resetUserName = user?.name ? user.name : "-";
     const resetPaidAt = orderByShop?.order
-      ? `${getDateFormat(orderByShop?.order.paidAt).YYYY_MM_DD} / ${
-          getDateFormat(orderByShop?.order.paidAt).HH_MM_SS
+      ? `${
+          getDateFormat(orderByShop?.order.paidAt, DateType.PAYMENT).YYYY_MM_DD
+        } / ${
+          getDateFormat(orderByShop?.order.paidAt, DateType.PAYMENT).HH_MM_SS
         }`
       : "-";
 

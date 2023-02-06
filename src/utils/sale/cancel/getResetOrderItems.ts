@@ -8,7 +8,7 @@ import {
   ShipmentType,
 } from "@constants/sale";
 
-import { getDateFormat } from "@utils/date";
+import { DateType, getDateFormat } from "@utils/date";
 
 const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
   const hasOrderItems =
@@ -224,8 +224,8 @@ const getOrder = (orderByShop: {
     postCode: postCode ? postCode : "-",
     shipmentMemo: shipmentMemo ? shipmentMemo : "-",
     paidAt: paidAt
-      ? `${getDateFormat(paidAt).YYYY_MM_DD} / ${
-          getDateFormat(paidAt).HH_MM_SS
+      ? `${getDateFormat(paidAt, DateType.PAYMENT).YYYY_MM_DD} / ${
+          getDateFormat(paidAt, DateType.PAYMENT).HH_MM_SS
         }`
       : "-",
   };
@@ -273,24 +273,24 @@ const getStatusReason = (
       ) {
         result.mainReason = mainReasonType[mainReason];
         result.detailedReason = detailedReason;
-        result.requestCancelAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
-          getDateFormat(createdAt).HH_MM_SS
-        }`;
+        result.requestCancelAt = `${
+          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
+        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
       }
 
       if (status === OrderStatusName.CANCEL_COMPLETED) {
-        result.completedCancelAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
-          getDateFormat(createdAt).HH_MM_SS
-        }`;
+        result.completedCancelAt = `${
+          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
+        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
         result.amount = amount;
       }
 
       if (status === OrderStatusName.CANCEL_REFUSAL) {
         result.refusalReason = mainReasonType[mainReason];
         result.refusalDateaildReason = detailedReason;
-        result.refusalCancelAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
-          getDateFormat(createdAt).HH_MM_SS
-        }`;
+        result.refusalCancelAt = `${
+          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
+        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
       }
 
       return result;

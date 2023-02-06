@@ -1,3 +1,8 @@
+export enum DateType {
+  DEFAULT = "DEFAULT",
+  PAYMENT = "PAYMENT",
+}
+
 export const getTodayTimeValue = () => {
   const date = new Date();
   const year = date.getFullYear();
@@ -8,8 +13,9 @@ export const getTodayTimeValue = () => {
   return today;
 };
 
-export const getDateFormat = (date: string) => {
+export const getDateFormat = (date: string, type: DateType) => {
   const KOREA_TIME_ZONE = new Date(date).getTime() - 3240 * 10000;
+  let HH_MM_SS: string;
 
   const YYYY_MM_DD_HH_MM_SS = new Date(date)
     .toISOString()
@@ -17,7 +23,16 @@ export const getDateFormat = (date: string) => {
     .replace(/\..*/, "");
 
   const YYYY_MM_DD = new Date(date).toISOString().split("T")[0];
-  const HH_MM_SS = new Date(KOREA_TIME_ZONE).toTimeString().split(" ")[0];
+
+  switch (type) {
+    case DateType.DEFAULT:
+      HH_MM_SS = new Date(KOREA_TIME_ZONE).toTimeString().split(" ")[0];
+      break;
+    case DateType.PAYMENT:
+      HH_MM_SS = new Date(date).toTimeString().split(" ")[0];
+      break;
+    default:
+  }
 
   return { YYYY_MM_DD_HH_MM_SS, YYYY_MM_DD, HH_MM_SS };
 };
