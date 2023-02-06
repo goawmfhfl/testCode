@@ -101,7 +101,11 @@ export const TdContainer = styled.div`
   border-radius: 0px 0px 7px 7px;
 `;
 
-export const Tr = styled.div<{ colorIndex?: number; isLastRow?: boolean }>`
+export const Tr = styled.div<{
+  colorIndex?: number;
+  isLastRow?: boolean;
+  height?: number;
+}>`
   display: flex;
   width: 100%;
   border-bottom: ${({ theme: { palette }, isLastRow }) => {
@@ -114,10 +118,12 @@ export const Tr = styled.div<{ colorIndex?: number; isLastRow?: boolean }>`
     if (colorIndex === 1) return palette.yellow100;
     if (colorIndex === 2) return palette.blue100;
   }};
+  height: ${({ height }) => `${height}px` || "40px"};
 `;
 
 export const Td = styled.div<{
   width: number;
+  height?: number;
   type: TableType;
 }>`
   display: flex;
@@ -135,7 +141,6 @@ export const Td = styled.div<{
     border-right: none;
   }
 
-  height: 80px;
   padding: 8px;
 
   font-family: "Spoqa Han Sans Neo";

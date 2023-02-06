@@ -657,6 +657,7 @@ const OrderTable = () => {
                   key={rowIndex}
                   colorIndex={colorIndex}
                   isLastRow={isLastRow}
+                  height={80}
                 >
                   <Td type={TableType.SCROLL} width={fixTableType[0].width}>
                     {isFirstRow && (
@@ -799,6 +800,7 @@ const OrderTable = () => {
                   key={rowIndex}
                   colorIndex={colorIndex}
                   isLastRow={isLastRow}
+                  height={80}
                 >
                   <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
                     {claimStatus}
@@ -1073,7 +1075,7 @@ const OrderTable = () => {
 
 const ProductNameTd = styled(Td)`
   justify-content: flex-start;
-  padding: 8px 0px;
+  padding: 0px;
 `;
 
 const ProductThumbNailWrapper = styled.div`
@@ -1082,7 +1084,7 @@ const ProductThumbNailWrapper = styled.div`
   align-items: center;
 
   min-width: 56px;
-  height: 80px;
+  height: 100%;
 
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
@@ -1095,7 +1097,7 @@ const ProductThumbNail = styled.img`
 const ProductName = styled.span`
   display: block;
 
-  padding: 0 6px;
+  padding: 0 8px;
 
   overflow: hidden;
   text-overflow: ellipsis;
