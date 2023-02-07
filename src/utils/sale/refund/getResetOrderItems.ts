@@ -1,17 +1,14 @@
 import { NormalizedListType } from "@models/sale/order";
-import {
-  orderStatusNameType,
-  ShipmentStatus,
-  ShipmentType,
-} from "@constants/sale";
+import { orderStatusNameType } from "@constants/sale";
 import { DateType, getDateFormat } from "@utils/date";
+
 import {
-  getStatusReason,
-  getOption,
-  getDiscountPrice,
-  getTotalPrice,
   getShipmentPrice,
-  getTotalPaymentAmount,
+  getShipmentDistantPrice,
+  getStatusReason,
+  getShipmentInfos,
+  getOption,
+  getPaymentsInfo,
 } from "@utils/sale/index";
 
 const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
@@ -27,22 +24,9 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       id: orderId,
       merchantUid,
       merchantItemUid,
-      product: { thumbnail, name: productName },
-      user: { name: userName, phoneNumber: userPhoneNumber, email: userEmail },
-      orderByShop: {
-        order: {
-          paidAt,
-          recipientName,
-          recipientAddress,
-          recipientPhoneNumber,
-          postCode,
-        },
-        shipmentConditionalPrice,
-        bundleOrderItemTotalPrice,
-        bundleShipmentDistantPrice,
-        bundleShipmentPrice,
-        bundleShipmentType,
-      },
+      product,
+      user,
+      orderByShop,
       options,
       quantity,
       discountAppliedPrice,
@@ -52,101 +36,136 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       shipmentType,
       isBundleShipment,
       orderShipmentInfos,
-      orderStatus: { name: orderStatus },
-      claimStatus: { name: claimStatus },
+      orderStatus,
+      claimStatus,
+      statusReasons,
       colorIndex,
       rowIndex,
       isLastRow,
       isFirstRow,
     } = orderByid[id];
 
-    const resetMerchantUid = merchantUid ? merchantUid : "-";
-    const resetMerchantItemUid = merchantItemUid ? merchantItemUid : "-";
-    const resetProductName = productName ? productName : "-";
-    const resetProductThumbnail = thumbnail ? thumbnail : "-";
-    const resetUserName = userName ? userName : "-";
-    const resetPaidAt = paidAt
-      ? `${getDateFormat(paidAt, DateType.PAYMENT).YYYY_MM_DD} / ${
-          getDateFormat(paidAt, DateType.PAYMENT).HH_MM_SS
-        }`
-      : "-";
+    const {
+      requestAt,
+      mainReason,
+      detailedReason,
+      completedAt,
+      refusalAt,
+      refusalReason,
+      refusalDetailedReason,
+    } = getStatusReason(statusReasons);
 
-    const resetOrderStatus = orderStatus
-      ? orderStatusNameType[orderStatus]
-      : "-";
-    const resetClaimStatus = claimStatus
-      ? orderStatusNameType[claimStatus]
-      : "-";
-    const resetOrderShipmentInfosId = orderShipmentInfos
-      ? orderShipmentInfos.filter(
-          (info) => info.status === ShipmentStatus.SHIPPING
-        )[0]?.id
-      : null;
-    const resetShipmentCompany = orderShipmentInfos
-      ? orderShipmentInfos.filter(
-          (info) => info.status === ShipmentStatus.SHIPPING
-        )[0]?.shipmentCompany
-      : null;
-    const resetShipmentNumber = orderShipmentInfos
-      ? orderShipmentInfos.filter(
-          (info) => info.status === ShipmentStatus.SHIPPING
-        )[0]?.shipmentNumber
-      : null;
+    const {
+      shippingOrderId,
+      shipmentCompany: shippingShipmentCompany,
+      shipmentNumber: shippingShipmentNumber,
+      refundOrderId,
+      refundShipmentCompany,
+      refundShipmentNumber,
+    } = getShipmentInfos(orderShipmentInfos);
 
-    const resetRecipientName = recipientName ? recipientName : "-";
-    const resetRecipientPhoneNumber = recipientPhoneNumber
-      ? recipientPhoneNumber
-      : "-";
-    const resetRecipientAddress = recipientAddress ? recipientAddress : "-";
-    const resetPostCode = postCode ? postCode : "-";
-    const resetUserEmail = userEmail ? userEmail : "-";
-    const resetUserPhoneNumber = userPhoneNumber ? userPhoneNumber : "-";
     const { optionName, optionPrice, optionQuantity } = getOption(options);
 
-    const resetQuantity = quantity ? quantity : optionQuantity;
-    const discountPrice = 0;
+    const calculateShipmentPrice: number = getShipmentPrice(
+      isBundleShipment,
+      shipmentPrice,
+      shipmentType,
+      orderByShop
+    );
+    const calculateShipmentDistantPrice: number = getShipmentDistantPrice(
+      isBundleShipment,
+      shipmentDistantPrice,
+      orderByShop
+    );
 
-    const totalPrice = 0;
-
-    const resetShipmentDistantPrice = shipmentDistantPrice
-      ? `${shipmentDistantPrice.toLocaleString("ko-KR")}`
-      : "-";
-
-    const totalPaymentAmount = 0;
-
-    const isChecked = false;
-    const isShipmentInfoEdit = false;
-    const temporaryShipmentCompany = resetShipmentCompany || "";
-    const temporaryShipmentNumber = resetShipmentNumber || 0;
+    const {
+      resetQuantity,
+      resetOriginalPrice,
+      resetDiscountPrice,
+      resetOptionPrice,
+      totalPrice,
+      totalPaymentAmount,
+    } = getPaymentsInfo(
+      originalPrice,
+      discountAppliedPrice,
+      quantity,
+      optionPrice,
+      optionQuantity,
+      calculateShipmentPrice,
+      calculateShipmentDistantPrice
+    );
 
     return {
       id: orderId,
-      merchantUid: resetMerchantUid,
-      merchantItemUid: resetMerchantItemUid,
-      thumbnail: resetProductThumbnail,
-      productName: resetProductName,
-      userName: resetUserName,
-      orderStatus: resetOrderStatus,
-      claimStatus: resetClaimStatus,
-      orderShipmentInfosId: resetOrderShipmentInfosId,
-      shipmentCompany: resetShipmentCompany,
-      shipmentNumber: resetShipmentNumber,
-      paidAt: resetPaidAt,
-      recipientName: resetRecipientName,
-      recipientPhoneNumber: resetRecipientPhoneNumber,
-      recipientAddress: resetRecipientAddress,
-      postCode: resetPostCode,
-      userEmail: resetUserEmail,
-      userPhoneNumber: resetUserPhoneNumber,
+      merchantUid: merchantUid || "-",
+      merchantItemUid: merchantItemUid || "-",
+      thumbnail: product?.thumbnail || "-",
+      productName: product?.name || "-",
+      userName: user?.name || "-",
+      orderStatus: orderStatus?.name
+        ? orderStatusNameType[orderStatus.name]
+        : "-",
+      claimStatus: claimStatus?.name
+        ? orderStatusNameType[claimStatus.name]
+        : "-",
+      paidAt: orderByShop?.order?.paidAt
+        ? `${
+            getDateFormat(orderByShop?.order?.paidAt, DateType.PAYMENT)
+              .YYYY_MM_DD
+          } / ${
+            getDateFormat(orderByShop?.order?.paidAt, DateType.PAYMENT).HH_MM_SS
+          }`
+        : "-",
+      requestAt: requestAt || "-",
+      mainReason: mainReason || "-",
+      detailedReason: detailedReason || "-",
+      completedAt: completedAt || "-",
+      shippingOrderId,
+      shippingShipmentCompany,
+      shippingShipmentNumber,
+      refundOrderId,
+      refundShipmentCompany,
+      refundShipmentNumber,
+      option: optionName || "-",
       quantity: resetQuantity,
-      totalPrice,
-      shipmentPrice: null,
-      shipmentDistantPrice: resetShipmentDistantPrice,
-      totalPaymentAmount,
-      isChecked,
-      isShipmentInfoEdit,
-      temporaryShipmentCompany,
-      temporaryShipmentNumber,
+      price: resetOriginalPrice
+        ? `${resetOriginalPrice.toLocaleString("ko-KR")}`
+        : "-",
+      optionPrice: resetOptionPrice
+        ? `${resetOptionPrice.toLocaleString("ko-KR")}`
+        : "-",
+      discountPrice: resetDiscountPrice
+        ? `${resetDiscountPrice.toLocaleString("ko-KR")}`
+        : "-",
+      totalPrice: totalPrice ? `${totalPrice.toLocaleString("ko-KR")}` : "-",
+      shipmentPrice: calculateShipmentPrice
+        ? `${calculateShipmentPrice.toLocaleString("ko-KR")}`
+        : "-",
+      shipmentDistantPrice: calculateShipmentDistantPrice
+        ? `${calculateShipmentDistantPrice.toLocaleString("ko-KR")}`
+        : "-",
+      totalPaymentAmount: totalPaymentAmount
+        ? `${totalPaymentAmount.toLocaleString("ko-KR")}`
+        : "-",
+
+      recipientName: orderByShop?.order?.recipientName || "-",
+      recipientPhoneNumber: orderByShop?.order?.recipientPhoneNumber || "-",
+      recipientAddress: orderByShop?.order?.recipientAddress || "-",
+      postCode: orderByShop?.order?.postCode || "-",
+      userEmail: user?.email || "-",
+      userPhoneNumber: user?.phoneNumber || "-",
+      refusalAt: refusalAt || "-",
+      refusalReason,
+      refusalDetailedReason: refusalDetailedReason || "-",
+
+      isChecked: false,
+      isShipmentInfoEdit: false,
+      temporaryShipmentCompany: shippingShipmentCompany || "",
+      temporaryShipmentNumber: shippingShipmentNumber || "",
+      isRefundShipmentInfoEdit: false,
+      temporaryRefundShipmentCompany: refundShipmentCompany || "",
+      temporaryRefundShipmentNumber: refundShipmentNumber || "",
+
       colorIndex,
       rowIndex,
       isLastRow,

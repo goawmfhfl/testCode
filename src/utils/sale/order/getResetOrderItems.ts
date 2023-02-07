@@ -50,12 +50,14 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
     } = getShipmentInfos(orderShipmentInfos);
 
     const { optionName, optionPrice, optionQuantity } = getOption(options);
+
     const calculateShipmentPrice: number = getShipmentPrice(
       isBundleShipment,
       shipmentPrice,
       shipmentType,
       orderByShop
     );
+
     const calculateShipmentDistantPrice: number = getShipmentDistantPrice(
       isBundleShipment,
       shipmentDistantPrice,
@@ -78,11 +80,6 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       calculateShipmentPrice,
       calculateShipmentDistantPrice
     );
-
-    const isChecked = false;
-    const isShipmentInfoEdit = false;
-    const temporaryShipmentCompany = shippingShipmentCompany || "";
-    const temporaryShipmentNumber = shippingShipmentNumber || 0;
 
     return {
       id: orderId,
@@ -133,10 +130,10 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
         ? `${totalPaymentAmount.toLocaleString("ko-KR")}`
         : "-",
 
-      isChecked,
-      isShipmentInfoEdit,
-      temporaryShipmentCompany,
-      temporaryShipmentNumber,
+      isChecked: false,
+      isShipmentInfoEdit: false,
+      temporaryShipmentCompany: shippingShipmentCompany || "",
+      temporaryShipmentNumber: shippingShipmentNumber || 0,
       colorIndex,
       rowIndex,
       isLastRow,

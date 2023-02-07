@@ -348,10 +348,18 @@ const getShipmentPrice = (orders: Array<OrderItems>) => {
 };
 
 const getShipmentDistantPrice = (orders: Array<OrderItems>) => {
-  return orders.reduce((result, { shipmentDistantPrice }) => {
-    if (shipmentDistantPrice) return (result = shipmentDistantPrice);
-    if (!shipmentDistantPrice) return (result = 0);
-  }, 0);
+  return orders.reduce(
+    (result, { orderByShop: { bundleShipmentDistantPrice } }) => {
+      if (bundleShipmentDistantPrice) {
+        return (result = bundleShipmentDistantPrice);
+      }
+
+      if (!bundleShipmentDistantPrice) {
+        return (result = 0);
+      }
+    },
+    0
+  );
 };
 
 const compareBundleShipment = (a: OrderItems, b: OrderItems) => {

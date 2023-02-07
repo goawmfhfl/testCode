@@ -112,8 +112,8 @@ export interface ResetOrderItemType {
   recipientPhoneNumber: string;
   recipientAddress?: string;
   shipmentMemo?: string;
-
   postCode?: string | number;
+
   option?: string;
   quantity?: number;
   price?: string;
@@ -125,18 +125,16 @@ export interface ResetOrderItemType {
   discountPrice: string | number;
   shipmentPrice: string;
   shipmentDistantPrice?: string | number;
-
-  mainReason?: string;
-  detailedReason?: string;
-
   totalPaymentAmount: string;
   totalRefundAmout?: string;
 
-  requestCancelAt?: string;
-  completedCancelAt?: string;
-  refusalCancelAt?: string;
+  mainReason?: string;
+  detailedReason?: string;
+  requestAt?: string;
+  completedAt?: string;
+  refusalAt?: string;
   refusalReason?: string;
-  refusalDateaildReason?: string;
+  refusalDetailedReason?: string;
 
   isChecked: boolean;
   isShipmentInfoEdit?: boolean;

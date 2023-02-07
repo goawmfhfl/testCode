@@ -638,7 +638,6 @@ const OrderTable = () => {
             resetOrderItem?.map(
               (
                 {
-                  id,
                   rowIndex,
                   merchantUid,
                   merchantItemUid,

@@ -275,6 +275,7 @@ const RefundTable = () => {
                   key={rowIndex}
                   colorIndex={colorIndex}
                   isLastRow={isLastRow}
+                  height={80}
                 >
                   <Td type={TableType.SCROLL} width={fixTableType[0].width}>
                     {isFirstRow && (
@@ -414,10 +415,10 @@ const RefundTable = () => {
               ({
                 id,
                 paidAt,
-                requestCancelAt,
+                requestAt,
                 mainReason,
                 detailedReason,
-                completedCancelAt,
+                completedAt,
                 optionName,
                 optionQuantity,
                 originalPrice,
@@ -432,10 +433,9 @@ const RefundTable = () => {
                 recipientName,
                 recipientPhoneNumber,
                 totalRefundAmout,
-                refusalCancelAt,
+                refusalAt,
                 refusalReason,
-                refusalDateaildReason,
-
+                refusalDetailedReason,
                 colorIndex,
                 rowIndex,
                 isLastRow,
@@ -445,6 +445,7 @@ const RefundTable = () => {
                   key={rowIndex}
                   colorIndex={colorIndex}
                   isLastRow={isLastRow}
+                  height={80}
                 >
                   <Td
                     type={TableType.SCROLL}
@@ -595,7 +596,7 @@ const RefundTable = () => {
 
 const ProductNameTd = styled(Td)`
   justify-content: flex-start;
-  padding: 8px 0px;
+  padding: 0px;
 `;
 
 const ProductThumbNailWrapper = styled.div`
@@ -604,7 +605,7 @@ const ProductThumbNailWrapper = styled.div`
   align-items: center;
 
   min-width: 40px;
-  height: 80px;
+  height: 100%;
 
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;

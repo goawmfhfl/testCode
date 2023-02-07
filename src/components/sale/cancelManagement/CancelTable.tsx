@@ -16,6 +16,7 @@ import {
   pageNumberListVar,
   paginationVisibilityVar,
   showHasAnyProblemModal,
+  systemModalVar,
   totalPageLengthVar,
 } from "@cache/index";
 
@@ -256,7 +257,6 @@ const CancelTable = () => {
             cancleOrderItems?.map(
               (
                 {
-                  id,
                   merchantUid,
                   merchantItemUid,
                   productName,
@@ -277,6 +277,7 @@ const CancelTable = () => {
                   key={rowIndex}
                   colorIndex={colorIndex}
                   isLastRow={isLastRow}
+                  height={80}
                 >
                   <Td type={TableType.SCROLL} width={fixTableType[0].width}>
                     {isFirstRow && (
@@ -388,50 +389,47 @@ const CancelTable = () => {
         <TdContainer>
           {!loading &&
             cancleOrderItems?.map(
-              (
-                {
-                  id,
-                  paidAt,
-                  requestCancelAt,
-                  mainReason,
-                  detailedReason,
-                  completedCancelAt,
-                  optionName,
-                  optionQuantity,
-                  originalPrice,
-                  optionPrice,
-                  discountPrice,
-                  totalPrice,
-                  shipmentPrice,
-                  shipmentDistantPrice,
-                  totalPaymentAmount,
-                  userEmail,
-                  userPhoneNumber,
-                  recipientName,
-                  recipientPhoneNumber,
-                  totalRefundAmout,
-                  refusalCancelAt,
-                  refusalReason,
-                  refusalDateaildReason,
+              ({
+                id,
+                paidAt,
+                requestAt,
+                mainReason,
+                detailedReason,
+                completedAt,
+                optionName,
+                optionQuantity,
+                originalPrice,
+                optionPrice,
+                discountPrice,
+                totalPrice,
+                shipmentPrice,
+                shipmentDistantPrice,
+                totalPaymentAmount,
+                userEmail,
+                userPhoneNumber,
+                recipientName,
+                recipientPhoneNumber,
+                totalRefundAmout,
+                refusalAt,
+                refusalReason,
+                refusalDetailedReason,
 
-                  colorIndex,
-                  rowIndex,
-                  isLastRow,
-                  isFirstRow,
-                  isChecked,
-                },
-                index
-              ) => (
+                colorIndex,
+                rowIndex,
+                isLastRow,
+                isFirstRow,
+              }) => (
                 <Tr
                   key={rowIndex}
                   colorIndex={colorIndex}
                   isLastRow={isLastRow}
+                  height={80}
                 >
                   <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
                     {paidAt}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[1].width}>
-                    {requestCancelAt}
+                    {requestAt}
                   </Td>
                   <ReasonTd
                     type={TableType.SCROLL}
@@ -471,7 +469,7 @@ const CancelTable = () => {
                     )}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[4].width}>
-                    {completedCancelAt}
+                    {completedAt}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[5].width}>
                     {optionName}
@@ -518,7 +516,7 @@ const CancelTable = () => {
                     {recipientPhoneNumber}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[19].width}>
-                    {refusalCancelAt}
+                    {refusalAt}
                   </Td>
                   <ReasonTd
                     type={TableType.SCROLL}
@@ -548,12 +546,12 @@ const CancelTable = () => {
                     )}
                   </ReasonTd>
                   <Td type={TableType.SCROLL} width={scrollTableType[21].width}>
-                    {(!isFirstRow || !refusalDateaildReason) && (
+                    {(!isFirstRow || !refusalDetailedReason) && (
                       <Reason isNeedJustifyCenter={true}>-</Reason>
                     )}
-                    {isFirstRow && refusalDateaildReason && (
+                    {isFirstRow && refusalDetailedReason && (
                       <Reason isNeedJustifyCenter={true}>
-                        {refusalDateaildReason}
+                        {refusalDetailedReason}
                       </Reason>
                     )}
                   </Td>
@@ -590,7 +588,7 @@ const CancelTable = () => {
 
 const ProductNameTd = styled(Td)`
   justify-content: flex-start;
-  padding: 8px 0px;
+  padding: 0px;
 `;
 
 const ProductThumbNailWrapper = styled.div`
@@ -599,8 +597,7 @@ const ProductThumbNailWrapper = styled.div`
   align-items: center;
 
   min-width: 40px;
-  height: 80px;
-
+  height: 100%;
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 
@@ -612,7 +609,7 @@ const ProductThumbNail = styled.img`
 const ProductName = styled.span`
   display: block;
 
-  padding: 0 6px;
+  padding: 0 8px;
 
   overflow: hidden;
   text-overflow: ellipsis;

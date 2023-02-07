@@ -1,13 +1,12 @@
-import React from "react";
+import { orderStatusNameType } from "@constants/sale";
 import { NormalizedType } from "@models/sale/index";
 import {
-  MainReason,
-  mainReasonType,
-  OrderStatusName,
-  orderStatusNameType,
-  ShipmentType,
-} from "@constants/sale";
-
+  getShipmentPrice,
+  getShipmentDistantPrice,
+  getStatusReason,
+  getOption,
+  getPaymentsInfo,
+} from "@utils/sale/index";
 import { DateType, getDateFormat } from "@utils/date";
 
 const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
@@ -33,7 +32,7 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       quantity,
       discountAppliedPrice,
       originalPrice,
-      shipmentPrice: individualShipmentPrice,
+      shipmentPrice,
       shipmentDistantPrice,
       shipmentType,
       isBundleShipment,
@@ -43,103 +42,99 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       isFirstRow,
     } = orderByid[id];
 
-    const { thumbnail, name: productName } = getProducts(product);
     const {
-      name: userName,
-      email: userEmail,
-      phoneNumber: userPhoneNumber,
-    } = getUser(user);
-
-    const resetOrderStatus = orderStatus
-      ? orderStatusNameType[orderStatus.name]
-      : "-";
-
-    const resetClaimStatus = claimStatus
-      ? orderStatusNameType[claimStatus.name]
-      : "-";
-
-    const { recipientName, recipientPhoneNumber, postCode, paidAt } =
-      getOrder(orderByShop);
-
-    const {
-      requestCancelAt,
+      requestAt,
       mainReason,
       detailedReason,
-      completedCancelAt,
+      completedAt,
       amount,
-      refusalCancelAt,
+      refusalAt,
       refusalReason,
-      refusalDateaildReason,
+      refusalDetailedReason,
     } = getStatusReason(statusReasons);
 
     const { optionName, optionPrice, optionQuantity } = getOption(options);
-    const discountPrice = getDiscountPrice(originalPrice, discountAppliedPrice);
-    const totalPrice = getTotalPrice(
-      originalPrice,
-      discountAppliedPrice,
-      optionPrice
-    );
-
-    const shipmentPrice = getShipmentPrice(
+    const calculateShipmentPrice: number = getShipmentPrice(
       isBundleShipment,
-      individualShipmentPrice,
+      shipmentPrice,
       shipmentType,
       orderByShop
     );
-
-    const totalPaymentAmount = getTotalPaymentAmount(
-      originalPrice,
-      discountAppliedPrice,
-      optionPrice,
-      shipmentPrice,
-      shipmentDistantPrice
+    const calculateShipmentDistantPrice: number = getShipmentDistantPrice(
+      isBundleShipment,
+      shipmentDistantPrice,
+      orderByShop
     );
 
-    const isChecked = false;
+    const {
+      resetQuantity,
+      resetOriginalPrice,
+      resetDiscountPrice,
+      resetOptionPrice,
+      totalPrice,
+      totalPaymentAmount,
+    } = getPaymentsInfo(
+      originalPrice,
+      discountAppliedPrice,
+      quantity,
+      optionPrice,
+      optionQuantity,
+      calculateShipmentPrice,
+      calculateShipmentDistantPrice
+    );
 
     return {
       id: orderId,
-      merchantUid,
-      merchantItemUid,
-      thumbnail,
-      productName,
-      userName,
-      orderStatus: resetOrderStatus,
-      claimStatus: resetClaimStatus,
-      paidAt,
-      requestCancelAt,
-      mainReason,
-      detailedReason,
-      completedCancelAt,
-      optionName,
-      optionQuantity: quantity ? quantity : optionQuantity,
-      originalPrice: originalPrice
-        ? `${originalPrice.toLocaleString("ko-KR")}`
+      merchantUid: merchantUid || "-",
+      merchantItemUid: merchantItemUid || "-",
+      thumbnail: product.thumbnail || "-",
+      productName: product.name || "-",
+      userName: user.name || "-",
+      orderStatus: orderStatus ? orderStatusNameType[orderStatus.name] : "-",
+      claimStatus: claimStatus ? orderStatusNameType[claimStatus.name] : "-",
+      paidAt: orderByShop?.order?.paidAt
+        ? `${
+            getDateFormat(orderByShop?.order?.paidAt, DateType.PAYMENT)
+              .YYYY_MM_DD
+          } / ${
+            getDateFormat(orderByShop?.order?.paidAt, DateType.PAYMENT).HH_MM_SS
+          }`
         : "-",
-      optionPrice: optionPrice ? `${optionPrice.toLocaleString("ko-KR")}` : "-",
-      discountPrice: discountPrice
-        ? `${discountPrice.toLocaleString("ko-KR")}`
+      requestAt: requestAt || "-",
+      mainReason: mainReason || "-",
+      detailedReason: detailedReason || "-",
+      completedAt: completedAt || "-",
+      optionName: optionName || "-",
+      quantity: resetQuantity,
+      originalPrice: resetOriginalPrice
+        ? `${resetOriginalPrice.toLocaleString("ko-KR")}`
+        : "-",
+      optionPrice: resetOptionPrice
+        ? `${resetOptionPrice.toLocaleString("ko-KR")}`
+        : "-",
+      discountPrice: resetDiscountPrice
+        ? `${resetDiscountPrice.toLocaleString("ko-KR")}`
         : "-",
       totalPrice: totalPrice ? `${totalPrice.toLocaleString("ko-KR")}` : "-",
-      shipmentPrice: shipmentPrice
-        ? `${shipmentPrice.toLocaleString("ko-KR")}`
+      shipmentPrice: calculateShipmentPrice
+        ? `${calculateShipmentPrice.toLocaleString("ko-KR")}`
         : "-",
-      shipmentDistantPrice: shipmentDistantPrice
-        ? `${shipmentDistantPrice.toLocaleString("ko-KR")}`
+      shipmentDistantPrice: calculateShipmentDistantPrice
+        ? `${calculateShipmentDistantPrice.toLocaleString("ko-KR")}`
         : "-",
       totalPaymentAmount: totalPaymentAmount
         ? `${totalPaymentAmount.toLocaleString("ko-KR")}`
         : "-",
       totalRefundAmout: amount ? `${amount.toLocaleString("ko-KR")}` : "-",
-      userEmail,
-      userPhoneNumber,
-      recipientName,
-      recipientPhoneNumber,
-      refusalCancelAt: refusalCancelAt ? refusalCancelAt : "-",
-      refusalReason,
-      refusalDateaildReason,
+      userEmail: user.email || "-",
+      userPhoneNumber: user.phoneNumber || "-",
+      recipientName: orderByShop?.order?.recipientName || "-",
+      recipientPhoneNumber: orderByShop?.order?.recipientPhoneNumber || "-",
+      refusalAt: refusalAt || "-",
+      refusalReason: refusalReason || "-",
+      refusalDetailedReason: refusalDetailedReason || "-",
 
-      isChecked,
+      isChecked: false,
       colorIndex,
       rowIndex,
       isLastRow,
@@ -147,277 +142,6 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
     };
   });
 
-  return result;
-};
-
-const getProducts = (products: { thumbnail: string; name: string }) => {
-  const hasProducts = !!products;
-
-  if (!hasProducts)
-    return {
-      thumbnail: "",
-      name: "-",
-    };
-
-  return {
-    thumbnail: products.thumbnail,
-    name: products.name,
-  };
-};
-
-const getUser = (user: {
-  name: string;
-  email: string;
-  phoneNumber: string;
-}) => {
-  const hasUser = !!user;
-  if (!hasUser)
-    return {
-      name: "-",
-      email: "-",
-      phoneNumber: "-",
-    };
-
-  const { name, email, phoneNumber } = user;
-
-  return {
-    name: name ? name : "-",
-    email: email ? email : "-",
-    phoneNumber: phoneNumber ? phoneNumber : "-",
-  };
-};
-
-const getOrder = (orderByShop: {
-  order: {
-    recipientName: string;
-    recipientPhoneNumber: string;
-    recipientAddress: string;
-    postCode: number;
-    shipmentMemo: string;
-    paidAt: string;
-  };
-}) => {
-  const hasOrder = !!orderByShop && !!orderByShop.order;
-  if (!hasOrder)
-    return {
-      recipientName: "-",
-      recipientPhoneNumber: "-",
-      recipientAddress: "-",
-      postCode: "-",
-      shipmentMemo: "-",
-      paidAt: "-",
-    };
-
-  const {
-    recipientName,
-    recipientPhoneNumber,
-    recipientAddress,
-    postCode,
-    shipmentMemo,
-    paidAt,
-  } = orderByShop.order;
-
-  return {
-    recipientName: recipientName ? recipientName : "-",
-    recipientPhoneNumber: recipientPhoneNumber ? recipientPhoneNumber : "-",
-    recipientAddress: recipientAddress ? recipientAddress : "-",
-    postCode: postCode ? postCode : "-",
-    shipmentMemo: shipmentMemo ? shipmentMemo : "-",
-    paidAt: paidAt
-      ? `${getDateFormat(paidAt, DateType.PAYMENT).YYYY_MM_DD} / ${
-          getDateFormat(paidAt, DateType.PAYMENT).HH_MM_SS
-        }`
-      : "-",
-  };
-};
-
-const getStatusReason = (
-  statusReason: Array<{
-    createdAt: string;
-    amount: number;
-    mainReason: MainReason;
-    detailedReason: string;
-    status: OrderStatusName;
-  }>
-) => {
-  const statusReasonInitailValue = {
-    requestCancelAt: "",
-    completedCancelAt: "",
-    mainReason: "",
-    detailedReason: "",
-    amount: 0,
-    refusalCancelAt: "",
-    refusalReason: "",
-    refusalDateaildReason: "",
-  };
-
-  const hasStatusReason = !!statusReason && !!statusReason.length;
-  if (!hasStatusReason) {
-    return {
-      requestCancelAt: "",
-      completedCancelAt: "",
-      mainReason: "",
-      detailedReason: "",
-      amount: 0,
-      refusalCancelAt: "",
-      refusalReason: "",
-      refusalDateaildReason: "",
-    };
-  }
-
-  return statusReason.reduce(
-    (result, { createdAt, amount, mainReason, detailedReason, status }) => {
-      if (
-        status === OrderStatusName.CANCEL_REQUEST ||
-        status === OrderStatusName.CANCEL_COMPLETED
-      ) {
-        result.mainReason = mainReasonType[mainReason];
-        result.detailedReason = detailedReason;
-        result.requestCancelAt = `${
-          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
-        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
-      }
-
-      if (status === OrderStatusName.CANCEL_COMPLETED) {
-        result.completedCancelAt = `${
-          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
-        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
-        result.amount = amount;
-      }
-
-      if (status === OrderStatusName.CANCEL_REFUSAL) {
-        result.refusalReason = mainReasonType[mainReason];
-        result.refusalDateaildReason = detailedReason;
-        result.refusalCancelAt = `${
-          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
-        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
-      }
-
-      return result;
-    },
-    statusReasonInitailValue
-  );
-};
-
-const getOption = (
-  options: Array<{
-    id: number;
-    components: Array<{
-      name: string;
-      value: string;
-    }>;
-    quantity: number;
-    price: number;
-    isRequired: boolean;
-  }>
-) => {
-  const optioninitailValue = {
-    optionName: "",
-    optionPrice: 0,
-    optionQuantity: 0,
-  };
-  const hasOption = !!options && !!options.length;
-  if (!hasOption)
-    return {
-      optionName: "",
-      optionPrice: 0,
-      optionQuantity: 0,
-    };
-
-  return options.reduce((result, { components, quantity, price }) => {
-    result.optionName += components.reduce((component, { name, value }) => {
-      if (component) {
-        component += `/ ${name} : ${value} `;
-      }
-      if (!component) {
-        component = `${name} : ${value} `;
-      }
-      return component;
-    }, "");
-
-    result.optionQuantity = quantity;
-    result.optionPrice = quantity * price;
-
-    return result;
-  }, optioninitailValue);
-};
-
-const getDiscountPrice = (
-  originalPrice: number,
-  discountAppliedPrice: number
-) => {
-  if (!discountAppliedPrice) return 0;
-
-  return discountAppliedPrice - originalPrice;
-};
-
-const getTotalPrice = (
-  originalPrice: number,
-  discountAppliedPrice: number,
-  optionPrice: number
-) => {
-  return originalPrice + optionPrice + discountAppliedPrice;
-};
-
-const getShipmentPrice = (
-  isBundleShipment: boolean,
-  shipmentPrice: number,
-  shipmentType: ShipmentType,
-  orderByShop: {
-    bundleShipmentPrice: number;
-    bundleShipmentDistantPrice: number;
-    bundleShipmentType: ShipmentType;
-    bundleOrderItemTotalPrice: number;
-    shipmentConditionalPrice: number;
-  }
-) => {
-  if (!shipmentPrice) return 0;
-
-  if (!isBundleShipment) {
-    if (shipmentType === ShipmentType.FREE) {
-      return 0;
-    }
-    if (shipmentType === ShipmentType.CHARGE) {
-      return shipmentPrice;
-    }
-  }
-
-  if (isBundleShipment && !!orderByShop) {
-    const {
-      bundleShipmentType,
-      bundleShipmentPrice,
-      bundleOrderItemTotalPrice,
-      shipmentConditionalPrice,
-    } = orderByShop;
-
-    if (bundleShipmentType === ShipmentType.FREE) {
-      return 0;
-    }
-    if (bundleShipmentType === ShipmentType.CHARGE) {
-      return bundleShipmentPrice;
-    }
-    if (bundleShipmentType === ShipmentType.CONDITIONAL_FREE) {
-      const isConditionalFree =
-        bundleOrderItemTotalPrice > shipmentConditionalPrice;
-
-      return isConditionalFree ? 0 : bundleShipmentPrice;
-    }
-  }
-};
-
-const getTotalPaymentAmount = (
-  originalPrice: number,
-  discountAppliedPrice: number,
-  optionPrice: number,
-  shipmentPrice: number,
-  shipmentDistantPrice: number
-) => {
-  const result =
-    originalPrice +
-    discountAppliedPrice +
-    optionPrice +
-    shipmentPrice +
-    shipmentDistantPrice;
   return result;
 };
 

@@ -25,16 +25,11 @@ export const getPaymentsInfo = (
   shipmentDistantPrice = shipmentDistantPrice ?? 0;
 
   const resetQuantity = quantity ? quantity : optionQuantity;
-
   const resetOriginalPrice = originalPrice * resetQuantity;
-
   const resetDiscountPrice =
     (discountAppliedPrice - originalPrice) * resetQuantity;
-
   const resetOptionPrice = optionPirce * optionQuantity;
-
   const totalPrice = resetOriginalPrice + resetOptionPrice + resetDiscountPrice;
-
   const totalPaymentAmount = totalPrice + shipmentPrice + shipmentDistantPrice;
 
   return {
@@ -57,54 +52,57 @@ export const getStatusReason = (
   }>
 ) => {
   const statusReasonInitailValue = {
-    requestCancelAt: "",
-    completedCancelAt: "",
+    requestAt: "",
+    completedAt: "",
     mainReason: "",
     detailedReason: "",
     amount: 0,
-    refusalCancelAt: "",
+    refusalAt: "",
     refusalReason: "",
-    refusalDateaildReason: "",
+    refusalDetailedReason: "",
   };
 
   const hasStatusReason = !!statusReason && !!statusReason.length;
   if (!hasStatusReason) {
-    return {
-      requestCancelAt: "",
-      completedCancelAt: "",
-      mainReason: "",
-      detailedReason: "",
-      amount: 0,
-      refusalCancelAt: "",
-      refusalReason: "",
-      refusalDateaildReason: "",
-    };
+    return statusReasonInitailValue;
   }
 
   return statusReason.reduce(
     (result, { createdAt, amount, mainReason, detailedReason, status }) => {
       if (
         status === OrderStatusName.CANCEL_REQUEST ||
-        status === OrderStatusName.CANCEL_COMPLETED
+        status === OrderStatusName.CANCEL_COMPLETED ||
+        status === OrderStatusName.REFUND_REQUEST ||
+        status === OrderStatusName.REFUND_COMPLETED ||
+        status === OrderStatusName.EXCHANGE_REQUEST ||
+        status === OrderStatusName.EXCHANGE_COMPLETED
       ) {
         result.mainReason = mainReasonType[mainReason];
         result.detailedReason = detailedReason;
-        result.requestCancelAt = `${
+        result.requestAt = `${
           getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
         } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
       }
 
-      if (status === OrderStatusName.CANCEL_COMPLETED) {
-        result.completedCancelAt = `${
+      if (
+        status === OrderStatusName.CANCEL_COMPLETED ||
+        status === OrderStatusName.REFUND_COMPLETED ||
+        status === OrderStatusName.EXCHANGE_COMPLETED
+      ) {
+        result.completedAt = `${
           getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
         } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
         result.amount = amount;
       }
 
-      if (status === OrderStatusName.CANCEL_REFUSAL) {
+      if (
+        status === OrderStatusName.CANCEL_REFUSAL ||
+        status === OrderStatusName.REFUND_REFUSAL ||
+        status === OrderStatusName.EXCHANGE_REFUSAL
+      ) {
         result.refusalReason = mainReasonType[mainReason];
-        result.refusalDateaildReason = detailedReason;
-        result.refusalCancelAt = `${
+        result.refusalDetailedReason = detailedReason;
+        result.refusalAt = `${
           getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
         } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
       }
