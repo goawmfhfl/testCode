@@ -160,16 +160,19 @@ export const GET_REFUND_ORDERS_BY_SELLER = gql`
         merchantUid
         merchantItemUid
         isBundleShipment
+
         product {
           code
           thumbnail
           name
         }
+
         user {
           name
           email
           phoneNumber
         }
+
         orderByShop {
           bundleShipmentPrice
           bundleShipmentDistantPrice
@@ -191,6 +194,9 @@ export const GET_REFUND_ORDERS_BY_SELLER = gql`
           mainReason
           detailedReason
           status
+          uploadedFileUrls {
+            url
+          }
         }
 
         options {

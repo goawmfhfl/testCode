@@ -431,19 +431,17 @@ const CancelTable = () => {
                   <Td type={TableType.SCROLL} width={scrollTableType[1].width}>
                     {requestAt}
                   </Td>
-                  <ReasonTd
+                  <MainReasonTd
                     type={TableType.SCROLL}
                     width={scrollTableType[2].width}
                   >
                     {(!isFirstRow || !mainReason) && (
-                      <Reason isNeedJustifyCenter={true}>-</Reason>
+                      <Reason isCenterAligned={true}>-</Reason>
                     )}
 
                     {isFirstRow && mainReason && (
                       <>
-                        <Reason isNeedJustifyCenter={false}>
-                          {mainReason}
-                        </Reason>
+                        <Reason isCenterAligned={false}>{mainReason}</Reason>
                         <Button
                           type={"button"}
                           size={"small"}
@@ -457,15 +455,13 @@ const CancelTable = () => {
                         </Button>
                       </>
                     )}
-                  </ReasonTd>
+                  </MainReasonTd>
                   <Td type={TableType.SCROLL} width={scrollTableType[3].width}>
                     {(!isFirstRow || !detailedReason) && (
-                      <Reason isNeedJustifyCenter={true}>-</Reason>
+                      <Reason isCenterAligned={true}>-</Reason>
                     )}
                     {isFirstRow && detailedReason && (
-                      <Reason isNeedJustifyCenter={true}>
-                        {detailedReason}
-                      </Reason>
+                      <Reason isCenterAligned={true}>{detailedReason}</Reason>
                     )}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[4].width}>
@@ -518,19 +514,17 @@ const CancelTable = () => {
                   <Td type={TableType.SCROLL} width={scrollTableType[19].width}>
                     {refusalAt}
                   </Td>
-                  <ReasonTd
+                  <MainReasonTd
                     type={TableType.SCROLL}
                     width={scrollTableType[20].width}
                   >
                     {(!isFirstRow || !refusalReason) && (
-                      <Reason isNeedJustifyCenter={true}>-</Reason>
+                      <Reason isCenterAligned={true}>-</Reason>
                     )}
 
                     {isFirstRow && refusalReason && (
                       <>
-                        <Reason isNeedJustifyCenter={false}>
-                          {refusalReason}
-                        </Reason>
+                        <Reason isCenterAligned={false}>{refusalReason}</Reason>
                         <Button
                           type={"button"}
                           size={"small"}
@@ -544,13 +538,13 @@ const CancelTable = () => {
                         </Button>
                       </>
                     )}
-                  </ReasonTd>
+                  </MainReasonTd>
                   <Td type={TableType.SCROLL} width={scrollTableType[21].width}>
                     {(!isFirstRow || !refusalDetailedReason) && (
-                      <Reason isNeedJustifyCenter={true}>-</Reason>
+                      <Reason isCenterAligned={true}>-</Reason>
                     )}
                     {isFirstRow && refusalDetailedReason && (
-                      <Reason isNeedJustifyCenter={true}>
+                      <Reason isCenterAligned={true}>
                         {refusalDetailedReason}
                       </Reason>
                     )}
@@ -560,8 +554,6 @@ const CancelTable = () => {
             )}
         </TdContainer>
       </ScrollTable>
-
-      {loading && <Loading type={TableType.SCROLL} />}
 
       {!hasCancelOrderItems && (
         <NoDataContainer type={TableType.SCROLL}>
@@ -582,6 +574,8 @@ const CancelTable = () => {
           )}
         </NoDataContainer>
       )}
+
+      {loading && <Loading type={TableType.SCROLL} />}
     </TableContainer>
   );
 };
@@ -618,15 +612,16 @@ const ProductName = styled.span`
   -webkit-box-orient: vertical;
 `;
 
-const ReasonTd = styled(Td)`
+const MainReasonTd = styled(Td)`
   display: flex;
   justify-content: space-between;
 
   padding: 0px 8px;
 `;
-const Reason = styled.span<{ isNeedJustifyCenter: boolean }>`
-  ${({ isNeedJustifyCenter }) =>
-    isNeedJustifyCenter
+
+const Reason = styled.span<{ isCenterAligned: boolean }>`
+  ${({ isCenterAligned }) =>
+    isCenterAligned
       ? css`
           margin: 0 auto;
         `

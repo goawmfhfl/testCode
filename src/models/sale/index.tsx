@@ -36,6 +36,9 @@ export interface OrderItems {
     mainReason: MainReason;
     detailedReason: string;
     status: OrderStatusName;
+    uploadedFileUrls: Array<{
+      url: string;
+    }>;
   }>;
 
   orderByShop?: {
@@ -104,9 +107,19 @@ export interface ResetOrderItemType {
   orderStatus: string;
   claimStatus: string;
 
-  orderShipmentInfosId?: number;
+  shipmentOrderId?: number;
+  isShipmentInfoEdit?: boolean;
+  temporaryShipmentCompany?: string;
+  temporaryShipmentNumber?: number;
   shipmentCompany?: string;
   shipmentNumber?: number;
+
+  refundOrderId?: number;
+  isRefundShipmentInfoEdit?: boolean;
+  refundShipmentCompany?: string;
+  refundShipmentNumber?: number;
+  temporaryRefundShipmentCompany?: string;
+  temporaryRefundShipmentNumber?: number;
 
   recipientName: string;
   recipientPhoneNumber: string;
@@ -135,11 +148,11 @@ export interface ResetOrderItemType {
   refusalAt?: string;
   refusalReason?: string;
   refusalDetailedReason?: string;
+  amount?: number | string;
+  attachedImages?: Array<{ url: string }> | null;
 
   isChecked: boolean;
-  isShipmentInfoEdit?: boolean;
-  temporaryShipmentCompany?: string;
-  temporaryShipmentNumber?: number;
+
   colorIndex: number;
   rowIndex: string;
   isLastRow: boolean;

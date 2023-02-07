@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import styled, { css } from "styled-components";
+import axios, { AxiosError } from "axios";
 import { useMutation, useReactiveVar } from "@apollo/client";
 import { cloneDeep } from "lodash";
-import styled from "styled-components";
 
 import {
   fixTableType,
@@ -49,7 +50,13 @@ import {
 } from "@cache/sale/refund";
 import { NormalizedType, OrderItems, ResetOrderItemType } from "@models/sale";
 import constructOrderItem from "@utils/sale/constructOrderItem";
-import getResetOrderItems from "@utils/sale/cancel/getResetOrderItems";
+import getResetOrderItems from "@utils/sale/refund/getResetOrderItems";
+import {
+  OrderStatusName,
+  shipmentCompanyCode,
+  ShipmentStatus,
+} from "@constants/sale";
+import { showHasServerErrorModal } from "@cache/productManagement";
 
 const RefundTable = () => {
   const { getOrders, error, loading, data } = useLazyRefundOrders();
@@ -60,6 +67,14 @@ const RefundTable = () => {
   const refundOrderItems = useReactiveVar(refundOrderItemsVar);
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
+
+  const [shipmentCompanys, setShipmentCompanys] = useState<
+    Array<{
+      Code: string;
+      International: boolean;
+      Name: string;
+    }>
+  >([]);
 
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newOrderItems = cloneDeep(refundOrderItems);
@@ -110,6 +125,103 @@ const RefundTable = () => {
         checkedOrderItemsVar(filteredOrderItems);
         newOrderItems[index].isChecked = false;
       }
+      refundOrderItemsVar(newOrderItems);
+    };
+
+  const changeShipmentNumberHandler =
+    (index: number, shipmentStatus: ShipmentStatus) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newOrderItems = cloneDeep(refundOrderItems);
+      const newCheckedOrderItems = cloneDeep(checkedOrderItems);
+
+      if (shipmentStatus === ShipmentStatus.SHIPPING) {
+        newOrderItems[index].temporaryShipmentNumber = Number(e.target.value);
+      }
+      if (shipmentStatus === ShipmentStatus.REFUND_PICK_UP) {
+        newOrderItems[index].temporaryRefundShipmentNumber = Number(
+          e.target.value
+        );
+      }
+
+      refundOrderItemsVar(newOrderItems);
+
+      if (newCheckedOrderItems.length > 0) {
+        const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
+          (list) => list.id === newOrderItems[index].id
+        );
+
+        if (findCheckedOrderItemsIndex !== -1) {
+          newCheckedOrderItems[
+            findCheckedOrderItemsIndex
+          ].temporaryShipmentNumber = Number(e.target.value);
+
+          if (shipmentStatus === ShipmentStatus.SHIPPING) {
+            newCheckedOrderItems[
+              findCheckedOrderItemsIndex
+            ].temporaryShipmentNumber = Number(e.target.value);
+          }
+          if (shipmentStatus === ShipmentStatus.REFUND_PICK_UP) {
+            newCheckedOrderItems[
+              findCheckedOrderItemsIndex
+            ].temporaryRefundShipmentNumber = Number(e.target.value);
+          }
+        }
+
+        checkedOrderItemsVar(newCheckedOrderItems);
+      }
+    };
+
+  const changeShipmentCompanyHandler =
+    (index: number, shipmentStatus: ShipmentStatus) =>
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const newOrderItems = cloneDeep(refundOrderItems);
+      const newCheckedOrderItems = cloneDeep(checkedOrderItems);
+
+      if (shipmentStatus === ShipmentStatus.SHIPPING) {
+        newOrderItems[index].temporaryShipmentCompany = e.target.value;
+      }
+      if (shipmentStatus === ShipmentStatus.REFUND_PICK_UP) {
+        newOrderItems[index].temporaryRefundShipmentCompany = e.target.value;
+      }
+
+      refundOrderItemsVar(newOrderItems);
+
+      if (newCheckedOrderItems.length > 0) {
+        const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
+          (list) => list.id === newOrderItems[index].id
+        );
+
+        if (findCheckedOrderItemsIndex !== -1) {
+          if (shipmentStatus === ShipmentStatus.SHIPPING) {
+            newCheckedOrderItems[
+              findCheckedOrderItemsIndex
+            ].temporaryShipmentCompany = e.target.value;
+          }
+          if (shipmentStatus === ShipmentStatus.REFUND_PICK_UP) {
+            newCheckedOrderItems[
+              findCheckedOrderItemsIndex
+            ].temporaryRefundShipmentCompany = e.target.value;
+          }
+        }
+
+        checkedOrderItemsVar(newCheckedOrderItems);
+      }
+    };
+
+  const handleEditButtonClick =
+    (id: number, shipmentStatus: ShipmentStatus) => () => {
+      const newOrderItems = cloneDeep(refundOrderItems);
+
+      const findOrderItmeIndex = newOrderItems.findIndex(
+        (orderItem) => orderItem.id === id
+      );
+      if (shipmentStatus === ShipmentStatus.SHIPPING) {
+        newOrderItems[findOrderItmeIndex].isShipmentInfoEdit = true;
+      }
+      if (shipmentStatus === ShipmentStatus.REFUND_PICK_UP) {
+        newOrderItems[findOrderItmeIndex].isRefundShipmentInfoEdit = true;
+      }
+
       refundOrderItemsVar(newOrderItems);
     };
 
@@ -213,6 +325,47 @@ const RefundTable = () => {
     }
   }, [error]);
 
+  useEffect(() => {
+    void (async () => {
+      try {
+        const parameter = {
+          params: { t_key: process.env.REACT_APP_SWEETTRAKER_API_KEY },
+        };
+
+        const response = await axios.get(
+          "https://info.sweettracker.co.kr/api/v1/companylist",
+          parameter
+        );
+
+        const {
+          data: { Company },
+        } = response as {
+          data: {
+            Company: Array<{
+              Code: string;
+              International: boolean;
+              Name: string;
+            }>;
+          };
+        };
+
+        setShipmentCompanys(Company);
+      } catch (error) {
+        const errors = error as Error | AxiosError;
+
+        if (axios.isAxiosError(errors)) {
+          const { msg } = errors.response.data as {
+            status: boolean;
+            msg: string;
+            code: string;
+          };
+
+          showHasServerErrorModal(msg, "택배사 리스트 요청");
+        }
+      }
+    })();
+  }, []);
+
   const hasRefundOrderItems =
     !!refundOrderItems && !!refundOrderItems.length && !loading;
   const isFetchingOrderItemsFailed = !loading && !error && hasRefundOrderItems;
@@ -254,7 +407,6 @@ const RefundTable = () => {
             refundOrderItems.map(
               (
                 {
-                  id,
                   merchantUid,
                   merchantItemUid,
                   productName,
@@ -262,7 +414,6 @@ const RefundTable = () => {
                   userName,
                   orderStatus,
                   claimStatus,
-
                   colorIndex,
                   rowIndex,
                   isLastRow,
@@ -285,14 +436,12 @@ const RefundTable = () => {
                       />
                     )}
                   </Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={fixTableType[1].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={fixTableType[2].width}
-                  ></Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[1].width}>
+                    {merchantUid}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[2].width}>
+                    {merchantItemUid}
+                  </Td>
                   <ProductNameTd
                     type={TableType.SCROLL}
                     width={fixTableType[3].width}
@@ -302,18 +451,15 @@ const RefundTable = () => {
                     </ProductThumbNailWrapper>
                     <ProductName>{productName}</ProductName>
                   </ProductNameTd>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={fixTableType[4].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={fixTableType[5].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={fixTableType[6].width}
-                  ></Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[4].width}>
+                    {userName}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[5].width}>
+                    {orderStatus}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[6].width}>
+                    {claimStatus}
+                  </Td>
                 </Tr>
               )
             )}
@@ -412,164 +558,572 @@ const RefundTable = () => {
         <TdContainer>
           {hasRefundOrderItems &&
             refundOrderItems.map(
-              ({
-                id,
-                paidAt,
-                requestAt,
-                mainReason,
-                detailedReason,
-                completedAt,
-                optionName,
-                optionQuantity,
-                originalPrice,
-                optionPrice,
-                discountPrice,
-                totalPrice,
-                shipmentPrice,
-                shipmentDistantPrice,
-                totalPaymentAmount,
-                userEmail,
-                userPhoneNumber,
-                recipientName,
-                recipientPhoneNumber,
-                totalRefundAmout,
-                refusalAt,
-                refusalReason,
-                refusalDetailedReason,
-                colorIndex,
-                rowIndex,
-                isLastRow,
-                isFirstRow,
-              }) => (
+              (
+                {
+                  id,
+                  paidAt,
+                  requestAt,
+                  mainReason,
+                  detailedReason,
+                  claimStatus,
+                  attachedImages,
+                  completedAt,
+
+                  shipmentOrderId,
+                  shipmentCompany,
+                  shipmentNumber,
+                  isShipmentInfoEdit,
+                  temporaryShipmentCompany,
+                  temporaryShipmentNumber,
+
+                  refundOrderId,
+                  refundShipmentCompany,
+                  refundShipmentNumber,
+                  isRefundShipmentInfoEdit,
+                  temporaryRefundShipmentCompany,
+                  temporaryRefundShipmentNumber,
+
+                  option,
+                  quantity,
+                  originalPrice,
+                  optionPrice,
+                  discountPrice,
+                  totalPrice,
+                  shipmentPrice,
+                  shipmentDistantPrice,
+                  totalPaymentAmount,
+                  amount,
+
+                  userEmail,
+                  userPhoneNumber,
+                  recipientName,
+                  recipientPhoneNumber,
+                  recipientAddress,
+                  postCode,
+
+                  refusalAt,
+                  refusalReason,
+                  refusalDetailedReason,
+                  colorIndex,
+                  rowIndex,
+                  isLastRow,
+                  isFirstRow,
+                },
+                index
+              ) => (
                 <Tr
                   key={rowIndex}
                   colorIndex={colorIndex}
                   isLastRow={isLastRow}
                   height={80}
                 >
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[0].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[1].width}
-                  ></Td>
-                  <Td
+                  <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
+                    {paidAt}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[1].width}>
+                    {requestAt}
+                  </Td>
+                  <MainReasonTd
                     type={TableType.SCROLL}
                     width={scrollTableType[2].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[3].width}
-                  ></Td>
-                  <Td
+                  >
+                    {(!isFirstRow || !mainReason) && (
+                      <Reason isCenterAligned={true}>-</Reason>
+                    )}
+
+                    {isFirstRow && mainReason && (
+                      <>
+                        <Reason isCenterAligned={false}>{mainReason}</Reason>
+                        <Button
+                          type={"button"}
+                          size={"small"}
+                          width={"55px"}
+                          disabled={
+                            statusName === OrderStatusName.REFUND_COMPLETED ||
+                            claimStatus === "환불 오류"
+                          }
+                        >
+                          수정
+                        </Button>
+                      </>
+                    )}
+                  </MainReasonTd>
+
+                  <Td type={TableType.SCROLL} width={scrollTableType[3].width}>
+                    {(!isFirstRow || !detailedReason) && (
+                      <Reason isCenterAligned={true}>-</Reason>
+                    )}
+
+                    {isFirstRow && detailedReason && (
+                      <Reason isCenterAligned={true}>{detailedReason}</Reason>
+                    )}
+                  </Td>
+
+                  <AttachedImageTd
                     type={TableType.SCROLL}
                     width={scrollTableType[4].width}
-                  ></Td>
-                  <Td
+                  >
+                    {!!attachedImages && !!attachedImages.length
+                      ? attachedImages.map(({ url }) => (
+                          <AttachedImage src={url} />
+                        ))
+                      : "-"}
+                  </AttachedImageTd>
+                  <Td type={TableType.SCROLL} width={scrollTableType[5].width}>
+                    {completedAt}
+                  </Td>
+                  <ShipmentColumn
                     type={TableType.SCROLL}
-                    width={scrollTableType[5].width}
-                  ></Td>
-                  <Td
+                    width={scrollTableType[6].width + scrollTableType[7].width}
+                    as={"form"}
+                    action="http://info.sweettracker.co.kr/tracking/5"
+                    method="post"
+                    target="_black"
+                  >
+                    <ShipmentTemplateInput
+                      type="text"
+                      id="t_key"
+                      name="t_key"
+                      value={process.env.REACT_APP_SWEETTRAKER_API_KEY}
+                      readOnly={true}
+                    />
+                    <ShipmentCompanyTd width={scrollTableType[6].width}>
+                      {isFirstRow ? (
+                        <>
+                          {shipmentCompany ? (
+                            isShipmentInfoEdit ? (
+                              <Dropdown
+                                onChange={changeShipmentCompanyHandler(
+                                  index,
+                                  ShipmentStatus.SHIPPING
+                                )}
+                                arrowSrc={triangleArrowSvg}
+                                value={temporaryShipmentCompany}
+                                sizing={"medium"}
+                                width={"104px"}
+                                disabled={claimStatus === "환불 완료"}
+                              >
+                                <Option hidden value="default">
+                                  택배사
+                                </Option>
+                                {shipmentCompanys.map(({ Code, Name }) => (
+                                  <Option key={Code} value={Code}>
+                                    {Name}
+                                  </Option>
+                                ))}
+                              </Dropdown>
+                            ) : (
+                              <>
+                                <ShipmentTemplateInput
+                                  type="text"
+                                  id="t_code"
+                                  name="t_code"
+                                  value={shipmentCompany}
+                                  readOnly={true}
+                                />
+                                {shipmentCompanyCode[shipmentCompany]}
+                              </>
+                            )
+                          ) : (
+                            <Dropdown
+                              onChange={changeShipmentCompanyHandler(
+                                index,
+                                ShipmentStatus.SHIPPING
+                              )}
+                              arrowSrc={triangleArrowSvg}
+                              value={temporaryShipmentCompany}
+                              sizing={"medium"}
+                              width={"104px"}
+                              disabled={claimStatus === "환불 완료"}
+                            >
+                              <Option hidden value="default">
+                                택배사
+                              </Option>
+                              {shipmentCompanys.map(({ Code, Name }) => (
+                                <Option key={Code} value={Code}>
+                                  {Name}
+                                </Option>
+                              ))}
+                            </Dropdown>
+                          )}
+                        </>
+                      ) : shipmentCompany ? (
+                        shipmentCompanyCode[shipmentCompany]
+                      ) : (
+                        "-"
+                      )}
+                    </ShipmentCompanyTd>
+                    <ShipmnetNumberTd width={scrollTableType[7].width}>
+                      {isFirstRow ? (
+                        <>
+                          {shipmentNumber ? (
+                            isShipmentInfoEdit ? (
+                              <ShipmnetNumberContainer>
+                                <EditShipmentNumberInput
+                                  type="text"
+                                  onChange={changeShipmentNumberHandler(
+                                    index,
+                                    ShipmentStatus.SHIPPING
+                                  )}
+                                  disabled={claimStatus === "환불 완료"}
+                                  width={"145px"}
+                                  value={
+                                    temporaryShipmentNumber === 0
+                                      ? ""
+                                      : temporaryShipmentNumber
+                                  }
+                                />
+                                <Button type="button" size="small" width="55px">
+                                  저장
+                                </Button>
+                              </ShipmnetNumberContainer>
+                            ) : (
+                              <ShipmnetNumberContainer>
+                                <ShipmnetNumber>
+                                  {shipmentNumber}
+                                </ShipmnetNumber>
+                                <ShipmentTemplateInput
+                                  type="text"
+                                  id="t_invoice"
+                                  name="t_invoice"
+                                  value={shipmentNumber}
+                                  readOnly={true}
+                                />
+                                <ButtonContainer>
+                                  <Button
+                                    size="small"
+                                    width="55px"
+                                    onClick={handleEditButtonClick(
+                                      id,
+                                      ShipmentStatus.SHIPPING
+                                    )}
+                                    disabled={claimStatus === "환불 완료"}
+                                    backgroundColor={"#fff"}
+                                    borderColor={"#BBC0C6"}
+                                    type="button"
+                                  >
+                                    수정
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    width="55px"
+                                    backgroundColor={"#414A5B"}
+                                    color={"#fff"}
+                                    type="submit"
+                                  >
+                                    조회
+                                  </Button>
+                                </ButtonContainer>
+                              </ShipmnetNumberContainer>
+                            )
+                          ) : (
+                            <ShipmnetNumberContainer>
+                              <ShipmnetNumberInput
+                                onChange={changeShipmentNumberHandler(
+                                  index,
+                                  ShipmentStatus.SHIPPING
+                                )}
+                                disabled={claimStatus === "환불 완료"}
+                                width={"145px"}
+                                value={
+                                  temporaryShipmentNumber === 0
+                                    ? ""
+                                    : temporaryShipmentNumber
+                                }
+                              />
+                              <SubmitButton
+                                size="small"
+                                disabled={claimStatus === "환불 완료"}
+                                width={"55px"}
+                                backgroundColor={"#fff"}
+                                borderColor={"#BBC0C6"}
+                                type="button"
+                              >
+                                발송
+                              </SubmitButton>
+                            </ShipmnetNumberContainer>
+                          )}
+                        </>
+                      ) : shipmentNumber ? (
+                        shipmentNumber
+                      ) : (
+                        "-"
+                      )}
+                    </ShipmnetNumberTd>
+                  </ShipmentColumn>
+                  <ShipmentColumn
                     type={TableType.SCROLL}
-                    width={scrollTableType[6].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[7].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[8].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[9].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[10].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[11].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[12].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[13].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[14].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[15].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[16].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[17].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[18].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[19].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[20].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[21].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[22].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[23].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[24].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[25].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[26].width}
-                  ></Td>
-                  <Td
+                    width={scrollTableType[8].width + scrollTableType[9].width}
+                    as={"form"}
+                    action="http://info.sweettracker.co.kr/tracking/5"
+                    method="post"
+                    target="_black"
+                  >
+                    <ShipmentTemplateInput
+                      type="text"
+                      id="t_key"
+                      name="t_key"
+                      value={process.env.REACT_APP_SWEETTRAKER_API_KEY}
+                      readOnly={true}
+                    />
+                    <ShipmentCompanyTd width={scrollTableType[8].width}>
+                      {isFirstRow ? (
+                        <>
+                          {refundShipmentCompany ? (
+                            isRefundShipmentInfoEdit ? (
+                              <Dropdown
+                                onChange={changeShipmentCompanyHandler(
+                                  index,
+                                  ShipmentStatus.REFUND_PICK_UP
+                                )}
+                                arrowSrc={triangleArrowSvg}
+                                value={temporaryRefundShipmentCompany}
+                                sizing={"medium"}
+                                width={"104px"}
+                                disabled={claimStatus === "환불 완료"}
+                              >
+                                <Option hidden value="default">
+                                  택배사
+                                </Option>
+                                {shipmentCompanys.map(({ Code, Name }) => (
+                                  <Option key={Code} value={Code}>
+                                    {Name}
+                                  </Option>
+                                ))}
+                              </Dropdown>
+                            ) : (
+                              <>
+                                <ShipmentTemplateInput
+                                  type="text"
+                                  id="t_code"
+                                  name="t_code"
+                                  value={refundShipmentCompany}
+                                  readOnly={true}
+                                />
+                                {shipmentCompanyCode[refundShipmentCompany]}
+                              </>
+                            )
+                          ) : (
+                            <Dropdown
+                              onChange={changeShipmentCompanyHandler(
+                                index,
+                                ShipmentStatus.REFUND_PICK_UP
+                              )}
+                              arrowSrc={triangleArrowSvg}
+                              value={temporaryRefundShipmentCompany}
+                              sizing={"medium"}
+                              width={"104px"}
+                              disabled={claimStatus === "환불 완료"}
+                            >
+                              <Option hidden value="default">
+                                택배사
+                              </Option>
+                              {shipmentCompanys.map(({ Code, Name }) => (
+                                <Option key={Code} value={Code}>
+                                  {Name}
+                                </Option>
+                              ))}
+                            </Dropdown>
+                          )}
+                        </>
+                      ) : refundShipmentCompany ? (
+                        shipmentCompanyCode[refundShipmentCompany]
+                      ) : (
+                        "-"
+                      )}
+                    </ShipmentCompanyTd>
+                    <ShipmnetNumberTd width={scrollTableType[9].width}>
+                      {isFirstRow ? (
+                        <>
+                          {refundShipmentNumber ? (
+                            isRefundShipmentInfoEdit ? (
+                              <ShipmnetNumberContainer>
+                                <EditShipmentNumberInput
+                                  type="text"
+                                  onChange={changeShipmentNumberHandler(
+                                    index,
+                                    ShipmentStatus.REFUND_PICK_UP
+                                  )}
+                                  disabled={claimStatus === "환불 완료"}
+                                  width={"145px"}
+                                  value={
+                                    temporaryRefundShipmentNumber === 0
+                                      ? ""
+                                      : temporaryRefundShipmentNumber
+                                  }
+                                />
+                                <Button type="button" size="small" width="55px">
+                                  저장
+                                </Button>
+                              </ShipmnetNumberContainer>
+                            ) : (
+                              <ShipmnetNumberContainer>
+                                <ShipmnetNumber>
+                                  {refundShipmentNumber}
+                                </ShipmnetNumber>
+                                <ShipmentTemplateInput
+                                  type="text"
+                                  id="t_invoice"
+                                  name="t_invoice"
+                                  value={refundShipmentNumber}
+                                  readOnly={true}
+                                />
+                                <ButtonContainer>
+                                  <Button
+                                    size="small"
+                                    width="55px"
+                                    onClick={handleEditButtonClick(
+                                      id,
+                                      ShipmentStatus.REFUND_PICK_UP
+                                    )}
+                                    backgroundColor={"#fff"}
+                                    borderColor={"#BBC0C6"}
+                                    type="button"
+                                    disabled={claimStatus === "환불 완료"}
+                                  >
+                                    수정
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    width="55px"
+                                    backgroundColor={"#414A5B"}
+                                    color={"#fff"}
+                                    type="submit"
+                                  >
+                                    조회
+                                  </Button>
+                                </ButtonContainer>
+                              </ShipmnetNumberContainer>
+                            )
+                          ) : (
+                            <ShipmnetNumberContainer>
+                              <ShipmnetNumberInput
+                                onChange={changeShipmentNumberHandler(
+                                  index,
+                                  ShipmentStatus.REFUND_PICK_UP
+                                )}
+                                disabled={claimStatus === "환불 완료"}
+                                width={"145px"}
+                                value={
+                                  temporaryRefundShipmentNumber === 0
+                                    ? ""
+                                    : temporaryRefundShipmentNumber
+                                }
+                              />
+                              <SubmitButton
+                                size="small"
+                                disabled={claimStatus === "환불 완료"}
+                                width={"55px"}
+                                backgroundColor={"#fff"}
+                                borderColor={"#BBC0C6"}
+                                type="button"
+                              >
+                                수거
+                              </SubmitButton>
+                            </ShipmnetNumberContainer>
+                          )}
+                        </>
+                      ) : refundShipmentNumber ? (
+                        refundShipmentNumber
+                      ) : (
+                        "-"
+                      )}
+                    </ShipmnetNumberTd>
+                  </ShipmentColumn>
+                  <Td type={TableType.SCROLL} width={scrollTableType[10].width}>
+                    {option}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[11].width}>
+                    {quantity}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[12].width}>
+                    {originalPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[13].width}>
+                    {optionPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[14].width}>
+                    {discountPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[15].width}>
+                    {totalPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[16].width}>
+                    {shipmentPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[17].width}>
+                    {shipmentDistantPrice}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[18].width}>
+                    {totalPaymentAmount}
+                  </Td>
+
+                  <Td type={TableType.SCROLL} width={scrollTableType[19].width}>
+                    {amount}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[20].width}>
+                    {userEmail}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[21].width}>
+                    {userPhoneNumber}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[22].width}>
+                    {recipientName}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[23].width}>
+                    {recipientPhoneNumber}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[24].width}>
+                    {recipientAddress}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[25].width}>
+                    {postCode}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[26].width}>
+                    {refusalAt}
+                  </Td>
+                  <MainReasonTd
                     type={TableType.SCROLL}
                     width={scrollTableType[27].width}
-                  ></Td>
-                  <Td
-                    type={TableType.SCROLL}
-                    width={scrollTableType[28].width}
-                  ></Td>
+                  >
+                    {(!isFirstRow || !refusalReason) && (
+                      <Reason isCenterAligned={true}>-</Reason>
+                    )}
+
+                    {isFirstRow && refusalReason && (
+                      <>
+                        <Reason isCenterAligned={false}>{refusalReason}</Reason>
+                        <Button
+                          type={"button"}
+                          size={"small"}
+                          width={"55px"}
+                          disabled={
+                            statusName === OrderStatusName.REFUND_COMPLETED ||
+                            claimStatus === "환불 오류"
+                          }
+                        >
+                          수정
+                        </Button>
+                      </>
+                    )}
+                  </MainReasonTd>
+
+                  <Td type={TableType.SCROLL} width={scrollTableType[28].width}>
+                    {(!isFirstRow || !refusalDetailedReason) && (
+                      <Reason isCenterAligned={true}>-</Reason>
+                    )}
+
+                    {isFirstRow && refusalDetailedReason && (
+                      <Reason isCenterAligned={true}>
+                        {refusalDetailedReason}
+                      </Reason>
+                    )}
+                  </Td>
                 </Tr>
               )
             )}
         </TdContainer>
       </ScrollTable>
-
-      {loading && <Loading type={TableType.SCROLL} />}
 
       {!hasRefundOrderItems && (
         <NoDataContainer type={TableType.SCROLL}>
@@ -590,9 +1144,20 @@ const RefundTable = () => {
           )}
         </NoDataContainer>
       )}
+
+      {loading && <Loading type={TableType.SCROLL} />}
     </TableContainer>
   );
 };
+
+const AttachedImageTd = styled(Td)`
+  gap: 6px;
+`;
+
+const AttachedImage = styled.img`
+  height: 24px;
+  width: 24px;
+`;
 
 const ProductNameTd = styled(Td)`
   justify-content: flex-start;
@@ -625,6 +1190,93 @@ const ProductName = styled.span`
   display: -webkit-box;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
+`;
+
+const MainReasonTd = styled(Td)`
+  display: flex;
+  justify-content: space-between;
+
+  padding: 0px 8px;
+`;
+
+const Reason = styled.span<{ isCenterAligned: boolean }>`
+  ${({ isCenterAligned }) =>
+    isCenterAligned
+      ? css`
+          margin: 0 auto;
+        `
+      : css``}
+`;
+
+const ShipmentColumn = styled(Td)`
+  padding: 0px;
+`;
+
+const Dropdown = styled(SelectInput)`
+  padding-right: 16px;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`;
+
+const ShipmnetNumberInput = styled(Input)`
+  margin-right: 0px;
+`;
+
+const EditShipmentNumberInput = styled(Input)`
+  margin-right: 4px;
+`;
+
+const ShipmentCompanyTd = styled.div<{ width: number }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-width: ${({ width }) => `${width}px`};
+  height: 100%;
+  border-right: 1px solid ${({ theme }) => theme.palette.grey500};
+`;
+
+const ShipmnetNumberTd = styled.div<{ width: number }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: ${({ width }) => `${width}px`};
+  overflow: hidden;
+`;
+
+const ShipmnetNumberContainer = styled.div`
+  width: 100%;
+  padding: 0px 8px 0px 8px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const ShipmnetNumber = styled.span`
+  width: 100%;
+  margin-right: 8px;
+
+  text-align: center;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`;
+
+const ShipmentTemplateInput = styled.input`
+  display: none;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+`;
+
+const SubmitButton = styled(Button)`
+  border-left: none;
 `;
 
 export default RefundTable;

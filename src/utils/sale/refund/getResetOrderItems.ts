@@ -46,6 +46,7 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
     } = orderByid[id];
 
     const {
+      attachedImages,
       requestAt,
       mainReason,
       detailedReason,
@@ -53,10 +54,11 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       refusalAt,
       refusalReason,
       refusalDetailedReason,
+      amount,
     } = getStatusReason(statusReasons);
 
     const {
-      shippingOrderId,
+      shipmentOrderId,
       shipmentCompany: shippingShipmentCompany,
       shipmentNumber: shippingShipmentNumber,
       refundOrderId,
@@ -119,16 +121,20 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       requestAt: requestAt || "-",
       mainReason: mainReason || "-",
       detailedReason: detailedReason || "-",
+      attachedImages:
+        !!attachedImages && !!attachedImages.length ? attachedImages : null,
       completedAt: completedAt || "-",
-      shippingOrderId,
-      shippingShipmentCompany,
-      shippingShipmentNumber,
+
+      shipmentOrderId,
+      shipmentCompany: shippingShipmentCompany,
+      shipmentNumber: shippingShipmentNumber,
       refundOrderId,
       refundShipmentCompany,
       refundShipmentNumber,
+
       option: optionName || "-",
       quantity: resetQuantity,
-      price: resetOriginalPrice
+      originalPrice: resetOriginalPrice
         ? `${resetOriginalPrice.toLocaleString("ko-KR")}`
         : "-",
       optionPrice: resetOptionPrice
@@ -147,6 +153,7 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       totalPaymentAmount: totalPaymentAmount
         ? `${totalPaymentAmount.toLocaleString("ko-KR")}`
         : "-",
+      amount: amount ? `${amount.toLocaleString("ko-KR")}` : "-",
 
       recipientName: orderByShop?.order?.recipientName || "-",
       recipientPhoneNumber: orderByShop?.order?.recipientPhoneNumber || "-",
@@ -161,10 +168,11 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       isChecked: false,
       isShipmentInfoEdit: false,
       temporaryShipmentCompany: shippingShipmentCompany || "",
-      temporaryShipmentNumber: shippingShipmentNumber || "",
+      temporaryShipmentNumber: shippingShipmentNumber || 0,
+
       isRefundShipmentInfoEdit: false,
       temporaryRefundShipmentCompany: refundShipmentCompany || "",
-      temporaryRefundShipmentNumber: refundShipmentNumber || "",
+      temporaryRefundShipmentNumber: refundShipmentNumber || 0,
 
       colorIndex,
       rowIndex,

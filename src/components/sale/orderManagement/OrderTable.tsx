@@ -767,7 +767,7 @@ const OrderTable = () => {
                   colorIndex,
                   claimStatus,
                   orderStatus,
-                  orderShipmentInfosId,
+                  shipmentOrderId,
                   shipmentCompany,
                   shipmentNumber,
                   paidAt,
@@ -903,7 +903,7 @@ const OrderTable = () => {
                                   width="55px"
                                   onClick={handleSaveButtonClick(
                                     id,
-                                    orderShipmentInfosId,
+                                    shipmentOrderId,
                                     temporaryShipmentCompany,
                                     temporaryShipmentNumber,
                                     ShipmentStatus.SHIPPING
@@ -1130,7 +1130,7 @@ const ShipmentCompanyTd = styled.div<{ width: number }>`
   justify-content: center;
   align-items: center;
 
-  width: ${({ width }) => `${width}px`};
+  min-width: ${({ width }) => `${width}px`};
   height: 100%;
   border-right: 1px solid ${({ theme }) => theme.palette.grey500};
 `;

@@ -44,7 +44,7 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
     } = orderByid[id];
 
     const {
-      shippingOrderId,
+      shipmentOrderId,
       shipmentCompany: shippingShipmentCompany,
       shipmentNumber: shippingShipmentNumber,
     } = getShipmentInfos(orderShipmentInfos);
@@ -90,7 +90,7 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       userName: user?.name || "-",
       orderStatus: orderStatus ? orderStatusNameType[orderStatus.name] : "-",
       claimStatus: claimStatus ? orderStatusNameType[claimStatus.name] : "-",
-      orderShipmentInfosId: shippingOrderId,
+      shipmentOrderId,
       shipmentCompany: shippingShipmentCompany,
       shipmentNumber: shippingShipmentNumber,
       paidAt: orderByShop?.order?.paidAt

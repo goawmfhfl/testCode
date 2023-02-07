@@ -49,9 +49,23 @@ export const getStatusReason = (
     mainReason: MainReason;
     detailedReason: string;
     status: OrderStatusName;
+
+    uploadedFileUrls: Array<{
+      url: string;
+    }>;
   }>
 ) => {
-  const statusReasonInitailValue = {
+  const statusReasonInitailValue: {
+    requestAt: string;
+    completedAt: string;
+    mainReason: string;
+    detailedReason: string;
+    amount: number;
+    refusalAt: string;
+    refusalReason: string;
+    refusalDetailedReason: string;
+    attachedImages: Array<{ url: string }>;
+  } = {
     requestAt: "",
     completedAt: "",
     mainReason: "",
@@ -60,6 +74,7 @@ export const getStatusReason = (
     refusalAt: "",
     refusalReason: "",
     refusalDetailedReason: "",
+    attachedImages: [],
   };
 
   const hasStatusReason = !!statusReason && !!statusReason.length;
@@ -68,7 +83,17 @@ export const getStatusReason = (
   }
 
   return statusReason.reduce(
-    (result, { createdAt, amount, mainReason, detailedReason, status }) => {
+    (
+      result,
+      {
+        createdAt,
+        amount,
+        mainReason,
+        detailedReason,
+        status,
+        uploadedFileUrls,
+      }
+    ) => {
       if (
         status === OrderStatusName.CANCEL_REQUEST ||
         status === OrderStatusName.CANCEL_COMPLETED ||
@@ -82,6 +107,7 @@ export const getStatusReason = (
         result.requestAt = `${
           getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
         } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
+        result.attachedImages = uploadedFileUrls;
       }
 
       if (
@@ -242,7 +268,7 @@ export const getShipmentInfos = (
   }>
 ) => {
   const orderShipmentInfoInitailValue: {
-    shippingOrderId?: number;
+    shipmentOrderId?: number;
     shipmentCompany?: string;
     shipmentNumber?: number;
     refundOrderId?: number;
@@ -255,7 +281,7 @@ export const getShipmentInfos = (
     exchangeAgainShipmentCompany?: string;
     exchangeAgainShipmentNumber?: number;
   } = {
-    shippingOrderId: null,
+    shipmentOrderId: null,
     shipmentCompany: null,
     shipmentNumber: null,
     refundOrderId: null,
@@ -277,27 +303,27 @@ export const getShipmentInfos = (
     return orderShipmentInfos.reduce(
       (result, { id, shipmentCompany, shipmentNumber, status }) => {
         if (status === ShipmentStatus.SHIPPING) {
-          result.shippingOrderId = id;
-          (result.shipmentCompany = shipmentCompany),
-            (result.shipmentNumber = shipmentNumber);
+          result.shipmentOrderId = id;
+          result.shipmentCompany = shipmentCompany;
+          result.shipmentNumber = shipmentNumber;
         }
 
         if (status === ShipmentStatus.REFUND_PICK_UP) {
           result.refundOrderId = id;
-          (result.refundShipmentCompany = shipmentCompany),
-            (result.refundShipmentNumber = shipmentNumber);
+          result.refundShipmentCompany = shipmentCompany;
+          result.refundShipmentNumber = shipmentNumber;
         }
 
         if (status === ShipmentStatus.EXCHANGE_PICK_UP) {
           result.exchangeOrderId = id;
-          (result.exchangeShipmentCompany = shipmentCompany),
-            (result.exchangeShipmentNumber = shipmentNumber);
+          result.exchangeShipmentCompany = shipmentCompany;
+          result.exchangeShipmentNumber = shipmentNumber;
         }
 
         if (status === ShipmentStatus.EXCHANGE_PICK_UP_AGAIN) {
           result.exchangeAgainOrderId = id;
-          (result.exchangeAgainShipmentCompany = shipmentCompany),
-            (result.exchangeAgainShipmentNumber = shipmentNumber);
+          result.exchangeAgainShipmentCompany = shipmentCompany;
+          result.exchangeAgainShipmentNumber = shipmentNumber;
         }
 
         return result;
