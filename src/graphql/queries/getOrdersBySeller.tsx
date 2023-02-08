@@ -108,6 +108,7 @@ export const GET_CANCEL_ORDERS_BY_SELLER = gql`
           }
         }
         statusReasons {
+          id
           createdAt
           amount
           mainReason
@@ -189,6 +190,7 @@ export const GET_REFUND_ORDERS_BY_SELLER = gql`
         }
 
         statusReasons {
+          id
           createdAt
           amount
           mainReason

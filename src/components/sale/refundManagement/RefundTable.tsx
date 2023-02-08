@@ -16,6 +16,7 @@ import {
   checkAllBoxStatusVar,
   paginationVisibilityVar,
   systemModalVar,
+  modalVar,
 } from "@cache/index";
 
 import { TableType } from "@models/index";
@@ -24,6 +25,29 @@ import useLazyRefundOrders from "@hooks/order/useLazyRefundOrders";
 
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 
+import {
+  checkedOrderItemsVar,
+  filterOptionVar,
+  refundOrderItemsVar,
+} from "@cache/sale/refund";
+import { NormalizedType, OrderItems, ResetOrderItemType } from "@models/sale";
+import constructOrderItem from "@utils/sale/constructOrderItem";
+import getResetOrderItems from "@utils/sale/refund/getResetOrderItems";
+import {
+  OrderStatusName,
+  shipmentCompanyCode,
+  ShipmentStatus,
+} from "@constants/sale";
+import { showHasServerErrorModal } from "@cache/productManagement";
+import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
+import { GET_REFUND_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+import { EDIT_SHIPMENT_NUMBER } from "@graphql/mutations/editShipmentNumber";
+import {
+  EditShipmentNumberInputType,
+  EditShipmentNumberType,
+  SendOrderItemsInputType,
+  SendOrderItemsType,
+} from "@models/sale/order";
 import {
   FixedTable,
   TableContainer,
@@ -43,20 +67,8 @@ import {
 } from "@components/common/input/Dropdown";
 import Button from "@components/common/Button";
 import { Input } from "@components/common/input/TextInput";
-import {
-  checkedOrderItemsVar,
-  filterOptionVar,
-  refundOrderItemsVar,
-} from "@cache/sale/refund";
-import { NormalizedType, OrderItems, ResetOrderItemType } from "@models/sale";
-import constructOrderItem from "@utils/sale/constructOrderItem";
-import getResetOrderItems from "@utils/sale/refund/getResetOrderItems";
-import {
-  OrderStatusName,
-  shipmentCompanyCode,
-  ShipmentStatus,
-} from "@constants/sale";
-import { showHasServerErrorModal } from "@cache/productManagement";
+
+import EditReasonModal from "@components/sale/refundManagement/EditReasonModal";
 
 const RefundTable = () => {
   const { getOrders, error, loading, data } = useLazyRefundOrders();
@@ -64,10 +76,63 @@ const RefundTable = () => {
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
+  const [sendOrderItems] = useMutation<
+    SendOrderItemsType,
+    {
+      input: SendOrderItemsInputType;
+    }
+  >(SEND_ORDER_ITEMS, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    refetchQueries: [
+      {
+        query: GET_REFUND_ORDERS_BY_SELLER,
+        variables: {
+          input: {
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
+          },
+        },
+      },
+      "GetOrdersBySeller",
+    ],
+  });
+
+  const [editShipmentNumber] = useMutation<
+    EditShipmentNumberType,
+    {
+      input: EditShipmentNumberInputType;
+    }
+  >(EDIT_SHIPMENT_NUMBER, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    refetchQueries: [
+      {
+        query: GET_REFUND_ORDERS_BY_SELLER,
+        variables: {
+          input: {
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
+          },
+        },
+      },
+      "GetOrdersBySeller",
+    ],
+  });
+
   const refundOrderItems = useReactiveVar(refundOrderItemsVar);
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
-
   const [shipmentCompanys, setShipmentCompanys] = useState<
     Array<{
       Code: string;
@@ -223,6 +288,16 @@ const RefundTable = () => {
       }
 
       refundOrderItemsVar(newOrderItems);
+    };
+
+  const handleEditReasonModalClick =
+    (statusReasonId: number, status: OrderStatusName) => () => {
+      modalVar({
+        isVisible: true,
+        component: (
+          <EditReasonModal statusReasonId={statusReasonId} status={status} />
+        ),
+      });
     };
 
   useEffect(() => {
@@ -565,24 +640,23 @@ const RefundTable = () => {
                   requestAt,
                   mainReason,
                   detailedReason,
+                  statusReasonId,
+                  reasonStatus,
                   claimStatus,
                   attachedImages,
                   completedAt,
-
                   shipmentOrderId,
                   shipmentCompany,
                   shipmentNumber,
                   isShipmentInfoEdit,
                   temporaryShipmentCompany,
                   temporaryShipmentNumber,
-
                   refundOrderId,
                   refundShipmentCompany,
                   refundShipmentNumber,
                   isRefundShipmentInfoEdit,
                   temporaryRefundShipmentCompany,
                   temporaryRefundShipmentNumber,
-
                   option,
                   quantity,
                   originalPrice,
@@ -593,17 +667,17 @@ const RefundTable = () => {
                   shipmentDistantPrice,
                   totalPaymentAmount,
                   amount,
-
                   userEmail,
                   userPhoneNumber,
                   recipientName,
                   recipientPhoneNumber,
                   recipientAddress,
                   postCode,
-
                   refusalAt,
                   refusalReason,
                   refusalDetailedReason,
+                  refusalReasonStatus,
+                  refusalStatusReasonId,
                   colorIndex,
                   rowIndex,
                   isLastRow,
@@ -642,6 +716,7 @@ const RefundTable = () => {
                             statusName === OrderStatusName.REFUND_COMPLETED ||
                             claimStatus === "환불 오류"
                           }
+                          onClick={handleEditReasonModalClick(id, reasonStatus)}
                         >
                           수정
                         </Button>
@@ -694,7 +769,7 @@ const RefundTable = () => {
                             isShipmentInfoEdit ? (
                               <Dropdown
                                 onChange={changeShipmentCompanyHandler(
-                                  index,
+                                  statusReasonId,
                                   ShipmentStatus.SHIPPING
                                 )}
                                 arrowSrc={triangleArrowSvg}
@@ -999,7 +1074,7 @@ const RefundTable = () => {
                             <ShipmnetNumberContainer>
                               <ShipmnetNumberInput
                                 onChange={changeShipmentNumberHandler(
-                                  index,
+                                  refusalStatusReasonId,
                                   ShipmentStatus.REFUND_PICK_UP
                                 )}
                                 disabled={claimStatus === "환불 완료"}
@@ -1101,6 +1176,10 @@ const RefundTable = () => {
                             statusName === OrderStatusName.REFUND_COMPLETED ||
                             claimStatus === "환불 오류"
                           }
+                          onClick={handleEditReasonModalClick(
+                            id,
+                            refusalReasonStatus
+                          )}
                         >
                           수정
                         </Button>

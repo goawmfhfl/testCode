@@ -384,7 +384,7 @@ export const optionListType: Array<{
   },
 ];
 
-export const refusalOptionListType: Array<{
+export const refusalCancelOrRefundOptionList: Array<{
   id: number;
   label: string;
   value: MainReason;
@@ -421,6 +421,54 @@ export const refusalOptionListType: Array<{
   },
   {
     id: 6,
+    label: mainReasonType.OTHER_REASONS,
+    value: MainReason.OTHER_REASONS,
+  },
+];
+
+export const refusalExchangeOptionList: Array<{
+  id: number;
+  label: string;
+  value: MainReason;
+}> = [
+  {
+    id: 0,
+    label: mainReasonType.DEFAULT,
+    value: MainReason.DEFAULT,
+  },
+  {
+    id: 1,
+    label: mainReasonType.CUSTOM_MADE,
+    value: MainReason.CUSTOM_MADE,
+  },
+  {
+    id: 2,
+    label: mainReasonType.REFUSAL_BY_CUSTOMER_REQUEST,
+    value: MainReason.REFUSAL_BY_CUSTOMER_REQUEST,
+  },
+  {
+    id: 3,
+    label: mainReasonType.PRODUCT_ALREADY_READY,
+    value: MainReason.PRODUCT_ALREADY_READY,
+  },
+  {
+    id: 4,
+    label: mainReasonType.SENSE_TRACE_OF_USE,
+    value: MainReason.SENSE_TRACE_OF_USE,
+  },
+  {
+    id: 5,
+    label: mainReasonType.DAMAGED_BY_CUSTOMER,
+    value: MainReason.DAMAGED_BY_CUSTOMER,
+  },
+  {
+    // 교환할 상품 재고 부족 Type필요
+    id: 6,
+    label: mainReasonType.DAMAGED_BY_CUSTOMER,
+    value: MainReason.DAMAGED_BY_CUSTOMER,
+  },
+  {
+    id: 7,
     label: mainReasonType.OTHER_REASONS,
     value: MainReason.OTHER_REASONS,
   },

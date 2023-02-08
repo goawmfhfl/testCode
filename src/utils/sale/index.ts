@@ -44,6 +44,7 @@ export const getPaymentsInfo = (
 
 export const getStatusReason = (
   statusReason: Array<{
+    id: number;
     createdAt: string;
     amount: number;
     mainReason: MainReason;
@@ -60,20 +61,29 @@ export const getStatusReason = (
     completedAt: string;
     mainReason: string;
     detailedReason: string;
+    reasonStatus: OrderStatusName;
+    statusReasonId: number;
     amount: number;
     refusalAt: string;
     refusalReason: string;
     refusalDetailedReason: string;
+    refusalReasonStatus: OrderStatusName;
+    refusalStatusReasonId: number;
+
     attachedImages: Array<{ url: string }>;
   } = {
     requestAt: "",
     completedAt: "",
     mainReason: "",
     detailedReason: "",
+    reasonStatus: null,
+    refusalStatusReasonId: null,
     amount: 0,
     refusalAt: "",
     refusalReason: "",
     refusalDetailedReason: "",
+    refusalReasonStatus: null,
+    statusReasonId: null,
     attachedImages: [],
   };
 
@@ -86,6 +96,7 @@ export const getStatusReason = (
     (
       result,
       {
+        id,
         createdAt,
         amount,
         mainReason,
@@ -102,8 +113,10 @@ export const getStatusReason = (
         status === OrderStatusName.EXCHANGE_REQUEST ||
         status === OrderStatusName.EXCHANGE_COMPLETED
       ) {
+        result.statusReasonId = id;
         result.mainReason = mainReasonType[mainReason];
         result.detailedReason = detailedReason;
+        result.reasonStatus = status;
         result.requestAt = `${
           getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
         } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
@@ -126,8 +139,10 @@ export const getStatusReason = (
         status === OrderStatusName.REFUND_REFUSAL ||
         status === OrderStatusName.EXCHANGE_REFUSAL
       ) {
+        result.refusalStatusReasonId = id;
         result.refusalReason = mainReasonType[mainReason];
         result.refusalDetailedReason = detailedReason;
+        result.refusalReasonStatus = status;
         result.refusalAt = `${
           getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
         } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;

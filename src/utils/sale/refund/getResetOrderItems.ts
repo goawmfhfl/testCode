@@ -50,12 +50,18 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       requestAt,
       mainReason,
       detailedReason,
+      reasonStatus,
+      statusReasonId,
       completedAt,
       refusalAt,
       refusalReason,
       refusalDetailedReason,
+      refusalReasonStatus,
+      refusalStatusReasonId,
       amount,
     } = getStatusReason(statusReasons);
+
+    console.log([{ reasonStatus }, { refusalReasonStatus }]);
 
     const {
       shipmentOrderId,
@@ -121,6 +127,8 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       requestAt: requestAt || "-",
       mainReason: mainReason || "-",
       detailedReason: detailedReason || "-",
+      reasonStatus,
+      statusReasonId,
       attachedImages:
         !!attachedImages && !!attachedImages.length ? attachedImages : null,
       completedAt: completedAt || "-",
@@ -164,6 +172,8 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       refusalAt: refusalAt || "-",
       refusalReason,
       refusalDetailedReason: refusalDetailedReason || "-",
+      refusalReasonStatus,
+      refusalStatusReasonId,
 
       isChecked: false,
       isShipmentInfoEdit: false,

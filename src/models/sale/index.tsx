@@ -31,6 +31,7 @@ export interface OrderItems {
   };
 
   statusReasons?: Array<{
+    id: number;
     createdAt: string;
     amount: number;
     mainReason: MainReason;
@@ -143,11 +144,15 @@ export interface ResetOrderItemType {
 
   mainReason?: string;
   detailedReason?: string;
+  reasonStatus?: OrderStatusName;
+  statusReasonId?: number;
   requestAt?: string;
   completedAt?: string;
   refusalAt?: string;
   refusalReason?: string;
   refusalDetailedReason?: string;
+  refusalReasonStatus?: OrderStatusName;
+  refusalStatusReasonId?: number;
   amount?: number | string;
   attachedImages?: Array<{ url: string }> | null;
 
@@ -183,4 +188,17 @@ export interface NormalizedType {
     allIds: Array<string>;
     byId: { [key: string]: OrderItems };
   };
+}
+
+export interface EditStatusReasonBySellerType {
+  editStatusReasonBySeller: {
+    ok: boolean;
+    error?: string;
+  };
+}
+
+export interface EditStatusReasonBySellerInputType {
+  statusReasonId: number;
+  mainReason: MainReason;
+  detailedReason: string;
 }

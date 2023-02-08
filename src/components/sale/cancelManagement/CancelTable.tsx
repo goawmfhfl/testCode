@@ -51,7 +51,6 @@ import Button from "@components/common/Button";
 import getResetOrderItems from "@utils/sale/cancel/getResetOrderItems";
 import { Input } from "@components/common/input/TextInput";
 import EditReasonModal from "@components/sale/cancelManagement/EditReasonModal";
-import EditRefusalReasonModal from "@components/sale/cancelManagement/EditRefusalReasonModal";
 
 const CancelTable = () => {
   const { getOrders, error, loading, data } = useLazyCancelOrders();
@@ -115,19 +114,15 @@ const CancelTable = () => {
       cancleOrderItemsVar(newOrderItems);
     };
 
-  const handleReasonModalClick = (orderItemId: number) => () => {
-    modalVar({
-      isVisible: true,
-      component: <EditReasonModal orderItemId={orderItemId} />,
-    });
-  };
-
-  const handleEditRefusalReasonModalClick = (orderItemId: number) => () => {
-    modalVar({
-      isVisible: true,
-      component: <EditRefusalReasonModal orderItemId={orderItemId} />,
-    });
-  };
+  const handleEditReasonModalClick =
+    (statusReasonId: number, status: OrderStatusName) => () => {
+      modalVar({
+        isVisible: true,
+        component: (
+          <EditReasonModal statusReasonId={statusReasonId} status={status} />
+        ),
+      });
+    };
 
   useEffect(() => {
     void (async () => {
@@ -395,6 +390,8 @@ const CancelTable = () => {
                 requestAt,
                 mainReason,
                 detailedReason,
+                reasonStatus,
+                statusReasonId,
                 completedAt,
                 optionName,
                 optionQuantity,
@@ -413,7 +410,8 @@ const CancelTable = () => {
                 refusalAt,
                 refusalReason,
                 refusalDetailedReason,
-
+                refusalReasonStatus,
+                refusalStatusReasonId,
                 colorIndex,
                 rowIndex,
                 isLastRow,
@@ -446,7 +444,10 @@ const CancelTable = () => {
                           type={"button"}
                           size={"small"}
                           width={"55px"}
-                          onClick={handleReasonModalClick(id)}
+                          onClick={handleEditReasonModalClick(
+                            statusReasonId,
+                            reasonStatus
+                          )}
                           disabled={
                             statusName === OrderStatusName.CANCEL_COMPLETED
                           }
@@ -529,7 +530,10 @@ const CancelTable = () => {
                           type={"button"}
                           size={"small"}
                           width={"55px"}
-                          onClick={handleEditRefusalReasonModalClick(id)}
+                          onClick={handleEditReasonModalClick(
+                            refusalStatusReasonId,
+                            refusalReasonStatus
+                          )}
                           disabled={
                             statusName === OrderStatusName.CANCEL_COMPLETED
                           }

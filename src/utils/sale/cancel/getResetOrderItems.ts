@@ -46,11 +46,15 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       requestAt,
       mainReason,
       detailedReason,
+      reasonStatus,
+      statusReasonId,
       completedAt,
       amount,
       refusalAt,
       refusalReason,
       refusalDetailedReason,
+      refusalReasonStatus,
+      refusalStatusReasonId,
     } = getStatusReason(statusReasons);
 
     const { optionName, optionPrice, optionQuantity } = getOption(options);
@@ -103,6 +107,8 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       requestAt: requestAt || "-",
       mainReason: mainReason || "-",
       detailedReason: detailedReason || "-",
+      reasonStatus,
+      statusReasonId,
       completedAt: completedAt || "-",
       optionName: optionName || "-",
       quantity: resetQuantity,
@@ -133,6 +139,8 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       refusalAt: refusalAt || "-",
       refusalReason: refusalReason || "-",
       refusalDetailedReason: refusalDetailedReason || "-",
+      refusalReasonStatus,
+      refusalStatusReasonId,
 
       isChecked: false,
       colorIndex,
