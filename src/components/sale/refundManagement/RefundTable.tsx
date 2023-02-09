@@ -687,21 +687,21 @@ const RefundTable = () => {
               checked={checkAllBoxStatus}
             />
           </Th>
-          <Th width={fixTableType[1].width} type={TableType.SCROLL}>
+          {/* <Th width={fixTableType[1].width} type={TableType.SCROLL}>
             {fixTableType[1].label}
           </Th>
           <Th width={fixTableType[2].width} type={TableType.SCROLL}>
             {fixTableType[2].label}
-          </Th>
+          </Th> */}
           <Th width={fixTableType[3].width} type={TableType.SCROLL}>
             {fixTableType[3].label}
           </Th>
-          <Th width={fixTableType[4].width} type={TableType.SCROLL}>
+          {/* <Th width={fixTableType[4].width} type={TableType.SCROLL}>
             {fixTableType[4].label}
           </Th>
           <Th width={fixTableType[5].width} type={TableType.SCROLL}>
             {fixTableType[5].label}
-          </Th>
+          </Th> */}
           <Th width={fixTableType[6].width} type={TableType.SCROLL}>
             {fixTableType[6].label}
           </Th>
@@ -740,12 +740,12 @@ const RefundTable = () => {
                       />
                     )}
                   </Td>
-                  <Td type={TableType.SCROLL} width={fixTableType[1].width}>
+                  {/* <Td type={TableType.SCROLL} width={fixTableType[1].width}>
                     {merchantUid}
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[2].width}>
                     {merchantItemUid}
-                  </Td>
+                  </Td> */}
                   <ProductNameTd
                     type={TableType.SCROLL}
                     width={fixTableType[3].width}
@@ -755,12 +755,12 @@ const RefundTable = () => {
                     </ProductThumbNailWrapper>
                     <ProductName>{productName}</ProductName>
                   </ProductNameTd>
-                  <Td type={TableType.SCROLL} width={fixTableType[4].width}>
+                  {/* <Td type={TableType.SCROLL} width={fixTableType[4].width}>
                     {userName}
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[5].width}>
                     {orderStatus}
-                  </Td>
+                  </Td> */}
                   <Td type={TableType.SCROLL} width={fixTableType[6].width}>
                     {claimStatus}
                   </Td>
@@ -1279,8 +1279,8 @@ const RefundTable = () => {
                                   onClick={handleSaveButtonClick(
                                     id,
                                     refundOrderId,
-                                    temporaryShipmentCompany,
-                                    temporaryShipmentNumber,
+                                    temporaryRefundShipmentCompany,
+                                    temporaryRefundShipmentNumber,
                                     ShipmentStatus.REFUND_PICK_UP
                                   )}
                                 >

@@ -132,10 +132,13 @@ const Controller = () => {
 
     const { isShipmentCompanyFullFilled, isShipmentNumberFullFilled } =
       reconstructCheckedOrderItems.reduce(
-        (result, { temporaryShipmentCompany, temporaryShipmentNumber }) => {
-          if (!temporaryShipmentCompany)
+        (
+          result,
+          { temporaryRefundShipmentCompany, temporaryRefundShipmentNumber }
+        ) => {
+          if (!temporaryRefundShipmentCompany)
             result.isShipmentCompanyFullFilled = false;
-          if (!temporaryShipmentNumber)
+          if (!temporaryRefundShipmentNumber)
             result.isShipmentCompanyFullFilled = false;
 
           return result;
@@ -183,10 +186,14 @@ const Controller = () => {
             loadingSpinnerVisibilityVar(true);
 
             const components = reconstructCheckedOrderItems.map(
-              ({ id, temporaryShipmentCompany, temporaryShipmentNumber }) => ({
+              ({
+                id,
+                temporaryRefundShipmentCompany,
+                temporaryRefundShipmentNumber,
+              }) => ({
                 orderItemId: id,
-                shipmentCompany: temporaryShipmentCompany,
-                shipmentNumber: Number(temporaryShipmentNumber),
+                shipmentCompany: temporaryRefundShipmentCompany,
+                shipmentNumber: Number(temporaryRefundShipmentNumber),
               })
             );
 
@@ -196,7 +203,10 @@ const Controller = () => {
               },
             } = await sendOrderItems({
               variables: {
-                input: { components: components, type: SendType.SEND },
+                input: {
+                  components: components,
+                  type: SendType.REFUND_PICK_UP,
+                },
               },
             });
 

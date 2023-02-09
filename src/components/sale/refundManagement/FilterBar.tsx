@@ -113,7 +113,11 @@ const FilterBar = () => {
         isActvie={statusName === null}
         onClick={handleFilterOptionNameClick(null)}
       >
-        전체 {totalPageLength}
+        전체{" "}
+        {refundRequest +
+          refundPickUpInProgress +
+          refundPickUpCompleted +
+          refundCompleted}
       </Filter>
       <Filter
         isActvie={statusName === OrderStatusName.REFUND_REQUEST}
