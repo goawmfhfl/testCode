@@ -7,6 +7,46 @@ import {
 } from "@constants/sale";
 import { DateType, getDateFormat } from "@utils/date";
 
+export const getOrdersLength = (
+  orders: Array<{
+    orderStatus: { name: OrderStatusName };
+    claimStatus: { name: OrderStatusName };
+  }>
+) => {
+  return orders.reduce(
+    (result, { orderStatus, claimStatus }) => {
+      if (orderStatus.name === OrderStatusName.CANCEL_REQUEST) {
+        result.cancelRequest++;
+      }
+      if (orderStatus.name === OrderStatusName.CANCEL_COMPLETED) {
+        result.cancelCompleted++;
+      }
+      if (claimStatus.name === OrderStatusName.REFUND_REQUEST) {
+        result.refundRequest++;
+      }
+      if (claimStatus.name === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS) {
+        result.refundPickUpInProgress++;
+      }
+      if (claimStatus.name === OrderStatusName.REFUND_PICK_UP_COMPLETED) {
+        result.refundPickUpCompleted++;
+      }
+      if (claimStatus.name === OrderStatusName.REFUND_COMPLETED) {
+        result.refundCompleted++;
+      }
+
+      return result;
+    },
+    {
+      cancelRequest: 0,
+      cancelCompleted: 0,
+      refundRequest: 0,
+      refundPickUpInProgress: 0,
+      refundPickUpCompleted: 0,
+      refundCompleted: 0,
+    }
+  );
+};
+
 export const getPaymentsInfo = (
   originalPrice: number,
   discountAppliedPrice: number,

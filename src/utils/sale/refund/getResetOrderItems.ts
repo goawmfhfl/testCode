@@ -61,8 +61,6 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       amount,
     } = getStatusReason(statusReasons);
 
-    console.log([{ reasonStatus }, { refusalReasonStatus }]);
-
     const {
       shipmentOrderId,
       shipmentCompany: shippingShipmentCompany,

@@ -27,6 +27,7 @@ import {
   OrderStatusType,
   OrderStatusName,
   optionListType,
+  SendType,
 } from "@constants/sale";
 import { useMutation, useReactiveVar } from "@apollo/client";
 import { checkedOrderItemsVar } from "@cache/sale";
@@ -320,7 +321,7 @@ const Controller = () => {
               },
             } = await sendOrderItems({
               variables: {
-                input: { components },
+                input: { components: components, type: SendType.SEND },
               },
             });
 

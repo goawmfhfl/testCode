@@ -1,5 +1,12 @@
 import { SearchQueryType } from "@models/sale";
 
+export enum SendType {
+  SEND = "SEND",
+  REFUND_PICK_UP = "REFUND_PICK_UP",
+  EXCHANGE_PICK_UP = "EXCHANGE_PICK_UP",
+  EXCHANGE_RESEND = "EXCHANGE_RESEND",
+}
+
 export enum OrderSearchType {
   RECIPIENT_NAME = "RECIPIENT_NAME",
   RECIPIENT_PHONE_NUMBER = "RECIPIENT_PHONE_NUMBER",
@@ -78,8 +85,6 @@ export enum OrderStatusName {
   EXCHANGE_REFUSAL = "EXCHANGE_REFUSAL",
   EXCHANGE_ERROR = "EXCHANGE_ERROR",
   CONFIRM_PURCHASE = "CONFIRM_PURCHASE",
-  PICK_UP_IN_PROGRESS = "PICK_UP_IN_PROGRESS",
-  PICK_UP_COMPLETED = "PICK_UP_COMPLETED",
 }
 
 export const orderStatusNameType = {

@@ -10,7 +10,7 @@ import {
   scrollTableType,
   tableWidth,
 } from "@constants/sale/orderManagement/table";
-import { ShipmentStatus, shipmentCompanyCode } from "@constants/sale";
+import { ShipmentStatus, shipmentCompanyCode, SendType } from "@constants/sale";
 
 import {
   filterOptionVar,
@@ -300,6 +300,7 @@ const OrderTable = () => {
                         shipmentNumber,
                       },
                     ],
+                    type: SendType.SEND,
                   },
                 },
               });
@@ -399,6 +400,25 @@ const OrderTable = () => {
 
               if (ok) {
                 loadingSpinnerVisibilityVar(false);
+                const newOrderItems = cloneDeep(resetOrderItem);
+
+                const findOrderItmeIndex = newOrderItems.findIndex(
+                  ({ id }) => id === orderItemId
+                );
+                const filterdOrderItems = newOrderItems.filter(
+                  (orderItem) => orderItem.id === orderItemId
+                );
+
+                newOrderItems[findOrderItmeIndex].isShipmentInfoEdit = false;
+
+                filterdOrderItems.forEach((_, index) => {
+                  newOrderItems[findOrderItmeIndex + index].shipmentCompany =
+                    shipmentCompany;
+                  newOrderItems[findOrderItmeIndex + index].shipmentNumber =
+                    shipmentNumber;
+                });
+
+                resetOrderItemVar(newOrderItems);
 
                 systemModalVar({
                   ...systemModalVar(),
@@ -413,28 +433,6 @@ const OrderTable = () => {
                   confirmButtonVisibility: true,
                   cancelButtonVisibility: false,
                   confirmButtonClickHandler: () => {
-                    const newOrderItems = cloneDeep(resetOrderItem);
-
-                    const findOrderItmeIndex = newOrderItems.findIndex(
-                      ({ id }) => id === orderItemId
-                    );
-                    const filterdOrderItems = newOrderItems.filter(
-                      (orderItem) => orderItem.id === orderItemId
-                    );
-
-                    newOrderItems[findOrderItmeIndex].isShipmentInfoEdit =
-                      false;
-
-                    filterdOrderItems.forEach((_, index) => {
-                      newOrderItems[
-                        findOrderItmeIndex + index
-                      ].shipmentCompany = shipmentCompany;
-                      newOrderItems[findOrderItmeIndex + index].shipmentNumber =
-                        shipmentNumber;
-                    });
-
-                    resetOrderItemVar(newOrderItems);
-
                     systemModalVar({
                       ...systemModalVar(),
                       isVisible: false,

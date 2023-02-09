@@ -24,7 +24,6 @@ import Button from "@components/common/Button";
 
 const FilterBar = () => {
   const { data, getOrderStatus } = useLazyOrderStatus();
-
   const { statusName } = useReactiveVar(filterOptionVar);
   const totalPageLength = useReactiveVar(totalPageLengthVar);
   const orders = data?.getOrdersBySeller.totalOrderItems || [];
@@ -38,7 +37,7 @@ const FilterBar = () => {
       });
       paginationSkipVar(0);
 
-      if (filterOptionName === null) {
+      if (!filterOptionName) {
         filterOptionVar({
           ...filterOptionVar(),
           statusName: null,

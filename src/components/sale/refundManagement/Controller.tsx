@@ -1,28 +1,83 @@
 import React, { useState } from "react";
 import styled from "styled-components/macro";
-import { useReactiveVar } from "@apollo/client";
+import { useMutation, useReactiveVar } from "@apollo/client";
 
-import { filterOptionVar } from "@cache/sale/refund";
-import { commonFilterOptionVar, paginationSkipVar } from "@cache/index";
-import { OrderSearchType, searchQueryType } from "@constants/sale";
+import {
+  checkedOrderItemsVar,
+  filterOptionVar,
+  refundOrderItemsVar,
+} from "@cache/sale/refund";
+import {
+  checkAllBoxStatusVar,
+  commonFilterOptionVar,
+  loadingSpinnerVisibilityVar,
+  paginationSkipVar,
+  showHasAnyProblemModal,
+  systemModalVar,
+} from "@cache/index";
+import { OrderSearchType, searchQueryType, SendType } from "@constants/sale";
 import { skipQuantityType } from "@constants/index";
 import { changeOrderStatusType } from "@constants/sale/refundManagement/index";
 
+import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
+
+import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
+import { GET_REFUND_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+
 import questionMarkSrc from "@icons/questionmark.svg";
+import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 
 import ControllerContainer from "@components/sale/ControllerContainer";
 import Button from "@components/common/Button";
 import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
+import {
+  SendOrderItemsInputType,
+  SendOrderItemsType,
+} from "@models/sale/order";
+import { showHasServerErrorModal } from "@cache/productManagement";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } =
     useReactiveVar(filterOptionVar);
 
+  const [sendOrderItems] = useMutation<
+    SendOrderItemsType,
+    {
+      input: SendOrderItemsInputType;
+    }
+  >(SEND_ORDER_ITEMS, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    refetchQueries: [
+      {
+        query: GET_REFUND_ORDERS_BY_SELLER,
+        variables: {
+          input: {
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
+          },
+        },
+      },
+      "GetOrdersBySeller",
+    ],
+  });
+
   const [showNotice, setShowNotice] = useState<boolean>(false);
   const [temporaryQuery, setTemporaryQuery] = useState<string>("");
+
+  const refundOrderItems = useReactiveVar(refundOrderItemsVar);
+  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
+  const reconstructCheckedOrderItems =
+    getReconstructCheckedOrderItems(checkedOrderItems);
+  const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
 
   const changeOrderStatusHandler = (
     e: React.ChangeEvent<HTMLSelectElement>
@@ -52,10 +107,137 @@ const Controller = () => {
 
     paginationSkipVar(0);
   };
+
+  const handleSendButtonClick = () => {
+    if (!checkedOrderItems.length) {
+      showHasAnyProblemModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
+      return;
+    }
+
+    // showHasAnyProblemModal(
+    //   <>
+    //     해당 버튼은 선택하신
+    //     <br />
+    //     주문건을 처리할 수 없습니다.
+    //     <br />
+    //     주문 상태를 다시 확인해주세요.
+    //   </>
+    // );
+
+    const { isShipmentCompanyFullFilled, isShipmentNumberFullFilled } =
+      reconstructCheckedOrderItems.reduce(
+        (result, { temporaryShipmentCompany, temporaryShipmentNumber }) => {
+          if (!temporaryShipmentCompany)
+            result.isShipmentCompanyFullFilled = false;
+          if (!temporaryShipmentNumber)
+            result.isShipmentCompanyFullFilled = false;
+
+          return result;
+        },
+        {
+          isShipmentCompanyFullFilled: true,
+          isShipmentNumberFullFilled: true,
+        }
+      );
+
+    if (!isShipmentCompanyFullFilled || !isShipmentNumberFullFilled) {
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        icon: exclamationmarkSrc,
+        description: <>송장정보를 기입해주세요</>,
+        cancelButtonVisibility: false,
+        confirmButtonVisibility: true,
+        confirmButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+            icon: "",
+          });
+        },
+      });
+
+      return;
+    }
+
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: (
+        <>
+          해당 반품건을 <br />
+          수거 처리 하시겠습니까?
+        </>
+      ),
+      cancelButtonVisibility: true,
+      confirmButtonVisibility: true,
+      confirmButtonClickHandler: () => {
+        try {
+          void (async () => {
+            loadingSpinnerVisibilityVar(true);
+
+            const components = reconstructCheckedOrderItems.map(
+              ({ id, temporaryShipmentCompany, temporaryShipmentNumber }) => ({
+                orderItemId: id,
+                shipmentCompany: temporaryShipmentCompany,
+                shipmentNumber: Number(temporaryShipmentNumber),
+              })
+            );
+
+            const {
+              data: {
+                sendOrderItems: { ok, error },
+              },
+            } = await sendOrderItems({
+              variables: {
+                input: { components: components, type: SendType.SEND },
+              },
+            });
+
+            if (ok) {
+              loadingSpinnerVisibilityVar(false);
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: <>수거 처리되었습니다.</>,
+                confirmButtonVisibility: true,
+                cancelButtonVisibility: false,
+                confirmButtonClickHandler: () => {
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+
+                  checkedOrderItemsVar([]);
+                  checkAllBoxStatusVar(false);
+                },
+              });
+            }
+            if (error) {
+              loadingSpinnerVisibilityVar(false);
+              showHasServerErrorModal(error, "수거 처리");
+            }
+          })();
+        } catch (error) {
+          loadingSpinnerVisibilityVar(false);
+          showHasServerErrorModal(error as string, "수거 처리");
+        }
+      },
+    });
+  };
+
   return (
     <ControllerContainer>
       <ActiveButtonContainer>
-        <ControlButton size="small">수거</ControlButton>
+        <ControlButton size="small" onClick={handleSendButtonClick}>
+          수거
+        </ControlButton>
         <ControlButton size="small">반품 거절</ControlButton>
         <ControlButton size="small">반품 완료 처리</ControlButton>
         <ChangeOrderStatusDropDown

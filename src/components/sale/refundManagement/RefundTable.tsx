@@ -17,13 +17,12 @@ import {
   paginationVisibilityVar,
   systemModalVar,
   modalVar,
+  loadingSpinnerVisibilityVar,
 } from "@cache/index";
 
 import { TableType } from "@models/index";
 
 import useLazyRefundOrders from "@hooks/order/useLazyRefundOrders";
-
-import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 
 import {
   checkedOrderItemsVar,
@@ -35,6 +34,7 @@ import constructOrderItem from "@utils/sale/constructOrderItem";
 import getResetOrderItems from "@utils/sale/refund/getResetOrderItems";
 import {
   OrderStatusName,
+  SendType,
   shipmentCompanyCode,
   ShipmentStatus,
 } from "@constants/sale";
@@ -48,6 +48,10 @@ import {
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
+
+import exclamationmarkSrc from "@icons/exclamationmark.svg";
+import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
+
 import {
   FixedTable,
   TableContainer,
@@ -67,7 +71,6 @@ import {
 } from "@components/common/input/Dropdown";
 import Button from "@components/common/Button";
 import { Input } from "@components/common/input/TextInput";
-
 import EditReasonModal from "@components/sale/refundManagement/EditReasonModal";
 
 const RefundTable = () => {
@@ -290,6 +293,100 @@ const RefundTable = () => {
       refundOrderItemsVar(newOrderItems);
     };
 
+  const handleSendButtonClick =
+    (id: number, shipmentCompany: string, shipmentNumber: number) => () => {
+      if (!shipmentCompany || !shipmentNumber) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          icon: exclamationmarkSrc,
+          description: <>송장정보를 기입해주세요</>,
+          cancelButtonVisibility: false,
+          confirmButtonVisibility: true,
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+              icon: "",
+            });
+          },
+        });
+
+        return;
+      }
+
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: (
+          <>
+            해당 반품건을 <br />
+            수거 처리 하시겠습니까?
+          </>
+        ),
+        cancelButtonVisibility: true,
+        confirmButtonVisibility: true,
+        confirmButtonClickHandler: () => {
+          try {
+            void (async () => {
+              loadingSpinnerVisibilityVar(true);
+              const {
+                data: {
+                  sendOrderItems: { ok, error },
+                },
+              } = await sendOrderItems({
+                variables: {
+                  input: {
+                    components: [
+                      {
+                        orderItemId: id,
+                        shipmentCompany,
+                        shipmentNumber,
+                      },
+                    ],
+                    type: SendType.REFUND_PICK_UP,
+                  },
+                },
+              });
+
+              if (ok) {
+                loadingSpinnerVisibilityVar(false);
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: true,
+                  description: <>수거 처리되었습니다.</>,
+                  confirmButtonVisibility: true,
+                  cancelButtonVisibility: false,
+                  confirmButtonClickHandler: () => {
+                    systemModalVar({
+                      ...systemModalVar(),
+                      isVisible: false,
+                    });
+
+                    checkedOrderItemsVar([]);
+                    checkAllBoxStatusVar(false);
+                  },
+                });
+              }
+              if (error) {
+                loadingSpinnerVisibilityVar(false);
+                showHasServerErrorModal(error, "수거 처리");
+              }
+            })();
+          } catch (error) {
+            loadingSpinnerVisibilityVar(false);
+            showHasServerErrorModal(error as string, "수거 처리");
+          }
+        },
+        cancelButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
+      });
+    };
+
   const handleEditReasonModalClick =
     (
       statusReasonId: number,
@@ -308,6 +405,127 @@ const RefundTable = () => {
             detailedReason={detailedReason}
           />
         ),
+      });
+    };
+
+  const handleSaveButtonClick =
+    (
+      orderItemId: number,
+      orderShipmentInfoId: number,
+      shipmentCompany: string,
+      shipmentNumber: number,
+      status: ShipmentStatus
+    ) =>
+    () => {
+      if (!shipmentCompany || !shipmentNumber) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          icon: exclamationmarkSrc,
+          description: <>송장정보를 기입해주세요</>,
+          cancelButtonVisibility: false,
+          confirmButtonVisibility: true,
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+              icon: "",
+            });
+          },
+        });
+
+        return;
+      }
+
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: <>송장을 수정하시겠습니까?</>,
+        confirmButtonVisibility: true,
+        cancelButtonVisibility: true,
+        confirmButtonClickHandler: () => {
+          try {
+            console.log([
+              orderItemId,
+              orderShipmentInfoId,
+              shipmentCompany,
+              shipmentNumber,
+              status,
+            ]);
+
+            void (async () => {
+              loadingSpinnerVisibilityVar(true);
+              const {
+                data: {
+                  editShipmentNumber: { ok, error },
+                },
+              } = await editShipmentNumber({
+                variables: {
+                  input: {
+                    orderItemId,
+                    orderShipmentInfoId,
+                    shipmentCompany,
+                    shipmentNumber,
+                    status,
+                  },
+                },
+              });
+
+              if (ok) {
+                loadingSpinnerVisibilityVar(false);
+                const newOrderItems = cloneDeep(refundOrderItems);
+
+                const findOrderItmeIndex = newOrderItems.findIndex(
+                  ({ id }) => id === orderItemId
+                );
+                const filterdOrderItems = newOrderItems.filter(
+                  (orderItem) => orderItem.id === orderItemId
+                );
+
+                newOrderItems[findOrderItmeIndex].isShipmentInfoEdit = false;
+
+                filterdOrderItems.forEach((_, index) => {
+                  newOrderItems[findOrderItmeIndex + index].shipmentCompany =
+                    shipmentCompany;
+                  newOrderItems[findOrderItmeIndex + index].shipmentNumber =
+                    shipmentNumber;
+                });
+
+                refundOrderItemsVar(newOrderItems);
+
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: true,
+                  description: (
+                    <>
+                      송장 수정이
+                      <br />
+                      완료되었습니다.
+                    </>
+                  ),
+                  confirmButtonVisibility: true,
+                  cancelButtonVisibility: false,
+                  confirmButtonClickHandler: () => {
+                    systemModalVar({
+                      ...systemModalVar(),
+                      isVisible: false,
+                    });
+
+                    checkedOrderItemsVar([]);
+                    checkAllBoxStatusVar(false);
+                  },
+                });
+              }
+              if (error) {
+                loadingSpinnerVisibilityVar(false);
+                showHasServerErrorModal(error, "송장 수정");
+              }
+            })();
+          } catch (error) {
+            loadingSpinnerVisibilityVar(false);
+            showHasServerErrorModal(error as string, "송장 수정");
+          }
+        },
       });
     };
 
@@ -728,7 +946,7 @@ const RefundTable = () => {
                             claimStatus === "환불 오류"
                           }
                           onClick={handleEditReasonModalClick(
-                            id,
+                            statusReasonId,
                             reasonStatus,
                             mainReason,
                             detailedReason
@@ -756,7 +974,7 @@ const RefundTable = () => {
                   >
                     {!!attachedImages && !!attachedImages.length
                       ? attachedImages.map(({ url }) => (
-                          <AttachedImage src={url} />
+                          <AttachedImage src={encodeURI(url)} />
                         ))
                       : "-"}
                   </AttachedImageTd>
@@ -785,7 +1003,7 @@ const RefundTable = () => {
                             isShipmentInfoEdit ? (
                               <Dropdown
                                 onChange={changeShipmentCompanyHandler(
-                                  statusReasonId,
+                                  index,
                                   ShipmentStatus.SHIPPING
                                 )}
                                 arrowSrc={triangleArrowSvg}
@@ -864,7 +1082,18 @@ const RefundTable = () => {
                                       : temporaryShipmentNumber
                                   }
                                 />
-                                <Button type="button" size="small" width="55px">
+                                <Button
+                                  type="button"
+                                  size="small"
+                                  width="55px"
+                                  onClick={handleSaveButtonClick(
+                                    id,
+                                    shipmentOrderId,
+                                    temporaryShipmentCompany,
+                                    temporaryShipmentNumber,
+                                    ShipmentStatus.SHIPPING
+                                  )}
+                                >
                                   저장
                                 </Button>
                               </ShipmnetNumberContainer>
@@ -1043,7 +1272,18 @@ const RefundTable = () => {
                                       : temporaryRefundShipmentNumber
                                   }
                                 />
-                                <Button type="button" size="small" width="55px">
+                                <Button
+                                  type="button"
+                                  size="small"
+                                  width="55px"
+                                  onClick={handleSaveButtonClick(
+                                    id,
+                                    refundOrderId,
+                                    temporaryShipmentCompany,
+                                    temporaryShipmentNumber,
+                                    ShipmentStatus.REFUND_PICK_UP
+                                  )}
+                                >
                                   저장
                                 </Button>
                               </ShipmnetNumberContainer>
@@ -1090,7 +1330,7 @@ const RefundTable = () => {
                             <ShipmnetNumberContainer>
                               <ShipmnetNumberInput
                                 onChange={changeShipmentNumberHandler(
-                                  refusalStatusReasonId,
+                                  index,
                                   ShipmentStatus.REFUND_PICK_UP
                                 )}
                                 disabled={claimStatus === "환불 완료"}
@@ -1105,9 +1345,14 @@ const RefundTable = () => {
                                 size="small"
                                 disabled={claimStatus === "환불 완료"}
                                 width={"55px"}
-                                backgroundColor={"#fff"}
-                                borderColor={"#BBC0C6"}
+                                backgroundColor={"#414A5B"}
+                                color={"#fff"}
                                 type="button"
+                                onClick={handleSendButtonClick(
+                                  id,
+                                  temporaryRefundShipmentCompany,
+                                  temporaryRefundShipmentNumber
+                                )}
                               >
                                 수거
                               </SubmitButton>
@@ -1193,7 +1438,7 @@ const RefundTable = () => {
                             claimStatus === "환불 오류"
                           }
                           onClick={handleEditReasonModalClick(
-                            id,
+                            refusalStatusReasonId,
                             refusalReasonStatus,
                             refusalReason,
                             refusalDetailedReason
