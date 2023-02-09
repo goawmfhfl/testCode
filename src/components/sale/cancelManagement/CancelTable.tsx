@@ -115,11 +115,22 @@ const CancelTable = () => {
     };
 
   const handleEditReasonModalClick =
-    (statusReasonId: number, status: OrderStatusName) => () => {
+    (
+      statusReasonId: number,
+      status: OrderStatusName,
+      mainReason: string,
+      detailedReason: string
+    ) =>
+    () => {
       modalVar({
         isVisible: true,
         component: (
-          <EditReasonModal statusReasonId={statusReasonId} status={status} />
+          <EditReasonModal
+            statusReasonId={statusReasonId}
+            status={status}
+            mainReason={mainReason}
+            detailedReason={detailedReason}
+          />
         ),
       });
     };
@@ -446,7 +457,9 @@ const CancelTable = () => {
                           width={"55px"}
                           onClick={handleEditReasonModalClick(
                             statusReasonId,
-                            reasonStatus
+                            reasonStatus,
+                            mainReason,
+                            detailedReason
                           )}
                           disabled={
                             statusName === OrderStatusName.CANCEL_COMPLETED
@@ -532,7 +545,9 @@ const CancelTable = () => {
                           width={"55px"}
                           onClick={handleEditReasonModalClick(
                             refusalStatusReasonId,
-                            refusalReasonStatus
+                            refusalReasonStatus,
+                            refusalReason,
+                            refusalDetailedReason
                           )}
                           disabled={
                             statusName === OrderStatusName.CANCEL_COMPLETED

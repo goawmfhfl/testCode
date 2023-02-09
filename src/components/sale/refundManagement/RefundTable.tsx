@@ -291,11 +291,22 @@ const RefundTable = () => {
     };
 
   const handleEditReasonModalClick =
-    (statusReasonId: number, status: OrderStatusName) => () => {
+    (
+      statusReasonId: number,
+      status: OrderStatusName,
+      mainReason: string,
+      detailedReason: string
+    ) =>
+    () => {
       modalVar({
         isVisible: true,
         component: (
-          <EditReasonModal statusReasonId={statusReasonId} status={status} />
+          <EditReasonModal
+            statusReasonId={statusReasonId}
+            status={status}
+            mainReason={mainReason}
+            detailedReason={detailedReason}
+          />
         ),
       });
     };
@@ -716,7 +727,12 @@ const RefundTable = () => {
                             statusName === OrderStatusName.REFUND_COMPLETED ||
                             claimStatus === "환불 오류"
                           }
-                          onClick={handleEditReasonModalClick(id, reasonStatus)}
+                          onClick={handleEditReasonModalClick(
+                            id,
+                            reasonStatus,
+                            mainReason,
+                            detailedReason
+                          )}
                         >
                           수정
                         </Button>
@@ -1178,7 +1194,9 @@ const RefundTable = () => {
                           }
                           onClick={handleEditReasonModalClick(
                             id,
-                            refusalReasonStatus
+                            refusalReasonStatus,
+                            refusalReason,
+                            refusalDetailedReason
                           )}
                         >
                           수정

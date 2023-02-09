@@ -322,6 +322,25 @@ export const mainReasonType = {
   OTHER_REASONS: "기타 사유",
 };
 
+export const mainReasonTypes = {
+  "사유를 선택해주세요.": MainReason.DEFAULT,
+  "구매 의사 취소": MainReason.NO_INTENTION,
+  "색상 및 사이즈 변경": MainReason.CHANGE_COLOR_OR_SIZE,
+  "다른 상품 잘못 주문": MainReason.DIFFERENT_PRODUCT,
+  "배송 지연": MainReason.DELAYED_SHIPMENT,
+  "배송 누락": MainReason.OMITTED_SHIPMENT,
+  "상품 품절": MainReason.OUT_OF_STOCK,
+  "상품 파손": MainReason.DAMAGED,
+  "상품 정보 상이": MainReason.MISINFORMED,
+  오배송: MainReason.MISDELIVERY,
+  "커스터마이즈 주문제작": MainReason.CUSTOM_MADE,
+  "고객 요청에 의한 거부": MainReason.REFUSAL_BY_CUSTOMER_REQUEST,
+  "상품 준비 완료": MainReason.PRODUCT_ALREADY_READY,
+  "사용 흔적이 보임": MainReason.SENSE_TRACE_OF_USE,
+  "고객에 의해 파손됨": MainReason.DAMAGED_BY_CUSTOMER,
+  "기타 사유": MainReason.OTHER_REASONS,
+};
+
 export const optionListType: Array<{
   id: number;
   label: string;

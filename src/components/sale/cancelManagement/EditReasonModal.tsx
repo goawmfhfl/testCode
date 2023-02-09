@@ -10,7 +10,12 @@ import {
   systemModalVar,
 } from "@cache/index";
 import { filterOptionVar } from "@cache/sale/cancel";
-import { MainReason, optionListType, OrderStatusName } from "@constants/sale";
+import {
+  MainReason,
+  mainReasonTypes,
+  optionListType,
+  OrderStatusName,
+} from "@constants/sale";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -35,9 +40,13 @@ import { EDIT_STATUS_REASON_BY_SELLER } from "@graphql/mutations/editStatusReaso
 const EditReasonModal = ({
   statusReasonId,
   status,
+  mainReason,
+  detailedReason,
 }: {
   statusReasonId: number;
   status: OrderStatusName;
+  mainReason: string;
+  detailedReason: string;
 }) => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } =
@@ -227,6 +236,12 @@ const EditReasonModal = ({
   };
 
   useEffect(() => {
+    if (mainReason && detailedReason) {
+      setReason({
+        main: mainReasonTypes[mainReason] as MainReason,
+        detail: detailedReason,
+      });
+    }
     return () => {
       setReason({
         main: MainReason.DEFAULT,
@@ -250,6 +265,7 @@ const EditReasonModal = ({
           arrowSrc={triangleArrowSvg}
           sizing={"medium"}
           width={"160px"}
+          value={main}
           onChange={changeReasonHandler}
         >
           <Option value={MainReason.DEFAULT} hidden>
@@ -269,6 +285,7 @@ const EditReasonModal = ({
           width="376px"
           height="88px"
           size="small"
+          value={detail}
           onChange={changeDetailReasonHandler}
         />
       </ReasonContainer>

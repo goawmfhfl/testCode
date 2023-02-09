@@ -15,6 +15,7 @@ import {
   optionListType,
   refusalCancelOrRefundOptionList,
   OrderStatusName,
+  mainReasonTypes,
 } from "@constants/sale";
 import { checkedOrderItemsVar } from "@cache/sale";
 import { showHasServerErrorModal } from "@cache/productManagement";
@@ -40,9 +41,13 @@ import Textarea from "@components/common/input/Textarea";
 const EditReasonModal = ({
   statusReasonId,
   status,
+  mainReason,
+  detailedReason,
 }: {
   statusReasonId: number;
   status: OrderStatusName;
+  mainReason: string;
+  detailedReason: string;
 }) => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } =
@@ -232,6 +237,13 @@ const EditReasonModal = ({
   };
 
   useEffect(() => {
+    if (mainReason && detailedReason) {
+      setReason({
+        main: mainReasonTypes[mainReason] as MainReason,
+        detail: detailedReason,
+      });
+    }
+
     return () => {
       setReason({
         main: MainReason.DEFAULT,
@@ -274,6 +286,7 @@ const EditReasonModal = ({
           arrowSrc={triangleArrowSvg}
           sizing={"medium"}
           width={"160px"}
+          value={main}
           onChange={changeReasonHandler}
         >
           <Option value={MainReason.DEFAULT} hidden>
@@ -307,6 +320,7 @@ const EditReasonModal = ({
           width="376px"
           height="88px"
           size="small"
+          value={detail}
           onChange={changeDetailReasonHandler}
         />
       </ReasonContainer>
