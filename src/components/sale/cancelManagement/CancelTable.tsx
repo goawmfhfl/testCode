@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import styled, { css } from "styled-components/macro";
-import { useMutation, useReactiveVar } from "@apollo/client";
+import { useReactiveVar } from "@apollo/client";
 import { cloneDeep } from "lodash";
 import { TableType } from "@models/index";
 
@@ -12,12 +12,10 @@ import {
 import {
   checkAllBoxStatusVar,
   commonFilterOptionVar,
-  loadingSpinnerVisibilityVar,
   modalVar,
   pageNumberListVar,
   paginationVisibilityVar,
   showHasAnyProblemModal,
-  systemModalVar,
   totalPageLengthVar,
 } from "@cache/index";
 
@@ -26,23 +24,14 @@ import {
   fixTableType,
   scrollTableType,
 } from "@constants/sale/cancelManagement/table";
-import {
-  MainReason,
-  mainReasonType,
-  optionListType,
-  OrderStatusName,
-} from "@constants/sale";
-
-import useLazyCancelOrders from "@hooks/order/useLazyCancelOrders";
+import { OrderStatusName } from "@constants/sale";
 
 import { NormalizedType } from "@models/sale/cancel";
 import { ResetOrderItemType } from "@models/sale";
-
 import { OrderItems } from "@models/sale";
 
+import useLazyCancelOrders from "@hooks/order/useLazyCancelOrders";
 import constructOrderItem from "@utils/sale/constructOrderItem";
-
-import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 
 import {
   FixedTable,
@@ -57,12 +46,7 @@ import {
 import Checkbox from "@components/common/input/Checkbox";
 import Loading from "@components/common/table/Loading";
 import NoDataContainer from "@components/common/table/NoDataContainer";
-import {
-  SelectInput,
-  OptionInput as Option,
-} from "@components/common/input/Dropdown";
 import Button from "@components/common/Button";
-import { Input } from "@components/common/input/TextInput";
 import getResetOrderItems from "@utils/sale/cancel/getResetOrderItems";
 import EditReasonModal from "@components/sale/cancelManagement/EditReasonModal";
 import EditRefusalReasonModal from "@components/sale/cancelManagement/EditRefusalReasonModal";
@@ -200,7 +184,6 @@ const CancelTable = () => {
       reconstructCancelOrderItem
     );
     cancleOrderItemsVar(resetOrderItems);
-
     checkedOrderItemsVar([]);
     checkAllBoxStatusVar(false);
   }, [data]);
@@ -211,34 +194,24 @@ const CancelTable = () => {
 
   useEffect(() => {
     if (error) {
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        description: (
-          <>
-            내부 서버 오류로 인해 요청하신
-            <br />
-            작업을 완료하지 못했습니다.
-            <br />
-            다시 한 번 시도 후 같은 문제가 발생할 경우
-            <br />
-            찹스틱스로 문의해주세요.
-            <br />
-            <br />
-            (전화 문의 070-4187-3848)
-            <br />
-            <br />
-            Code:
-            {error.message}
-          </>
-        ),
-        confirmButtonClickHandler: () => {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: false,
-          });
-        },
-      });
+      showHasAnyProblemModal(
+        <>
+          내부 서버 오류로 인해 요청하신
+          <br />
+          작업을 완료하지 못했습니다.
+          <br />
+          다시 한 번 시도 후 같은 문제가 발생할 경우
+          <br />
+          찹스틱스로 문의해주세요.
+          <br />
+          <br />
+          (전화 문의 070-4187-3848)
+          <br />
+          <br />
+          Code:
+          {error.message}
+        </>
+      );
     }
   }, [error]);
 
