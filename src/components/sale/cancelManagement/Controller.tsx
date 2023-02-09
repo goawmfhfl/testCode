@@ -17,29 +17,31 @@ import {
   checkAllBoxStatusVar,
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
+  modalVar,
   paginationSkipVar,
   showHasAnyProblemModal,
   systemModalVar,
 } from "@cache/index";
 import { filterOptionVar } from "@cache/sale/cancel";
+import {
+  ConfirmOrDenyCancelBySellerInputType,
+  ConfirmOrDenyCancelBySellerType,
+} from "@models/sale/cancel";
+import { showHasServerErrorModal } from "@cache/productManagement";
+import { checkedOrderItemsVar } from "@cache/sale/cancel";
+
+import { CONFIRM_OR_DENY_CANCEL_BY_SELLER } from "@graphql/mutations/confirmOrDenyCancelBySeller";
+import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
 import getOrderItemIsCheckedStatus from "@utils/sale/cancel/getOrderItemIsCheckedStatus";
-import getConfirmOrDenyCancelComponents from "@utils/sale/cancel/getConfirmOrDenyCancelComponents";
 
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 import ControllerContainer from "@components/sale/ControllerContainer";
 import Button from "@components/common/Button";
 import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
-import { checkedOrderItemsVar } from "@cache/sale/cancel";
-import {
-  ConfirmOrDenyCancelBySellerInputType,
-  ConfirmOrDenyCancelBySellerType,
-} from "@models/sale/cancel";
-import { CONFIRM_OR_DENY_CANCEL_BY_SELLER } from "@graphql/mutations/confirmOrDenyCancelBySeller";
-import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
-import { showHasServerErrorModal } from "@cache/productManagement";
+import HandleCancelRefusalModal from "@components/sale/cancelManagement/HandleCancelRefusalModal";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -51,6 +53,7 @@ const Controller = () => {
 
   const reconstructCheckedOrderItems: Array<ResetOrderItemType> =
     getReconstructCheckedOrderItems(checkedOrderItems);
+
   const { isCancelCompletedChecked } = getOrderItemIsCheckedStatus(
     reconstructCheckedOrderItems
   );
@@ -106,115 +109,98 @@ const Controller = () => {
       );
       return;
     }
-    systemModalVar({
-      ...systemModalVar(),
-      isVisible: true,
-      description:
-        status === OrderCancel.APPROVE ? (
-          <>취소요청을 승인하시겠습니까?</>
-        ) : (
-          <>취소요청을 거절하시겠습니까?</>
-        ),
-      confirmButtonVisibility: true,
-      cancelButtonVisibility: true,
-      confirmButtonClickHandler: () => {
-        try {
-          const components: Array<{
-            orderItemId: number;
-            mainReason: MainReason;
-            detailedReason: string;
-            cause: Cause;
-          }> = getConfirmOrDenyCancelComponents(reconstructCheckedOrderItems);
 
-          console.log([{ components }, { status }]);
+    if (status === OrderCancel.APPROVE) {
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: <>취소요청을 승인하시겠습니까?</>,
+        confirmButtonVisibility: true,
+        cancelButtonVisibility: true,
+        confirmButtonClickHandler: () => {
+          try {
+            void (async () => {
+              loadingSpinnerVisibilityVar(true);
+              const components = reconstructCheckedOrderItems.map(({ id }) => ({
+                orderItemId: id,
+                mainReason: null,
+                detailedReason: null,
+              }));
+              const {
+                data: {
+                  confirmOrDenyCancelBySeller: { ok, error },
+                },
+              } = await confirmOrDenyCancel({
+                variables: {
+                  input: { components, status: OrderCancel.APPROVE },
+                },
+              });
 
-          void (async () => {
-            loadingSpinnerVisibilityVar(true);
-            const {
-              data: {
-                confirmOrDenyCancelBySeller: { ok, error },
-              },
-            } = await confirmOrDenyCancel({
-              variables: {
-                input: { components, status },
-              },
-            });
-
-            if (ok) {
-              loadingSpinnerVisibilityVar(false);
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description:
-                  status === OrderCancel.APPROVE ? (
-                    <>취소가 완료되었습니다</>
-                  ) : (
+              if (ok) {
+                loadingSpinnerVisibilityVar(false);
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: true,
+                  description: <>취소가 완료되었습니다</>,
+                  confirmButtonVisibility: true,
+                  cancelButtonVisibility: false,
+                  confirmButtonClickHandler: () => {
+                    systemModalVar({
+                      ...systemModalVar(),
+                      isVisible: false,
+                    });
+                    checkedOrderItemsVar([]);
+                    checkAllBoxStatusVar(false);
+                  },
+                });
+              }
+              if (error) {
+                loadingSpinnerVisibilityVar(false);
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: true,
+                  description: (
                     <>
-                      취소 요청이 거절되었습니다.
+                      PG사 오류 혹은 네트워크 오류로 인해
                       <br />
-                      이제 주문관리 - 상품 준비중에서
+                      환불 처리가 되지 않았습니다.
                       <br />
-                      관리 가능합니다.
+                      취소 승인 버튼을 다시 눌러
+                      <br />
+                      취소를 진행해주세요.
                     </>
                   ),
-                confirmButtonVisibility: true,
-                cancelButtonVisibility: false,
-                confirmButtonClickHandler: () => {
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-                  checkedOrderItemsVar([]);
-                  checkAllBoxStatusVar(false);
-                },
-              });
-            }
-            if (error) {
-              loadingSpinnerVisibilityVar(false);
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: (
-                  <>
-                    취소 `${orderCancelType[status]}`을(를) <br />
-                    완료하지 못했습니다.
-                    <br />
-                    다시 시도 후 같은 문제가 발생할 시
-                    <br />
-                    찹스틱스에 문의해주세요
-                    <br />
-                    <br />
-                    에러메시지:
-                    <br />
-                    {error}
-                  </>
-                ),
-                confirmButtonVisibility: true,
-                cancelButtonVisibility: false,
-                confirmButtonClickHandler: () => {
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-                },
-              });
-            }
-          })();
-        } catch (error) {
-          loadingSpinnerVisibilityVar(false);
-          showHasServerErrorModal(
-            error as string,
-            `취소 ${orderCancelType[status]}`
-          );
-        }
-      },
-      cancelButtonClickHandler: () => {
-        systemModalVar({
-          ...systemModalVar(),
-          isVisible: false,
-        });
-      },
-    });
+                  confirmButtonVisibility: true,
+                  cancelButtonVisibility: false,
+                  confirmButtonClickHandler: () => {
+                    systemModalVar({
+                      ...systemModalVar(),
+                      isVisible: false,
+                    });
+                  },
+                });
+              }
+            })();
+          } catch (error) {
+            loadingSpinnerVisibilityVar(false);
+            showHasServerErrorModal(error as string, "취소 승인");
+          }
+        },
+        cancelButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
+      });
+    }
+
+    if (status === OrderCancel.DENY) {
+      modalVar({
+        isVisible: true,
+        component: <HandleCancelRefusalModal />,
+      });
+    }
   };
 
   const changeSearchTypeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
