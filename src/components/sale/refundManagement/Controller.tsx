@@ -504,18 +504,47 @@ const Controller = () => {
   return (
     <ControllerContainer>
       <ActiveButtonContainer>
-        <ControlButton size="small" onClick={handleSendButtonClick}>
+        <ControlButton
+          size="small"
+          disabled={
+            statusName === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS ||
+            statusName === OrderStatusName.REFUND_PICK_UP_COMPLETED ||
+            statusName === OrderStatusName.REFUND_COMPLETED
+          }
+          onClick={handleSendButtonClick}
+        >
           수거
         </ControlButton>
-        <ControlButton size="small" onClick={handleRefusalRefundButtonClick}>
+        <ControlButton
+          size="small"
+          disabled={
+            statusName === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS ||
+            statusName === OrderStatusName.REFUND_PICK_UP_COMPLETED ||
+            statusName === OrderStatusName.REFUND_COMPLETED
+          }
+          onClick={handleRefusalRefundButtonClick}
+        >
           반품 거절
         </ControlButton>
-        <ControlButton size="small">반품 완료 처리</ControlButton>
+        <ControlButton
+          size="small"
+          disabled={
+            statusName === OrderStatusName.REFUND_REQUEST ||
+            statusName === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS ||
+            statusName === OrderStatusName.REFUND_COMPLETED
+          }
+        >
+          반품 완료 처리
+        </ControlButton>
         <ChangeOrderStatusDropDown
           arrowSrc={triangleArrowSvg}
           sizing={"medium"}
           width={"119px"}
           value={OrderStatusName.DEFAULT}
+          disabled={
+            statusName === OrderStatusName.REFUND_PICK_UP_COMPLETED ||
+            statusName === OrderStatusName.REFUND_COMPLETED
+          }
           onChange={changeOrderStatusByForceHandler}
         >
           {changeRefundOrderStatusByForceType.map(({ id, label, value }) => (

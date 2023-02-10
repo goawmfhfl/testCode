@@ -24,7 +24,6 @@ import {
 import {
   searchQueryType,
   OrderSearchType,
-  OrderStatusType,
   OrderStatusName,
   optionListType,
   SendType,
