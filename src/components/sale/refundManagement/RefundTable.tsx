@@ -34,6 +34,7 @@ import { NormalizedType, OrderItems, ResetOrderItemType } from "@models/sale";
 import constructOrderItem from "@utils/sale/constructOrderItem";
 import getResetOrderItems from "@utils/sale/refund/getResetOrderItems";
 import {
+  OrderStatusGroup,
   OrderStatusName,
   SendType,
   shipmentCompanyCode,
@@ -545,7 +546,7 @@ const RefundTable = () => {
             type,
             statusName,
             statusType,
-            statusGroup,
+            statusGroup: OrderStatusGroup.REFUND,
           },
         },
       });

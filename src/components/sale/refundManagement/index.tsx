@@ -12,15 +12,6 @@ import RefundTable from "@components/sale/refundManagement/RefundTable";
 import Pagination from "@components/common/Pagination";
 
 const RefundManagement = () => {
-  useEffect(() => {
-    commonSaleFilterOptionVar({
-      type: null,
-      statusName: null,
-      statusType: OrderStatusType.CLAIM,
-      statusGroup: OrderStatusGroup.REFUND,
-    });
-  }, []);
-
   return (
     <Container>
       <ContentsHeader headerName={HeaderNames.Refund} />
