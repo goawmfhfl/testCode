@@ -18,18 +18,23 @@ export const getOrdersLength = (
       if (orderStatus.name === OrderStatusName.CANCEL_REQUEST) {
         result.cancelRequest++;
       }
+
       if (orderStatus.name === OrderStatusName.CANCEL_COMPLETED) {
         result.cancelCompleted++;
       }
+
       if (claimStatus.name === OrderStatusName.REFUND_REQUEST) {
         result.refundRequest++;
       }
+
       if (claimStatus.name === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS) {
         result.refundPickUpInProgress++;
       }
+
       if (claimStatus.name === OrderStatusName.REFUND_PICK_UP_COMPLETED) {
         result.refundPickUpCompleted++;
       }
+
       if (claimStatus.name === OrderStatusName.REFUND_COMPLETED) {
         result.refundCompleted++;
       }

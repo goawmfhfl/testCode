@@ -8,6 +8,7 @@ import {
   ShipmentStatus,
   ShipmentType,
 } from "@constants/sale";
+import { DenyRefundOrExchangeRequestType } from "@constants/sale";
 import { OrderItems } from "@models/sale/index";
 
 export interface GetRefundOrdersBySellerType {
@@ -28,4 +29,20 @@ export interface GetRefundOrdersBySellerInputType {
   statusName?: OrderStatusName;
   statusType?: OrderStatusType;
   statusGroup: OrderStatusGroup;
+}
+
+export interface DenyRefundOrExchangeRequestBySellerType {
+  denyRefunrOrExchangeRequestBySeller: {
+    ok: boolean;
+    error?: string;
+  };
+}
+
+export interface DenyRefundOrExchangeRequestBySellerInputType {
+  components: Array<{
+    orderItemId: number;
+    mainReason: MainReason;
+    detailedReason: string;
+  }>;
+  type: DenyRefundOrExchangeRequestType;
 }

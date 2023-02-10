@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
-import { filterOptionVar } from "@cache/sale/refund";
+import { commonSaleFilterOptionVar } from "@cache/sale";
 import { commonFilterOptionVar, paginationSkipVar } from "@cache/index";
 import { OrderSearchType, searchQueryType } from "@constants/sale";
 import { skipQuantityType } from "@constants/index";
@@ -18,8 +18,9 @@ import { Input as SearchInput } from "@components/common/input/SearchInput";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const { type, statusName, statusType, statusGroup } = useReactiveVar(
+    commonSaleFilterOptionVar
+  );
 
   const [showNotice, setShowNotice] = useState<boolean>(false);
   const [temporaryQuery, setTemporaryQuery] = useState<string>("");
@@ -33,8 +34,8 @@ const Controller = () => {
   const changeSearchTypeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const type = e.target.value as OrderSearchType;
 
-    filterOptionVar({
-      ...filterOptionVar(),
+    commonSaleFilterOptionVar({
+      ...commonSaleFilterOptionVar(),
       type,
     });
   };

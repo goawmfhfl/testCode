@@ -24,11 +24,12 @@ import { TableType } from "@models/index";
 
 import useLazyRefundOrders from "@hooks/order/useLazyRefundOrders";
 
+import { refundOrderItemsVar } from "@cache/sale/refund";
+
 import {
-  checkedOrderItemsVar,
-  filterOptionVar,
-  refundOrderItemsVar,
-} from "@cache/sale/refund";
+  commonCheckedOrderItemsVar,
+  commonSaleFilterOptionVar,
+} from "@cache/sale";
 import { NormalizedType, OrderItems, ResetOrderItemType } from "@models/sale";
 import constructOrderItem from "@utils/sale/constructOrderItem";
 import getResetOrderItems from "@utils/sale/refund/getResetOrderItems";
@@ -76,8 +77,9 @@ import EditReasonModal from "@components/sale/refundManagement/EditReasonModal";
 const RefundTable = () => {
   const { getOrders, error, loading, data } = useLazyRefundOrders();
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const { type, statusName, statusType, statusGroup } = useReactiveVar(
+    commonSaleFilterOptionVar
+  );
 
   const [sendOrderItems] = useMutation<
     SendOrderItemsType,
@@ -134,7 +136,7 @@ const RefundTable = () => {
   });
 
   const refundOrderItems = useReactiveVar(refundOrderItemsVar);
-  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
+  const checkedOrderItems = useReactiveVar(commonCheckedOrderItemsVar);
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
   const [shipmentCompanys, setShipmentCompanys] = useState<
     Array<{
@@ -154,7 +156,7 @@ const RefundTable = () => {
         isChecked: true,
       }));
       refundOrderItemsVar(checkAllOrderItem);
-      checkedOrderItemsVar(checkAllOrderItem);
+      commonCheckedOrderItemsVar(checkAllOrderItem);
     }
 
     if (!e.target.checked) {
@@ -164,7 +166,7 @@ const RefundTable = () => {
       }));
 
       refundOrderItemsVar(checkAllOrderItem);
-      checkedOrderItemsVar([]);
+      commonCheckedOrderItemsVar([]);
     }
   };
 
@@ -182,7 +184,10 @@ const RefundTable = () => {
           isChecked: true,
         }));
 
-        checkedOrderItemsVar([...checkedOrderItems, ...checkTargetOrderItems]);
+        commonCheckedOrderItemsVar([
+          ...checkedOrderItems,
+          ...checkTargetOrderItems,
+        ]);
         newOrderItems[index].isChecked = true;
       }
 
@@ -190,7 +195,7 @@ const RefundTable = () => {
         const filteredOrderItems = checkedOrderItems.filter(
           (orderItem) => orderItem.id !== targetOrderItemId
         );
-        checkedOrderItemsVar(filteredOrderItems);
+        commonCheckedOrderItemsVar(filteredOrderItems);
         newOrderItems[index].isChecked = false;
       }
       refundOrderItemsVar(newOrderItems);
@@ -235,7 +240,7 @@ const RefundTable = () => {
           }
         }
 
-        checkedOrderItemsVar(newCheckedOrderItems);
+        commonCheckedOrderItemsVar(newCheckedOrderItems);
       }
     };
 
@@ -272,7 +277,7 @@ const RefundTable = () => {
           }
         }
 
-        checkedOrderItemsVar(newCheckedOrderItems);
+        commonCheckedOrderItemsVar(newCheckedOrderItems);
       }
     };
 
@@ -363,7 +368,7 @@ const RefundTable = () => {
                       isVisible: false,
                     });
 
-                    checkedOrderItemsVar([]);
+                    commonCheckedOrderItemsVar([]);
                     checkAllBoxStatusVar(false);
                   },
                 });
@@ -511,7 +516,7 @@ const RefundTable = () => {
                       isVisible: false,
                     });
 
-                    checkedOrderItemsVar([]);
+                    commonCheckedOrderItemsVar([]);
                     checkAllBoxStatusVar(false);
                   },
                 });
@@ -588,7 +593,7 @@ const RefundTable = () => {
 
     refundOrderItemsVar(resetOrderItems);
 
-    checkedOrderItemsVar([]);
+    commonCheckedOrderItemsVar([]);
     checkAllBoxStatusVar(false);
   }, [data]);
 

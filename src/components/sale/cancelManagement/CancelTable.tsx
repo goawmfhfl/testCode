@@ -4,11 +4,8 @@ import { useReactiveVar } from "@apollo/client";
 import { cloneDeep } from "lodash";
 import { TableType } from "@models/index";
 
-import {
-  cancleOrderItemsVar,
-  checkedOrderItemsVar,
-  filterOptionVar,
-} from "@cache/sale/cancel";
+import { commonSaleFilterOptionVar } from "@cache/sale";
+import { cancleOrderItemsVar, checkedOrderItemsVar } from "@cache/sale/cancel";
 import {
   checkAllBoxStatusVar,
   commonFilterOptionVar,
@@ -55,8 +52,9 @@ import EditReasonModal from "@components/sale/cancelManagement/EditReasonModal";
 const CancelTable = () => {
   const { getOrders, error, loading, data } = useLazyCancelOrders();
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const { type, statusName, statusType, statusGroup } = useReactiveVar(
+    commonSaleFilterOptionVar
+  );
 
   const cancleOrderItems = useReactiveVar(cancleOrderItemsVar);
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);

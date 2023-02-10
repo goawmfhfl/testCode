@@ -7,7 +7,8 @@ import {
   paginationSkipVar,
   totalPageLengthVar,
 } from "@cache/index";
-import { filterOptionVar } from "@cache/sale/refund";
+
+import { commonSaleFilterOptionVar } from "@cache/sale";
 import {
   OrderStatusGroup,
   OrderStatusName,
@@ -22,7 +23,7 @@ import Button from "@components/common/Button";
 const FilterBar = () => {
   const { data, getOrders } = useLazyRefundOrders();
 
-  const { statusName } = useReactiveVar(filterOptionVar);
+  const { statusName } = useReactiveVar(commonSaleFilterOptionVar);
   const orders = data?.getOrdersBySeller.totalOrderItems || [];
   const totalPageLength = useReactiveVar(totalPageLengthVar);
   const {
@@ -41,8 +42,8 @@ const FilterBar = () => {
       paginationSkipVar(0);
 
       if (!filterOptionName) {
-        filterOptionVar({
-          ...filterOptionVar(),
+        commonSaleFilterOptionVar({
+          ...commonSaleFilterOptionVar(),
           statusName: null,
           statusType: OrderStatusType.CLAIM,
           statusGroup: OrderStatusGroup.REFUND,
@@ -50,8 +51,8 @@ const FilterBar = () => {
       }
 
       if (filterOptionName === OrderStatusName.REFUND_REQUEST) {
-        filterOptionVar({
-          ...filterOptionVar(),
+        commonSaleFilterOptionVar({
+          ...commonSaleFilterOptionVar(),
           statusName: filterOptionName,
           statusType: OrderStatusType.CLAIM,
           statusGroup: OrderStatusGroup.REFUND,
@@ -59,8 +60,8 @@ const FilterBar = () => {
       }
 
       if (filterOptionName === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS) {
-        filterOptionVar({
-          ...filterOptionVar(),
+        commonSaleFilterOptionVar({
+          ...commonSaleFilterOptionVar(),
           statusName: filterOptionName,
           statusType: OrderStatusType.CLAIM,
           statusGroup: OrderStatusGroup.REFUND,
@@ -68,8 +69,8 @@ const FilterBar = () => {
       }
 
       if (filterOptionName === OrderStatusName.REFUND_PICK_UP_COMPLETED) {
-        filterOptionVar({
-          ...filterOptionVar(),
+        commonSaleFilterOptionVar({
+          ...commonSaleFilterOptionVar(),
           statusName: filterOptionName,
           statusType: OrderStatusType.CLAIM,
           statusGroup: OrderStatusGroup.REFUND,
@@ -77,8 +78,8 @@ const FilterBar = () => {
       }
 
       if (filterOptionName === OrderStatusName.REFUND_COMPLETED) {
-        filterOptionVar({
-          ...filterOptionVar(),
+        commonSaleFilterOptionVar({
+          ...commonSaleFilterOptionVar(),
           statusName: filterOptionName,
           statusType: OrderStatusType.CLAIM,
           statusGroup: OrderStatusGroup.REFUND,

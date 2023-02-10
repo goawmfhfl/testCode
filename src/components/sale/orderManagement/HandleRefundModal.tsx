@@ -22,9 +22,11 @@ import {
 import { ResetOrderItemType } from "@models/sale/index";
 
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+import { REQEUST_REFUND_OR_EXCHANGE_BY_SELLER } from "@graphql/mutations/requestRefundOrExchangeBySeller";
 
 import getWhoseResponsibility from "@utils/sale/order/getWhoseResponsibility";
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
+import getCancelOrderItemComponents from "@utils/sale/order/getCancelOrderItemComponents";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -37,8 +39,6 @@ import {
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
-import getCancelOrderItemComponents from "@utils/sale/order/getCancelOrderItemComponents";
-import { REQEUST_REFUND_OR_EXCHANGE_BY_SELLER } from "@graphql/mutations/requestRefundOrExchangeBySeller";
 
 const HandleRefundModal = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);

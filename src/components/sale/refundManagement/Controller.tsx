@@ -3,21 +3,28 @@ import styled from "styled-components/macro";
 import { useMutation, useReactiveVar } from "@apollo/client";
 
 import {
-  checkedOrderItemsVar,
-  filterOptionVar,
-  refundOrderItemsVar,
-} from "@cache/sale/refund";
+  commonSaleFilterOptionVar,
+  commonCheckedOrderItemsVar,
+} from "@cache/sale";
+import { refundOrderItemsVar } from "@cache/sale/refund";
 import {
   checkAllBoxStatusVar,
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
+  modalVar,
   paginationSkipVar,
   showHasAnyProblemModal,
   systemModalVar,
 } from "@cache/index";
-import { OrderSearchType, searchQueryType, SendType } from "@constants/sale";
+import { showHasServerErrorModal } from "@cache/productManagement";
+import {
+  OrderSearchType,
+  searchQueryType,
+  SendType,
+  DenyRefundOrExchangeRequestType,
+} from "@constants/sale";
 import { skipQuantityType } from "@constants/index";
-import { changeOrderStatusType } from "@constants/sale/refundManagement/index";
+import { changeRefundOrderStatusByForceType } from "@constants/sale/refundManagement/index";
 
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
 
@@ -36,12 +43,13 @@ import {
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
-import { showHasServerErrorModal } from "@cache/productManagement";
+import HandleRefusalRefundOrExchangeRequestModal from "@components/sale/HandleRefusalRefundOrExchangeRequestModal";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const { type, statusName, statusType, statusGroup } = useReactiveVar(
+    commonSaleFilterOptionVar
+  );
 
   const [sendOrderItems] = useMutation<
     SendOrderItemsType,
@@ -74,7 +82,7 @@ const Controller = () => {
   const [temporaryQuery, setTemporaryQuery] = useState<string>("");
 
   const refundOrderItems = useReactiveVar(refundOrderItemsVar);
-  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
+  const checkedOrderItems = useReactiveVar(commonCheckedOrderItemsVar);
   const reconstructCheckedOrderItems =
     getReconstructCheckedOrderItems(checkedOrderItems);
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
@@ -85,11 +93,22 @@ const Controller = () => {
     return "";
   };
 
+  const handleRefusalRefundButtonClick = () => {
+    modalVar({
+      isVisible: true,
+      component: (
+        <HandleRefusalRefundOrExchangeRequestModal
+          status={DenyRefundOrExchangeRequestType.REFUND}
+        />
+      ),
+    });
+  };
+
   const changeSearchTypeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const type = e.target.value as OrderSearchType;
 
-    filterOptionVar({
-      ...filterOptionVar(),
+    commonSaleFilterOptionVar({
+      ...commonSaleFilterOptionVar(),
       type,
     });
   };
@@ -224,7 +243,7 @@ const Controller = () => {
                     isVisible: false,
                   });
 
-                  checkedOrderItemsVar([]);
+                  commonCheckedOrderItemsVar([]);
                   checkAllBoxStatusVar(false);
                 },
               });
@@ -248,7 +267,9 @@ const Controller = () => {
         <ControlButton size="small" onClick={handleSendButtonClick}>
           수거
         </ControlButton>
-        <ControlButton size="small">반품 거절</ControlButton>
+        <ControlButton size="small" onClick={handleRefusalRefundButtonClick}>
+          반품 거절
+        </ControlButton>
         <ControlButton size="small">반품 완료 처리</ControlButton>
         <ChangeOrderStatusDropDown
           arrowSrc={triangleArrowSvg}
@@ -258,7 +279,7 @@ const Controller = () => {
           onChange={changeOrderStatusHandler}
         >
           <Option value={"default"}>강제 상태 변경</Option>
-          {changeOrderStatusType.map(({ id, label, value }) => (
+          {changeRefundOrderStatusByForceType.map(({ id, label, value }) => (
             <Option value={value} key={id}>
               {label}
             </Option>

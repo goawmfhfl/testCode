@@ -1,5 +1,10 @@
 import { SearchQueryType } from "@models/sale";
 
+export enum DenyRefundOrExchangeRequestType {
+  REFUND = "REFUND",
+  EXCHANGE = "EXCHANGE",
+}
+
 export enum SendType {
   SEND = "SEND",
   REFUND_PICK_UP = "REFUND_PICK_UP",
