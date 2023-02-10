@@ -5,7 +5,45 @@ import {
   ShipmentStatus,
   ShipmentType,
 } from "@constants/sale";
+import { ResetOrderItemType } from "@models/sale";
 import { DateType, getDateFormat } from "@utils/date";
+
+export const getIsCheckedStatus = (
+  checkedOrderItems: Array<ResetOrderItemType>
+) => {
+  return checkedOrderItems.reduce(
+    (result, { claimStatus }) => {
+      if (claimStatus === "반품 요청") {
+        result.isRefundRequestChecked = true;
+        result.refundRequestCount++;
+      }
+      if (claimStatus === "수거중") {
+        result.isRefundPickUpInProgressChecked = true;
+        result.refundPickUpInProgressCount++;
+      }
+      if (claimStatus === "수거 완료") {
+        result.isRefundPickUpCompletedChecked = true;
+        result.refundPickUpCompletedCount++;
+      }
+      if (claimStatus === "반품 완료") {
+        result.isRefundCompletedChecked = true;
+        result.refundCompletedCount++;
+      }
+
+      return result;
+    },
+    {
+      isRefundRequestChecked: false,
+      refundRequestCount: 0,
+      isRefundPickUpInProgressChecked: false,
+      refundPickUpInProgressCount: 0,
+      isRefundPickUpCompletedChecked: false,
+      refundPickUpCompletedCount: 0,
+      isRefundCompletedChecked: false,
+      refundCompletedCount: 0,
+    }
+  );
+};
 
 export const getOrdersLength = (
   orders: Array<{

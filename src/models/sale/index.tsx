@@ -202,3 +202,15 @@ export interface EditStatusReasonBySellerInputType {
   mainReason: MainReason;
   detailedReason: string;
 }
+
+export interface ChangeOrderStatusByForceType {
+  changeOrderStatusByForce: {
+    ok: boolean;
+    error?: string;
+  };
+}
+
+export interface ChangeOrderStatusByForceInputType {
+  components: Array<{ orderItemId: number }>;
+  orderStatusName: OrderStatusName;
+}

@@ -68,6 +68,7 @@ export enum ShipmentType {
 }
 
 export enum OrderStatusName {
+  DEFAULT = "DEFAULT",
   PAYMENT_COMPLETED = "PAYMENT_COMPLETED",
   PREPARING = "PREPARING",
   SHIPPING = "SHIPPING",

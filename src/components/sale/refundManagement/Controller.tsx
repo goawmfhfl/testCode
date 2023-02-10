@@ -22,14 +22,26 @@ import {
   searchQueryType,
   SendType,
   DenyRefundOrExchangeRequestType,
+  OrderStatusName,
 } from "@constants/sale";
 import { skipQuantityType } from "@constants/index";
 import { changeRefundOrderStatusByForceType } from "@constants/sale/refundManagement/index";
 
-import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
-
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
+import { CHANGE_ORDER_STATUS_BY_FORCE } from "@graphql/mutations/changeOrderStatusByForce";
 import { GET_REFUND_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+
+import {
+  ChangeOrderStatusByForceType,
+  ChangeOrderStatusByForceInputType,
+  ResetOrderItemType,
+} from "@models/sale";
+import {
+  SendOrderItemsInputType,
+  SendOrderItemsType,
+} from "@models/sale/order";
+
+import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
 
 import questionMarkSrc from "@icons/questionmark.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -39,17 +51,41 @@ import ControllerContainer from "@components/sale/ControllerContainer";
 import Button from "@components/common/Button";
 import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
-import {
-  SendOrderItemsInputType,
-  SendOrderItemsType,
-} from "@models/sale/order";
 import HandleRefusalRefundOrExchangeRequestModal from "@components/sale/HandleRefusalRefundOrExchangeRequestModal";
+import { getIsCheckedStatus } from "@utils/sale";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } = useReactiveVar(
     commonSaleFilterOptionVar
   );
+
+  const [changeOrderStatusByForce] = useMutation<
+    ChangeOrderStatusByForceType,
+    {
+      input: ChangeOrderStatusByForceInputType;
+    }
+  >(CHANGE_ORDER_STATUS_BY_FORCE, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    refetchQueries: [
+      {
+        query: GET_REFUND_ORDERS_BY_SELLER,
+        variables: {
+          input: {
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
+          },
+        },
+      },
+      "GetOrdersBySeller",
+    ],
+  });
 
   const [sendOrderItems] = useMutation<
     SendOrderItemsType,
@@ -81,19 +117,215 @@ const Controller = () => {
   const [showNotice, setShowNotice] = useState<boolean>(false);
   const [temporaryQuery, setTemporaryQuery] = useState<string>("");
 
-  const refundOrderItems = useReactiveVar(refundOrderItemsVar);
-  const checkedOrderItems = useReactiveVar(commonCheckedOrderItemsVar);
-  const reconstructCheckedOrderItems =
+  const refundOrderItems: Array<ResetOrderItemType> =
+    useReactiveVar(refundOrderItemsVar);
+  const checkedOrderItems: Array<ResetOrderItemType> = useReactiveVar(
+    commonCheckedOrderItemsVar
+  );
+  const reconstructCheckedOrderItems: Array<ResetOrderItemType> =
     getReconstructCheckedOrderItems(checkedOrderItems);
+
+  const {
+    isRefundRequestChecked,
+    refundRequestCount,
+    isRefundPickUpInProgressChecked,
+    refundPickUpInProgressCount,
+    isRefundPickUpCompletedChecked,
+    refundPickUpCompletedCount,
+    isRefundCompletedChecked,
+  } = getIsCheckedStatus(reconstructCheckedOrderItems);
+
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
 
-  const changeOrderStatusHandler = (
+  const handleOrderStatusByForceClick = () => {
+    if (!checkedOrderItems.length) {
+      showHasAnyProblemModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
+      return;
+    }
+
+    if (isRefundCompletedChecked) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+      return;
+    }
+  };
+
+  const changeOrderStatusByForceHandler = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    return "";
+    const claimStatus = e.target.value as OrderStatusName;
+
+    if (
+      (claimStatus === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS &&
+        isRefundPickUpInProgressChecked) ||
+      (claimStatus === OrderStatusName.REFUND_COMPLETED &&
+        isRefundPickUpCompletedChecked)
+    ) {
+      showHasAnyProblemModal(
+        <>
+          현재와 같은 주문상태로
+          <br />
+          변경할 수 없습니다.
+          <br />
+          다른 주문상태로 변경을
+          <br />
+          선택해주세요.
+        </>
+      );
+      return;
+    }
+
+    if (
+      claimStatus === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS &&
+      isRefundPickUpCompletedChecked
+    ) {
+      showHasAnyProblemModal(
+        <>
+          현재 주문 상태보다
+          <br />
+          이전 상태로 돌아갈 수 없습니다.
+          <br />
+          다른 주문상태로 변경을
+          <br />
+          선택해주세요.
+        </>
+      );
+      return;
+    }
+
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: (
+        <>
+          {isRefundRequestChecked && `반품요청 ${refundRequestCount}건`}{" "}
+          {isRefundPickUpInProgressChecked &&
+            `수거중 ${refundPickUpInProgressCount}건`}
+          을
+          <br />
+          {claimStatus === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS &&
+            "수거중으로"}
+          {claimStatus === OrderStatusName.REFUND_COMPLETED && "수거완료로"}{" "}
+          변경 처리하시겠습니까?
+        </>
+      ),
+      confirmButtonVisibility: true,
+      cancelButtonVisibility: true,
+      confirmButtonClickHandler: () => {
+        const description =
+          claimStatus === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS
+            ? "수거중"
+            : "수거완료";
+        try {
+          void (async () => {
+            loadingSpinnerVisibilityVar(true);
+            const components = reconstructCheckedOrderItems.map(({ id }) => ({
+              orderItemId: id,
+            }));
+
+            const {
+              data: {
+                changeOrderStatusByForce: { ok, error },
+              },
+            } = await changeOrderStatusByForce({
+              variables: {
+                input: {
+                  components,
+                  orderStatusName: claimStatus,
+                },
+              },
+            });
+
+            if (ok) {
+              loadingSpinnerVisibilityVar(false);
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: <>{description}상태로 변경되었습니다.</>,
+                confirmButtonVisibility: true,
+                cancelButtonVisibility: false,
+                confirmButtonClickHandler: () => {
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+
+                  commonCheckedOrderItemsVar([]);
+                  checkAllBoxStatusVar(false);
+                },
+              });
+            }
+            if (error) {
+              loadingSpinnerVisibilityVar(false);
+              showHasServerErrorModal(error, description);
+            }
+          })();
+        } catch (error) {
+          loadingSpinnerVisibilityVar(false);
+          showHasServerErrorModal(error as string, description);
+        }
+      },
+      cancelButtonClickHandler: () => {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: <>주문 상태 변경이 취소되었습니다</>,
+          confirmButtonVisibility: true,
+          cancelButtonVisibility: false,
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+            });
+          },
+        });
+      },
+    });
   };
 
   const handleRefusalRefundButtonClick = () => {
+    if (!checkedOrderItems.length) {
+      showHasAnyProblemModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
+      return;
+    }
+
+    if (
+      isRefundPickUpInProgressChecked ||
+      isRefundPickUpCompletedChecked ||
+      isRefundCompletedChecked
+    ) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+
+      return;
+    }
+
     modalVar({
       isVisible: true,
       component: (
@@ -139,15 +371,23 @@ const Controller = () => {
       return;
     }
 
-    // showHasAnyProblemModal(
-    //   <>
-    //     해당 버튼은 선택하신
-    //     <br />
-    //     주문건을 처리할 수 없습니다.
-    //     <br />
-    //     주문 상태를 다시 확인해주세요.
-    //   </>
-    // );
+    if (
+      isRefundPickUpInProgressChecked ||
+      isRefundPickUpCompletedChecked ||
+      isRefundCompletedChecked
+    ) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+
+      return;
+    }
 
     const { isShipmentCompanyFullFilled, isShipmentNumberFullFilled } =
       reconstructCheckedOrderItems.reduce(
@@ -275,10 +515,9 @@ const Controller = () => {
           arrowSrc={triangleArrowSvg}
           sizing={"medium"}
           width={"119px"}
-          value={type}
-          onChange={changeOrderStatusHandler}
+          value={OrderStatusName.DEFAULT}
+          onChange={changeOrderStatusByForceHandler}
         >
-          <Option value={"default"}>강제 상태 변경</Option>
           {changeRefundOrderStatusByForceType.map(({ id, label, value }) => (
             <Option value={value} key={id}>
               {label}
@@ -296,7 +535,7 @@ const Controller = () => {
             <NoticeCOntainer>
               <NoticeIcon src={questionMarkSrc} />
               <NoticeText>
-                강제 상태 변경은 선택한 주문상틔 이후 상태로만 변경 가능합니다.
+                강제 상태 변경은 선택한 주문상태 이후 상태로만 변경 가능합니다.
                 <br /> 이전 상태로 변경은 불가합니다.
               </NoticeText>
             </NoticeCOntainer>
@@ -310,6 +549,7 @@ const Controller = () => {
           width={"119px"}
           value={type}
           onChange={changeSearchTypeHandler}
+          onClick={handleOrderStatusByForceClick}
         >
           {searchQueryType.map(({ id, label, value }) => (
             <Option value={value} key={id}>

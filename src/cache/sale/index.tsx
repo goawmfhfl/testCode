@@ -1,11 +1,6 @@
 import { makeVar } from "@apollo/client";
-import {
-  OrderStatusType,
-  OrderStatusGroup,
-  OrderSearchType,
-  SaleMenuStatusType,
-} from "@constants/sale";
-import { FilterOptionVarType, OrderItems } from "@models/sale/index";
+import { SaleMenuStatusType } from "@constants/sale";
+import { FilterOptionVarType } from "@models/sale/index";
 import { ResetOrderItemType } from "@models/sale";
 
 export const saleMenuStatusVar = makeVar<SaleMenuStatusType>(
@@ -15,10 +10,10 @@ export const saleMenuStatusVar = makeVar<SaleMenuStatusType>(
 export const checkedOrderItemsVar = makeVar<Array<ResetOrderItemType>>([]);
 
 export const commonSaleFilterOptionVar = makeVar<FilterOptionVarType>({
-  type: OrderSearchType.RECIPIENT_NAME,
+  type: null,
   statusName: null,
-  statusType: OrderStatusType.ORDER,
-  statusGroup: OrderStatusGroup.ORDER,
+  statusType: null,
+  statusGroup: null,
 });
 
 export const commonCheckedOrderItemsVar = makeVar<Array<ResetOrderItemType>>(
