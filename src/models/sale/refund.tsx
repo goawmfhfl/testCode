@@ -46,3 +46,17 @@ export interface DenyRefundOrExchangeRequestBySellerInputType {
   }>;
   type: DenyRefundOrExchangeRequestType;
 }
+
+export interface CompleteRefundBySellerType {
+  completeRefundBySeller: {
+    ok: boolean;
+    error?: string;
+  };
+}
+
+export interface CompleteRefundBySellerInputType {
+  components: Array<{
+    orderItemId: number;
+    cause: Cause;
+  }>;
+}

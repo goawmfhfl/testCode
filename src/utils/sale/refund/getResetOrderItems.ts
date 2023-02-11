@@ -59,6 +59,7 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       refusalReasonStatus,
       refusalStatusReasonId,
       amount,
+      cause,
     } = getStatusReason(statusReasons);
 
     const {
@@ -109,10 +110,10 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       productName: product?.name || "-",
       userName: user?.name || "-",
       orderStatus: orderStatus?.name
-        ? orderStatusNameType[orderStatus.name]
+        ? (orderStatusNameType[orderStatus.name] as string)
         : "-",
       claimStatus: claimStatus?.name
-        ? orderStatusNameType[claimStatus.name]
+        ? (orderStatusNameType[claimStatus?.name] as string)
         : "-",
       paidAt: orderByShop?.order?.paidAt
         ? `${
@@ -181,6 +182,9 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       isRefundShipmentInfoEdit: false,
       temporaryRefundShipmentCompany: refundShipmentCompany || "",
       temporaryRefundShipmentNumber: refundShipmentNumber || 0,
+
+      isBundleShipment,
+      cause,
 
       colorIndex,
       rowIndex,

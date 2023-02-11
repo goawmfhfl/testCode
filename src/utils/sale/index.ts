@@ -1,4 +1,5 @@
 import {
+  Cause,
   MainReason,
   mainReasonType,
   OrderStatusName,
@@ -133,6 +134,7 @@ export const getStatusReason = (
     mainReason: MainReason;
     detailedReason: string;
     status: OrderStatusName;
+    cause: Cause;
 
     uploadedFileUrls: Array<{
       url: string;
@@ -147,6 +149,7 @@ export const getStatusReason = (
     reasonStatus: OrderStatusName;
     statusReasonId: number;
     amount: number;
+    cause: Cause;
     refusalAt: string;
     refusalReason: string;
     refusalDetailedReason: string;
@@ -162,6 +165,7 @@ export const getStatusReason = (
     reasonStatus: null,
     refusalStatusReasonId: null,
     amount: 0,
+    cause: null,
     refusalAt: "",
     refusalReason: "",
     refusalDetailedReason: "",
@@ -185,6 +189,7 @@ export const getStatusReason = (
         mainReason,
         detailedReason,
         status,
+        cause,
         uploadedFileUrls,
       }
     ) => {
@@ -203,6 +208,7 @@ export const getStatusReason = (
         result.requestAt = `${
           getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
         } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
+        result.cause = cause;
         result.attachedImages = uploadedFileUrls;
       }
 

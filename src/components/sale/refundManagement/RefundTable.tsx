@@ -29,6 +29,7 @@ import { refundOrderItemsVar } from "@cache/sale/refund";
 import {
   commonCheckedOrderItemsVar,
   commonSaleFilterOptionVar,
+  totalOrderItemsVar,
 } from "@cache/sale";
 import { NormalizedType, OrderItems, ResetOrderItemType } from "@models/sale";
 import constructOrderItem from "@utils/sale/constructOrderItem";
@@ -592,6 +593,7 @@ const RefundTable = () => {
       reconstructOrderItems
     );
 
+    totalOrderItemsVar(totalOrderItems);
     refundOrderItemsVar(resetOrderItems);
 
     commonCheckedOrderItemsVar([]);

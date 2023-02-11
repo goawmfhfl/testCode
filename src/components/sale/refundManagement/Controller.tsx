@@ -5,8 +5,9 @@ import { useMutation, useReactiveVar } from "@apollo/client";
 import {
   commonSaleFilterOptionVar,
   commonCheckedOrderItemsVar,
+  totalOrderItemsVar,
 } from "@cache/sale";
-import { refundOrderItemsVar } from "@cache/sale/refund";
+
 import {
   checkAllBoxStatusVar,
   commonFilterOptionVar,
@@ -23,11 +24,13 @@ import {
   SendType,
   DenyRefundOrExchangeRequestType,
   OrderStatusName,
+  Cause,
 } from "@constants/sale";
 import { skipQuantityType } from "@constants/index";
 import { changeRefundOrderStatusByForceType } from "@constants/sale/refundManagement/index";
 
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
+import { COMPLETE_REFUND_BY_SELLER } from "@graphql/mutations/completeRefundBySeller";
 import { CHANGE_ORDER_STATUS_BY_FORCE } from "@graphql/mutations/changeOrderStatusByForce";
 import { GET_REFUND_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 
@@ -35,11 +38,16 @@ import {
   ChangeOrderStatusByForceType,
   ChangeOrderStatusByForceInputType,
   ResetOrderItemType,
+  OrderItems,
 } from "@models/sale";
 import {
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
+import {
+  CompleteRefundBySellerType,
+  CompleteRefundBySellerInputType,
+} from "@models/sale/refund";
 
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
 
@@ -53,6 +61,10 @@ import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
 import HandleRefusalRefundOrExchangeRequestModal from "@components/sale/HandleRefusalRefundOrExchangeRequestModal";
 import { getIsCheckedStatus } from "@utils/sale";
+import {
+  getHandleCompleteRefundErrorCase,
+  getRefundInformation,
+} from "@utils/sale/refund";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -114,11 +126,37 @@ const Controller = () => {
     ],
   });
 
+  const [completeRefund] = useMutation<
+    CompleteRefundBySellerType,
+    {
+      input: CompleteRefundBySellerInputType;
+    }
+  >(COMPLETE_REFUND_BY_SELLER, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    refetchQueries: [
+      {
+        query: GET_REFUND_ORDERS_BY_SELLER,
+        variables: {
+          input: {
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
+          },
+        },
+      },
+      "GetOrdersBySeller",
+    ],
+  });
+
   const [showNotice, setShowNotice] = useState<boolean>(false);
   const [temporaryQuery, setTemporaryQuery] = useState<string>("");
 
-  const refundOrderItems: Array<ResetOrderItemType> =
-    useReactiveVar(refundOrderItemsVar);
+  const totalOrderItems: Array<OrderItems> = useReactiveVar(totalOrderItemsVar);
   const checkedOrderItems: Array<ResetOrderItemType> = useReactiveVar(
     commonCheckedOrderItemsVar
   );
@@ -136,6 +174,266 @@ const Controller = () => {
   } = getIsCheckedStatus(reconstructCheckedOrderItems);
 
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
+
+  const handleSendButtonClick = () => {
+    if (!checkedOrderItems.length) {
+      showHasAnyProblemModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
+      return;
+    }
+
+    if (
+      isRefundPickUpInProgressChecked ||
+      isRefundPickUpCompletedChecked ||
+      isRefundCompletedChecked
+    ) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+
+      return;
+    }
+
+    const { isShipmentCompanyFullFilled, isShipmentNumberFullFilled } =
+      reconstructCheckedOrderItems.reduce(
+        (
+          result,
+          { temporaryRefundShipmentCompany, temporaryRefundShipmentNumber }
+        ) => {
+          if (!temporaryRefundShipmentCompany)
+            result.isShipmentCompanyFullFilled = false;
+          if (!temporaryRefundShipmentNumber)
+            result.isShipmentCompanyFullFilled = false;
+
+          return result;
+        },
+        {
+          isShipmentCompanyFullFilled: true,
+          isShipmentNumberFullFilled: true,
+        }
+      );
+
+    if (!isShipmentCompanyFullFilled || !isShipmentNumberFullFilled) {
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        icon: exclamationmarkSrc,
+        description: <>송장정보를 기입해주세요</>,
+        cancelButtonVisibility: false,
+        confirmButtonVisibility: true,
+        confirmButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+            icon: "",
+          });
+        },
+      });
+
+      return;
+    }
+
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description: (
+        <>
+          해당 반품건을 <br />
+          수거 처리 하시겠습니까?
+        </>
+      ),
+      cancelButtonVisibility: true,
+      confirmButtonVisibility: true,
+      confirmButtonClickHandler: () => {
+        try {
+          void (async () => {
+            loadingSpinnerVisibilityVar(true);
+
+            const components = reconstructCheckedOrderItems.map(
+              ({
+                id,
+                temporaryRefundShipmentCompany,
+                temporaryRefundShipmentNumber,
+              }) => ({
+                orderItemId: id,
+                shipmentCompany: temporaryRefundShipmentCompany,
+                shipmentNumber: Number(temporaryRefundShipmentNumber),
+              })
+            );
+
+            const {
+              data: {
+                sendOrderItems: { ok, error },
+              },
+            } = await sendOrderItems({
+              variables: {
+                input: {
+                  components: components,
+                  type: SendType.REFUND_PICK_UP,
+                },
+              },
+            });
+
+            if (ok) {
+              loadingSpinnerVisibilityVar(false);
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: <>수거 처리되었습니다.</>,
+                confirmButtonVisibility: true,
+                cancelButtonVisibility: false,
+                confirmButtonClickHandler: () => {
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+
+                  commonCheckedOrderItemsVar([]);
+                  checkAllBoxStatusVar(false);
+                },
+              });
+            }
+            if (error) {
+              loadingSpinnerVisibilityVar(false);
+              showHasServerErrorModal(error, "수거 처리");
+            }
+          })();
+        } catch (error) {
+          loadingSpinnerVisibilityVar(false);
+          showHasServerErrorModal(error as string, "수거 처리");
+        }
+      },
+    });
+  };
+
+  const handleRefusalRefundButtonClick = () => {
+    if (!checkedOrderItems.length) {
+      showHasAnyProblemModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
+      return;
+    }
+
+    if (
+      isRefundPickUpInProgressChecked ||
+      isRefundPickUpCompletedChecked ||
+      isRefundCompletedChecked
+    ) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+
+      return;
+    }
+
+    modalVar({
+      isVisible: true,
+      component: (
+        <HandleRefusalRefundOrExchangeRequestModal
+          status={DenyRefundOrExchangeRequestType.REFUND}
+        />
+      ),
+    });
+  };
+
+  const handleCompleteRefundButtonClick = () => {
+    if (!checkedOrderItems.length) {
+      showHasAnyProblemModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
+      return;
+    }
+
+    if (
+      isRefundRequestChecked ||
+      isRefundPickUpInProgressChecked ||
+      isRefundCompletedChecked
+    ) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+
+      return;
+    }
+
+    const { hasDiffrentOrder, hasDifferentShipmentType, hasDifferentCause } =
+      getHandleCompleteRefundErrorCase(reconstructCheckedOrderItems);
+
+    if (hasDiffrentOrder) {
+      showHasAnyProblemModal(
+        <>
+          반품 완료처리는 하나의
+          <br />
+          주문건 안에서만 가능합니다.
+        </>
+      );
+
+      return;
+    }
+
+    if (hasDifferentShipmentType) {
+      showHasAnyProblemModal(
+        <>
+          반품 완료처리는 하나의
+          <br />
+          묶음 배송 안에서만 가능합니다.
+        </>
+      );
+
+      return;
+    }
+
+    if (hasDifferentCause) {
+      showHasAnyProblemModal(
+        <>
+          반품 완료처리는 하나의
+          <br />
+          귀책사유 에서만 가능합니다.
+        </>
+      );
+
+      return;
+    }
+
+    const {
+      cause,
+      totalPaymentAmount,
+      shipmentPrice,
+      mainReason,
+      detailedReason,
+    } = getRefundInformation(reconstructCheckedOrderItems, totalOrderItems);
+  };
 
   const handleOrderStatusByForceClick = () => {
     if (!checkedOrderItems.length) {
@@ -296,46 +594,6 @@ const Controller = () => {
     });
   };
 
-  const handleRefusalRefundButtonClick = () => {
-    if (!checkedOrderItems.length) {
-      showHasAnyProblemModal(
-        <>
-          선택된 주문건이 없습니다
-          <br />
-          주문건을 선택해주세요
-        </>
-      );
-      return;
-    }
-
-    if (
-      isRefundPickUpInProgressChecked ||
-      isRefundPickUpCompletedChecked ||
-      isRefundCompletedChecked
-    ) {
-      showHasAnyProblemModal(
-        <>
-          해당 버튼은 선택하신
-          <br />
-          주문건을 처리할 수 없습니다.
-          <br />
-          주문 상태를 다시 확인해주세요.
-        </>
-      );
-
-      return;
-    }
-
-    modalVar({
-      isVisible: true,
-      component: (
-        <HandleRefusalRefundOrExchangeRequestModal
-          status={DenyRefundOrExchangeRequestType.REFUND}
-        />
-      ),
-    });
-  };
-
   const changeSearchTypeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const type = e.target.value as OrderSearchType;
 
@@ -357,148 +615,6 @@ const Controller = () => {
     });
 
     paginationSkipVar(0);
-  };
-
-  const handleSendButtonClick = () => {
-    if (!checkedOrderItems.length) {
-      showHasAnyProblemModal(
-        <>
-          선택된 주문건이 없습니다
-          <br />
-          주문건을 선택해주세요
-        </>
-      );
-      return;
-    }
-
-    if (
-      isRefundPickUpInProgressChecked ||
-      isRefundPickUpCompletedChecked ||
-      isRefundCompletedChecked
-    ) {
-      showHasAnyProblemModal(
-        <>
-          해당 버튼은 선택하신
-          <br />
-          주문건을 처리할 수 없습니다.
-          <br />
-          주문 상태를 다시 확인해주세요.
-        </>
-      );
-
-      return;
-    }
-
-    const { isShipmentCompanyFullFilled, isShipmentNumberFullFilled } =
-      reconstructCheckedOrderItems.reduce(
-        (
-          result,
-          { temporaryRefundShipmentCompany, temporaryRefundShipmentNumber }
-        ) => {
-          if (!temporaryRefundShipmentCompany)
-            result.isShipmentCompanyFullFilled = false;
-          if (!temporaryRefundShipmentNumber)
-            result.isShipmentCompanyFullFilled = false;
-
-          return result;
-        },
-        {
-          isShipmentCompanyFullFilled: true,
-          isShipmentNumberFullFilled: true,
-        }
-      );
-
-    if (!isShipmentCompanyFullFilled || !isShipmentNumberFullFilled) {
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        icon: exclamationmarkSrc,
-        description: <>송장정보를 기입해주세요</>,
-        cancelButtonVisibility: false,
-        confirmButtonVisibility: true,
-        confirmButtonClickHandler: () => {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: false,
-            icon: "",
-          });
-        },
-      });
-
-      return;
-    }
-
-    systemModalVar({
-      ...systemModalVar(),
-      isVisible: true,
-      description: (
-        <>
-          해당 반품건을 <br />
-          수거 처리 하시겠습니까?
-        </>
-      ),
-      cancelButtonVisibility: true,
-      confirmButtonVisibility: true,
-      confirmButtonClickHandler: () => {
-        try {
-          void (async () => {
-            loadingSpinnerVisibilityVar(true);
-
-            const components = reconstructCheckedOrderItems.map(
-              ({
-                id,
-                temporaryRefundShipmentCompany,
-                temporaryRefundShipmentNumber,
-              }) => ({
-                orderItemId: id,
-                shipmentCompany: temporaryRefundShipmentCompany,
-                shipmentNumber: Number(temporaryRefundShipmentNumber),
-              })
-            );
-
-            const {
-              data: {
-                sendOrderItems: { ok, error },
-              },
-            } = await sendOrderItems({
-              variables: {
-                input: {
-                  components: components,
-                  type: SendType.REFUND_PICK_UP,
-                },
-              },
-            });
-
-            if (ok) {
-              loadingSpinnerVisibilityVar(false);
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: <>수거 처리되었습니다.</>,
-                confirmButtonVisibility: true,
-                cancelButtonVisibility: false,
-                confirmButtonClickHandler: () => {
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-
-                  commonCheckedOrderItemsVar([]);
-                  checkAllBoxStatusVar(false);
-                },
-              });
-            }
-            if (error) {
-              loadingSpinnerVisibilityVar(false);
-              showHasServerErrorModal(error, "수거 처리");
-            }
-          })();
-        } catch (error) {
-          loadingSpinnerVisibilityVar(false);
-          showHasServerErrorModal(error as string, "수거 처리");
-        }
-      },
-    });
   };
 
   return (
@@ -533,6 +649,7 @@ const Controller = () => {
             statusName === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS ||
             statusName === OrderStatusName.REFUND_COMPLETED
           }
+          onClick={handleCompleteRefundButtonClick}
         >
           반품 완료 처리
         </ControlButton>

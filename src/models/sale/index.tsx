@@ -1,4 +1,5 @@
 import {
+  Cause,
   MainReason,
   OrderSearchType,
   OrderStatusGroup,
@@ -36,6 +37,7 @@ export interface OrderItems {
     amount: number;
     mainReason: MainReason;
     detailedReason: string;
+    cause: Cause;
     status: OrderStatusName;
     uploadedFileUrls: Array<{
       url: string;
@@ -73,9 +75,10 @@ export interface OrderItems {
   quantity: number;
   discountAppliedPrice: number;
   originalPrice: number;
+
+  shipmentType: ShipmentType;
   shipmentPrice: number;
   shipmentDistantPrice: number;
-  shipmentType: ShipmentType;
 
   orderShipmentInfos?: Array<{
     id: number;
@@ -155,6 +158,9 @@ export interface ResetOrderItemType {
   refusalStatusReasonId?: number;
   amount?: number | string;
   attachedImages?: Array<{ url: string }> | null;
+
+  isBundleShipment?: boolean;
+  cause?: Cause;
 
   isChecked: boolean;
 

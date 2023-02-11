@@ -195,6 +195,7 @@ export const GET_REFUND_ORDERS_BY_SELLER = gql`
           amount
           mainReason
           detailedReason
+          cause
           status
           uploadedFileUrls {
             url
