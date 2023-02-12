@@ -50,6 +50,11 @@ import {
 } from "@models/sale/refund";
 
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
+import { getIsCheckedStatus } from "@utils/sale";
+import {
+  getHandleCompleteRefundErrorCase,
+  getRefundInformation,
+} from "@utils/sale/refund";
 
 import questionMarkSrc from "@icons/questionmark.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -60,11 +65,7 @@ import Button from "@components/common/Button";
 import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
 import HandleRefusalRefundOrExchangeRequestModal from "@components/sale/HandleRefusalRefundOrExchangeRequestModal";
-import { getIsCheckedStatus } from "@utils/sale";
-import {
-  getHandleCompleteRefundErrorCase,
-  getRefundInformation,
-} from "@utils/sale/refund";
+import HandleCompleteRefundModal from "@components/sale/refundManagement/HandleCompleteRefundModal";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -358,6 +359,27 @@ const Controller = () => {
   };
 
   const handleCompleteRefundButtonClick = () => {
+    const {
+      cause,
+      totalPaymentAmount,
+      shipmentPrice,
+      mainReason,
+      detailedReason,
+    } = getRefundInformation(reconstructCheckedOrderItems, totalOrderItems);
+
+    modalVar({
+      isVisible: true,
+      component: (
+        <HandleCompleteRefundModal
+          cause={cause}
+          totalPaymentAmount={totalPaymentAmount}
+          shipmentPrice={shipmentPrice}
+          mainReason={mainReason}
+          detailedReason={detailedReason}
+        />
+      ),
+    });
+
     if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
         <>
@@ -425,14 +447,6 @@ const Controller = () => {
 
       return;
     }
-
-    const {
-      cause,
-      totalPaymentAmount,
-      shipmentPrice,
-      mainReason,
-      detailedReason,
-    } = getRefundInformation(reconstructCheckedOrderItems, totalOrderItems);
   };
 
   const handleOrderStatusByForceClick = () => {
