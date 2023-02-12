@@ -1,8 +1,5 @@
-import { useEffect } from "react";
 import styled from "styled-components/macro";
 import { HeaderNames } from "@constants/index";
-import { OrderStatusGroup, OrderStatusType } from "@constants/sale";
-import { filterOptionVar } from "@cache/sale/order";
 
 import ContentsHeader from "@components/common/ContentsHeader";
 import FilterBar from "@components/sale/orderManagement/FilterBar";

@@ -88,8 +88,12 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       thumbnail: product?.thumbnail || "-",
       productName: product?.name || "-",
       userName: user?.name || "-",
-      orderStatus: orderStatus ? orderStatusNameType[orderStatus.name] : "-",
-      claimStatus: claimStatus ? orderStatusNameType[claimStatus.name] : "-",
+      orderStatus: orderStatus
+        ? (orderStatusNameType[orderStatus.name] as string)
+        : "-",
+      claimStatus: claimStatus
+        ? (orderStatusNameType[claimStatus.name] as string)
+        : "-",
       shipmentOrderId,
       shipmentCompany: shippingShipmentCompany,
       shipmentNumber: shippingShipmentNumber,

@@ -94,8 +94,12 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       thumbnail: product.thumbnail || "-",
       productName: product.name || "-",
       userName: user.name || "-",
-      orderStatus: orderStatus ? orderStatusNameType[orderStatus.name] : "-",
-      claimStatus: claimStatus ? orderStatusNameType[claimStatus.name] : "-",
+      orderStatus: orderStatus
+        ? (orderStatusNameType[orderStatus.name] as string)
+        : "-",
+      claimStatus: claimStatus
+        ? (orderStatusNameType[claimStatus.name] as string)
+        : "-",
       paidAt: orderByShop?.order?.paidAt
         ? `${
             getDateFormat(orderByShop?.order?.paidAt, DateType.PAYMENT)

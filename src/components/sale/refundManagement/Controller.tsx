@@ -24,7 +24,6 @@ import {
   SendType,
   DenyRefundOrExchangeRequestType,
   OrderStatusName,
-  Cause,
 } from "@constants/sale";
 import { skipQuantityType } from "@constants/index";
 import { changeRefundOrderStatusByForceType } from "@constants/sale/refundManagement/index";

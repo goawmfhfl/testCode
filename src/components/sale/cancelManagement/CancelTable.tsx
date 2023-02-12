@@ -17,7 +17,6 @@ import {
   pageNumberListVar,
   paginationVisibilityVar,
   showHasAnyProblemModal,
-  systemModalVar,
   totalPageLengthVar,
 } from "@cache/index";
 
@@ -50,7 +49,6 @@ import Loading from "@components/common/table/Loading";
 import NoDataContainer from "@components/common/table/NoDataContainer";
 import Button from "@components/common/Button";
 import getResetOrderItems from "@utils/sale/cancel/getResetOrderItems";
-import { Input } from "@components/common/input/TextInput";
 import EditReasonModal from "@components/sale/cancelManagement/EditReasonModal";
 
 const CancelTable = () => {
@@ -397,7 +395,6 @@ const CancelTable = () => {
           {!loading &&
             cancleOrderItems?.map(
               ({
-                id,
                 paidAt,
                 requestAt,
                 mainReason,

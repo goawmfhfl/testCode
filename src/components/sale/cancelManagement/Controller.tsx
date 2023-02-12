@@ -4,13 +4,11 @@ import { useMutation, useReactiveVar } from "@apollo/client";
 
 import { skipQuantityType } from "@constants/index";
 import {
-  Cause,
-  MainReason,
   OrderSearchType,
   OrderStatusName,
   searchQueryType,
 } from "@constants/sale";
-import { OrderCancel, orderCancelType } from "@constants/sale/cancelManagement";
+import { OrderCancel } from "@constants/sale/cancelManagement";
 import { ResetOrderItemType } from "@models/sale";
 
 import {
