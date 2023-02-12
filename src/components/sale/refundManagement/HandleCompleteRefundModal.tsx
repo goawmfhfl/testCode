@@ -15,16 +15,20 @@ import Button from "@components/common/Button";
 
 const HandleCompleteRefundModal = ({
   cause,
-  totalPaymentAmount,
+  totalPrice,
   shipmentPrice,
+  shipmentDistantPrice,
   mainReason,
   detailedReason,
+  isConditionalFree,
 }: {
   cause: Cause;
-  totalPaymentAmount: number;
+  totalPrice: number;
   shipmentPrice: number;
+  shipmentDistantPrice: number;
   mainReason: string;
   detailedReason: string;
+  isConditionalFree: boolean;
 }) => {
   return (
     <Container>
@@ -41,24 +45,22 @@ const HandleCompleteRefundModal = ({
 
       <ReasonContainer>
         <Label>환불 사유</Label>
-        <Reason>
-          환불 사유환불 사유환불 사유환불 사유환불 사유환불 사유환불
-        </Reason>
+        <Reason>{detailedReason}</Reason>
       </ReasonContainer>
 
       <RefundAmountContainer>
         <Label>환불 금액</Label>
         <CalculateRefundAmountContainer>
-          <WhoseCause>소비자 귀책</WhoseCause>
+          <WhoseCause>{cause}</WhoseCause>
 
           <RefundContainer>
             <RefundLabel>결제 금액(상품가+최초배송비)</RefundLabel>
-            <RefundPrice>48,000</RefundPrice>
+            <RefundPrice>{totalPrice}</RefundPrice>
           </RefundContainer>
 
           <RefundContainer>
             <RefundLabel>-최초 배송비</RefundLabel>
-            <RefundPrice>3,000</RefundPrice>
+            <RefundPrice>{shipmentPrice}</RefundPrice>
           </RefundContainer>
 
           <RefundShipmentContainer>

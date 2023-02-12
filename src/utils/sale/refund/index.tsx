@@ -1,4 +1,4 @@
-import { Cause, MainReason } from "@constants/sale";
+import { Cause, MainReason, ShipmentType } from "@constants/sale";
 import { OrderItems, ResetOrderItemType } from "@models/sale";
 import {
   getOption,
@@ -13,11 +13,6 @@ export const getHandleCompleteRefundErrorCase = (
 ) => {
   return checkedOrderItems.reduce(
     (result, { isBundleShipment, cause }, index, array) => {
-      let hasBundleShipment;
-      let hasIndividualShipment;
-      let isClientCause;
-      let isSellerCause;
-
       const order = array[0].merchantUid;
       const hasFilteredOrders = array.filter(
         ({ merchantUid }) => merchantUid !== order
@@ -27,33 +22,38 @@ export const getHandleCompleteRefundErrorCase = (
       }
 
       if (isBundleShipment) {
-        hasBundleShipment = true;
+        result.hasBundleShipment = true;
       }
 
       if (!isBundleShipment) {
-        hasIndividualShipment = true;
+        result.hasIndividualShipment = true;
       }
 
-      if (hasBundleShipment && hasIndividualShipment) {
+      if (result.hasBundleShipment && result.hasIndividualShipment) {
         result.hasDifferentShipmentType = true;
       }
 
       if (cause === Cause.CLIENT) {
-        isClientCause = true;
+        result.isClientCause = true;
       }
 
       if (cause === Cause.SELLER) {
-        isSellerCause = true;
+        result.isSellerCause = true;
       }
 
-      if (isClientCause && isSellerCause) {
+      if (result.isClientCause && result.isSellerCause) {
         result.hasDifferentCause = true;
       }
 
       return result;
     },
     {
-      hasDiffrentOrder: true,
+      isClientCause: false,
+      isSellerCause: false,
+      hasBundleShipment: false,
+      hasIndividualShipment: false,
+
+      hasDiffrentOrder: false,
       hasDifferentShipmentType: false,
       hasDifferentCause: false,
     }
@@ -94,13 +94,14 @@ export const getRefundInformation = (
         shipmentType,
         orderByShop
       );
+
       const calculateShipmentDistantPrice: number = getShipmentDistantPrice(
         isBundleShipment,
         shipmentDistantPrice,
         orderByShop
       );
 
-      const { totalPaymentAmount } = getPaymentsInfo(
+      const { totalPrice } = getPaymentsInfo(
         originalPrice,
         discountAppliedPrice,
         quantity,
@@ -111,22 +112,61 @@ export const getRefundInformation = (
       );
 
       result.cause = cause;
-      result.totalPaymentAmount += totalPaymentAmount;
-      result.shipmentPrice =
-        cause === Cause.CLIENT
-          ? Math.max(shipmentPrice + shipmentDistantPrice, result.shipmentPrice)
-          : 0;
       result.mainReason = mainReason;
       result.detailedReason = detailedReason;
+      result.totalPrice += totalPrice;
+
+      if (cause === Cause.SELLER) {
+        result.shipmentPrice = 0;
+        result.shipmentDistantPrice = calculateShipmentDistantPrice;
+      }
+
+      if (cause === Cause.CLIENT) {
+        if (
+          orderByShop.bundleShipmentType === ShipmentType.FREE ||
+          orderByShop.bundleShipmentType === ShipmentType.CHARGE
+        ) {
+          result.shipmentPrice = Math.max(
+            calculateShipmentPrice,
+            result.shipmentPrice
+          );
+          result.shipmentDistantPrice = calculateShipmentDistantPrice;
+        }
+
+        if (orderByShop.bundleShipmentType === ShipmentType.CONDITIONAL_FREE) {
+          result.expensiveShipmentPrice = Math.max(
+            orderByShop.bundleShipmentPrice,
+            result.expensiveShipmentPrice
+          );
+          result.shipmentDistantPrice = calculateShipmentDistantPrice;
+
+          const isConditionalShipmentPriceFree =
+            orderByShop.bundleOrderItemTotalPrice - result.totalPrice >=
+            orderByShop.shipmentConditionalPrice;
+
+          if (isConditionalShipmentPriceFree) {
+            result.shipmentPrice = 0;
+            result.isConditionalFree = true;
+          }
+
+          if (!isConditionalShipmentPriceFree) {
+            result.shipmentPrice = result.expensiveShipmentPrice;
+            result.isConditionalFree = false;
+          }
+        }
+      }
 
       return result;
     },
     {
       cause: Cause.DEFAULT,
-      totalPaymentAmount: 0,
+      totalPrice: 0,
       shipmentPrice: 0,
+      shipmentDistantPrice: 0,
       mainReason: "",
       detailedReason: "",
+      isConditionalFree: false,
+      expensiveShipmentPrice: 0,
     }
   );
 };

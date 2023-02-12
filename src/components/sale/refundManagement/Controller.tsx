@@ -361,8 +361,10 @@ const Controller = () => {
   const handleCompleteRefundButtonClick = () => {
     const {
       cause,
-      totalPaymentAmount,
+      totalPrice,
       shipmentPrice,
+      shipmentDistantPrice,
+      isConditionalFree,
       mainReason,
       detailedReason,
     } = getRefundInformation(reconstructCheckedOrderItems, totalOrderItems);
@@ -372,10 +374,12 @@ const Controller = () => {
       component: (
         <HandleCompleteRefundModal
           cause={cause}
-          totalPaymentAmount={totalPaymentAmount}
+          totalPrice={totalPrice}
           shipmentPrice={shipmentPrice}
+          shipmentDistantPrice={shipmentDistantPrice}
           mainReason={mainReason}
           detailedReason={detailedReason}
+          isConditionalFree={isConditionalFree}
         />
       ),
     });
