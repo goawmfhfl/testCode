@@ -148,6 +148,7 @@ const CancelTable = () => {
             statusGroup,
           },
         },
+        fetchPolicy: "no-cache",
       });
     })();
   }, [page, skip, query, type, statusName, statusType, statusGroup]);

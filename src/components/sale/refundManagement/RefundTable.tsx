@@ -550,6 +550,7 @@ const RefundTable = () => {
             statusGroup: OrderStatusGroup.REFUND,
           },
         },
+        fetchPolicy: "no-cache",
       });
     })();
   }, [page, skip, query, type, statusName, statusType, statusGroup]);

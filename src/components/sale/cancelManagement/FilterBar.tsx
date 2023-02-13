@@ -79,6 +79,7 @@ const FilterBar = () => {
             statusGroup: OrderStatusGroup.CANCEL,
           },
         },
+        fetchPolicy: "no-cache",
       });
     })();
   }, []);

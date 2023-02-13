@@ -480,6 +480,7 @@ const OrderTable = () => {
             statusGroup,
           },
         },
+        fetchPolicy: "no-cache",
       });
     })();
   }, [page, skip, query, type, statusName, statusType, statusGroup]);
@@ -521,6 +522,7 @@ const OrderTable = () => {
 
     const resetOrderItems: Array<ResetOrderItemType> =
       getResetOrderItems(nomalizedOrderItem);
+
     resetOrderItemVar(resetOrderItems);
     checkedOrderItemsVar([]);
   }, [data]);

@@ -101,6 +101,7 @@ const FilterBar = () => {
             statusGroup: OrderStatusGroup.REFUND,
           },
         },
+        fetchPolicy: "no-cache",
       });
     })();
   }, []);

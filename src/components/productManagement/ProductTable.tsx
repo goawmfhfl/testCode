@@ -237,6 +237,7 @@ const ProductTable = () => {
     void (async () => {
       await getProducts({
         variables: { input: { page, skip, status, query } },
+        fetchPolicy: "no-cache",
       });
     })();
   }, [page, skip, status, query]);
