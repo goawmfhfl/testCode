@@ -7,7 +7,7 @@ import {
   paginationSkipVar,
   totalPageLengthVar,
 } from "@cache/index";
-import { filterOptionVar } from "@cache/sale/exchange";
+import { commonSaleFilterOptionVar } from "@cache/sale";
 
 import { OrderStatusName, OrderStatusType } from "@constants/sale";
 
@@ -15,7 +15,7 @@ import FilterBarContainer from "@components/sale/FilterBarContainer";
 import Button from "@components/common/Button";
 
 const FilterBar = () => {
-  const { statusName } = useReactiveVar(filterOptionVar);
+  const { statusName } = useReactiveVar(commonSaleFilterOptionVar);
   const totalPageLength = useReactiveVar(totalPageLengthVar);
 
   const handleFilterOptionNameClick =
@@ -25,8 +25,8 @@ const FilterBar = () => {
         page: 1,
       });
       paginationSkipVar(0);
-      filterOptionVar({
-        ...filterOptionVar(),
+      commonSaleFilterOptionVar({
+        ...commonSaleFilterOptionVar(),
         statusName: filterOptionName,
         statusType: OrderStatusType.ORDER,
       });

@@ -50,14 +50,12 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
     } = getShipmentInfos(orderShipmentInfos);
 
     const { optionName, optionPrice, optionQuantity } = getOption(options);
-
     const calculateShipmentPrice: number = getShipmentPrice(
       isBundleShipment,
       shipmentPrice,
       shipmentType,
       orderByShop
     );
-
     const calculateShipmentDistantPrice: number = getShipmentDistantPrice(
       isBundleShipment,
       shipmentDistantPrice,

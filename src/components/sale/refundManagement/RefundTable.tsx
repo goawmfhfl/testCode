@@ -19,19 +19,18 @@ import {
   modalVar,
   loadingSpinnerVisibilityVar,
 } from "@cache/index";
+import { refundOrderItemsVar } from "@cache/sale/refund";
 
 import { TableType } from "@models/index";
+import { NormalizedType, OrderItems, ResetOrderItemType } from "@models/sale";
 
 import useLazyRefundOrders from "@hooks/order/useLazyRefundOrders";
-
-import { refundOrderItemsVar } from "@cache/sale/refund";
 
 import {
   commonCheckedOrderItemsVar,
   commonSaleFilterOptionVar,
   totalOrderItemsVar,
 } from "@cache/sale";
-import { NormalizedType, OrderItems, ResetOrderItemType } from "@models/sale";
 import constructOrderItem from "@utils/sale/constructOrderItem";
 import getResetOrderItems from "@utils/sale/refund/getResetOrderItems";
 import {

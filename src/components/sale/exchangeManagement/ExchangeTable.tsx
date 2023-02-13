@@ -1,6 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useReactiveVar } from "@apollo/client";
 
+import styled, { css } from "styled-components";
+import { OrderStatusGroup } from "@constants/sale";
+import {
+  checkAllBoxStatusVar,
+  commonFilterOptionVar,
+  loadingSpinnerVisibilityVar,
+  pageNumberListVar,
+  showHasAnyProblemModal,
+  totalPageLengthVar,
+} from "@cache/index";
+import {
+  commonCheckedOrderItemsVar,
+  commonSaleFilterOptionVar,
+} from "@cache/sale";
+import { exchangeOrderItemsVar } from "@cache/sale/exchange";
+import {
+  fixTableType,
+  scrollTableType,
+  tableWidth,
+} from "@constants/sale/exchangeManagement/table";
+
+import { NormalizedType } from "@models/sale";
 import { TableType } from "@models/index";
+import useLazyExchangeOrders from "@hooks/order/useLazyExchangeOrders";
+import constructOrderItem from "@utils/sale/constructOrderItem";
 
 import {
   FixedTable,
@@ -17,14 +42,121 @@ import Loading from "@components/common/table/Loading";
 import NoDataContainer from "@components/common/table/NoDataContainer";
 import Button from "@components/common/Button";
 import EditReasonModal from "@components/sale/cancelManagement/EditReasonModal";
-import {
-  fixTableType,
-  scrollTableType,
-  tableWidth,
-} from "@constants/sale/exchangeManagement/table";
-import styled, { css } from "styled-components";
 
 const ExchangeTable = () => {
+  const { getOrders } = useLazyExchangeOrders();
+  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
+  const { type, statusName, statusType, statusGroup } = useReactiveVar(
+    commonSaleFilterOptionVar
+  );
+
+  const exchangerOrderItems = useReactiveVar(exchangeOrderItemsVar);
+  const checkedOrderItems = useReactiveVar(commonCheckedOrderItemsVar);
+  const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
+
+  useEffect(() => {
+    void (async () => {
+      loadingSpinnerVisibilityVar(true);
+      try {
+        const {
+          data: {
+            getOrdersBySeller: {
+              ok,
+              error,
+              totalPages,
+              totalResults,
+              totalOrderItems,
+            },
+          },
+        } = await getOrders({
+          variables: {
+            input: {
+              page,
+              skip,
+              query,
+              type,
+              statusName,
+              statusType,
+              statusGroup: OrderStatusGroup.REFUND,
+            },
+          },
+          fetchPolicy: "no-cache",
+        });
+
+        if (ok) {
+          loadingSpinnerVisibilityVar(false);
+          const isLastPageChanged = totalPages < page;
+
+          if (isLastPageChanged && totalPages !== 0) {
+            commonFilterOptionVar({
+              ...commonFilterOptionVar(),
+              page: totalPages,
+            });
+
+            return;
+          }
+
+          pageNumberListVar(
+            Array(totalPages)
+              .fill(null)
+              .map((_, index) => index + 1)
+          );
+
+          totalPageLengthVar(totalResults);
+
+          const reconstructOrderItems: NormalizedType =
+            constructOrderItem(totalOrderItems);
+
+          exchangeOrderItemsVar([]);
+          commonCheckedOrderItemsVar([]);
+          checkAllBoxStatusVar(false);
+        }
+
+        if (error) {
+          loadingSpinnerVisibilityVar(false);
+          showHasAnyProblemModal(
+            <>
+              내부 서버 오류로 인해 요청하신
+              <br />
+              작업을 완료하지 못했습니다.
+              <br />
+              다시 한 번 시도 후 같은 문제가 발생할 경우
+              <br />
+              찹스틱스로 문의해주세요.
+              <br />
+              <br />
+              (전화 문의 070-4187-3848)
+              <br />
+              <br />
+              Code:
+              {error}
+            </>
+          );
+        }
+      } catch (error) {
+        loadingSpinnerVisibilityVar(false);
+        showHasAnyProblemModal(
+          <>
+            내부 서버 오류로 인해 요청하신
+            <br />
+            작업을 완료하지 못했습니다.
+            <br />
+            다시 한 번 시도 후 같은 문제가 발생할 경우
+            <br />
+            찹스틱스로 문의해주세요.
+            <br />
+            <br />
+            (전화 문의 070-4187-3848)
+            <br />
+            <br />
+            Code:
+            {error}
+          </>
+        );
+      }
+    })();
+  }, [page, skip, query, type, statusName, statusType, statusGroup]);
+
   return (
     <TableContainer type={TableType.SCROLL} hasData={true}>
       <FixedTable>
