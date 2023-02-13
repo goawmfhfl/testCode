@@ -452,14 +452,6 @@ const RefundTable = () => {
         cancelButtonVisibility: true,
         confirmButtonClickHandler: () => {
           try {
-            console.log([
-              orderItemId,
-              orderShipmentInfoId,
-              shipmentCompany,
-              shipmentNumber,
-              status,
-            ]);
-
             void (async () => {
               loadingSpinnerVisibilityVar(true);
               const {

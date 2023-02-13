@@ -22,7 +22,7 @@ import {
   tableWidth,
 } from "@constants/sale/exchangeManagement/table";
 
-import { NormalizedType } from "@models/sale";
+import { NormalizedType, ResetOrderItemType } from "@models/sale";
 import { TableType } from "@models/index";
 import useLazyExchangeOrders from "@hooks/order/useLazyExchangeOrders";
 import constructOrderItem from "@utils/sale/constructOrderItem";
@@ -42,16 +42,21 @@ import Loading from "@components/common/table/Loading";
 import NoDataContainer from "@components/common/table/NoDataContainer";
 import Button from "@components/common/Button";
 import EditReasonModal from "@components/sale/cancelManagement/EditReasonModal";
+import getResetOrderItems from "@utils/sale/exchange/getResetOrderItems";
 
 const ExchangeTable = () => {
-  const { getOrders } = useLazyExchangeOrders();
+  const { getOrders, loading, error } = useLazyExchangeOrders();
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } = useReactiveVar(
     commonSaleFilterOptionVar
   );
 
-  const exchangerOrderItems = useReactiveVar(exchangeOrderItemsVar);
-  const checkedOrderItems = useReactiveVar(commonCheckedOrderItemsVar);
+  const exchangerOrderItems: Array<ResetOrderItemType> = useReactiveVar(
+    exchangeOrderItemsVar
+  );
+  const checkedOrderItems: Array<ResetOrderItemType> = useReactiveVar(
+    commonCheckedOrderItemsVar
+  );
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
 
   useEffect(() => {
@@ -107,7 +112,11 @@ const ExchangeTable = () => {
           const reconstructOrderItems: NormalizedType =
             constructOrderItem(totalOrderItems);
 
-          exchangeOrderItemsVar([]);
+          const resetOrderItems: Array<ResetOrderItemType> = getResetOrderItems(
+            reconstructOrderItems
+          );
+
+          exchangeOrderItemsVar(resetOrderItems);
           commonCheckedOrderItemsVar([]);
           checkAllBoxStatusVar(false);
         }

@@ -378,12 +378,12 @@ export const getShipmentInfos = (
     refundOrderId?: number;
     refundShipmentCompany?: string;
     refundShipmentNumber?: number;
-    exchangeOrderId?: number;
-    exchangeShipmentCompany?: string;
-    exchangeShipmentNumber?: number;
-    exchangeAgainOrderId?: number;
-    exchangeAgainShipmentCompany?: string;
-    exchangeAgainShipmentNumber?: number;
+    pickupOrderId?: number;
+    pickupShipmentCompany?: string;
+    pickupShipmentNumber?: number;
+    pickupAgainOrderId?: number;
+    pickupAgainShipmentCompany?: string;
+    pickupAgainShipmentNumber?: number;
   } = {
     shipmentOrderId: null,
     shipmentCompany: null,
@@ -391,12 +391,12 @@ export const getShipmentInfos = (
     refundOrderId: null,
     refundShipmentCompany: null,
     refundShipmentNumber: null,
-    exchangeOrderId: null,
-    exchangeShipmentCompany: null,
-    exchangeShipmentNumber: null,
-    exchangeAgainOrderId: null,
-    exchangeAgainShipmentCompany: null,
-    exchangeAgainShipmentNumber: null,
+    pickupOrderId: null,
+    pickupShipmentCompany: null,
+    pickupShipmentNumber: null,
+    pickupAgainOrderId: null,
+    pickupAgainShipmentCompany: null,
+    pickupAgainShipmentNumber: null,
   };
   const hasOrderShipmentInfos =
     !!orderShipmentInfos && !!orderShipmentInfos.length;
@@ -419,15 +419,15 @@ export const getShipmentInfos = (
         }
 
         if (status === ShipmentStatus.EXCHANGE_PICK_UP) {
-          result.exchangeOrderId = id;
-          result.exchangeShipmentCompany = shipmentCompany;
-          result.exchangeShipmentNumber = shipmentNumber;
+          result.pickupOrderId = id;
+          result.pickupShipmentCompany = shipmentCompany;
+          result.pickupShipmentNumber = shipmentNumber;
         }
 
         if (status === ShipmentStatus.EXCHANGE_PICK_UP_AGAIN) {
-          result.exchangeAgainOrderId = id;
-          result.exchangeAgainShipmentCompany = shipmentCompany;
-          result.exchangeAgainShipmentNumber = shipmentNumber;
+          result.pickupAgainOrderId = id;
+          result.pickupAgainShipmentCompany = shipmentCompany;
+          result.pickupAgainShipmentNumber = shipmentNumber;
         }
 
         return result;
