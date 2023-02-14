@@ -53,12 +53,12 @@ export const getOrdersLength = (
   }>
 ) => {
   return orders.reduce(
-    (result, { orderStatus, claimStatus }) => {
-      if (orderStatus.name === OrderStatusName.CANCEL_REQUEST) {
+    (result, { claimStatus }) => {
+      if (claimStatus.name === OrderStatusName.CANCEL_REQUEST) {
         result.cancelRequest++;
       }
 
-      if (orderStatus.name === OrderStatusName.CANCEL_COMPLETED) {
+      if (claimStatus.name === OrderStatusName.CANCEL_COMPLETED) {
         result.cancelCompleted++;
       }
 
@@ -78,6 +78,26 @@ export const getOrdersLength = (
         result.refundCompleted++;
       }
 
+      if (claimStatus.name === OrderStatusName.EXCHANGE_REQUEST) {
+        result.exchangeReqeust++;
+      }
+
+      if (claimStatus.name === OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS) {
+        result.exchangePickupInProgress++;
+      }
+
+      if (claimStatus.name === OrderStatusName.EXCHANGE_PICK_UP_COMPLETED) {
+        result.exchangePickupCompleted++;
+      }
+
+      if (claimStatus.name === OrderStatusName.SHIPPING_AGAIN) {
+        result.shippingAgain++;
+      }
+
+      if (claimStatus.name === OrderStatusName.EXCHANGE_COMPLETED) {
+        result.exchangeCompleted++;
+      }
+
       return result;
     },
     {
@@ -87,6 +107,11 @@ export const getOrdersLength = (
       refundPickUpInProgress: 0,
       refundPickUpCompleted: 0,
       refundCompleted: 0,
+      exchangeReqeust: 0,
+      exchangePickupInProgress: 0,
+      exchangePickupCompleted: 0,
+      shippingAgain: 0,
+      exchangeCompleted: 0,
     }
   );
 };

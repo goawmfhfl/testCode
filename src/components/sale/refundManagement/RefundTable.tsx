@@ -36,6 +36,7 @@ import getResetOrderItems from "@utils/sale/refund/getResetOrderItems";
 import {
   OrderStatusGroup,
   OrderStatusName,
+  OrderStatusType,
   SendType,
   shipmentCompanyCode,
   ShipmentStatus,
@@ -538,7 +539,7 @@ const RefundTable = () => {
             query,
             type,
             statusName,
-            statusType,
+            statusType: OrderStatusType.CLAIM,
             statusGroup: OrderStatusGroup.REFUND,
           },
         },

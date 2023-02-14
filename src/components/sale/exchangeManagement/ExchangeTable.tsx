@@ -7,6 +7,7 @@ import styled, { css } from "styled-components";
 import {
   OrderStatusGroup,
   OrderStatusName,
+  OrderStatusType,
   SendType,
   shipmentCompanyCode,
   ShipmentStatus,
@@ -591,8 +592,8 @@ const ExchangeTable = () => {
               query,
               type,
               statusName,
-              statusType,
-              statusGroup: OrderStatusGroup.REFUND,
+              statusType: OrderStatusType.CLAIM,
+              statusGroup: OrderStatusGroup.EXCHANGE,
             },
           },
           fetchPolicy: "no-cache",
@@ -781,7 +782,7 @@ const ExchangeTable = () => {
                   height={80}
                 >
                   <Td type={TableType.SCROLL} width={fixTableType[0].width}>
-                  {isFirstRow && (
+                    {isFirstRow && (
                       <Checkbox
                         onChange={changeSingleCheckBoxHandler(index)}
                         checked={isChecked}
