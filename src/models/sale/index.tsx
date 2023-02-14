@@ -125,6 +125,22 @@ export interface ResetOrderItemType {
   temporaryRefundShipmentCompany?: string;
   temporaryRefundShipmentNumber?: number;
 
+  pickupOrderId?: number;
+  pickupShipmentCompany?: string;
+  pickupShipmentNumber?: number;
+
+  isPickupShipmentInfoEdit?: boolean;
+  temporaryPickupShipmentCompany?: string;
+  temporaryPickupShipmentNumber?: number;
+
+  pickupAgainOrderId?: number;
+  pickupAgainShipmentCompany?: string;
+  pickupAgainShipmentNumber?: number;
+
+  isPickupAgainShipmentInfoEdit?: boolean;
+  temporaryPickupAgainShipmentCompany?: string;
+  temporaryPickupAgainShipmentNumber?: number;
+
   recipientName: string;
   recipientPhoneNumber: string;
   recipientAddress?: string;

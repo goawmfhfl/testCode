@@ -185,7 +185,6 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       refusalReasonStatus,
       refusalStatusReasonId,
 
-      isChecked: false,
       isShipmentInfoEdit: false,
       temporaryShipmentCompany: shippingShipmentCompany || "",
       temporaryShipmentNumber: shippingShipmentNumber || 0,
@@ -201,6 +200,7 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       isBundleShipment,
       cause,
 
+      isChecked: false,
       colorIndex,
       rowIndex,
       isLastRow,

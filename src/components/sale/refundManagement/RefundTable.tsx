@@ -979,9 +979,11 @@ const RefundTable = () => {
                         ))
                       : "-"}
                   </AttachedImageTd>
+
                   <Td type={TableType.SCROLL} width={scrollTableType[5].width}>
                     {completedAt}
                   </Td>
+
                   <ShipmentColumn
                     type={TableType.SCROLL}
                     width={scrollTableType[6].width + scrollTableType[7].width}
@@ -1172,6 +1174,7 @@ const RefundTable = () => {
                       )}
                     </ShipmnetNumberTd>
                   </ShipmentColumn>
+
                   <ShipmentColumn
                     type={TableType.SCROLL}
                     width={scrollTableType[8].width + scrollTableType[9].width}
@@ -1551,16 +1554,16 @@ const Reason = styled.span<{ isCenterAligned: boolean }>`
       : css``}
 `;
 
-const ShipmentColumn = styled(Td)`
-  padding: 0px;
-`;
-
 const Dropdown = styled(SelectInput)`
   padding-right: 16px;
 
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+`;
+
+const ShipmentColumn = styled(Td)`
+  padding: 0px;
 `;
 
 const ShipmnetNumberInput = styled(Input)`
