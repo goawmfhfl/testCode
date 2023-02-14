@@ -22,7 +22,7 @@ export const getIsCheckedStatus = (
         result.isPickupInProgressChecked = true;
         result.pickupInProgressCount++;
       }
-      if (claimStatus === "수거 완료") {
+      if (claimStatus === "수거완료") {
         result.isPickupCompletedChecked = true;
         result.pickupCompletedCount++;
       }

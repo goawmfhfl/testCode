@@ -456,6 +456,19 @@ const Controller = () => {
   ) => {
     const claimStatus = e.target.value as OrderStatusName;
 
+    if (isRefundCompletedChecked) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+      return;
+    }
+
     if (
       (claimStatus === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS &&
         isPickupInProgressChecked) ||

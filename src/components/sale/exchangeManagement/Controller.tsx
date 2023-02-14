@@ -11,13 +11,17 @@ import {
   checkAllBoxStatusVar,
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
+  modalVar,
   paginationSkipVar,
   showHasAnyProblemModal,
   systemModalVar,
 } from "@cache/index";
+import { showHasServerErrorModal } from "@cache/productManagement";
 import {
+  DenyRefundOrExchangeRequestType,
   OrderSearchType,
   OrderStatusName,
+  orderStatusNameType,
   searchQueryType,
   SendType,
 } from "@constants/sale";
@@ -34,8 +38,14 @@ import {
   OrderItems,
   ResetOrderItemType,
 } from "@models/sale";
+import {
+  SendOrderItemsInputType,
+  SendOrderItemsType,
+} from "@models/sale/order";
 
+import { getIsCheckedStatus } from "@utils/sale";
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
+import getDescription from "@utils/sale/exchange/getDescription";
 
 import questionMarkSrc from "@icons/questionmark.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -45,12 +55,8 @@ import ControllerContainer from "@components/sale/ControllerContainer";
 import Button from "@components/common/Button";
 import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
-import {
-  SendOrderItemsInputType,
-  SendOrderItemsType,
-} from "@models/sale/order";
-import { getIsCheckedStatus } from "@utils/sale";
-import { showHasServerErrorModal } from "@cache/productManagement";
+
+import HandleRefusalRefundOrExchangeRequestModal from "@components/sale/HandleRefusalRefundOrExchangeRequestModal";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -122,19 +128,10 @@ const Controller = () => {
 
   const {
     isExchangeRequestChecked,
-    exchangeRequestCount,
-
     isPickupInProgressChecked,
-    pickupInProgressCount,
-
     isPickupCompletedChecked,
-    pickupCompletedCount,
-
     isShippingAgainChecked,
-    shippingAgainCount,
-
     isExchangeCompletedChecked,
-    exchangeCompletedCount,
   } = getIsCheckedStatus(reconstructCheckedOrderItems);
 
   const handleSendButtonClick = (sendType: SendType) => () => {
@@ -336,6 +333,215 @@ const Controller = () => {
     });
   };
 
+  const handleRefusalExchangeButtonClick = () => {
+    if (!checkedOrderItems.length) {
+      showHasAnyProblemModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
+      return;
+    }
+
+    if (
+      isPickupInProgressChecked ||
+      isShippingAgainChecked ||
+      isExchangeCompletedChecked
+    ) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+
+      return;
+    }
+
+    modalVar({
+      isVisible: true,
+      component: (
+        <HandleRefusalRefundOrExchangeRequestModal
+          status={DenyRefundOrExchangeRequestType.EXCHANGE}
+        />
+      ),
+    });
+  };
+
+  const handleOrderStatusByForceClick = () => {
+    if (!checkedOrderItems.length) {
+      showHasAnyProblemModal(
+        <>
+          선택된 주문건이 없습니다
+          <br />
+          주문건을 선택해주세요
+        </>
+      );
+      return;
+    }
+
+    if (isShippingAgainChecked || isExchangeCompletedChecked) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+      return;
+    }
+  };
+
+  const changeOrderStatusByForceHandler = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const claimStatus = e.target.value as OrderStatusName;
+
+    if (isExchangeCompletedChecked) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+      return;
+    }
+
+    if (
+      (claimStatus === OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS &&
+        isPickupInProgressChecked) ||
+      (claimStatus === OrderStatusName.EXCHANGE_COMPLETED &&
+        isPickupCompletedChecked) ||
+      (claimStatus === OrderStatusName.SHIPPING_AGAIN && isShippingAgainChecked)
+    ) {
+      showHasAnyProblemModal(
+        <>
+          현재와 같은 주문상태로
+          <br />
+          변경할 수 없습니다.
+          <br />
+          다른 주문상태로 변경을
+          <br />
+          선택해주세요.
+        </>
+      );
+      return;
+    }
+
+    if (
+      (claimStatus === OrderStatusName.EXCHANGE_COMPLETED &&
+        isExchangeCompletedChecked) ||
+      (claimStatus === OrderStatusName.SHIPPING_AGAIN &&
+        (isPickupInProgressChecked || isPickupCompletedChecked))
+    ) {
+      showHasAnyProblemModal(
+        <>
+          현재 주문 상태보다
+          <br />
+          이전 상태로 돌아갈 수 없습니다.
+          <br />
+          다른 주문상태로 변경을
+          <br />
+          선택해주세요.
+        </>
+      );
+      return;
+    }
+
+    const description = getDescription(
+      getIsCheckedStatus(reconstructCheckedOrderItems),
+      claimStatus
+    );
+
+    systemModalVar({
+      ...systemModalVar(),
+      isVisible: true,
+      description,
+      confirmButtonVisibility: true,
+      cancelButtonVisibility: true,
+      confirmButtonClickHandler: () => {
+        try {
+          void (async () => {
+            loadingSpinnerVisibilityVar(true);
+            const components = reconstructCheckedOrderItems.map(({ id }) => ({
+              orderItemId: id,
+            }));
+
+            const {
+              data: {
+                changeOrderStatusByForce: { ok, error },
+              },
+            } = await changeOrderStatusByForce({
+              variables: {
+                input: {
+                  components,
+                  orderStatusName: claimStatus,
+                },
+              },
+            });
+
+            if (ok) {
+              loadingSpinnerVisibilityVar(false);
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: true,
+                description: (
+                  <>
+                    "{orderStatusNameType[claimStatus] as string}" 상태로
+                    변경되었습니다.
+                  </>
+                ),
+                confirmButtonVisibility: true,
+                cancelButtonVisibility: false,
+                confirmButtonClickHandler: () => {
+                  systemModalVar({
+                    ...systemModalVar(),
+                    isVisible: false,
+                  });
+
+                  commonCheckedOrderItemsVar([]);
+                  checkAllBoxStatusVar(false);
+                },
+              });
+            }
+            if (error) {
+              loadingSpinnerVisibilityVar(false);
+              showHasServerErrorModal(error, "강제 상태 변경");
+            }
+          })();
+        } catch (error) {
+          loadingSpinnerVisibilityVar(false);
+          showHasServerErrorModal(error as string, "강제 상태 변경");
+        }
+      },
+      cancelButtonClickHandler: () => {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          description: <>주문 상태 변경이 취소되었습니다</>,
+          confirmButtonVisibility: true,
+          cancelButtonVisibility: false,
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+            });
+          },
+        });
+      },
+    });
+  };
+
   const changeSearchTypeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const type = e.target.value as OrderSearchType;
 
@@ -397,16 +603,33 @@ const Controller = () => {
         >
           교환 재발송
         </ControlButton>
-        <ControlButton size="small">교환 거절</ControlButton>
+
+        <ControlButton
+          size="small"
+          onClick={handleRefusalExchangeButtonClick}
+          disabled={
+            statusName === OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS ||
+            statusName === OrderStatusName.SHIPPING_AGAIN ||
+            statusName === OrderStatusName.EXCHANGE_COMPLETED
+          }
+        >
+          교환 거절
+        </ControlButton>
+
         <ChangeOrderStatusDropDown
           arrowSrc={triangleArrowSvg}
           sizing={"medium"}
           width={"119px"}
           value={type}
+          onClick={handleOrderStatusByForceClick}
+          onChange={changeOrderStatusByForceHandler}
         >
-          <Option value={"default"}>강제 상태 변경</Option>
           {changeOrderStatusType.map(({ id, label, value }) => (
-            <Option value={value} key={id}>
+            <Option
+              value={value}
+              key={id}
+              hidden={value === OrderStatusName.DEFAULT}
+            >
               {label}
             </Option>
           ))}
