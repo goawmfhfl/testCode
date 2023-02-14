@@ -1,7 +1,18 @@
 import React from "react";
 import styled from "styled-components";
+import { useMutation, useReactiveVar } from "@apollo/client";
 
 import { Cause } from "@constants/sale";
+import { commonFilterOptionVar } from "@cache/index";
+import { commonSaleFilterOptionVar } from "@cache/sale";
+
+import { COMPLETE_REFUND_BY_SELLER } from "@graphql/mutations/completeRefundBySeller";
+import { GET_REFUND_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+
+import {
+  CompleteRefundBySellerInputType,
+  CompleteRefundBySellerType,
+} from "@models/sale/refund";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import exclamationGreySrc from "@icons/exclamation-grey.svg";
@@ -30,6 +41,36 @@ const HandleCompleteRefundModal = ({
   detailedReason: string;
   isConditionalFree: boolean;
 }) => {
+  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
+  const { type, statusName, statusType, statusGroup } = useReactiveVar(
+    commonSaleFilterOptionVar
+  );
+  const [completeRefund] = useMutation<
+    CompleteRefundBySellerType,
+    {
+      input: CompleteRefundBySellerInputType;
+    }
+  >(COMPLETE_REFUND_BY_SELLER, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    refetchQueries: [
+      {
+        query: GET_REFUND_ORDERS_BY_SELLER,
+        variables: {
+          input: {
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
+          },
+        },
+      },
+      "GetOrdersBySeller",
+    ],
+  });
   return (
     <Container>
       <Title>반품 완료처리하기</Title>

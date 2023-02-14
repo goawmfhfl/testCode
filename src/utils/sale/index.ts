@@ -19,16 +19,26 @@ export const getIsCheckedStatus = (
         result.refundRequestCount++;
       }
       if (claimStatus === "수거중") {
-        result.isRefundPickUpInProgressChecked = true;
-        result.refundPickUpInProgressCount++;
+        result.isPickupInProgressChecked = true;
+        result.pickupInProgressCount++;
       }
       if (claimStatus === "수거 완료") {
-        result.isRefundPickUpCompletedChecked = true;
-        result.refundPickUpCompletedCount++;
+        result.isPickupCompletedChecked = true;
+        result.pickupCompletedCount++;
       }
-      if (claimStatus === "반품 완료") {
-        result.isRefundCompletedChecked = true;
-        result.refundCompletedCount++;
+      if (claimStatus === "교환 요청") {
+        result.isExchangeRequestChecked = true;
+        result.exchangeRequestCount++;
+      }
+
+      if (claimStatus === "재발송") {
+        result.isShippingAgainChecked = true;
+        result.shippingAgainCount++;
+      }
+
+      if (claimStatus === "교환 완료") {
+        result.isExchangeCompletedChecked = true;
+        result.exchangeCompletedCount++;
       }
 
       return result;
@@ -36,12 +46,24 @@ export const getIsCheckedStatus = (
     {
       isRefundRequestChecked: false,
       refundRequestCount: 0,
-      isRefundPickUpInProgressChecked: false,
-      refundPickUpInProgressCount: 0,
-      isRefundPickUpCompletedChecked: false,
-      refundPickUpCompletedCount: 0,
+
+      isPickupInProgressChecked: false,
+      pickupInProgressCount: 0,
+
+      isPickupCompletedChecked: false,
+      pickupCompletedCount: 0,
+
       isRefundCompletedChecked: false,
       refundCompletedCount: 0,
+
+      isExchangeRequestChecked: false,
+      exchangeRequestCount: 0,
+
+      isShippingAgainChecked: false,
+      shippingAgainCount: 0,
+
+      isExchangeCompletedChecked: false,
+      exchangeCompletedCount: 0,
     }
   );
 };
