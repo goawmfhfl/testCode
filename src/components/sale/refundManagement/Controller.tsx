@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components/macro";
 import { useMutation, useReactiveVar } from "@apollo/client";
 
@@ -634,6 +634,17 @@ const Controller = () => {
     paginationSkipVar(0);
   };
 
+  useEffect(() => {
+    const debounce = setTimeout(() => {
+      return commonFilterOptionVar({
+        ...commonFilterOptionVar(),
+        query: temporaryQuery,
+      });
+    }, 500);
+
+    return () => clearTimeout(debounce);
+  }, [temporaryQuery]);
+
   return (
     <ControllerContainer>
       <ActiveButtonContainer>
@@ -680,6 +691,7 @@ const Controller = () => {
             statusName === OrderStatusName.REFUND_COMPLETED
           }
           onChange={changeOrderStatusByForceHandler}
+          onClick={handleOrderStatusByForceClick}
         >
           {changeRefundOrderStatusByForceType.map(({ id, label, value }) => (
             <Option value={value} key={id}>
@@ -712,7 +724,6 @@ const Controller = () => {
           width={"119px"}
           value={type}
           onChange={changeSearchTypeHandler}
-          onClick={handleOrderStatusByForceClick}
         >
           {searchQueryType.map(({ id, label, value }) => (
             <Option value={value} key={id}>
