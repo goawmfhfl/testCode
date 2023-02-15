@@ -38,6 +38,8 @@ import {
   ChangeOrderStatusByForceInputType,
   ResetOrderItemType,
   OrderItems,
+  EstimateRefundAmountType,
+  EstimateRefundAmountInputType,
 } from "@models/sale";
 import {
   SendOrderItemsInputType,
@@ -50,10 +52,7 @@ import {
 
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
 import { getIsCheckedStatus } from "@utils/sale";
-import {
-  getHandleCompleteRefundErrorCase,
-  getRefundInformation,
-} from "@utils/sale/refund";
+import { getHandleCompleteRefundErrorCase } from "@utils/sale/refund";
 
 import questionMarkSrc from "@icons/questionmark.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -65,6 +64,7 @@ import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
 import HandleRefusalRefundOrExchangeRequestModal from "@components/sale/HandleRefusalRefundOrExchangeRequestModal";
 import HandleCompleteRefundModal from "@components/sale/refundManagement/HandleCompleteRefundModal";
+import { ESTIMATE_REFUND_AMOUNT } from "@graphql/mutations/estimateRefundAmout";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -78,6 +78,33 @@ const Controller = () => {
       input: ChangeOrderStatusByForceInputType;
     }
   >(CHANGE_ORDER_STATUS_BY_FORCE, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    refetchQueries: [
+      {
+        query: GET_REFUND_ORDERS_BY_SELLER,
+        variables: {
+          input: {
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
+          },
+        },
+      },
+      "GetOrdersBySeller",
+    ],
+  });
+
+  const [estimateRefundAmount] = useMutation<
+    EstimateRefundAmountType,
+    {
+      input: EstimateRefundAmountInputType;
+    }
+  >(ESTIMATE_REFUND_AMOUNT, {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
@@ -331,31 +358,6 @@ const Controller = () => {
   };
 
   const handleCompleteRefundButtonClick = () => {
-    const {
-      cause,
-      totalPrice,
-      shipmentPrice,
-      shipmentDistantPrice,
-      isConditionalFree,
-      mainReason,
-      detailedReason,
-    } = getRefundInformation(reconstructCheckedOrderItems, totalOrderItems);
-
-    modalVar({
-      isVisible: true,
-      component: (
-        <HandleCompleteRefundModal
-          cause={cause}
-          totalPrice={totalPrice}
-          shipmentPrice={shipmentPrice}
-          shipmentDistantPrice={shipmentDistantPrice}
-          mainReason={mainReason}
-          detailedReason={detailedReason}
-          isConditionalFree={isConditionalFree}
-        />
-      ),
-    });
-
     if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
         <>
@@ -423,6 +425,21 @@ const Controller = () => {
 
       return;
     }
+
+    // modalVar({
+    //   isVisible: true,
+    //   component: (
+    //     <HandleCompleteRefundModal
+    //       cause={cause}
+    //       totalPrice={totalPrice}
+    //       shipmentPrice={shipmentPrice}
+    //       shipmentDistantPrice={shipmentDistantPrice}
+    //       mainReason={mainReason}
+    //       detailedReason={detailedReason}
+    //       isConditionalFree={isConditionalFree}
+    //     />
+    //   ),
+    // });
   };
 
   const handleOrderStatusByForceClick = () => {

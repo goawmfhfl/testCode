@@ -236,3 +236,20 @@ export interface ChangeOrderStatusByForceInputType {
   components: Array<{ orderItemId: number }>;
   orderStatusName: OrderStatusName;
 }
+
+export interface EstimateRefundAmountType {
+  estimateRefundAmount: {
+    ok: boolean;
+    error?: string;
+    totalProductAmount: number;
+    initialShipmentAmount: number;
+    initialShipmentDistantAmount: number;
+    shipmentRefundAmount: number;
+    bundleShipmentType: ShipmentType;
+    isConditionalAmountBreak: boolean;
+  };
+}
+export interface EstimateRefundAmountInputType {
+  orderItemIds: Array<number>;
+  cause: Cause;
+}
