@@ -42,6 +42,7 @@ export interface ColorInputType {
   hex: string;
   value: ColorType;
   darkCheckedIcon?: boolean;
+  src?: string;
 }
 
 export enum DiscountMethod {
