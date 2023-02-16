@@ -9,13 +9,22 @@ import {
   modalVar,
   systemModalVar,
 } from "@cache/index";
-import { filterOptionVar } from "@cache/sale/cancel";
+import { commonSaleFilterOptionVar } from "@cache/sale";
 import {
   MainReason,
-  mainReasonTypes,
   optionListType,
+  refusalCancelOrRefundOptionList,
   OrderStatusName,
+  mainReasonTypes,
 } from "@constants/sale";
+import { checkedOrderItemsVar } from "@cache/sale";
+import { showHasServerErrorModal } from "@cache/productManagement";
+import {
+  EditStatusReasonBySellerInputType,
+  EditStatusReasonBySellerType,
+} from "@models/sale";
+import { GET_REFUND_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+import { EDIT_STATUS_REASON_BY_SELLER } from "@graphql/mutations/editStatusReasonBySeller";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -28,14 +37,6 @@ import {
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
-import { checkedOrderItemsVar } from "@cache/sale";
-import { showHasServerErrorModal } from "@cache/productManagement";
-import {
-  EditStatusReasonBySellerInputType,
-  EditStatusReasonBySellerType,
-} from "@models/sale";
-import { GET_CANCEL_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
-import { EDIT_STATUS_REASON_BY_SELLER } from "@graphql/mutations/editStatusReasonBySeller";
 
 const EditReasonModal = ({
   statusReasonId,
@@ -49,8 +50,9 @@ const EditReasonModal = ({
   detailedReason: string;
 }) => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const { type, statusName, statusType, statusGroup } = useReactiveVar(
+    commonSaleFilterOptionVar
+  );
 
   const [reason, setReason] = useState<{
     main: MainReason;
@@ -72,7 +74,7 @@ const EditReasonModal = ({
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
-        query: GET_CANCEL_ORDERS_BY_SELLER,
+        query: GET_REFUND_ORDERS_BY_SELLER,
         variables: {
           input: {
             page,
@@ -114,10 +116,10 @@ const EditReasonModal = ({
 
   const handleSubmitButtonClick = () => {
     const errorReason: string =
-      status === OrderStatusName.CANCEL_REQUEST ||
-      status === OrderStatusName.CANCEL_COMPLETED
-        ? "취소 사유 수정"
-        : "취소 거절 사유 수정";
+      status === OrderStatusName.REFUND_REQUEST ||
+      status === OrderStatusName.REFUND_COMPLETED
+        ? "반품 사유 수정"
+        : "반품 거절 사유 수정";
 
     systemModalVar({
       ...systemModalVar(),
@@ -128,13 +130,13 @@ const EditReasonModal = ({
         status === OrderStatusName.REFUND_REQUEST ||
         status === OrderStatusName.REFUND_COMPLETED ? (
           <>
-            기입하신 대로 취소 사유를
+            기입하신 대로 반품 사유를
             <br />
             수정하시겠습니까?
           </>
         ) : (
           <>
-            기입하신 대로 취소 거절 사유를
+            기입하신 대로 반품 거절 사유를
             <br />
             수정하시겠습니까?
           </>
@@ -163,12 +165,13 @@ const EditReasonModal = ({
                 ...systemModalVar(),
                 isVisible: true,
                 description:
-                  status === OrderStatusName.CANCEL_REQUEST ||
-                  status === OrderStatusName.CANCEL_COMPLETED ? (
-                    <>취소 사유가 수정되었습니다</>
+                  status === OrderStatusName.REFUND_REQUEST ||
+                  status === OrderStatusName.REFUND_COMPLETED ? (
+                    <>반품 사유가 수정되었습니다</>
                   ) : (
-                    <>취소 거절 사유가 수정되었습니다</>
+                    <>반품 거절 사유가 수정되었습니다</>
                   ),
+
                 confirmButtonVisibility: true,
                 cancelButtonVisibility: false,
                 confirmButtonClickHandler: () => {
@@ -185,7 +188,6 @@ const EditReasonModal = ({
                 },
               });
             }
-
             if (error) {
               loadingSpinnerVisibilityVar(false);
               systemModalVar({
@@ -242,6 +244,7 @@ const EditReasonModal = ({
         detail: detailedReason,
       });
     }
+
     return () => {
       setReason({
         main: MainReason.DEFAULT,
@@ -253,11 +256,30 @@ const EditReasonModal = ({
   return (
     <Container>
       <CloseButton onClick={handleCloseButtonClick} src={closeIconSource} />
-      <Title>취소 사유 수정하기</Title>
+      <Title>
+        {status === OrderStatusName.REFUND_REQUEST ||
+        status === OrderStatusName.REFUND_COMPLETED ? (
+          <>반품 사유 수정하기</>
+        ) : (
+          <>반품 거절 사유 수정하기</>
+        )}
+      </Title>
+
       <NoticeContainer icon={exclamationmarkSrc} width={"392px"}>
-        취소 사유 수정 전 반드시 소비자와 합의 후 처리해주시길
-        <br />
-        바랍니다.
+        {status === OrderStatusName.REFUND_REQUEST ||
+        status === OrderStatusName.REFUND_COMPLETED ? (
+          <>
+            반품 사유 수정하기 전 반드시 소비자와 합의 후 처리해주시길
+            <br />
+            바랍니다.
+          </>
+        ) : (
+          <>
+            반품 거절을 사유 수정하기 전 반드시 소비자와 합의 후 처리해주시길
+            <br />
+            바랍니다.
+          </>
+        )}
       </NoticeContainer>
       <ReasonContainer>
         <Label>대표사유</Label>
@@ -271,11 +293,25 @@ const EditReasonModal = ({
           <Option value={MainReason.DEFAULT} hidden>
             사유를 선택해주세요
           </Option>
-          {optionListType.map(({ id, label, value }) => (
-            <Option value={value} key={id}>
-              {label}
-            </Option>
-          ))}
+
+          {status === OrderStatusName.REFUND_REQUEST ||
+          status === OrderStatusName.REFUND_COMPLETED ? (
+            <>
+              {optionListType.map(({ id, label, value }) => (
+                <Option value={value} key={id}>
+                  {label}
+                </Option>
+              ))}
+            </>
+          ) : (
+            <>
+              {refusalCancelOrRefundOptionList.map(({ id, label, value }) => (
+                <Option value={value} key={id}>
+                  {label}
+                </Option>
+              ))}
+            </>
+          )}
         </ReasonDropdown>
       </ReasonContainer>
 

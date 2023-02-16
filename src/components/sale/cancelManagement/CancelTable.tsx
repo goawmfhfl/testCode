@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import styled, { css } from "styled-components/macro";
-import { useMutation, useReactiveVar } from "@apollo/client";
+import { useReactiveVar } from "@apollo/client";
 import { cloneDeep } from "lodash";
 import { TableType } from "@models/index";
 
@@ -9,15 +9,14 @@ import {
   checkedOrderItemsVar,
   filterOptionVar,
 } from "@cache/sale/cancel";
+
 import {
   checkAllBoxStatusVar,
   commonFilterOptionVar,
-  loadingSpinnerVisibilityVar,
   modalVar,
   pageNumberListVar,
   paginationVisibilityVar,
   showHasAnyProblemModal,
-  systemModalVar,
   totalPageLengthVar,
 } from "@cache/index";
 
@@ -26,23 +25,14 @@ import {
   fixTableType,
   scrollTableType,
 } from "@constants/sale/cancelManagement/table";
-import {
-  MainReason,
-  mainReasonType,
-  optionListType,
-  OrderStatusName,
-} from "@constants/sale";
+import { OrderStatusName } from "@constants/sale";
 
-import useLazyCancelOrders from "@hooks/order/useLazyCancelOrders";
-
-import { NormalizedType } from "@models/sale/cancel";
+import { NormalizedType } from "@models/sale/index";
 import { ResetOrderItemType } from "@models/sale";
-
 import { OrderItems } from "@models/sale";
 
+import useLazyCancelOrders from "@hooks/order/useLazyCancelOrders";
 import constructOrderItem from "@utils/sale/constructOrderItem";
-
-import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 
 import {
   FixedTable,
@@ -57,15 +47,9 @@ import {
 import Checkbox from "@components/common/input/Checkbox";
 import Loading from "@components/common/table/Loading";
 import NoDataContainer from "@components/common/table/NoDataContainer";
-import {
-  SelectInput,
-  OptionInput as Option,
-} from "@components/common/input/Dropdown";
 import Button from "@components/common/Button";
-import { Input } from "@components/common/input/TextInput";
 import getResetOrderItems from "@utils/sale/cancel/getResetOrderItems";
 import EditReasonModal from "@components/sale/cancelManagement/EditReasonModal";
-import EditRefusalReasonModal from "@components/sale/cancelManagement/EditRefusalReasonModal";
 
 const CancelTable = () => {
   const { getOrders, error, loading, data } = useLazyCancelOrders();
@@ -129,19 +113,26 @@ const CancelTable = () => {
       cancleOrderItemsVar(newOrderItems);
     };
 
-  const handleReasonModalClick = (orderItemId: number) => () => {
-    modalVar({
-      isVisible: true,
-      component: <EditReasonModal orderItemId={orderItemId} />,
-    });
-  };
-
-  const handleEditRefusalReasonModalClick = (orderItemId: number) => () => {
-    modalVar({
-      isVisible: true,
-      component: <EditRefusalReasonModal orderItemId={orderItemId} />,
-    });
-  };
+  const handleEditReasonModalClick =
+    (
+      statusReasonId: number,
+      status: OrderStatusName,
+      mainReason: string,
+      detailedReason: string
+    ) =>
+    () => {
+      modalVar({
+        isVisible: true,
+        component: (
+          <EditReasonModal
+            statusReasonId={statusReasonId}
+            status={status}
+            mainReason={mainReason}
+            detailedReason={detailedReason}
+          />
+        ),
+      });
+    };
 
   useEffect(() => {
     void (async () => {
@@ -157,6 +148,7 @@ const CancelTable = () => {
             statusGroup,
           },
         },
+        fetchPolicy: "no-cache",
       });
     })();
   }, [page, skip, query, type, statusName, statusType, statusGroup]);
@@ -200,7 +192,6 @@ const CancelTable = () => {
       reconstructCancelOrderItem
     );
     cancleOrderItemsVar(resetOrderItems);
-
     checkedOrderItemsVar([]);
     checkAllBoxStatusVar(false);
   }, [data]);
@@ -211,34 +202,24 @@ const CancelTable = () => {
 
   useEffect(() => {
     if (error) {
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        description: (
-          <>
-            내부 서버 오류로 인해 요청하신
-            <br />
-            작업을 완료하지 못했습니다.
-            <br />
-            다시 한 번 시도 후 같은 문제가 발생할 경우
-            <br />
-            찹스틱스로 문의해주세요.
-            <br />
-            <br />
-            (전화 문의 070-4187-3848)
-            <br />
-            <br />
-            Code:
-            {error.message}
-          </>
-        ),
-        confirmButtonClickHandler: () => {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: false,
-          });
-        },
-      });
+      showHasAnyProblemModal(
+        <>
+          내부 서버 오류로 인해 요청하신
+          <br />
+          작업을 완료하지 못했습니다.
+          <br />
+          다시 한 번 시도 후 같은 문제가 발생할 경우
+          <br />
+          찹스틱스로 문의해주세요.
+          <br />
+          <br />
+          (전화 문의 070-4187-3848)
+          <br />
+          <br />
+          Code:
+          {error.message}
+        </>
+      );
     }
   }, [error]);
 
@@ -282,7 +263,6 @@ const CancelTable = () => {
             cancleOrderItems?.map(
               (
                 {
-                  id,
                   merchantUid,
                   merchantItemUid,
                   productName,
@@ -303,6 +283,7 @@ const CancelTable = () => {
                   key={rowIndex}
                   colorIndex={colorIndex}
                   isLastRow={isLastRow}
+                  height={80}
                 >
                   <Td type={TableType.SCROLL} width={fixTableType[0].width}>
                     {isFirstRow && (
@@ -414,69 +395,71 @@ const CancelTable = () => {
         <TdContainer>
           {!loading &&
             cancleOrderItems?.map(
-              (
-                {
-                  id,
-                  paidAt,
-                  requestCancelAt,
-                  mainReason,
-                  detailedReason,
-                  completedCancelAt,
-                  optionName,
-                  optionQuantity,
-                  originalPrice,
-                  optionPrice,
-                  discountPrice,
-                  totalPrice,
-                  shipmentPrice,
-                  shipmentDistantPrice,
-                  totalPaymentAmount,
-                  userEmail,
-                  userPhoneNumber,
-                  recipientName,
-                  recipientPhoneNumber,
-                  totalRefundAmout,
-                  refusalCancelAt,
-                  refusalReason,
-                  refusalDateaildReason,
-
-                  colorIndex,
-                  rowIndex,
-                  isLastRow,
-                  isFirstRow,
-                  isChecked,
-                },
-                index
-              ) => (
+              ({
+                paidAt,
+                requestAt,
+                mainReason,
+                detailedReason,
+                reasonStatus,
+                statusReasonId,
+                completedAt,
+                optionName,
+                optionQuantity,
+                originalPrice,
+                optionPrice,
+                discountPrice,
+                totalPrice,
+                shipmentPrice,
+                shipmentDistantPrice,
+                totalPaymentAmount,
+                userEmail,
+                userPhoneNumber,
+                recipientName,
+                recipientPhoneNumber,
+                totalRefundAmout,
+                refusalAt,
+                refusalReason,
+                refusalDetailedReason,
+                refusalReasonStatus,
+                refusalStatusReasonId,
+                colorIndex,
+                rowIndex,
+                isLastRow,
+                isFirstRow,
+              }) => (
                 <Tr
                   key={rowIndex}
                   colorIndex={colorIndex}
                   isLastRow={isLastRow}
+                  height={80}
                 >
                   <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
                     {paidAt}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[1].width}>
-                    {requestCancelAt}
+                    {requestAt}
                   </Td>
-                  <ReasonTd
+                  <MainReasonTd
                     type={TableType.SCROLL}
                     width={scrollTableType[2].width}
                   >
                     {(!isFirstRow || !mainReason) && (
-                      <Reason isNeedJustifyCenter={true}>-</Reason>
+                      <Reason isCenterAligned={true}>-</Reason>
                     )}
 
                     {isFirstRow && mainReason && (
                       <>
-                        <Reason isNeedJustifyCenter={false}>
-                          {mainReason}
-                        </Reason>
+                        <Reason isCenterAligned={false}>{mainReason}</Reason>
                         <Button
                           type={"button"}
                           size={"small"}
                           width={"55px"}
-                          onClick={handleReasonModalClick(id)}
+                          onClick={handleEditReasonModalClick(
+                            statusReasonId,
+                            reasonStatus,
+                            mainReason,
+                            detailedReason
+                          )}
                           disabled={
                             statusName === OrderStatusName.CANCEL_COMPLETED
                           }
@@ -485,19 +468,17 @@ const CancelTable = () => {
                         </Button>
                       </>
                     )}
-                  </ReasonTd>
+                  </MainReasonTd>
                   <Td type={TableType.SCROLL} width={scrollTableType[3].width}>
                     {(!isFirstRow || !detailedReason) && (
-                      <Reason isNeedJustifyCenter={true}>-</Reason>
+                      <Reason isCenterAligned={true}>-</Reason>
                     )}
                     {isFirstRow && detailedReason && (
-                      <Reason isNeedJustifyCenter={true}>
-                        {detailedReason}
-                      </Reason>
+                      <Reason isCenterAligned={true}>{detailedReason}</Reason>
                     )}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[4].width}>
-                    {completedCancelAt}
+                    {completedAt}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[5].width}>
                     {optionName}
@@ -544,26 +525,29 @@ const CancelTable = () => {
                     {recipientPhoneNumber}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[19].width}>
-                    {refusalCancelAt}
+                    {refusalAt}
                   </Td>
-                  <ReasonTd
+                  <MainReasonTd
                     type={TableType.SCROLL}
                     width={scrollTableType[20].width}
                   >
                     {(!isFirstRow || !refusalReason) && (
-                      <Reason isNeedJustifyCenter={true}>-</Reason>
+                      <Reason isCenterAligned={true}>-</Reason>
                     )}
 
                     {isFirstRow && refusalReason && (
                       <>
-                        <Reason isNeedJustifyCenter={false}>
-                          {refusalReason}
-                        </Reason>
+                        <Reason isCenterAligned={false}>{refusalReason}</Reason>
                         <Button
                           type={"button"}
                           size={"small"}
                           width={"55px"}
-                          onClick={handleEditRefusalReasonModalClick(id)}
+                          onClick={handleEditReasonModalClick(
+                            refusalStatusReasonId,
+                            refusalReasonStatus,
+                            refusalReason,
+                            refusalDetailedReason
+                          )}
                           disabled={
                             statusName === OrderStatusName.CANCEL_COMPLETED
                           }
@@ -572,14 +556,14 @@ const CancelTable = () => {
                         </Button>
                       </>
                     )}
-                  </ReasonTd>
+                  </MainReasonTd>
                   <Td type={TableType.SCROLL} width={scrollTableType[21].width}>
-                    {(!isFirstRow || !refusalDateaildReason) && (
-                      <Reason isNeedJustifyCenter={true}>-</Reason>
+                    {(!isFirstRow || !refusalDetailedReason) && (
+                      <Reason isCenterAligned={true}>-</Reason>
                     )}
-                    {isFirstRow && refusalDateaildReason && (
-                      <Reason isNeedJustifyCenter={true}>
-                        {refusalDateaildReason}
+                    {isFirstRow && refusalDetailedReason && (
+                      <Reason isCenterAligned={true}>
+                        {refusalDetailedReason}
                       </Reason>
                     )}
                   </Td>
@@ -588,8 +572,6 @@ const CancelTable = () => {
             )}
         </TdContainer>
       </ScrollTable>
-
-      {loading && <Loading type={TableType.SCROLL} />}
 
       {!hasCancelOrderItems && (
         <NoDataContainer type={TableType.SCROLL}>
@@ -610,13 +592,15 @@ const CancelTable = () => {
           )}
         </NoDataContainer>
       )}
+
+      {loading && <Loading type={TableType.SCROLL} />}
     </TableContainer>
   );
 };
 
 const ProductNameTd = styled(Td)`
   justify-content: flex-start;
-  padding: 8px 0px;
+  padding: 0px;
 `;
 
 const ProductThumbNailWrapper = styled.div`
@@ -625,8 +609,7 @@ const ProductThumbNailWrapper = styled.div`
   align-items: center;
 
   min-width: 40px;
-  height: 80px;
-
+  height: 100%;
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 
@@ -638,7 +621,7 @@ const ProductThumbNail = styled.img`
 const ProductName = styled.span`
   display: block;
 
-  padding: 0 6px;
+  padding: 0 8px;
 
   overflow: hidden;
   text-overflow: ellipsis;
@@ -647,15 +630,16 @@ const ProductName = styled.span`
   -webkit-box-orient: vertical;
 `;
 
-const ReasonTd = styled(Td)`
+const MainReasonTd = styled(Td)`
   display: flex;
   justify-content: space-between;
 
   padding: 0px 8px;
 `;
-const Reason = styled.span<{ isNeedJustifyCenter: boolean }>`
-  ${({ isNeedJustifyCenter }) =>
-    isNeedJustifyCenter
+
+const Reason = styled.span<{ isCenterAligned: boolean }>`
+  ${({ isCenterAligned }) =>
+    isCenterAligned
       ? css`
           margin: 0 auto;
         `

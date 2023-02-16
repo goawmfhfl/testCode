@@ -47,8 +47,7 @@ const FilterBar = () => {
     };
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
+    void (async () => {
       await getOrderStatus({
         variables: {
           input: {
@@ -61,6 +60,7 @@ const FilterBar = () => {
             statusGroup: OrderStatusGroup.ORDER,
           },
         },
+        fetchPolicy: "no-cache",
       });
     })();
   }, []);

@@ -62,16 +62,8 @@ export interface ConfirmOrDenyCancelBySellerType {
 export interface ConfirmOrDenyCancelBySellerInputType {
   components: Array<{
     orderItemId: number;
-    mainReason: MainReason;
-    detailedReason: string;
-    cause: Cause;
+    mainReason?: MainReason;
+    detailedReason?: string;
   }>;
   status: OrderCancel;
-}
-
-export interface NormalizedType {
-  orders: {
-    allIds: Array<string>;
-    byId: { [key: string]: OrderItems };
-  };
 }

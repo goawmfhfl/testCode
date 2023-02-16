@@ -9,13 +9,24 @@ import {
   modalVar,
   systemModalVar,
 } from "@cache/index";
-import { filterOptionVar } from "@cache/sale/cancel";
 import {
-  MainReason,
-  mainReasonTypes,
-  optionListType,
-  OrderStatusName,
-} from "@constants/sale";
+  commonSaleFilterOptionVar,
+  commonCheckedOrderItemsVar,
+} from "@cache/sale";
+
+import { showHasServerErrorModal } from "@cache/productManagement";
+import { MainReason, refusalCancelOrRefundOptionList } from "@constants/sale";
+import { ResetOrderItemType } from "@models/sale/index";
+
+import {
+  DenyRefundOrExchangeRequestBySellerType,
+  DenyRefundOrExchangeRequestBySellerInputType,
+} from "@models/sale/refund";
+
+import { GET_REFUND_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+import { DENY_REFUND_OR_EXCHANGE_REQUEST_BY_SELLER } from "@graphql/mutations/denyRefundOrExchangeRequestBySeller";
+
+import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -28,29 +39,23 @@ import {
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
-import { checkedOrderItemsVar } from "@cache/sale";
-import { showHasServerErrorModal } from "@cache/productManagement";
-import {
-  EditStatusReasonBySellerInputType,
-  EditStatusReasonBySellerType,
-} from "@models/sale";
-import { GET_CANCEL_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
-import { EDIT_STATUS_REASON_BY_SELLER } from "@graphql/mutations/editStatusReasonBySeller";
+import { DenyRefundOrExchangeRequestType } from "@constants/sale";
 
-const EditReasonModal = ({
-  statusReasonId,
+const HandleRefusalRefundOrExchangeRequestModal = ({
   status,
-  mainReason,
-  detailedReason,
 }: {
-  statusReasonId: number;
-  status: OrderStatusName;
-  mainReason: string;
-  detailedReason: string;
+  status: DenyRefundOrExchangeRequestType;
 }) => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const { type, statusName, statusType, statusGroup } = useReactiveVar(
+    commonSaleFilterOptionVar
+  );
+
+  const checkedOrderItems = useReactiveVar<Array<ResetOrderItemType>>(
+    commonCheckedOrderItemsVar
+  );
+  const reconstructCheckedOrderItems: Array<ResetOrderItemType> =
+    getReconstructCheckedOrderItems(checkedOrderItems);
 
   const [reason, setReason] = useState<{
     main: MainReason;
@@ -62,17 +67,17 @@ const EditReasonModal = ({
 
   const { main, detail } = reason;
 
-  const [editStatusReason] = useMutation<
-    EditStatusReasonBySellerType,
+  const [denyRefundReqeust] = useMutation<
+    DenyRefundOrExchangeRequestBySellerType,
     {
-      input: EditStatusReasonBySellerInputType;
+      input: DenyRefundOrExchangeRequestBySellerInputType;
     }
-  >(EDIT_STATUS_REASON_BY_SELLER, {
+  >(DENY_REFUND_OR_EXCHANGE_REQUEST_BY_SELLER, {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
-        query: GET_CANCEL_ORDERS_BY_SELLER,
+        query: GET_REFUND_ORDERS_BY_SELLER,
         variables: {
           input: {
             page,
@@ -113,46 +118,60 @@ const EditReasonModal = ({
   };
 
   const handleSubmitButtonClick = () => {
-    const errorReason: string =
-      status === OrderStatusName.CANCEL_REQUEST ||
-      status === OrderStatusName.CANCEL_COMPLETED
-        ? "취소 사유 수정"
-        : "취소 거절 사유 수정";
+    const { hasShippingOrderItem, hasShippingCompleted } =
+      reconstructCheckedOrderItems.reduce(
+        (result, { orderStatus }) => {
+          if (orderStatus === "배송중") result.hasShippingOrderItem = true;
+          if (orderStatus === "배송 완료") result.hasShippingCompleted = true;
+          return result;
+        },
+        {
+          hasShippingOrderItem: false,
+          hasShippingCompleted: false,
+        }
+      );
 
     systemModalVar({
       ...systemModalVar(),
       isVisible: true,
       confirmButtonVisibility: true,
       cancelButtonVisibility: true,
-      description:
-        status === OrderStatusName.REFUND_REQUEST ||
-        status === OrderStatusName.REFUND_COMPLETED ? (
-          <>
-            기입하신 대로 취소 사유를
-            <br />
-            수정하시겠습니까?
-          </>
-        ) : (
-          <>
-            기입하신 대로 취소 거절 사유를
-            <br />
-            수정하시겠습니까?
-          </>
-        ),
+      description: (
+        <>
+          `$
+          {status === DenyRefundOrExchangeRequestType.REFUND &&
+            "반품 요청을 거절하시겠습니까?"}
+          {status === DenyRefundOrExchangeRequestType.EXCHANGE &&
+            "교환 요청을 거절하시겠습니까?"}
+          `
+        </>
+      ),
+
       confirmButtonClickHandler: () => {
+        const description =
+          DenyRefundOrExchangeRequestType.REFUND === status
+            ? "반품 거절"
+            : "교환 거절";
+
         try {
           void (async () => {
             loadingSpinnerVisibilityVar(true);
+
+            const components = reconstructCheckedOrderItems.map(({ id }) => ({
+              orderItemId: id,
+              mainReason: main,
+              detailedReason: detail,
+            }));
+
             const {
               data: {
-                editStatusReasonBySeller: { ok, error },
+                denyRefunrOrExchangeRequestBySeller: { ok, error },
               },
-            } = await editStatusReason({
+            } = await denyRefundReqeust({
               variables: {
                 input: {
-                  statusReasonId,
-                  mainReason: main,
-                  detailedReason: detail,
+                  components,
+                  type: status,
                 },
               },
             });
@@ -162,13 +181,43 @@ const EditReasonModal = ({
               systemModalVar({
                 ...systemModalVar(),
                 isVisible: true,
-                description:
-                  status === OrderStatusName.CANCEL_REQUEST ||
-                  status === OrderStatusName.CANCEL_COMPLETED ? (
-                    <>취소 사유가 수정되었습니다</>
-                  ) : (
-                    <>취소 거절 사유가 수정되었습니다</>
-                  ),
+                description: (
+                  <>
+                    {status === DenyRefundOrExchangeRequestType.REFUND &&
+                      hasShippingOrderItem &&
+                      !hasShippingCompleted && (
+                        <>
+                          반품요청이 거절되었습니다.
+                          <br />
+                          (주문관리 - 배송중에서 확인 가능)
+                        </>
+                      )}
+
+                    {status === DenyRefundOrExchangeRequestType.REFUND &&
+                      !hasShippingOrderItem &&
+                      hasShippingCompleted && (
+                        <>
+                          반품요청이 거절되었습니다.
+                          <br />
+                          (주문관리 - 배송완료에서
+                          <br />
+                          확인 가능)
+                        </>
+                      )}
+
+                    {status === DenyRefundOrExchangeRequestType.REFUND &&
+                      hasShippingOrderItem &&
+                      hasShippingCompleted && (
+                        <>
+                          반품요청이 거절되었습니다.
+                          <br />
+                          (주문관리 - 배송중과 배송완료에서
+                          <br />
+                          확인 가능)
+                        </>
+                      )}
+                  </>
+                ),
                 confirmButtonVisibility: true,
                 cancelButtonVisibility: false,
                 confirmButtonClickHandler: () => {
@@ -180,7 +229,7 @@ const EditReasonModal = ({
                     ...systemModalVar(),
                     isVisible: false,
                   });
-                  checkedOrderItemsVar([]);
+                  commonCheckedOrderItemsVar([]);
                   checkAllBoxStatusVar(false);
                 },
               });
@@ -188,42 +237,12 @@ const EditReasonModal = ({
 
             if (error) {
               loadingSpinnerVisibilityVar(false);
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: (
-                  <>
-                    `${errorReason}`을(를) <br />
-                    완료하지 못했습니다.
-                    <br />
-                    다시 시도 후 같은 문제가 발생할 시
-                    <br />
-                    찹스틱스에 문의해주세요
-                    <br />
-                    <br />
-                    에러메시지:
-                    <br />
-                    {error}
-                  </>
-                ),
-                confirmButtonVisibility: true,
-                cancelButtonVisibility: false,
-                confirmButtonClickHandler: () => {
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-                  modalVar({
-                    ...modalVar(),
-                    isVisible: false,
-                  });
-                },
-              });
+              showHasServerErrorModal(error, description);
             }
           })();
         } catch (error) {
           loadingSpinnerVisibilityVar(false);
-          showHasServerErrorModal(error as string, errorReason);
+          showHasServerErrorModal(error as string, description);
         }
       },
       cancelButtonClickHandler: () => {
@@ -236,12 +255,6 @@ const EditReasonModal = ({
   };
 
   useEffect(() => {
-    if (mainReason && detailedReason) {
-      setReason({
-        main: mainReasonTypes[mainReason] as MainReason,
-        detail: detailedReason,
-      });
-    }
     return () => {
       setReason({
         main: MainReason.DEFAULT,
@@ -253,11 +266,9 @@ const EditReasonModal = ({
   return (
     <Container>
       <CloseButton onClick={handleCloseButtonClick} src={closeIconSource} />
-      <Title>취소 사유 수정하기</Title>
+      <Title>취소 거절하기</Title>
       <NoticeContainer icon={exclamationmarkSrc} width={"392px"}>
-        취소 사유 수정 전 반드시 소비자와 합의 후 처리해주시길
-        <br />
-        바랍니다.
+        취소 거절 처리 전 반드시 소비자와 합의 후 처리해주시길 바랍니다.
       </NoticeContainer>
       <ReasonContainer>
         <Label>대표사유</Label>
@@ -268,11 +279,12 @@ const EditReasonModal = ({
           value={main}
           onChange={changeReasonHandler}
         >
-          <Option value={MainReason.DEFAULT} hidden>
-            사유를 선택해주세요
-          </Option>
-          {optionListType.map(({ id, label, value }) => (
-            <Option value={value} key={id}>
+          {refusalCancelOrRefundOptionList.map(({ id, label, value }) => (
+            <Option
+              value={value}
+              key={id}
+              hidden={value === MainReason.DEFAULT}
+            >
               {label}
             </Option>
           ))}
@@ -371,4 +383,4 @@ const ReasonDropdown = styled(Dropdown)`
   padding-right: 0;
 `;
 
-export default EditReasonModal;
+export default HandleRefusalRefundOrExchangeRequestModal;

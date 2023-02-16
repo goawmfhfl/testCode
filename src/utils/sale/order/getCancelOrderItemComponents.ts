@@ -8,25 +8,12 @@ const getCancelOrderItemComponents = (
     cause: Cause;
   }
 ) => {
-  const componentsInitailValue: Array<{
-    orderItemId: number;
-    mainReason: MainReason;
-    detailedReason: string;
-    cause: Cause;
-  }> = [];
-
-  return orderItemId.reduce((result, orderItemId) => {
-    const components = {
-      orderItemId: orderItemId,
-      mainReason: reason.main,
-      detailedReason: reason.detail,
-      cause: reason.cause,
-    };
-
-    result.push(components);
-
-    return result;
-  }, componentsInitailValue);
+  return orderItemId.map((id) => ({
+    orderItemId: id,
+    mainReason: reason.main,
+    detailedReason: reason.detail,
+    cause: reason.cause,
+  }));
 };
 
 export default getCancelOrderItemComponents;

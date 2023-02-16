@@ -1,5 +1,17 @@
 import { SearchQueryType } from "@models/sale";
 
+export enum DenyRefundOrExchangeRequestType {
+  REFUND = "REFUND",
+  EXCHANGE = "EXCHANGE",
+}
+
+export enum SendType {
+  SEND = "SEND",
+  REFUND_PICK_UP = "REFUND_PICK_UP",
+  EXCHANGE_PICK_UP = "EXCHANGE_PICK_UP",
+  EXCHANGE_RESEND = "EXCHANGE_RESEND",
+}
+
 export enum OrderSearchType {
   RECIPIENT_NAME = "RECIPIENT_NAME",
   RECIPIENT_PHONE_NUMBER = "RECIPIENT_PHONE_NUMBER",
@@ -56,6 +68,7 @@ export enum ShipmentType {
 }
 
 export enum OrderStatusName {
+  DEFAULT = "DEFAULT",
   PAYMENT_COMPLETED = "PAYMENT_COMPLETED",
   PREPARING = "PREPARING",
   SHIPPING = "SHIPPING",
@@ -78,8 +91,6 @@ export enum OrderStatusName {
   EXCHANGE_REFUSAL = "EXCHANGE_REFUSAL",
   EXCHANGE_ERROR = "EXCHANGE_ERROR",
   CONFIRM_PURCHASE = "CONFIRM_PURCHASE",
-  PICK_UP_IN_PROGRESS = "PICK_UP_IN_PROGRESS",
-  PICK_UP_COMPLETED = "PICK_UP_COMPLETED",
 }
 
 export const orderStatusNameType = {
@@ -89,21 +100,21 @@ export const orderStatusNameType = {
   SHIPPING_COMPLETED: "배송 완료",
   CANCEL_REQUEST: "취소 요청",
   CANCEL_COMPLETED: "취소 완료",
-  CANCEL_ERROR: "취소 실패",
+  CANCEL_ERROR: "취소 오류",
   CANCEL_REFUSAL: "취소 거절",
-  REFUND_REQUEST: "환불 요청",
-  REFUND_PICK_UP_IN_PROGRESS: "환불 수거 진행중",
-  REFUND_PICK_UP_COMPLETED: "환불 수거 완료",
-  REFUND_COMPLETED: "환불 완료",
-  REFUND_REFUSAL: "환불 거절",
-  REFUND_ERROR: "환불 실패",
+  REFUND_REQUEST: "반품 요청",
+  REFUND_PICK_UP_IN_PROGRESS: "수거중",
+  REFUND_PICK_UP_COMPLETED: "수거완료",
+  REFUND_COMPLETED: "반품 완료",
+  REFUND_REFUSAL: "반품 거절",
+  REFUND_ERROR: "반품 오류",
   EXCHANGE_REQUEST: "교환 요청",
-  EXCHANGE_PICK_UP_IN_PROGRESS: "교환 수거중",
-  EXCHANGE_PICK_UP_COMPLETED: "교환 수거 완료",
+  EXCHANGE_PICK_UP_IN_PROGRESS: "수거중",
+  EXCHANGE_PICK_UP_COMPLETED: "수거 완료",
   SHIPPING_AGAIN: "재배송",
   EXCHANGE_COMPLETED: "교환 완료",
   EXCHANGE_REFUSAL: "교환 거절",
-  EXCHANGE_ERROR: "교환 실패",
+  EXCHANGE_ERROR: "교환 오류",
   CONFIRM_PURCHASE: "주문 승인",
   PICK_UP_IN_PROGRESS: "수거중",
   PICK_UP_COMPLETED: "수거 완료",
@@ -121,6 +132,7 @@ export enum OrderStatus {
   REFUND_REQUEST = "REFUND_REQUEST",
   REFUND_REFUSAL = "REFUND_REFUSAL",
   REFUND_COMPLETED = "REFUND_COMPLETED",
+  REFUND_ERROR = "REFUND_ERROR",
   REFUND_PICK_UP_ING = "REFUND_PICK_UP_ING",
   REFUND_PICK_UP_COMPLETED = "REFUND_PICK_UP_COMPLETED",
   EXCHANGE_REQUEST = "EXCHANGE_REQUEST",
@@ -139,6 +151,7 @@ export const claimStatusType = {
   REFUND_REQUEST: "환불 요청",
   REFUND_REFUSAL: "환불 거절",
   REFUND_COMPLETED: "환불 완료",
+  REFUND_ERROR: "환불 오류",
   REFUND_PICK_UP_ING: "환불 수거 진행중",
   REFUND_PICK_UP_COMPLETED: "환불 수거 완료",
   EXCHANGE_REQUEST: "교환 요청",
@@ -320,6 +333,25 @@ export const mainReasonType = {
   OTHER_REASONS: "기타 사유",
 };
 
+export const mainReasonTypes = {
+  "사유를 선택해주세요.": MainReason.DEFAULT,
+  "구매 의사 취소": MainReason.NO_INTENTION,
+  "색상 및 사이즈 변경": MainReason.CHANGE_COLOR_OR_SIZE,
+  "다른 상품 잘못 주문": MainReason.DIFFERENT_PRODUCT,
+  "배송 지연": MainReason.DELAYED_SHIPMENT,
+  "배송 누락": MainReason.OMITTED_SHIPMENT,
+  "상품 품절": MainReason.OUT_OF_STOCK,
+  "상품 파손": MainReason.DAMAGED,
+  "상품 정보 상이": MainReason.MISINFORMED,
+  오배송: MainReason.MISDELIVERY,
+  "커스터마이즈 주문제작": MainReason.CUSTOM_MADE,
+  "고객 요청에 의한 거부": MainReason.REFUSAL_BY_CUSTOMER_REQUEST,
+  "상품 준비 완료": MainReason.PRODUCT_ALREADY_READY,
+  "사용 흔적이 보임": MainReason.SENSE_TRACE_OF_USE,
+  "고객에 의해 파손됨": MainReason.DAMAGED_BY_CUSTOMER,
+  "기타 사유": MainReason.OTHER_REASONS,
+};
+
 export const optionListType: Array<{
   id: number;
   label: string;
@@ -382,7 +414,7 @@ export const optionListType: Array<{
   },
 ];
 
-export const refusalOptionListType: Array<{
+export const refusalCancelOrRefundOptionList: Array<{
   id: number;
   label: string;
   value: MainReason;
@@ -419,6 +451,54 @@ export const refusalOptionListType: Array<{
   },
   {
     id: 6,
+    label: mainReasonType.OTHER_REASONS,
+    value: MainReason.OTHER_REASONS,
+  },
+];
+
+export const refusalExchangeOptionList: Array<{
+  id: number;
+  label: string;
+  value: MainReason;
+}> = [
+  {
+    id: 0,
+    label: mainReasonType.DEFAULT,
+    value: MainReason.DEFAULT,
+  },
+  {
+    id: 1,
+    label: mainReasonType.CUSTOM_MADE,
+    value: MainReason.CUSTOM_MADE,
+  },
+  {
+    id: 2,
+    label: mainReasonType.REFUSAL_BY_CUSTOMER_REQUEST,
+    value: MainReason.REFUSAL_BY_CUSTOMER_REQUEST,
+  },
+  {
+    id: 3,
+    label: mainReasonType.PRODUCT_ALREADY_READY,
+    value: MainReason.PRODUCT_ALREADY_READY,
+  },
+  {
+    id: 4,
+    label: mainReasonType.SENSE_TRACE_OF_USE,
+    value: MainReason.SENSE_TRACE_OF_USE,
+  },
+  {
+    id: 5,
+    label: mainReasonType.DAMAGED_BY_CUSTOMER,
+    value: MainReason.DAMAGED_BY_CUSTOMER,
+  },
+  {
+    // 교환할 상품 재고 부족 Type필요
+    id: 6,
+    label: mainReasonType.DAMAGED_BY_CUSTOMER,
+    value: MainReason.DAMAGED_BY_CUSTOMER,
+  },
+  {
+    id: 7,
     label: mainReasonType.OTHER_REASONS,
     value: MainReason.OTHER_REASONS,
   },

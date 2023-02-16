@@ -1,15 +1,17 @@
+import { NormalizedListType } from "@models/sale/order";
 import { orderStatusNameType } from "@constants/sale";
-import { NormalizedType } from "@models/sale/index";
+import { DateType, getDateFormat } from "@utils/date";
+
 import {
   getShipmentPrice,
   getShipmentDistantPrice,
   getStatusReason,
+  getShipmentInfos,
   getOption,
   getPaymentsInfo,
 } from "@utils/sale/index";
-import { DateType, getDateFormat } from "@utils/date";
 
-const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
+const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
   const hasOrderItems =
     !!reconstructOrderItems && !!reconstructOrderItems.orders;
   if (!hasOrderItems) return;
@@ -24,10 +26,7 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       merchantItemUid,
       product,
       user,
-      claimStatus,
-      orderStatus,
       orderByShop,
-      statusReasons,
       options,
       quantity,
       discountAppliedPrice,
@@ -36,6 +35,10 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       shipmentDistantPrice,
       shipmentType,
       isBundleShipment,
+      orderShipmentInfos,
+      orderStatus,
+      claimStatus,
+      statusReasons,
       colorIndex,
       rowIndex,
       isLastRow,
@@ -43,21 +46,33 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
     } = orderByid[id];
 
     const {
+      attachedImages,
       requestAt,
       mainReason,
       detailedReason,
       reasonStatus,
       statusReasonId,
       completedAt,
-      amount,
       refusalAt,
       refusalReason,
       refusalDetailedReason,
       refusalReasonStatus,
       refusalStatusReasonId,
+      amount,
+      cause,
     } = getStatusReason(statusReasons);
 
+    const {
+      shipmentOrderId,
+      shipmentCompany: shippingShipmentCompany,
+      shipmentNumber: shippingShipmentNumber,
+      refundOrderId,
+      refundShipmentCompany,
+      refundShipmentNumber,
+    } = getShipmentInfos(orderShipmentInfos);
+
     const { optionName, optionPrice, optionQuantity } = getOption(options);
+
     const calculateShipmentPrice: number = getShipmentPrice(
       isBundleShipment,
       shipmentPrice,
@@ -91,14 +106,14 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       id: orderId,
       merchantUid: merchantUid || "-",
       merchantItemUid: merchantItemUid || "-",
-      thumbnail: product.thumbnail || "-",
-      productName: product.name || "-",
-      userName: user.name || "-",
-      orderStatus: orderStatus
+      thumbnail: product?.thumbnail || "-",
+      productName: product?.name || "-",
+      userName: user?.name || "-",
+      orderStatus: orderStatus?.name
         ? (orderStatusNameType[orderStatus.name] as string)
         : "-",
-      claimStatus: claimStatus
-        ? (orderStatusNameType[claimStatus.name] as string)
+      claimStatus: claimStatus?.name
+        ? (orderStatusNameType[claimStatus?.name] as string)
         : "-",
       paidAt: orderByShop?.order?.paidAt
         ? `${
@@ -113,8 +128,18 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       detailedReason: detailedReason || "-",
       reasonStatus,
       statusReasonId,
+      attachedImages:
+        !!attachedImages && !!attachedImages.length ? attachedImages : null,
       completedAt: completedAt || "-",
-      optionName: optionName || "-",
+
+      shipmentOrderId,
+      shipmentCompany: shippingShipmentCompany,
+      shipmentNumber: shippingShipmentNumber,
+      refundOrderId,
+      refundShipmentCompany,
+      refundShipmentNumber,
+
+      option: optionName || "-",
       quantity: resetQuantity,
       originalPrice: resetOriginalPrice
         ? `${resetOriginalPrice.toLocaleString("ko-KR")}`
@@ -135,25 +160,38 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       totalPaymentAmount: totalPaymentAmount
         ? `${totalPaymentAmount.toLocaleString("ko-KR")}`
         : "-",
-      totalRefundAmout: amount ? `${amount.toLocaleString("ko-KR")}` : "-",
-      userEmail: user.email || "-",
-      userPhoneNumber: user.phoneNumber || "-",
+      amount: amount ? `${amount.toLocaleString("ko-KR")}` : "-",
+
       recipientName: orderByShop?.order?.recipientName || "-",
       recipientPhoneNumber: orderByShop?.order?.recipientPhoneNumber || "-",
+      recipientAddress: orderByShop?.order?.recipientAddress || "-",
+      postCode: orderByShop?.order?.postCode || "-",
+      userEmail: user?.email || "-",
+      userPhoneNumber: user?.phoneNumber || "-",
       refusalAt: refusalAt || "-",
-      refusalReason: refusalReason || "-",
+      refusalReason,
       refusalDetailedReason: refusalDetailedReason || "-",
       refusalReasonStatus,
       refusalStatusReasonId,
 
       isChecked: false,
+      isShipmentInfoEdit: false,
+      temporaryShipmentCompany: shippingShipmentCompany || "",
+      temporaryShipmentNumber: shippingShipmentNumber || 0,
+
+      isRefundShipmentInfoEdit: false,
+      temporaryRefundShipmentCompany: refundShipmentCompany || "",
+      temporaryRefundShipmentNumber: refundShipmentNumber || 0,
+
+      isBundleShipment,
+      cause,
+
       colorIndex,
       rowIndex,
       isLastRow,
       isFirstRow,
     };
   });
-
   return result;
 };
 

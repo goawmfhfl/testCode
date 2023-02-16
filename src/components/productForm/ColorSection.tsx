@@ -7,6 +7,7 @@ import checkedIconSrc from "@icons/checkbox-checked-white.svg";
 import darkCheckedIconSrc from "@icons/checkbox-checked-grey.svg";
 import { PRODUCT_COLOR } from "@cache/productForm/index";
 import { ColorType, ColorInputType } from "@models/product/index";
+import patternImage from "@images/pattern-color.png";
 
 const colors: Array<ColorInputType> = [
   { name: "빨강", hex: "#FF0000", value: ColorType.RED },
@@ -41,7 +42,12 @@ const colors: Array<ColorInputType> = [
     darkCheckedIcon: true,
   },
   { name: "갈색", hex: "#955D0A", value: ColorType.BROWN },
-  { name: "패턴/일러스트", hex: "#008A0E", value: ColorType.PATTERN_ILLUST },
+  {
+    name: "패턴/일러스트",
+    hex: "#008A0E",
+    src: patternImage,
+    value: ColorType.PATTERN_ILLUST,
+  },
 ];
 
 interface MappedColorInputType extends ColorInputType {
@@ -63,13 +69,14 @@ const ProductColor = () => {
 
   return (
     <Container>
-      {mappedColorList.map(({ key, name, hex, value, darkCheckedIcon }) => {
+      {mappedColorList.map(({ key, name, hex, value, src }) => {
         const isWhite = value === ColorType.WHITE;
 
         return (
           <ColorContainer key={key}>
             <ColorCheckbox
-              hex={hex}
+              hex={!src && hex}
+              src={src}
               darkCheckedIcon={isWhite}
               hasDefaultBorder={isWhite}
               value={value}
@@ -120,6 +127,7 @@ const ColorCheckbox = styled.input.attrs({
   type: "checkbox",
 })<{
   hex: string;
+  src?: string;
   darkCheckedIcon: boolean | undefined;
   hasDefaultBorder: boolean | undefined;
 }>`
@@ -129,6 +137,14 @@ const ColorCheckbox = styled.input.attrs({
   &:after {
     content: "";
     background-color: ${({ hex }) => (hex ? hex : "")};
+    ${({ src }) =>
+      src &&
+      `
+    background-image: url("${src}");
+    background-size: contain;
+    background-repeat: repeat;
+  `};
+
     box-shadow: ${({ theme, hasDefaultBorder }) =>
       hasDefaultBorder ? `0 0 0 2px ${theme.palette.grey500} inset` : ""};
     width: 24px;
@@ -155,6 +171,14 @@ const ColorCheckbox = styled.input.attrs({
     }
 
     &:before {
+      ${({ src }) =>
+        src &&
+        `
+          background-image: url("${src}");
+          background-size: contain;
+          background-repeat: no-repeat;
+        `};
+
       content: "";
       width: 26px;
       height: 26px;

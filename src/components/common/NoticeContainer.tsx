@@ -21,7 +21,7 @@ const NoticeContainer = ({
   );
 };
 
-const Container = styled.div<{ width: string }>`
+export const Container = styled.div<{ width: string }>`
   display: flex;
 
   width: ${({ width }) => (width ? width : "100%")};
@@ -30,7 +30,7 @@ const Container = styled.div<{ width: string }>`
   background: ${({ theme: { palette } }) => palette.grey400};
 `;
 
-const NoticeText = styled.div<{ hasTopMargin: boolean }>`
+export const NoticeText = styled.div<{ hasTopMargin?: boolean }>`
   flex: 1;
   display: flex;
   align-items: center;
@@ -42,7 +42,7 @@ const NoticeText = styled.div<{ hasTopMargin: boolean }>`
   white-space: nowrap;
 `;
 
-const NoticeIcon = styled.img`
+export const NoticeIcon = styled.img`
   width: 24px;
   height: 24px;
   margin-right: 12px;

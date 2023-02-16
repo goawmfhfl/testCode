@@ -5,8 +5,8 @@ import {
   OrderStatusGroup,
   OrderStatusName,
   OrderStatusType,
+  SendType,
   ShipmentStatus,
-  ShipmentType,
 } from "@constants/sale";
 import { RequestRefundOrExchange } from "@constants/sale/orderManagement";
 import { OrderItems } from "@models/sale/index";
@@ -100,6 +100,7 @@ export interface SendOrderItemsInputType {
     shipmentCompany: string;
     shipmentNumber: number;
   }>;
+  type: SendType;
 }
 
 export interface ConfirmOrderItemsBySellerType {

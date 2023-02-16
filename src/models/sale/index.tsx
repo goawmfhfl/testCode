@@ -1,4 +1,5 @@
 import {
+  Cause,
   MainReason,
   OrderSearchType,
   OrderStatusGroup,
@@ -31,14 +32,19 @@ export interface OrderItems {
   };
 
   statusReasons?: Array<{
+    id: number;
     createdAt: string;
     amount: number;
     mainReason: MainReason;
     detailedReason: string;
+    cause: Cause;
     status: OrderStatusName;
+    uploadedFileUrls: Array<{
+      url: string;
+    }>;
   }>;
 
-  orderByShop: {
+  orderByShop?: {
     bundleShipmentPrice: number;
     bundleShipmentDistantPrice: number;
     bundleShipmentType: ShipmentType;
@@ -69,9 +75,10 @@ export interface OrderItems {
   quantity: number;
   discountAppliedPrice: number;
   originalPrice: number;
+
+  shipmentType: ShipmentType;
   shipmentPrice: number;
   shipmentDistantPrice: number;
-  shipmentType: ShipmentType;
 
   orderShipmentInfos?: Array<{
     id: number;
@@ -104,16 +111,26 @@ export interface ResetOrderItemType {
   orderStatus: string;
   claimStatus: string;
 
-  orderShipmentInfosId?: number;
+  shipmentOrderId?: number;
+  isShipmentInfoEdit?: boolean;
+  temporaryShipmentCompany?: string;
+  temporaryShipmentNumber?: number;
   shipmentCompany?: string;
   shipmentNumber?: number;
+
+  refundOrderId?: number;
+  isRefundShipmentInfoEdit?: boolean;
+  refundShipmentCompany?: string;
+  refundShipmentNumber?: number;
+  temporaryRefundShipmentCompany?: string;
+  temporaryRefundShipmentNumber?: number;
 
   recipientName: string;
   recipientPhoneNumber: string;
   recipientAddress?: string;
   shipmentMemo?: string;
-
   postCode?: string | number;
+
   option?: string;
   quantity?: number;
   price?: string;
@@ -125,23 +142,28 @@ export interface ResetOrderItemType {
   discountPrice: string | number;
   shipmentPrice: string;
   shipmentDistantPrice?: string | number;
-
-  mainReason?: string;
-  detailedReason?: string;
-
   totalPaymentAmount: string;
   totalRefundAmout?: string;
 
-  requestCancelAt?: string;
-  completedCancelAt?: string;
-  refusalCancelAt?: string;
+  mainReason?: string;
+  detailedReason?: string;
+  reasonStatus?: OrderStatusName;
+  statusReasonId?: number;
+  requestAt?: string;
+  completedAt?: string;
+  refusalAt?: string;
   refusalReason?: string;
-  refusalDateaildReason?: string;
+  refusalDetailedReason?: string;
+  refusalReasonStatus?: OrderStatusName;
+  refusalStatusReasonId?: number;
+  amount?: number | string;
+  attachedImages?: Array<{ url: string }> | null;
+
+  isBundleShipment?: boolean;
+  cause?: Cause;
 
   isChecked: boolean;
-  isShipmentInfoEdit?: boolean;
-  temporaryShipmentCompany?: string;
-  temporaryShipmentNumber?: number;
+
   colorIndex: number;
   rowIndex: string;
   isLastRow: boolean;
@@ -165,4 +187,36 @@ export interface SearchQueryType {
   id: number;
   label: string;
   value: string;
+}
+
+export interface NormalizedType {
+  orders: {
+    allIds: Array<string>;
+    byId: { [key: string]: OrderItems };
+  };
+}
+
+export interface EditStatusReasonBySellerType {
+  editStatusReasonBySeller: {
+    ok: boolean;
+    error?: string;
+  };
+}
+
+export interface EditStatusReasonBySellerInputType {
+  statusReasonId: number;
+  mainReason: MainReason;
+  detailedReason: string;
+}
+
+export interface ChangeOrderStatusByForceType {
+  changeOrderStatusByForce: {
+    ok: boolean;
+    error?: string;
+  };
+}
+
+export interface ChangeOrderStatusByForceInputType {
+  components: Array<{ orderItemId: number }>;
+  orderStatusName: OrderStatusName;
 }

@@ -49,8 +49,7 @@ const FilterBar = () => {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
+    void (async () => {
       await getProductStatus({
         variables: {
           input: {
@@ -60,6 +59,7 @@ const FilterBar = () => {
             query: null,
           },
         },
+        fetchPolicy: "no-cache",
       });
     })();
   }, []);
