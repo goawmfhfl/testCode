@@ -37,7 +37,7 @@ const Textarea = ({
       onKeyDown={onKeyDown}
       placeholder={placeholder}
       maxLength={maxLength}
-      value={value.replace(/^([-])[\s]$/gm, ($1) => {
+      value={value?.replace(/^([-])[\s]$/gm, ($1) => {
         console.log($1);
 
         return "• ";
