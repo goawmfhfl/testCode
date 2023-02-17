@@ -100,6 +100,7 @@ export const GET_CANCEL_ORDERS_BY_SELLER = gql`
           bundleShipmentType
           bundleOrderItemTotalPrice
           shipmentConditionalPrice
+
           order {
             recipientName
             recipientPhoneNumber
@@ -180,6 +181,7 @@ export const GET_REFUND_ORDERS_BY_SELLER = gql`
           bundleShipmentType
           bundleOrderItemTotalPrice
           shipmentConditionalPrice
+
           order {
             recipientName
             recipientPhoneNumber

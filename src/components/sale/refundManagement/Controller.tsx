@@ -24,12 +24,12 @@ import {
   SendType,
   DenyRefundOrExchangeRequestType,
   OrderStatusName,
+  Cause,
 } from "@constants/sale";
 import { skipQuantityType } from "@constants/index";
 import { changeRefundOrderStatusByForceType } from "@constants/sale/refundManagement/index";
 
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
-import { COMPLETE_REFUND_BY_SELLER } from "@graphql/mutations/completeRefundBySeller";
 import { CHANGE_ORDER_STATUS_BY_FORCE } from "@graphql/mutations/changeOrderStatusByForce";
 import { GET_REFUND_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 
@@ -38,17 +38,11 @@ import {
   ChangeOrderStatusByForceInputType,
   ResetOrderItemType,
   OrderItems,
-  EstimateRefundAmountType,
-  EstimateRefundAmountInputType,
 } from "@models/sale";
 import {
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
-import {
-  CompleteRefundBySellerType,
-  CompleteRefundBySellerInputType,
-} from "@models/sale/refund";
 
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
 import { getIsCheckedStatus } from "@utils/sale";
@@ -64,7 +58,6 @@ import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
 import HandleRefusalRefundOrExchangeRequestModal from "@components/sale/HandleRefusalRefundOrExchangeRequestModal";
 import HandleCompleteRefundModal from "@components/sale/refundManagement/HandleCompleteRefundModal";
-import { ESTIMATE_REFUND_AMOUNT } from "@graphql/mutations/estimateRefundAmout";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -78,33 +71,6 @@ const Controller = () => {
       input: ChangeOrderStatusByForceInputType;
     }
   >(CHANGE_ORDER_STATUS_BY_FORCE, {
-    fetchPolicy: "no-cache",
-    notifyOnNetworkStatusChange: true,
-    refetchQueries: [
-      {
-        query: GET_REFUND_ORDERS_BY_SELLER,
-        variables: {
-          input: {
-            page,
-            skip,
-            query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
-          },
-        },
-      },
-      "GetOrdersBySeller",
-    ],
-  });
-
-  const [estimateRefundAmount] = useMutation<
-    EstimateRefundAmountType,
-    {
-      input: EstimateRefundAmountInputType;
-    }
-  >(ESTIMATE_REFUND_AMOUNT, {
     fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
@@ -426,20 +392,25 @@ const Controller = () => {
       return;
     }
 
-    // modalVar({
-    //   isVisible: true,
-    //   component: (
-    //     <HandleCompleteRefundModal
-    //       cause={cause}
-    //       totalPrice={totalPrice}
-    //       shipmentPrice={shipmentPrice}
-    //       shipmentDistantPrice={shipmentDistantPrice}
-    //       mainReason={mainReason}
-    //       detailedReason={detailedReason}
-    //       isConditionalFree={isConditionalFree}
-    //     />
-    //   ),
-    // });
+    loadingSpinnerVisibilityVar(true);
+    const checkedOrderItemIds = reconstructCheckedOrderItems.map(
+      ({ id }) => id
+    );
+    const detailedReason = reconstructCheckedOrderItems.map(
+      ({ detailedReason }) => detailedReason
+    );
+    const cause = reconstructCheckedOrderItems.map(({ cause }) => cause);
+
+    modalVar({
+      isVisible: true,
+      component: (
+        <HandleCompleteRefundModal
+          orderItemIds={checkedOrderItemIds}
+          cause={cause[0]}
+          detailedReason={detailedReason[0]}
+        />
+      ),
+    });
   };
 
   const handleOrderStatusByForceClick = () => {

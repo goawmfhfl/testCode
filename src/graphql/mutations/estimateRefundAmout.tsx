@@ -5,6 +5,14 @@ export const ESTIMATE_REFUND_AMOUNT = gql`
     estimateRefundAmount(input: $input) {
       ok
       error
+      totalProductAmount
+      initialShipmentAmount
+      initialShipmentDistantAmount
+      shipmentRefundAmount
+      bundleShipmentType
+      isConditionalAmountBreak
+      isAllOrderItemRefunded
+      isFreeBreak
     }
   }
 `;

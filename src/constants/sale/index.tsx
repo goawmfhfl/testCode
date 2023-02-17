@@ -55,6 +55,11 @@ export enum OrderStatusType {
   ORDER = "ORDER",
   CLAIM = "CLAIM",
 }
+
+export const causeType = {
+  CLIENT: "소비자",
+  SELLER: "판매자",
+};
 export enum Cause {
   DEFAULT = "DEFAULT",
   CLIENT = "CLIENT",

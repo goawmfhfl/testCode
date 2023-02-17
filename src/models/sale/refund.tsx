@@ -58,5 +58,7 @@ export interface CompleteRefundBySellerInputType {
   components: Array<{
     orderItemId: number;
     cause: Cause;
+    totalAmount: number;
+    shipmentReturnAmount: number;
   }>;
 }

@@ -202,7 +202,7 @@ export const getStatusReason = (
     refusalDetailedReason: string;
     refusalReasonStatus: OrderStatusName;
     refusalStatusReasonId: number;
-
+    refusalCause: Cause;
     attachedImages: Array<{ url: string }>;
   } = {
     requestAt: "",
@@ -218,6 +218,7 @@ export const getStatusReason = (
     refusalDetailedReason: "",
     refusalReasonStatus: null,
     statusReasonId: null,
+    refusalCause: null,
     attachedImages: [],
   };
 
@@ -279,6 +280,7 @@ export const getStatusReason = (
         result.refusalReason = mainReasonType[mainReason];
         result.refusalDetailedReason = detailedReason;
         result.refusalReasonStatus = status;
+        result.refusalCause = cause;
         result.refusalAt = `${
           getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
         } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;

@@ -247,6 +247,8 @@ export interface EstimateRefundAmountType {
     shipmentRefundAmount: number;
     bundleShipmentType: ShipmentType;
     isConditionalAmountBreak: boolean;
+    isAllOrderItemRefunded: boolean;
+    isFreeBreak: boolean;
   };
 }
 export interface EstimateRefundAmountInputType {
