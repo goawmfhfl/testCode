@@ -196,6 +196,22 @@ const Login = () => {
   //   });
   // };
 
+  const token = window.sessionStorage.getItem(AUTH_TOKEN_KEY);
+
+  useEffect(() => {
+    if (!token) return;
+
+    (async () => {
+      const result = await getShopInfo();
+
+      if (result.data.getShopInfo.shop.registered) {
+        navigate(Pathnames.Product);
+      } else {
+        navigate(Pathnames.Shop);
+      }
+    })();
+  }, [token]);
+
   useEffect(() => {
     const isLoading = isLoginLoading || isShopLoading;
 
