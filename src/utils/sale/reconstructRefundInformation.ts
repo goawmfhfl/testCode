@@ -28,6 +28,11 @@ const reconstructRefundInformation = (
     isAllOrderItemRefunded,
   } = refundInformation;
 
+  const isFree = bundleShipmentType === ShipmentType.FREE;
+  const isCharge = bundleShipmentType === ShipmentType.CHARGE;
+  const isConditionalFree =
+    bundleShipmentType === ShipmentType.CONDITIONAL_FREE;
+
   let calculatedInitialShipmentAmount: number;
   let calculatedInitialShipmentDistantAmount: number;
   let calculatedShipmentRefundAmount: number;
@@ -35,52 +40,42 @@ const reconstructRefundInformation = (
 
   if (cause === Cause.CLIENT) {
     sign = "-";
+    calculatedInitialShipmentDistantAmount = 0;
+    calculatedShipmentRefundAmount =
+      shipmentRefundAmount + initialShipmentDistantAmount;
 
-    if (isConditionalAmountBreak) {
-      if (bundleShipmentType === ShipmentType.CHARGE) {
-        calculatedInitialShipmentAmount = initialShipmentAmount ?? 0;
-        calculatedInitialShipmentDistantAmount = 0;
-        calculatedShipmentRefundAmount =
-          shipmentRefundAmount + initialShipmentDistantAmount;
+    if (isFreeBreak) {
+      if (isConditionalAmountBreak) {
+        if (isCharge) {
+          calculatedInitialShipmentAmount = initialShipmentDistantAmount ?? 0;
+        }
       }
-      if (bundleShipmentType === ShipmentType.FREE) {
-        calculatedInitialShipmentAmount = 0;
-        calculatedInitialShipmentDistantAmount = 0;
-        shipmentRefundAmount + initialShipmentDistantAmount;
+
+      if (!isConditionalAmountBreak) {
+        if (isFree) {
+          calculatedInitialShipmentAmount = initialShipmentDistantAmount ?? 0;
+        }
+        if (isCharge) {
+          calculatedInitialShipmentAmount = initialShipmentDistantAmount ?? 0;
+        }
+        if (isConditionalFree) {
+          calculatedInitialShipmentAmount = 0;
+        }
       }
     }
 
-    if (!isConditionalAmountBreak) {
-      if (isFreeBreak) {
-        if (bundleShipmentType === ShipmentType.CHARGE) {
-          calculatedInitialShipmentAmount = initialShipmentAmount ?? 0;
-          calculatedInitialShipmentDistantAmount = 0;
-          calculatedShipmentRefundAmount =
-            shipmentRefundAmount + initialShipmentDistantAmount;
+    if (!isFreeBreak) {
+      if (isConditionalAmountBreak) {
+        if (isFree) {
+          calculatedInitialShipmentAmount = 0;
+        }
+        if (isCharge) {
+          calculatedInitialShipmentAmount = initialShipmentDistantAmount ?? 0;
         }
       }
 
-      if (!isFreeBreak) {
-        if (bundleShipmentType === ShipmentType.FREE) {
-          calculatedInitialShipmentAmount = 0;
-          calculatedInitialShipmentDistantAmount = 0;
-          calculatedShipmentRefundAmount =
-            shipmentRefundAmount + initialShipmentDistantAmount;
-        }
-
-        if (bundleShipmentType === ShipmentType.CHARGE) {
-          calculatedInitialShipmentAmount = 0;
-          calculatedInitialShipmentDistantAmount = 0;
-          calculatedShipmentRefundAmount =
-            shipmentRefundAmount + initialShipmentDistantAmount;
-        }
-
-        if (bundleShipmentType === ShipmentType.CONDITIONAL_FREE) {
-          calculatedInitialShipmentAmount = 0;
-          calculatedInitialShipmentDistantAmount = 0;
-          calculatedShipmentRefundAmount =
-            shipmentRefundAmount + initialShipmentDistantAmount;
-        }
+      if (!isConditionalAmountBreak) {
+        calculatedInitialShipmentAmount = 0;
       }
     }
   }
