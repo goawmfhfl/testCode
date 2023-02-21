@@ -46,6 +46,7 @@ import {
 import { getIsCheckedStatus } from "@utils/sale";
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
 import getDescription from "@utils/sale/exchange/getDescription";
+import { getHandleCompleteRefundErrorCase } from "@utils/sale/refund";
 
 import questionMarkSrc from "@icons/questionmark.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -55,8 +56,8 @@ import ControllerContainer from "@components/sale/ControllerContainer";
 import Button from "@components/common/Button";
 import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
-
 import HandleRefusalRefundOrExchangeRequestModal from "@components/sale/HandleRefusalRefundOrExchangeRequestModal";
+import HandleCompleteRefundModal from "@components/sale/refundManagement/HandleCompleteRefundModal";
 
 const Controller = () => {
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
@@ -363,6 +364,87 @@ const Controller = () => {
       return;
     }
 
+    if (isPickupCompletedChecked) {
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        description: (
+          <>
+            수거 완료된 교환건의 <br />
+            교환 거절은 반품으로 처리됩니다.
+            <br />
+            반품 완료 처리하시겠습니까?
+          </>
+        ),
+        confirmButtonVisibility: true,
+        cancelButtonVisibility: true,
+        confirmButtonClickHandler: () => {
+          const {
+            hasDiffrentOrder,
+            hasDifferentShipmentType,
+            hasDifferentCause,
+          } = getHandleCompleteRefundErrorCase(reconstructCheckedOrderItems);
+
+          if (hasDiffrentOrder) {
+            showHasAnyProblemModal(
+              <>
+                반품 완료처리는 하나의
+                <br />
+                주문건 안에서만 가능합니다.
+              </>
+            );
+
+            return;
+          }
+
+          if (hasDifferentShipmentType) {
+            showHasAnyProblemModal(
+              <>
+                반품 완료처리는 하나의
+                <br />
+                묶음 배송 안에서만 가능합니다.
+              </>
+            );
+
+            return;
+          }
+
+          if (hasDifferentCause) {
+            showHasAnyProblemModal(
+              <>
+                반품 완료처리는 하나의
+                <br />
+                귀책사유 에서만 가능합니다.
+              </>
+            );
+
+            return;
+          }
+
+          const checkedOrderItemIds = reconstructCheckedOrderItems.map(
+            ({ id }) => id
+          );
+          const detailedReason = reconstructCheckedOrderItems.map(
+            ({ detailedReason }) => detailedReason
+          );
+          const cause = reconstructCheckedOrderItems.map(({ cause }) => cause);
+
+          modalVar({
+            isVisible: true,
+            component: (
+              <HandleCompleteRefundModal
+                orderItemIds={checkedOrderItemIds}
+                cause={cause[0]}
+                detailedReason={detailedReason[0]}
+              />
+            ),
+          });
+        },
+      });
+
+      return;
+    }
+
     modalVar({
       isVisible: true,
       component: (
@@ -640,7 +722,7 @@ const Controller = () => {
           <NoticeCOntainer className={"notice"}>
             <NoticeIcon src={questionMarkSrc} />
             <NoticeText>
-              강제 상태 변경은 선택한 주문상틔 이후 상태로만 변경 가능합니다.
+              강제 상태 변경은 선택한 주문상태 이후 상태로만 변경 가능합니다.
               <br /> 이전 상태로 변경은 불가합니다.
             </NoticeText>
           </NoticeCOntainer>
