@@ -7,7 +7,6 @@ import {
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
   modalVar,
-  showHasAnyProblemModal,
   systemModalVar,
 } from "@cache/index";
 import {
@@ -16,11 +15,7 @@ import {
 } from "@cache/sale";
 
 import { showHasServerErrorModal } from "@cache/productManagement";
-import {
-  MainReason,
-  refusalCancelOrRefundOptionList,
-  refusalExchangeOptionList,
-} from "@constants/sale";
+import { MainReason, refusalCancelOrRefundOptionList } from "@constants/sale";
 import { DenyRefundOrExchangeRequestType } from "@constants/sale";
 import { ResetOrderItemType } from "@models/sale/index";
 
@@ -48,7 +43,6 @@ import {
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
-import { getHandleCompleteRefundErrorCase } from "@utils/sale/refund";
 
 const HandleRefusalRefundOrExchangeRequestModal = ({
   status,
