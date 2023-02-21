@@ -1,12 +1,5 @@
-import { Cause, MainReason, ShipmentType } from "@constants/sale";
-import { OrderItems, ResetOrderItemType } from "@models/sale";
-import {
-  getOption,
-  getPaymentsInfo,
-  getShipmentDistantPrice,
-  getShipmentPrice,
-  getStatusReason,
-} from "..";
+import { Cause } from "@constants/sale";
+import { ResetOrderItemType } from "@models/sale";
 
 export const getHandleCompleteRefundErrorCase = (
   checkedOrderItems: Array<ResetOrderItemType>
@@ -17,8 +10,8 @@ export const getHandleCompleteRefundErrorCase = (
       const hasFilteredOrders = array.filter(
         ({ merchantUid }) => merchantUid !== order
       );
-      if (hasFilteredOrders.length === 0) {
-        result.hasDiffrentOrder = false;
+      if (hasFilteredOrders.length !== 0) {
+        result.hasDiffrentOrder = true;
       }
 
       if (isBundleShipment) {
@@ -53,9 +46,10 @@ export const getHandleCompleteRefundErrorCase = (
       hasBundleShipment: false,
       hasIndividualShipment: false,
 
-      hasDiffrentOrder: false,
       hasDifferentShipmentType: false,
       hasDifferentCause: false,
+
+      hasDiffrentOrder: false,
     }
   );
 };
