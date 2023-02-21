@@ -157,62 +157,6 @@ const HandleRefusalRefundOrExchangeRequestModal = ({
       hasRefundPickupCompleted &&
       DenyRefundOrExchangeRequestType.EXCHANGE === status;
 
-    if (isPickupCompletedExchangeRequest) {
-      const { hasDiffrentOrder, hasDifferentShipmentType, hasDifferentCause } =
-        getHandleCompleteRefundErrorCase(reconstructCheckedOrderItems);
-
-      if (hasDiffrentOrder) {
-        showHasAnyProblemModal(
-          <>
-            반품 완료처리는 하나의
-            <br />
-            주문건 안에서만 가능합니다.
-          </>
-        );
-
-        return;
-      }
-
-      if (hasDifferentShipmentType) {
-        showHasAnyProblemModal(
-          <>
-            반품 완료처리는 하나의
-            <br />
-            묶음 배송 안에서만 가능합니다.
-          </>
-        );
-
-        return;
-      }
-
-      if (hasDifferentCause) {
-        showHasAnyProblemModal(
-          <>
-            반품 완료처리는 하나의
-            <br />
-            귀책사유 에서만 가능합니다.
-          </>
-        );
-
-        return;
-      }
-
-      // modalVar({
-      //   isVisible: true,
-      //   component: (
-      //     <HandleCompleteRefundModal
-      //       cause={cause}
-      //       totalPrice={totalPrice}
-      //       shipmentPrice={shipmentPrice}
-      //       shipmentDistantPrice={shipmentDistantPrice}
-      //       mainReason={mainReason}
-      //       detailedReason={detailedReason}
-      //       isConditionalFree={isConditionalFree}
-      //     />
-      //   ),
-      // });
-    }
-
     if (!isPickupCompletedExchangeRequest) {
       systemModalVar({
         ...systemModalVar(),
