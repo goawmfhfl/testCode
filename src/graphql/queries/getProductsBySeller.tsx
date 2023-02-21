@@ -13,6 +13,8 @@ export interface ProductsType {
   originalPrice: number;
   discountAmount?: number;
   discountMethod?: string;
+  startDiscountDate?: string;
+  endDiscountDate?: string;
   thumbnail: string;
   quantity: number;
   status: ProductStatus;
@@ -67,6 +69,8 @@ export const GET_PRODUCTS_BY_SELLER = gql`
         discountAmount
         discountMethod
         discountAmount
+        startDiscountDate
+        endDiscountDate
         originalPrice
         quantity
         thumbnail
