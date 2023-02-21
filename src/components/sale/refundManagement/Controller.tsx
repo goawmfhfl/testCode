@@ -392,7 +392,6 @@ const Controller = () => {
       return;
     }
 
-    loadingSpinnerVisibilityVar(true);
     const checkedOrderItemIds = reconstructCheckedOrderItems.map(
       ({ id }) => id
     );

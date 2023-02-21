@@ -25,8 +25,6 @@ import {
   CompleteRefundBySellerType,
 } from "@models/sale/refund";
 
-import reconstructRefundInformation from "@utils/sale/reconstructRefundInformation";
-
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import exclamationGreySrc from "@icons/exclamation-grey.svg";
 import NoticeContainer, {
@@ -46,6 +44,7 @@ const HandleCompleteRefundModal = ({
   cause: Cause;
   detailedReason: string;
 }) => {
+  const sign = cause === Cause.CLIENT ? "-" : "+";
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } = useReactiveVar(
     commonSaleFilterOptionVar
@@ -56,19 +55,11 @@ const HandleCompleteRefundModal = ({
     initialShipmentAmount: number;
     initialShipmentDistantAmount: number;
     shipmentRefundAmount: number;
-    bundleShipmentType: ShipmentType;
-    isConditionalAmountBreak: boolean;
-    isAllOrderItemRefunded: boolean;
-    isFreeBreak: boolean;
   }>({
     totalProductAmount: 0,
     initialShipmentAmount: 0,
     initialShipmentDistantAmount: 0,
     shipmentRefundAmount: 0,
-    bundleShipmentType: null,
-    isConditionalAmountBreak: null,
-    isAllOrderItemRefunded: null,
-    isFreeBreak: null,
   });
 
   const {
@@ -76,18 +67,41 @@ const HandleCompleteRefundModal = ({
     initialShipmentAmount,
     initialShipmentDistantAmount,
     shipmentRefundAmount,
-    sign,
-  } = reconstructRefundInformation(refundInformation, cause);
-
-  const {
-    shipmentRefundAmount: shipmentRefundPrice,
-    initialShipmentDistantAmount: shipmentDistantPrice,
   } = refundInformation;
 
-  const [calculateTotalRefundAmount, setCalculateTotalRefundAmount] =
-    useState<number>(0);
-  const [handleRefundAmount, setHandleRefundAmount] = useState<string>("");
-  const [refundAmount, setRefundAmount] = useState<number>(0);
+  const [handleShipmentStringType, setHandleShipmentStringType] = useState<{
+    shipment: string;
+    shipmentDistant: string;
+    refund: string;
+  }>({
+    shipment: "",
+    shipmentDistant: "",
+    refund: "",
+  });
+
+  const [handleShipmentNumberType, setHandleShipmentNumberType] = useState<{
+    shipmentDistant: number;
+    refund: number;
+  }>({
+    shipmentDistant: 0,
+    refund: 0,
+  });
+
+  useState<number>(0);
+  const { refund, shipment, shipmentDistant } = handleShipmentStringType;
+  const { refund: totalRefund, shipmentDistant: totalShipmentDistant } =
+    handleShipmentNumberType;
+
+  const [totalRefundAmount, setTotalRefundAmount] = useState<number>(0);
+  const totalAmount =
+    cause === Cause.CLIENT
+      ? totalProductAmount -
+        initialShipmentAmount -
+        totalRefund -
+        totalShipmentDistant
+      : totalProductAmount +
+        initialShipmentAmount +
+        initialShipmentDistantAmount;
 
   const [completeRefund] = useMutation<
     CompleteRefundBySellerType,
@@ -133,23 +147,28 @@ const HandleCompleteRefundModal = ({
     });
   };
 
-  const changeRefundShipmentHandler = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value: string = e.target.value;
+  const changeRefundShipmentAmountHandler =
+    (type: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value: string = e.target.value;
 
-    const deleteComma: string = value.replaceAll(",", "");
-    const deleteSignAndComma = Number(deleteComma.replaceAll(sign, ""));
+      const deleteComma: string = value.replaceAll(",", "");
+      const deleteSignAndComma = Number(deleteComma.replaceAll(sign, ""));
 
-    if (isNaN(deleteSignAndComma)) {
-      return;
-    }
+      if (isNaN(deleteSignAndComma)) {
+        return;
+      }
 
-    const addSignAndCommaRefundAmount = `${sign} ${deleteSignAndComma.toLocaleString()}`;
-    setHandleRefundAmount(addSignAndCommaRefundAmount);
-    setCalculateTotalRefundAmount(totalProductAmount - deleteSignAndComma);
-    setRefundAmount(deleteSignAndComma);
-  };
+      setHandleShipmentNumberType((prev) => ({
+        ...prev,
+        [type]: deleteSignAndComma,
+      }));
+
+      const addSignAndCommaRefundAmount = `${sign} ${deleteSignAndComma.toLocaleString()}`;
+      setHandleShipmentStringType((prev) => ({
+        ...prev,
+        [type]: addSignAndCommaRefundAmount,
+      }));
+    };
 
   const handleSubmitButtonClick = () => {
     void (async () => {
@@ -159,8 +178,8 @@ const HandleCompleteRefundModal = ({
         const components = orderItemIds.map((id) => ({
           orderItemId: id,
           cause,
-          totalAmount: calculateTotalRefundAmount,
-          shipmentReturnAmount: refundAmount,
+          totalAmount,
+          shipmentReturnAmount: totalRefund + totalShipmentDistant,
         }));
 
         const {
@@ -245,10 +264,6 @@ const HandleCompleteRefundModal = ({
               initialShipmentAmount,
               initialShipmentDistantAmount,
               shipmentRefundAmount,
-              bundleShipmentType,
-              isConditionalAmountBreak,
-              isAllOrderItemRefunded,
-              isFreeBreak,
             },
           },
         } = await estimateRefundAmount({
@@ -270,10 +285,6 @@ const HandleCompleteRefundModal = ({
             initialShipmentAmount: initialShipmentAmount ?? 0,
             initialShipmentDistantAmount: initialShipmentDistantAmount ?? 0,
             shipmentRefundAmount: shipmentRefundAmount ?? 0,
-            bundleShipmentType,
-            isConditionalAmountBreak,
-            isAllOrderItemRefunded,
-            isFreeBreak,
           });
         }
 
@@ -289,19 +300,26 @@ const HandleCompleteRefundModal = ({
   }, [orderItemIds, cause]);
 
   useEffect(() => {
-    const refundAmount = shipmentDistantPrice + shipmentRefundPrice;
-    const addSignAndCommaRefundAmount = `${sign} ${refundAmount.toLocaleString()}`;
+    const shipment = initialShipmentAmount;
+    const shipmentDistant = initialShipmentDistantAmount;
+    const refund = shipmentRefundAmount;
 
-    setHandleRefundAmount(addSignAndCommaRefundAmount);
-    setRefundAmount(refundAmount);
+    const addSignAndCommaShipment = `${sign} ${shipment.toLocaleString()}`;
+    const addSignAndCommaShipmentDistant = `${sign} ${shipmentDistant.toLocaleString()}`;
+    const addSignAndCommaRefund = `${sign} ${refund.toLocaleString()}`;
 
-    if (cause === Cause.CLIENT) {
-      setCalculateTotalRefundAmount(totalProductAmount - refundAmount);
-    }
+    setHandleShipmentStringType({
+      shipment: addSignAndCommaShipment,
+      shipmentDistant: addSignAndCommaShipmentDistant,
+      refund: addSignAndCommaRefund,
+    });
 
-    if (cause === Cause.SELLER) {
-      setCalculateTotalRefundAmount(totalProductAmount + refundAmount);
-    }
+    setHandleShipmentNumberType({
+      refund: shipmentRefundAmount,
+      shipmentDistant: initialShipmentDistantAmount,
+    });
+
+    setTotalRefundAmount(totalRefundAmount);
   }, [refundInformation]);
 
   return (
@@ -337,13 +355,11 @@ const HandleCompleteRefundModal = ({
           {initialShipmentAmount ? (
             <RefundInformationContainer>
               <RefundInformationLabel>최초 배송비</RefundInformationLabel>
-              <RefundInformationPrice>
-                {`${sign} ${initialShipmentAmount.toLocaleString("Ko-kr")}`}
-              </RefundInformationPrice>
+              <RefundInformationPrice>{shipment}</RefundInformationPrice>
             </RefundInformationContainer>
           ) : null}
 
-          {initialShipmentDistantAmount ? (
+          {initialShipmentDistantAmount && cause === Cause.SELLER ? (
             <RefundInformationContainer>
               <RefundInformationLabel>
                 최초 추가 배송비(제주도서산간)
@@ -356,15 +372,27 @@ const HandleCompleteRefundModal = ({
             </RefundInformationContainer>
           ) : null}
 
-          {shipmentRefundAmount ? (
+          {cause === Cause.CLIENT ? (
             <RefundShipmentContainer>
               <RefundInformationLabel>반품 배송비(편도)</RefundInformationLabel>
               <RefundShipmentInput
                 type={"text"}
-                value={handleRefundAmount}
-                onChange={changeRefundShipmentHandler}
+                value={refund}
+                onChange={changeRefundShipmentAmountHandler("refund")}
               />
+            </RefundShipmentContainer>
+          ) : null}
 
+          {cause === Cause.CLIENT ? (
+            <RefundShipmentContainer>
+              <RefundInformationLabel>
+                반품 추가 배송비(제주도서산간)
+              </RefundInformationLabel>
+              <RefundShipmentInput
+                type={"text"}
+                value={shipmentDistant}
+                onChange={changeRefundShipmentAmountHandler("shipmentDistant")}
+              />
               <ExclamationIconContainer>
                 <ExclamationIcon src={exclamationGreySrc} />
                 <StyledNoticeContainer width="363px" className={"notice"}>
@@ -388,7 +416,7 @@ const HandleCompleteRefundModal = ({
           <TotalPayAmountContainer>
             <TotalPaymentLabel>최종 환불 금액</TotalPaymentLabel>
             <TotalPaymentAmount>
-              {calculateTotalRefundAmount.toLocaleString("Ko-kr")}
+              {totalAmount.toLocaleString()}
             </TotalPaymentAmount>
           </TotalPayAmountContainer>
         </CalculateRefundAmountContainer>
@@ -500,6 +528,11 @@ const RefundInformationContainer = styled.div`
 
 const RefundInformationLabel = styled.span`
   width: 160px;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
 
   ${({
     theme: {
