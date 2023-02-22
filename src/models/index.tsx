@@ -1,4 +1,5 @@
 import { CategoryNames } from "@constants/category";
+import { OrderSearchType } from "@constants/sale";
 
 export enum UploadFileType {
   PRODUCT_THUMBNAIL = "PRODUCT_THUMBNAIL",
@@ -35,6 +36,7 @@ export interface CommonFilterOptionType {
   page: number;
   skip: number;
   query: string;
+  orderSearchType?: OrderSearchType;
 }
 
 export type QueryResponse<T> = T & {

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled from "styled-components/macro";
 import { useReactiveVar, useMutation } from "@apollo/client";
 
@@ -11,17 +12,21 @@ import {
 } from "@cache/index";
 import { checkedOrderItemsVar } from "@cache/sale";
 import { showHasServerErrorModal } from "@cache/productManagement";
-import { filterOptionVar, orderItemsVar } from "@cache/sale/order";
 
-import { Cause, MainReason } from "@constants/sale";
+import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
+import {
+  Cause,
+  MainReason,
+  OrderStatusGroup,
+  OrderStatusName,
+  OrderStatusType,
+} from "@constants/sale";
 
 import {
   CancelOrderItemsBySellerInputType,
   CancelOrderItemsBySellerType,
 } from "@models/sale/order";
 import { ResetOrderItemType } from "@models/sale/index";
-
-import { OrderItems } from "@models/sale/index";
 
 import { CANCEL_ORDERITEMS_BY_SELLER } from "@graphql/mutations/cancelOrderItemsBySeller";
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
@@ -52,11 +57,12 @@ interface HandleCancelOrderModalType {
 }
 
 const HandleCancelOrderModal = ({ option }: HandleCancelOrderModalType) => {
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
 
-  const orderItems = useReactiveVar<Array<OrderItems>>(orderItemsVar);
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
+  );
 
   const checkedOrderItems =
     useReactiveVar<Array<ResetOrderItemType>>(checkedOrderItemsVar);
@@ -90,10 +96,10 @@ const HandleCancelOrderModal = ({ option }: HandleCancelOrderModalType) => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.ORDER,
           },
         },
       },

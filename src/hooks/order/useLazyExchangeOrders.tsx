@@ -7,7 +7,7 @@ import {
 } from "@models/sale/exchange";
 
 const useLazyExchangeOrders = () => {
-  const [getOrders, { loading, error, data }] = useLazyQuery<
+  const [getOrderItems, { loading, error, data }] = useLazyQuery<
     GetExchangeOrdersBySellerType,
     { input: GetExchangeOrdersBySellerInputType }
   >(GET_EXCHANGE_ORDERS_BY_SELLER, {
@@ -16,6 +16,6 @@ const useLazyExchangeOrders = () => {
     errorPolicy: "all",
   });
 
-  return { getOrders, loading, error, data };
+  return { getOrderItems, loading, error, data };
 };
 export default useLazyExchangeOrders;

@@ -130,10 +130,3 @@ export interface RequestRefundOrExchangeBySellerInputType {
   }>;
   status: RequestRefundOrExchange;
 }
-
-export interface NormalizedListType {
-  orders: {
-    allIds: Array<string>;
-    byId: { [key: string]: OrderItems };
-  };
-}

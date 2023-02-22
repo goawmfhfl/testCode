@@ -2,12 +2,17 @@ import {
   Cause,
   MainReason,
   OrderSearchType,
-  OrderStatusGroup,
   OrderStatusName,
-  OrderStatusType,
   ShipmentStatus,
   ShipmentType,
 } from "@constants/sale";
+
+export interface NormalizedListType {
+  orders: {
+    allIds: Array<string>;
+    byId: { [key: string]: OrderItems };
+  };
+}
 
 export interface OrderItems {
   rowIndex: string;
@@ -194,9 +199,6 @@ export interface SkipQuantityType {
 
 export interface FilterOptionVarType {
   type?: OrderSearchType;
-  statusName?: OrderStatusName;
-  statusType?: OrderStatusType;
-  statusGroup: OrderStatusGroup;
 }
 
 export interface SearchQueryType {

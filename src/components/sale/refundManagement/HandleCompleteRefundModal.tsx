@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { useMutation, useReactiveVar } from "@apollo/client";
 
-import { Cause, causeType, ShipmentType } from "@constants/sale";
+import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
+import {
+  Cause,
+  causeType,
+  OrderStatusGroup,
+  OrderStatusName,
+  OrderStatusType,
+} from "@constants/sale";
 import {
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
   modalVar,
   systemModalVar,
 } from "@cache/index";
-import { commonSaleFilterOptionVar } from "@cache/sale";
 
 import {
   EstimateRefundAmountInputType,
@@ -34,20 +41,25 @@ import NoticeContainer, {
 } from "@components/common/NoticeContainer";
 import Input from "@components/common/Input";
 import Button from "@components/common/Button";
+import { showHasServerErrorModal } from "@cache/productManagement";
 
 const HandleCompleteRefundModal = ({
+  type,
   orderItemIds,
   cause,
   detailedReason,
 }: {
+  type: OrderStatusGroup;
   orderItemIds: Array<number>;
   cause: Cause;
   detailedReason: string;
 }) => {
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+
   const sign = cause === Cause.CLIENT ? "-" : "+";
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } = useReactiveVar(
-    commonSaleFilterOptionVar
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
   );
 
   const [refundInformation, setRefundInformation] = useState<{
@@ -119,10 +131,10 @@ const HandleCompleteRefundModal = ({
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: type,
           },
         },
       },
@@ -246,7 +258,7 @@ const HandleCompleteRefundModal = ({
         }
       } catch (error) {
         loadingSpinnerVisibilityVar(false);
-        console.log(error);
+        showHasServerErrorModal(error as string, "반품 처리");
       }
     })();
   };

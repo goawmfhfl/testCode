@@ -1,3 +1,9 @@
+import { ProductStatus } from "@constants/product";
+import {
+  OrderStatusGroup,
+  OrderStatusType,
+  OrderStatusName,
+} from "@constants/sale";
 import { SkipQuantityType } from "@models/sale";
 
 export const skipQuantityType: Array<SkipQuantityType> = [
@@ -102,22 +108,122 @@ export const productRegistrationSectionMapper: { [key: string]: string } = {
   tagInfos: PRODUCT_REGISTRATION_SECTIONS.SEARCH_TAG,
 };
 
-export enum Pathnames {
-  Home = "/",
-  Login = "/login",
-  Password = "/password",
-  Product = "/product",
-  ProductRegistration = "/product/registration",
-  Order = "/order",
-  // OrderCancel = "/order?claim=cancel",
-  // OrderReturn = "/order?claim=return",
-  // OrderExchange = "/order?claim=exchange",
-  Inquiry = "/inquiry",
-  Settlement = "/settlement",
-  Shop = "/shop",
-  Notice = "/notice",
-  Error = "/error",
-}
+export const encryptProductStatusId = {
+  [ProductStatus.ON_SALE]: "0",
+  [ProductStatus.STOP_SALE]: "1",
+  [ProductStatus.SOLD_OUT]: "2",
+  [ProductStatus.TEMPORARY]: "3",
+};
+
+export const decryptProductStatusId = {
+  "0": ProductStatus.ON_SALE,
+  "1": ProductStatus.STOP_SALE,
+  "2": ProductStatus.SOLD_OUT,
+  "3": ProductStatus.TEMPORARY,
+};
+
+export const encryptSaleStatusId = {
+  [OrderStatusGroup.ORDER]: "0",
+  [OrderStatusGroup.CANCEL]: "1",
+  [OrderStatusGroup.REFUND]: "2",
+  [OrderStatusGroup.EXCHANGE]: "3",
+};
+
+export const decryptSaleStatusId = {
+  "0": OrderStatusGroup.ORDER,
+  "1": OrderStatusGroup.CANCEL,
+  "2": OrderStatusGroup.REFUND,
+  "3": OrderStatusGroup.EXCHANGE,
+};
+
+export const encryptSaleTypeId = {
+  [OrderStatusType.ORDER]: "0",
+  [OrderStatusType.CLAIM]: "1",
+};
+
+export const decryptSaleTypeId = {
+  "0": OrderStatusType.ORDER,
+  "1": OrderStatusType.CLAIM,
+};
+
+export const encryptSaleNameId = {
+  [OrderStatusName.PAYMENT_COMPLETED]: "0",
+  [OrderStatusName.PREPARING]: "1",
+  [OrderStatusName.SHIPPING]: "2",
+  [OrderStatusName.SHIPPING_COMPLETED]: "3",
+  [OrderStatusName.CANCEL_REQUEST]: "4",
+  [OrderStatusName.CANCEL_COMPLETED]: "5",
+  [OrderStatusName.REFUND_REQUEST]: "6",
+  [OrderStatusName.REFUND_PICK_UP_IN_PROGRESS]: "7",
+  [OrderStatusName.REFUND_PICK_UP_COMPLETED]: "8",
+  [OrderStatusName.REFUND_COMPLETED]: "9",
+  [OrderStatusName.EXCHANGE_REQUEST]: "10",
+  [OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS]: "11",
+  [OrderStatusName.EXCHANGE_PICK_UP_COMPLETED]: "12",
+  [OrderStatusName.SHIPPING_AGAIN]: "13",
+  [OrderStatusName.EXCHANGE_COMPLETED]: "14",
+};
+
+export const decryptSaleNameId = {
+  "0": OrderStatusName.PAYMENT_COMPLETED,
+  "1": OrderStatusName.PREPARING,
+  "2": OrderStatusName.SHIPPING,
+  "3": OrderStatusName.SHIPPING_COMPLETED,
+  "4": OrderStatusName.CANCEL_REQUEST,
+  "5": OrderStatusName.CANCEL_COMPLETED,
+  "6": OrderStatusName.REFUND_REQUEST,
+  "7": OrderStatusName.REFUND_PICK_UP_IN_PROGRESS,
+  "8": OrderStatusName.REFUND_PICK_UP_COMPLETED,
+  "9": OrderStatusName.REFUND_COMPLETED,
+  "10": OrderStatusName.EXCHANGE_REQUEST,
+  "11": OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS,
+  "12": OrderStatusName.EXCHANGE_PICK_UP_COMPLETED,
+  "13": OrderStatusName.SHIPPING_AGAIN,
+  "14": OrderStatusName.EXCHANGE_COMPLETED,
+};
+
+export const Pathnames = {
+  Home: "/",
+  Login: "/login",
+  Password: "/password",
+  Product: "/product",
+  ProductOnsale: `/product?statusId=${encryptProductStatusId.ON_SALE}`,
+  ProductStopSale: `/product?statusId=${encryptProductStatusId.STOP_SALE}`,
+  ProductSoldOut: `/product?statusId=${encryptProductStatusId.SOLD_OUT}`,
+  ProductTemporary: `/product?statusId=${encryptProductStatusId.TEMPORARY}`,
+  ProductRegistration: `/product/registration`,
+
+  Sale: "/sale",
+
+  Order: `/sale?statusId=${encryptSaleStatusId.ORDER}`,
+  OrderPaymentCompleted: `/sale?statusId=${encryptSaleStatusId.ORDER}&typeId=${encryptSaleTypeId.ORDER}&nameId=${encryptSaleNameId.PAYMENT_COMPLETED}`,
+  OrderPreparing: `/sale?statusId=${encryptSaleStatusId.ORDER}&typeId=${encryptSaleTypeId.ORDER}&nameId=${encryptSaleNameId.PREPARING}`,
+  OrderShipping: `/sale?statusId=${encryptSaleStatusId.ORDER}&typeId=${encryptSaleTypeId.ORDER}&nameId=${encryptSaleNameId.SHIPPING}`,
+  OrderShippingCompleted: `/sale?statusId=${encryptSaleStatusId.ORDER}&typeId=${encryptSaleTypeId.ORDER}&nameId=${encryptSaleNameId.SHIPPING_COMPLETED}`,
+
+  Cancel: `/sale?statusId=${encryptSaleStatusId.CANCEL}`,
+  CancelReqeust: `/sale?statusId=${encryptSaleStatusId.CANCEL}&typeId=${encryptSaleTypeId.CLAIM}&nameId=${encryptSaleNameId.CANCEL_REQUEST}`,
+  CancelCompleted: `/sale?statusId=${encryptSaleStatusId.CANCEL}&typeId=${encryptSaleTypeId.ORDER}&nameId=${encryptSaleNameId.CANCEL_COMPLETED}`,
+
+  Refund: `/sale?statusId=${encryptSaleStatusId.REFUND}`,
+  RefundRequest: `/sale?statusId=${encryptSaleStatusId.REFUND}&typeId=${encryptSaleTypeId.CLAIM}&nameId=${encryptSaleNameId.REFUND_REQUEST}`,
+  RefundPickupInProgress: `/sale?statusId=${encryptSaleStatusId.REFUND}&typeId=${encryptSaleTypeId.CLAIM}&nameId=${encryptSaleNameId.REFUND_PICK_UP_IN_PROGRESS}`,
+  RefundPickupCompleted: `/sale?statusId=${encryptSaleStatusId.REFUND}&typeId=${encryptSaleTypeId.CLAIM}&nameId=${encryptSaleNameId.REFUND_PICK_UP_COMPLETED}`,
+  RefundCompleted: `/sale?statusId=${encryptSaleStatusId.REFUND}&typeId=${encryptSaleTypeId.CLAIM}&nameId=${encryptSaleNameId.REFUND_COMPLETED}`,
+
+  Exchange: `/sale?statusId=${encryptSaleStatusId.EXCHANGE}`,
+  ExchangeRequest: `/sale?statusId=${encryptSaleStatusId.EXCHANGE}&typeId=${encryptSaleTypeId.CLAIM}&nameId=${encryptSaleNameId.EXCHANGE_REQUEST}`,
+  ExchangePickupInProgress: `/sale?statusId=${encryptSaleStatusId.EXCHANGE}&typeId=${encryptSaleTypeId.CLAIM}&nameId=${encryptSaleNameId.EXCHANGE_PICK_UP_IN_PROGRESS}`,
+  ExchangePickupCompleted: `/sale?statusId=${encryptSaleStatusId.EXCHANGE}&typeId=${encryptSaleTypeId.CLAIM}&nameId=${encryptSaleNameId.EXCHANGE_PICK_UP_COMPLETED}`,
+  ExchangeShippingAgain: `/sale?statusId=${encryptSaleStatusId.EXCHANGE}&typeId=${encryptSaleTypeId.CLAIM}&nameId=${encryptSaleNameId.SHIPPING_AGAIN}`,
+  ExchangeCompleted: `/sale?statusId=${encryptSaleStatusId.EXCHANGE}&typeId=${encryptSaleTypeId.CLAIM}&nameId=${encryptSaleNameId.EXCHANGE_COMPLETED}`,
+
+  Inquiry: "/inquiry",
+  Settlement: "/settlement",
+  Shop: "/shop",
+  Notice: "/notice",
+  Error: "/error",
+};
 
 export enum ServiceUrls {
   Consumer = "https://www.chopsticks.market",

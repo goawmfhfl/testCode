@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useMutation, useReactiveVar } from "@apollo/client";
 import axios, { AxiosError } from "axios";
 import { cloneDeep } from "lodash";
-
 import styled, { css } from "styled-components";
+
+import {
+  decryptSaleNameId,
+  decryptSaleTypeId,
+  Pathnames,
+} from "@constants/index";
 import {
   OrderStatusGroup,
   OrderStatusName,
@@ -12,6 +18,11 @@ import {
   shipmentCompanyCode,
   ShipmentStatus,
 } from "@constants/sale";
+import {
+  fixTableType,
+  scrollTableType,
+  tableWidth,
+} from "@constants/sale/exchangeManagement/table";
 import {
   checkAllBoxStatusVar,
   commonFilterOptionVar,
@@ -22,18 +33,8 @@ import {
   systemModalVar,
   totalPageLengthVar,
 } from "@cache/index";
-import {
-  commonCheckedOrderItemsVar,
-  commonSaleFilterOptionVar,
-} from "@cache/sale";
 import { showHasServerErrorModal } from "@cache/productManagement";
-
-import { exchangeOrderItemsVar } from "@cache/sale/exchange";
-import {
-  fixTableType,
-  scrollTableType,
-  tableWidth,
-} from "@constants/sale/exchangeManagement/table";
+import { checkedOrderItemsVar, resetOrderItemsVar } from "@cache/sale";
 
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
 import { GET_EXCHANGE_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
@@ -46,8 +47,11 @@ import {
   SendOrderItemsType,
 } from "@models/sale/order";
 import { NormalizedType, ResetOrderItemType } from "@models/sale";
+
 import { TableType } from "@models/index";
+
 import useLazyExchangeOrders from "@hooks/order/useLazyExchangeOrders";
+
 import constructOrderItem from "@utils/sale/constructOrderItem";
 import getResetOrderItems from "@utils/sale/exchange/getResetOrderItems";
 
@@ -76,83 +80,13 @@ import EditReasonModal from "@components/sale/exchangeManagement/EditReasonModal
 import { Input } from "@components/common/input/TextInput";
 
 const ExchangeTable = () => {
-  const { getOrders, loading, error } = useLazyExchangeOrders();
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } = useReactiveVar(
-    commonSaleFilterOptionVar
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+
+  const { getOrderItems, loading, error } = useLazyExchangeOrders();
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
   );
-
-  const exchangeOrderItems: Array<ResetOrderItemType> = useReactiveVar(
-    exchangeOrderItemsVar
-  );
-
-  const checkedOrderItems: Array<ResetOrderItemType> = useReactiveVar(
-    commonCheckedOrderItemsVar
-  );
-  const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
-
-  const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newOrderItems = cloneDeep(exchangeOrderItems);
-    checkAllBoxStatusVar(e.target.checked);
-
-    if (e.target.checked) {
-      const checkAllOrderItem = newOrderItems.map((orderItem) => ({
-        ...orderItem,
-        isChecked: true,
-      }));
-      exchangeOrderItemsVar(checkAllOrderItem);
-      commonCheckedOrderItemsVar(checkAllOrderItem);
-    }
-
-    if (!e.target.checked) {
-      const checkAllOrderItem = newOrderItems.map((orderItem) => ({
-        ...orderItem,
-        isChecked: false,
-      }));
-
-      exchangeOrderItemsVar(checkAllOrderItem);
-      commonCheckedOrderItemsVar([]);
-    }
-  };
-
-  const changeSingleCheckBoxHandler =
-    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newOrderItems = cloneDeep(exchangeOrderItems);
-      const targetOrderItemId = newOrderItems[index].id;
-
-      if (e.target.checked) {
-        const targetOrderItems = newOrderItems.filter(
-          ({ id }) => id === targetOrderItemId
-        );
-        const checkTargetOrderItems = targetOrderItems.map((orderItem) => ({
-          ...orderItem,
-          isChecked: true,
-        }));
-
-        commonCheckedOrderItemsVar([
-          ...checkedOrderItems,
-          ...checkTargetOrderItems,
-        ]);
-        newOrderItems[index].isChecked = true;
-      }
-
-      if (!e.target.checked) {
-        const filteredOrderItems = checkedOrderItems.filter(
-          (orderItem) => orderItem.id !== targetOrderItemId
-        );
-        commonCheckedOrderItemsVar(filteredOrderItems);
-        newOrderItems[index].isChecked = false;
-      }
-      exchangeOrderItemsVar(newOrderItems);
-    };
-
-  const [shipmentCompanys, setShipmentCompanys] = useState<
-    Array<{
-      Code: string;
-      International: boolean;
-      Name: string;
-    }>
-  >([]);
 
   const [sendOrderItems] = useMutation<
     SendOrderItemsType,
@@ -170,10 +104,11 @@ const ExchangeTable = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.EXCHANGE,
           },
         },
       },
@@ -197,16 +132,80 @@ const ExchangeTable = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.EXCHANGE,
           },
         },
       },
       "GetOrdersBySeller",
     ],
   });
+
+  const orderItems = useReactiveVar(resetOrderItemsVar);
+  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
+  const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
+
+  const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newOrderItems = cloneDeep(orderItems);
+    checkAllBoxStatusVar(e.target.checked);
+
+    if (e.target.checked) {
+      const checkAllOrderItem = newOrderItems.map((orderItem) => ({
+        ...orderItem,
+        isChecked: true,
+      }));
+      resetOrderItemsVar(checkAllOrderItem);
+      checkedOrderItemsVar(checkAllOrderItem);
+    }
+
+    if (!e.target.checked) {
+      const checkAllOrderItem = newOrderItems.map((orderItem) => ({
+        ...orderItem,
+        isChecked: false,
+      }));
+
+      resetOrderItemsVar(checkAllOrderItem);
+      checkedOrderItemsVar([]);
+    }
+  };
+
+  const changeSingleCheckBoxHandler =
+    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newOrderItems = cloneDeep(orderItems);
+      const targetOrderItemId = newOrderItems[index].id;
+
+      if (e.target.checked) {
+        const targetOrderItems = newOrderItems.filter(
+          ({ id }) => id === targetOrderItemId
+        );
+        const checkTargetOrderItems = targetOrderItems.map((orderItem) => ({
+          ...orderItem,
+          isChecked: true,
+        }));
+
+        checkedOrderItemsVar([...checkedOrderItems, ...checkTargetOrderItems]);
+        newOrderItems[index].isChecked = true;
+      }
+
+      if (!e.target.checked) {
+        const filteredOrderItems = checkedOrderItems.filter(
+          (orderItem) => orderItem.id !== targetOrderItemId
+        );
+        checkedOrderItemsVar(filteredOrderItems);
+        newOrderItems[index].isChecked = false;
+      }
+      resetOrderItemsVar(newOrderItems);
+    };
+
+  const [shipmentCompanys, setShipmentCompanys] = useState<
+    Array<{
+      Code: string;
+      International: boolean;
+      Name: string;
+    }>
+  >([]);
 
   const handleEditReasonModalClick =
     (
@@ -232,7 +231,7 @@ const ExchangeTable = () => {
   const changeShipmentCompanyHandler =
     (index: number, shipmentStatus: ShipmentStatus) =>
     (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const newOrderItems = cloneDeep(exchangeOrderItems);
+      const newOrderItems = cloneDeep(orderItems);
       const newCheckedOrderItems = cloneDeep(checkedOrderItems);
 
       if (shipmentStatus === ShipmentStatus.SHIPPING) {
@@ -247,7 +246,7 @@ const ExchangeTable = () => {
           e.target.value;
       }
 
-      exchangeOrderItemsVar(newOrderItems);
+      resetOrderItemsVar(newOrderItems);
 
       if (newCheckedOrderItems.length > 0) {
         const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
@@ -272,14 +271,14 @@ const ExchangeTable = () => {
           }
         }
 
-        commonCheckedOrderItemsVar(newCheckedOrderItems);
+        checkedOrderItemsVar(newCheckedOrderItems);
       }
     };
 
   const changeShipmentNumberHandler =
     (index: number, shipmentStatus: ShipmentStatus) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newOrderItems = cloneDeep(exchangeOrderItems);
+      const newOrderItems = cloneDeep(orderItems);
       const newCheckedOrderItems = cloneDeep(checkedOrderItems);
 
       if (shipmentStatus === ShipmentStatus.SHIPPING) {
@@ -296,7 +295,7 @@ const ExchangeTable = () => {
         );
       }
 
-      exchangeOrderItemsVar(newOrderItems);
+      resetOrderItemsVar(newOrderItems);
 
       if (newCheckedOrderItems.length > 0) {
         const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
@@ -327,7 +326,7 @@ const ExchangeTable = () => {
           }
         }
 
-        commonCheckedOrderItemsVar(newCheckedOrderItems);
+        checkedOrderItemsVar(newCheckedOrderItems);
       }
     };
 
@@ -388,7 +387,7 @@ const ExchangeTable = () => {
 
               if (ok) {
                 loadingSpinnerVisibilityVar(false);
-                const newOrderItems = cloneDeep(exchangeOrderItems);
+                const newOrderItems = cloneDeep(orderItems);
 
                 const findOrderItmeIndex = newOrderItems.findIndex(
                   ({ id }) => id === orderItemId
@@ -406,7 +405,7 @@ const ExchangeTable = () => {
                     shipmentNumber;
                 });
 
-                exchangeOrderItemsVar(newOrderItems);
+                resetOrderItemsVar(newOrderItems);
 
                 systemModalVar({
                   ...systemModalVar(),
@@ -426,7 +425,7 @@ const ExchangeTable = () => {
                       isVisible: false,
                     });
 
-                    commonCheckedOrderItemsVar([]);
+                    checkedOrderItemsVar([]);
                     checkAllBoxStatusVar(false);
                   },
                 });
@@ -446,7 +445,7 @@ const ExchangeTable = () => {
 
   const handleEditButtonClick =
     (id: number, shipmentStatus: ShipmentStatus) => () => {
-      const newOrderItems = cloneDeep(exchangeOrderItems);
+      const newOrderItems = cloneDeep(orderItems);
 
       const findOrderItmeIndex = newOrderItems.findIndex(
         (orderItem) => orderItem.id === id
@@ -464,7 +463,7 @@ const ExchangeTable = () => {
         newOrderItems[findOrderItmeIndex].isPickupAgainShipmentInfoEdit = true;
       }
 
-      exchangeOrderItemsVar(newOrderItems);
+      resetOrderItemsVar(newOrderItems);
     };
 
   const handleSendButtonClick =
@@ -546,7 +545,7 @@ const ExchangeTable = () => {
                       isVisible: false,
                     });
 
-                    commonCheckedOrderItemsVar([]);
+                    checkedOrderItemsVar([]);
                     checkAllBoxStatusVar(false);
                   },
                 });
@@ -572,7 +571,6 @@ const ExchangeTable = () => {
 
   useEffect(() => {
     void (async () => {
-      loadingSpinnerVisibilityVar(true);
       try {
         const {
           data: {
@@ -584,23 +582,23 @@ const ExchangeTable = () => {
               totalOrderItems,
             },
           },
-        } = await getOrders({
+        } = await getOrderItems({
           variables: {
             input: {
               page,
               skip,
               query,
-              type,
-              statusName,
-              statusType: OrderStatusType.CLAIM,
+              type: orderSearchType,
+              statusName: decryptSaleNameId[nameId] as OrderStatusName,
+              statusType: decryptSaleTypeId[typeId] as OrderStatusType,
               statusGroup: OrderStatusGroup.EXCHANGE,
             },
           },
           fetchPolicy: "no-cache",
+          notifyOnNetworkStatusChange: true,
         });
 
         if (ok) {
-          loadingSpinnerVisibilityVar(false);
           const isLastPageChanged = totalPages < page;
 
           if (isLastPageChanged && totalPages !== 0) {
@@ -627,13 +625,12 @@ const ExchangeTable = () => {
             reconstructOrderItems
           );
 
-          exchangeOrderItemsVar(resetOrderItems);
-          commonCheckedOrderItemsVar([]);
+          resetOrderItemsVar(resetOrderItems);
+          checkedOrderItemsVar([]);
           checkAllBoxStatusVar(false);
         }
 
         if (error) {
-          loadingSpinnerVisibilityVar(false);
           showHasAnyProblemModal(
             <>
               내부 서버 오류로 인해 요청하신
@@ -654,7 +651,6 @@ const ExchangeTable = () => {
           );
         }
       } catch (error) {
-        loadingSpinnerVisibilityVar(false);
         showHasAnyProblemModal(
           <>
             내부 서버 오류로 인해 요청하신
@@ -675,7 +671,7 @@ const ExchangeTable = () => {
         );
       }
     })();
-  }, [page, skip, query, type, statusName, statusType, statusGroup]);
+  }, [page, skip, query, orderSearchType, nameId, typeId]);
 
   useEffect(() => {
     void (async () => {
@@ -718,8 +714,7 @@ const ExchangeTable = () => {
     })();
   }, []);
 
-  const hasExchangeOrderItems =
-    !!exchangeOrderItems && !!exchangeOrderItems.length && !loading;
+  const hasExchangeOrderItems = !!orderItems && !!orderItems.length && !loading;
   const isFetchingOrderItemsFailed =
     !loading && !error && hasExchangeOrderItems;
 
@@ -757,7 +752,7 @@ const ExchangeTable = () => {
         </ThContainer>
         <TdContainer>
           {hasExchangeOrderItems &&
-            exchangeOrderItems.map(
+            orderItems.map(
               (
                 {
                   merchantUid,
@@ -921,7 +916,7 @@ const ExchangeTable = () => {
 
         <TdContainer>
           {hasExchangeOrderItems &&
-            exchangeOrderItems.map(
+            orderItems.map(
               (
                 {
                   id,
@@ -1704,7 +1699,8 @@ const ExchangeTable = () => {
                           size={"small"}
                           width={"55px"}
                           disabled={
-                            statusName === OrderStatusName.REFUND_COMPLETED ||
+                            decryptSaleNameId[nameId] ===
+                              OrderStatusName.REFUND_COMPLETED ||
                             claimStatus === "환불 오류"
                           }
                           onClick={handleEditReasonModalClick(

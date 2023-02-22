@@ -7,7 +7,7 @@ import {
 } from "@models/sale/cancel";
 
 const useLazyCancelOrders = () => {
-  const [getOrders, { loading, error, data }] = useLazyQuery<
+  const [getOrderItem, { loading, error, data }] = useLazyQuery<
     GetCancelOrdersBySellerType,
     { input: GetCancelOrdersBySellerInputType }
   >(GET_CANCEL_ORDERS_BY_SELLER, {
@@ -16,6 +16,6 @@ const useLazyCancelOrders = () => {
     errorPolicy: "all",
   });
 
-  return { getOrders, loading, error, data };
+  return { getOrderItem, loading, error, data };
 };
 export default useLazyCancelOrders;

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import styled from "styled-components/macro";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useReactiveVar } from "@apollo/client";
-import { Pathnames } from "@constants/index";
+import { decryptSaleStatusId, Pathnames } from "@constants/index";
 import useShopInfo from "@hooks/useShopInfo";
 import {
   loadingSpinnerVisibilityVar,
@@ -10,8 +10,7 @@ import {
   sideNavigationBarStatusVar,
 } from "@cache/index";
 import { showHasServerErrorModal } from "@cache/productManagement";
-import { saleMenuStatusVar } from "@cache/sale";
-import { MenuStatusType, SaleMenuStatusType } from "@constants/sale";
+import { OrderStatusGroup } from "@constants/sale";
 
 import mediumTopSrc from "@icons/medium-top.svg";
 import mediumBottomSrc from "@icons/medium-bottom.svg";
@@ -19,13 +18,11 @@ import mediumBottomSrc from "@icons/medium-bottom.svg";
 const SideNavigationBar = () => {
   const { data, loading, error } = useShopInfo();
 
-  const saleMenuStatus = useReactiveVar(saleMenuStatusVar);
+  const [searchParams] = useSearchParams();
+  const { statusId } = Object.fromEntries([...searchParams]);
+
   const saleSubItemVisibility = useReactiveVar(saleSubItemVisibilityVar);
   const sideNavigationBarStatus = useReactiveVar(sideNavigationBarStatusVar);
-
-  const handleSubNavItemClick = (status: SaleMenuStatusType) => () => {
-    saleMenuStatusVar(status);
-  };
 
   useEffect(() => {
     loadingSpinnerVisibilityVar(loading);
@@ -41,50 +38,71 @@ const SideNavigationBar = () => {
     <Container>
       <Header>Shop Manager</Header>
       <NavList>
-        <NavItem
-          disabled={!isRegisteredShop}
-          isActive={sideNavigationBarStatus === Pathnames.Product}
-        >
-          <Link to={Pathnames.Product}>상품관리</Link>
-        </NavItem>
-        <NavItem
-          disabled={true}
-          isActive={sideNavigationBarStatus === Pathnames.Order}
-        >
-          <Link to={Pathnames.Order}>판매관리</Link>
-          {/* <DropdownIcon
-            src={saleSubItemVisibility ? mediumTopSrc : mediumBottomSrc}
-            isActive={sideNavigationBarStatus === Pathnames.Order}
-          /> */}
-        </NavItem>
-        {saleSubItemVisibility && (
-          <SubNavContainer
-            isActive={sideNavigationBarStatus === Pathnames.Order}
+        <Link to={Pathnames.Product}>
+          <NavItem
+            disabled={!isRegisteredShop}
+            isActive={location.pathname === Pathnames.Product}
           >
-            <SubNavItem
-              isActive={saleMenuStatus === SaleMenuStatusType.ORDER}
-              onClick={handleSubNavItemClick(SaleMenuStatusType.ORDER)}
-            >
-              주문 관리
-            </SubNavItem>
-            <SubNavItem
-              isActive={saleMenuStatus === SaleMenuStatusType.CANCEL}
-              onClick={handleSubNavItemClick(SaleMenuStatusType.CANCEL)}
-            >
-              취소 관리
-            </SubNavItem>
-            <SubNavItem
-              isActive={saleMenuStatus === SaleMenuStatusType.REFUND}
-              onClick={handleSubNavItemClick(SaleMenuStatusType.REFUND)}
-            >
-              반품 관리
-            </SubNavItem>
-            <SubNavItem
-              isActive={saleMenuStatus === SaleMenuStatusType.EXCHANGE}
-              onClick={handleSubNavItemClick(SaleMenuStatusType.EXCHANGE)}
-            >
-              교환 관리
-            </SubNavItem>
+            상품관리
+          </NavItem>
+        </Link>
+
+        <Link to={Pathnames.Order}>
+          <NavItem
+            disabled={true}
+            isActive={decryptSaleStatusId[statusId] === OrderStatusGroup.ORDER}
+          >
+            판매관리
+            {/* <DropdownIcon
+              src={saleSubItemVisibility ? mediumTopSrc : mediumBottomSrc}
+              isActive={statusId === Pathnames.Sale}
+            /> */}
+          </NavItem>
+        </Link>
+
+        {location.pathname === Pathnames.Sale && (
+          <SubNavContainer
+            isActive={sideNavigationBarStatus === Pathnames.Sale}
+          >
+            <Link to={Pathnames.Order}>
+              <SubNavItem
+                isActive={
+                  decryptSaleStatusId[statusId] === OrderStatusGroup.ORDER
+                }
+              >
+                주문 관리
+              </SubNavItem>
+            </Link>
+
+            <Link to={Pathnames.Cancel}>
+              <SubNavItem
+                isActive={
+                  decryptSaleStatusId[statusId] === OrderStatusGroup.CANCEL
+                }
+              >
+                취소 관리
+              </SubNavItem>
+            </Link>
+
+            <Link to={Pathnames.Refund}>
+              <SubNavItem
+                isActive={
+                  decryptSaleStatusId[statusId] === OrderStatusGroup.REFUND
+                }
+              >
+                반품 관리
+              </SubNavItem>
+            </Link>
+
+            <Link to={Pathnames.Exchange}>
+              <SubNavItem
+                isActive={
+                  decryptSaleStatusId[statusId] === OrderStatusGroup.EXCHANGE
+                }
+              >
+                교환 관리
+              </SubNavItem>
+            </Link>
           </SubNavContainer>
         )}
 

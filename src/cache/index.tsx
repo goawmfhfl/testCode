@@ -8,19 +8,20 @@ import {
   PRODUCT_REGISTRATION_SECTIONS,
   UnfulfilledStatus,
 } from "@constants/index";
+import { OrderSearchType } from "@constants/sale";
 
 // Global Layout
 export const loadingSpinnerVisibilityVar = makeVar<boolean>(false);
-export const saleSubItemVisibilityVar = makeVar<boolean>(false);
+export const saleSubItemVisibilityVar = makeVar<boolean>(true);
 export const sideNavigationBarStatusVar = makeVar<string>("");
 
 // TABLE: 페이지네이션
 export const paginationVisibilityVar = makeVar<boolean | ApolloError>(true);
-
 export const commonFilterOptionVar = makeVar<CommonFilterOptionType>({
   page: 1,
   skip: 20,
   query: null,
+  orderSearchType: OrderSearchType.RECIPIENT_NAME,
 });
 export const pageNumberListVar = makeVar<Array<number>>([]);
 export const paginationSkipVar = makeVar<number>(0);

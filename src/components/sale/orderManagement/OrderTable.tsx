@@ -1,53 +1,54 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled from "styled-components/macro";
 import axios, { AxiosError } from "axios";
 import { useMutation, useReactiveVar } from "@apollo/client";
 import { cloneDeep } from "lodash";
-import { TableType } from "@models/index";
 
+import { decryptSaleTypeId, decryptSaleNameId } from "@constants/index";
 import {
   fixTableType,
   scrollTableType,
   tableWidth,
 } from "@constants/sale/orderManagement/table";
-import { ShipmentStatus, shipmentCompanyCode, SendType } from "@constants/sale";
 
 import {
-  filterOptionVar,
-  orderItemsVar,
-  resetOrderItemVar,
-} from "@cache/sale/order";
+  ShipmentStatus,
+  shipmentCompanyCode,
+  SendType,
+  OrderStatusGroup,
+  OrderStatusType,
+  OrderStatusName,
+} from "@constants/sale";
+
 import {
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
-  showHasAnyProblemModal,
   systemModalVar,
   totalPageLengthVar,
-} from "@cache/index";
-import { checkedOrderItemsVar } from "@cache/sale";
-import { showHasServerErrorModal } from "@cache/productManagement/index";
-
-import {
-  EditShipmentNumberInputType,
-  EditShipmentNumberType,
-  NormalizedListType,
-  SendOrderItemsInputType,
-  SendOrderItemsType,
-} from "@models/sale/order";
-import { ResetOrderItemType } from "@models/sale";
-
-import getResetOrderItems from "@utils/sale/order/getResetOrderItems";
-import { preventNaNValues } from "@utils/index";
-import constructOrderItem from "@utils/sale/constructOrderItem";
-
-import {
   checkAllBoxStatusVar,
   pageNumberListVar,
   paginationVisibilityVar,
+  showHasAnyProblemModal,
 } from "@cache/index";
 
+import { checkedOrderItemsVar, resetOrderItemsVar } from "@cache/sale";
+import { showHasServerErrorModal } from "@cache/productManagement/index";
+
+import { TableType } from "@models/index";
+import {
+  EditShipmentNumberInputType,
+  EditShipmentNumberType,
+  SendOrderItemsInputType,
+  SendOrderItemsType,
+} from "@models/sale/order";
+import { ResetOrderItemType, NormalizedListType } from "@models/sale";
+
+import { preventNaNValues } from "@utils/index";
+import getResetOrderItems from "@utils/sale/order/getResetOrderItems";
+import constructOrderItem from "@utils/sale/constructOrderItem";
+
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
-import { OrderItems } from "@models/sale/index";
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
 import { EDIT_SHIPMENT_NUMBER } from "@graphql/mutations/editShipmentNumber";
 
@@ -77,10 +78,12 @@ import Button from "@components/common/Button";
 import { Input } from "@components/common/input/TextInput";
 
 const OrderTable = () => {
-  const { getOrderItem, error, loading, data } = useLazyOrders();
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+  const { getOrderItem, error, loading } = useLazyOrders();
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
+  );
 
   const [sendOrderItems] = useMutation<
     SendOrderItemsType,
@@ -98,10 +101,10 @@ const OrderTable = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.ORDER,
           },
         },
       },
@@ -125,10 +128,10 @@ const OrderTable = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.ORDER,
           },
         },
       },
@@ -136,8 +139,8 @@ const OrderTable = () => {
     ],
   });
 
-  const resetOrderItem =
-    useReactiveVar<Array<ResetOrderItemType>>(resetOrderItemVar);
+  const resetOrderItems =
+    useReactiveVar<Array<ResetOrderItemType>>(resetOrderItemsVar);
 
   const [shipmentCompanys, setShipmentCompanys] = useState<
     Array<{
@@ -151,7 +154,7 @@ const OrderTable = () => {
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
 
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newOrderItems = cloneDeep(resetOrderItem);
+    const newOrderItems = cloneDeep(resetOrderItems);
     checkAllBoxStatusVar(e.target.checked);
 
     if (e.target.checked) {
@@ -159,7 +162,7 @@ const OrderTable = () => {
         ...orderItem,
         isChecked: true,
       }));
-      resetOrderItemVar(checkAllOrderItem);
+      resetOrderItemsVar(checkAllOrderItem);
       checkedOrderItemsVar(checkAllOrderItem);
     }
 
@@ -169,14 +172,14 @@ const OrderTable = () => {
         isChecked: false,
       }));
 
-      resetOrderItemVar(checkAllOrderItem);
+      resetOrderItemsVar(checkAllOrderItem);
       checkedOrderItemsVar([]);
     }
   };
 
   const changeSingleCheckBoxHandler =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newOrderItems = cloneDeep(resetOrderItem);
+      const newOrderItems = cloneDeep(resetOrderItems);
       const targetOrderItemId = newOrderItems[index].id;
 
       if (e.target.checked) {
@@ -199,16 +202,16 @@ const OrderTable = () => {
         checkedOrderItemsVar(filteredOrderItems);
         newOrderItems[index].isChecked = false;
       }
-      resetOrderItemVar(newOrderItems);
+      resetOrderItemsVar(newOrderItems);
     };
 
   const changeShipmentNumberHandler =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newOrderItems = cloneDeep(resetOrderItem);
+      const newOrderItems = cloneDeep(resetOrderItems);
       const newCheckedOrderItems = cloneDeep(checkedOrderItems);
 
       newOrderItems[index].temporaryShipmentNumber = Number(e.target.value);
-      resetOrderItemVar(newOrderItems);
+      resetOrderItemsVar(newOrderItems);
 
       if (newCheckedOrderItems.length > 0) {
         const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
@@ -227,11 +230,11 @@ const OrderTable = () => {
 
   const changeShipmentCompanyHandler =
     (index: number) => (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const newOrderItems = cloneDeep(resetOrderItem);
+      const newOrderItems = cloneDeep(resetOrderItems);
       const newCheckedOrderItems = cloneDeep(checkedOrderItems);
 
       newOrderItems[index].temporaryShipmentCompany = e.target.value;
-      resetOrderItemVar(newOrderItems);
+      resetOrderItemsVar(newOrderItems);
 
       if (newCheckedOrderItems.length > 0) {
         const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
@@ -400,7 +403,7 @@ const OrderTable = () => {
 
               if (ok) {
                 loadingSpinnerVisibilityVar(false);
-                const newOrderItems = cloneDeep(resetOrderItem);
+                const newOrderItems = cloneDeep(resetOrderItems);
 
                 const findOrderItmeIndex = newOrderItems.findIndex(
                   ({ id }) => id === orderItemId
@@ -418,7 +421,7 @@ const OrderTable = () => {
                     shipmentNumber;
                 });
 
-                resetOrderItemVar(newOrderItems);
+                resetOrderItemsVar(newOrderItems);
 
                 systemModalVar({
                   ...systemModalVar(),
@@ -457,86 +460,95 @@ const OrderTable = () => {
     };
 
   const handleEditButtonClick = (id: number) => () => {
-    const newOrderItems = cloneDeep(resetOrderItem);
+    const newOrderItems = cloneDeep(resetOrderItems);
 
     const findOrderItmeIndex = newOrderItems.findIndex(
       (orderItem) => orderItem.id === id
     );
     newOrderItems[findOrderItmeIndex].isShipmentInfoEdit = true;
-    resetOrderItemVar(newOrderItems);
+    resetOrderItemsVar(newOrderItems);
   };
 
   useEffect(() => {
     void (async () => {
-      await getOrderItem({
-        variables: {
-          input: {
-            page,
-            skip,
-            query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+      try {
+        const {
+          data: {
+            getOrdersBySeller: {
+              ok,
+              error,
+              totalOrderItems,
+              totalPages,
+              totalResults,
+            },
           },
-        },
-        fetchPolicy: "no-cache",
-      });
-    })();
-  }, [page, skip, query, type, statusName, statusType, statusGroup]);
+        } = await getOrderItem({
+          variables: {
+            input: {
+              page,
+              skip,
+              query,
+              type: orderSearchType,
+              statusName: decryptSaleNameId[nameId] as OrderStatusName,
+              statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+              statusGroup: OrderStatusGroup.ORDER,
+            },
+          },
+          fetchPolicy: "no-cache",
+          notifyOnNetworkStatusChange: true,
+        });
 
-  useEffect(() => {
-    if (!data || !data.getOrdersBySeller) return;
+        if (ok) {
+          const isLastPageChanged = totalPages < page;
 
-    const {
-      totalPages,
-      totalResults,
-      totalOrderItems,
-    }: {
-      totalPages: number;
-      totalResults: number;
-      totalOrderItems: Array<OrderItems>;
-    } = data.getOrdersBySeller;
+          if (isLastPageChanged && totalPages !== 0) {
+            commonFilterOptionVar({
+              ...commonFilterOptionVar(),
+              page: totalPages,
+            });
+            return;
+          }
 
-    const isLastPageChanged = totalPages < page;
+          pageNumberListVar(
+            Array(totalPages)
+              .fill(null)
+              .map((_, index) => index + 1)
+          );
 
-    if (isLastPageChanged && totalPages !== 0) {
-      commonFilterOptionVar({
-        ...commonFilterOptionVar(),
-        page: totalPages,
-      });
+          totalPageLengthVar(totalResults);
 
-      return;
-    }
+          const nomalizedOrderItem: NormalizedListType =
+            constructOrderItem(totalOrderItems);
 
-    orderItemsVar(totalOrderItems);
-    pageNumberListVar(
-      Array(totalPages)
-        .fill(null)
-        .map((_, index) => index + 1)
-    );
-    totalPageLengthVar(totalResults);
+          const resetOrderItems: Array<ResetOrderItemType> =
+            getResetOrderItems(nomalizedOrderItem);
 
-    const nomalizedOrderItem: NormalizedListType =
-      constructOrderItem(totalOrderItems);
+          resetOrderItemsVar(resetOrderItems);
+          checkedOrderItemsVar([]);
+        }
 
-    const resetOrderItems: Array<ResetOrderItemType> =
-      getResetOrderItems(nomalizedOrderItem);
-
-    resetOrderItemVar(resetOrderItems);
-    checkedOrderItemsVar([]);
-  }, [data]);
-
-  useEffect(() => {
-    paginationVisibilityVar(loading || error);
-  }, [loading]);
-
-  useEffect(() => {
-    if (error) {
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        description: (
+        if (error) {
+          showHasAnyProblemModal(
+            <>
+              내부 서버 오류로 인해 요청하신
+              <br />
+              작업을 완료하지 못했습니다.
+              <br />
+              다시 한 번 시도 후 같은 문제가 발생할 경우
+              <br />
+              찹스틱스로 문의해주세요.
+              <br />
+              <br />
+              (전화 문의 070-4187-3848)
+              <br />
+              <br />
+              Code:
+              {error}
+            </>
+          );
+        }
+      } catch (error) {
+        showHasAnyProblemModal(
           <>
             내부 서버 오류로 인해 요청하신
             <br />
@@ -551,18 +563,16 @@ const OrderTable = () => {
             <br />
             <br />
             Code:
-            {error.message}
+            {error}
           </>
-        ),
-        confirmButtonClickHandler: () => {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: false,
-          });
-        },
-      });
-    }
-  }, [error]);
+        );
+      }
+    })();
+  }, [page, skip, query, typeId, nameId]);
+
+  useEffect(() => {
+    paginationVisibilityVar(loading || error);
+  }, [loading]);
 
   useEffect(() => {
     void (async () => {
@@ -605,7 +615,7 @@ const OrderTable = () => {
     })();
   }, []);
 
-  const hasOrderItems = !loading && !error && !!resetOrderItem?.length;
+  const hasOrderItems = !loading && !error && !!resetOrderItems?.length;
 
   return (
     <TableContainer type={TableType.SCROLL} hasData={hasOrderItems}>
@@ -635,7 +645,7 @@ const OrderTable = () => {
         </ThContainer>
         <TdContainer>
           {!loading &&
-            resetOrderItem?.map(
+            resetOrderItems?.map(
               (
                 {
                   rowIndex,
@@ -759,7 +769,7 @@ const OrderTable = () => {
 
         <TdContainer>
           {!loading &&
-            resetOrderItem?.map(
+            resetOrderItems?.map(
               (
                 {
                   id,

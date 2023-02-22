@@ -1,7 +1,6 @@
-import { NormalizedListType } from "@models/sale/order";
-import { DateType, getDateFormat } from "@utils/date";
 import { orderStatusNameType } from "@constants/sale";
-
+import { NormalizedListType } from "@models/sale";
+import { DateType, getDateFormat } from "@utils/date";
 import {
   getShipmentPrice,
   getShipmentDistantPrice,

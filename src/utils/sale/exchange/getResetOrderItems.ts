@@ -1,4 +1,4 @@
-import { NormalizedListType } from "@models/sale/order";
+import { NormalizedListType } from "@models/sale";
 import { orderStatusNameType } from "@constants/sale";
 import { DateType, getDateFormat } from "@utils/date";
 

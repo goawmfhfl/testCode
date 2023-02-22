@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { useMutation, useReactiveVar } from "@apollo/client";
 
+import {
+  MainReason,
+  optionListType,
+  refusalCancelOrRefundOptionList,
+  OrderStatusName,
+  mainReasonTypes,
+  OrderStatusType,
+  OrderStatusGroup,
+} from "@constants/sale";
+import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
 import {
   checkAllBoxStatusVar,
   commonFilterOptionVar,
@@ -9,14 +20,6 @@ import {
   modalVar,
   systemModalVar,
 } from "@cache/index";
-import { commonSaleFilterOptionVar } from "@cache/sale";
-import {
-  MainReason,
-  optionListType,
-  refusalCancelOrRefundOptionList,
-  OrderStatusName,
-  mainReasonTypes,
-} from "@constants/sale";
 import { checkedOrderItemsVar } from "@cache/sale";
 import { showHasServerErrorModal } from "@cache/productManagement";
 import {
@@ -50,9 +53,10 @@ const EditReasonModal = ({
   mainReason: string;
   detailedReason: string;
 }) => {
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } = useReactiveVar(
-    commonSaleFilterOptionVar
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
   );
 
   const [reason, setReason] = useState<{
@@ -81,10 +85,10 @@ const EditReasonModal = ({
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.EXCHANGE,
           },
         },
       },

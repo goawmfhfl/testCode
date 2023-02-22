@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled, { css } from "styled-components";
 import axios, { AxiosError } from "axios";
 import { useMutation, useReactiveVar } from "@apollo/client";
@@ -9,6 +10,7 @@ import {
   scrollTableType,
 } from "@constants/sale/refundManagement/table";
 import { tableWidth } from "@constants/sale/refundManagement/table";
+import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
 import {
   commonFilterOptionVar,
   pageNumberListVar,
@@ -18,19 +20,15 @@ import {
   systemModalVar,
   modalVar,
   loadingSpinnerVisibilityVar,
+  showHasAnyProblemModal,
 } from "@cache/index";
-import { refundOrderItemsVar } from "@cache/sale/refund";
 
 import { TableType } from "@models/index";
-import { NormalizedType, OrderItems, ResetOrderItemType } from "@models/sale";
+import { NormalizedType, ResetOrderItemType } from "@models/sale";
 
 import useLazyRefundOrders from "@hooks/order/useLazyRefundOrders";
 
-import {
-  commonCheckedOrderItemsVar,
-  commonSaleFilterOptionVar,
-  totalOrderItemsVar,
-} from "@cache/sale";
+import { checkedOrderItemsVar, resetOrderItemsVar } from "@cache/sale";
 import constructOrderItem from "@utils/sale/constructOrderItem";
 import getResetOrderItems from "@utils/sale/refund/getResetOrderItems";
 import {
@@ -77,10 +75,12 @@ import { Input } from "@components/common/input/TextInput";
 import EditReasonModal from "@components/sale/refundManagement/EditReasonModal";
 
 const RefundTable = () => {
-  const { getOrders, error, loading, data } = useLazyRefundOrders();
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } = useReactiveVar(
-    commonSaleFilterOptionVar
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+
+  const { getOrderItem, error, loading } = useLazyRefundOrders();
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
   );
 
   const [sendOrderItems] = useMutation<
@@ -99,10 +99,10 @@ const RefundTable = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.REFUND,
           },
         },
       },
@@ -126,10 +126,10 @@ const RefundTable = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.REFUND,
           },
         },
       },
@@ -137,8 +137,8 @@ const RefundTable = () => {
     ],
   });
 
-  const refundOrderItems = useReactiveVar(refundOrderItemsVar);
-  const checkedOrderItems = useReactiveVar(commonCheckedOrderItemsVar);
+  const orderItems = useReactiveVar(resetOrderItemsVar);
+  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
 
   const [shipmentCompanys, setShipmentCompanys] = useState<
@@ -150,7 +150,7 @@ const RefundTable = () => {
   >([]);
 
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newOrderItems = cloneDeep(refundOrderItems);
+    const newOrderItems = cloneDeep(orderItems);
     checkAllBoxStatusVar(e.target.checked);
 
     if (e.target.checked) {
@@ -158,8 +158,8 @@ const RefundTable = () => {
         ...orderItem,
         isChecked: true,
       }));
-      refundOrderItemsVar(checkAllOrderItem);
-      commonCheckedOrderItemsVar(checkAllOrderItem);
+      resetOrderItemsVar(checkAllOrderItem);
+      checkedOrderItemsVar(checkAllOrderItem);
     }
 
     if (!e.target.checked) {
@@ -168,14 +168,14 @@ const RefundTable = () => {
         isChecked: false,
       }));
 
-      refundOrderItemsVar(checkAllOrderItem);
-      commonCheckedOrderItemsVar([]);
+      resetOrderItemsVar(checkAllOrderItem);
+      checkedOrderItemsVar([]);
     }
   };
 
   const changeSingleCheckBoxHandler =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newOrderItems = cloneDeep(refundOrderItems);
+      const newOrderItems = cloneDeep(orderItems);
       const targetOrderItemId = newOrderItems[index].id;
 
       if (e.target.checked) {
@@ -187,10 +187,7 @@ const RefundTable = () => {
           isChecked: true,
         }));
 
-        commonCheckedOrderItemsVar([
-          ...checkedOrderItems,
-          ...checkTargetOrderItems,
-        ]);
+        checkedOrderItemsVar([...checkedOrderItems, ...checkTargetOrderItems]);
         newOrderItems[index].isChecked = true;
       }
 
@@ -198,16 +195,16 @@ const RefundTable = () => {
         const filteredOrderItems = checkedOrderItems.filter(
           (orderItem) => orderItem.id !== targetOrderItemId
         );
-        commonCheckedOrderItemsVar(filteredOrderItems);
+        checkedOrderItemsVar(filteredOrderItems);
         newOrderItems[index].isChecked = false;
       }
-      refundOrderItemsVar(newOrderItems);
+      resetOrderItemsVar(newOrderItems);
     };
 
   const changeShipmentNumberHandler =
     (index: number, shipmentStatus: ShipmentStatus) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newOrderItems = cloneDeep(refundOrderItems);
+      const newOrderItems = cloneDeep(orderItems);
       const newCheckedOrderItems = cloneDeep(checkedOrderItems);
 
       if (shipmentStatus === ShipmentStatus.SHIPPING) {
@@ -219,7 +216,7 @@ const RefundTable = () => {
         );
       }
 
-      refundOrderItemsVar(newOrderItems);
+      resetOrderItemsVar(newOrderItems);
 
       if (newCheckedOrderItems.length > 0) {
         const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
@@ -243,14 +240,14 @@ const RefundTable = () => {
           }
         }
 
-        commonCheckedOrderItemsVar(newCheckedOrderItems);
+        checkedOrderItemsVar(newCheckedOrderItems);
       }
     };
 
   const changeShipmentCompanyHandler =
     (index: number, shipmentStatus: ShipmentStatus) =>
     (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const newOrderItems = cloneDeep(refundOrderItems);
+      const newOrderItems = cloneDeep(orderItems);
       const newCheckedOrderItems = cloneDeep(checkedOrderItems);
 
       if (shipmentStatus === ShipmentStatus.SHIPPING) {
@@ -260,7 +257,7 @@ const RefundTable = () => {
         newOrderItems[index].temporaryRefundShipmentCompany = e.target.value;
       }
 
-      refundOrderItemsVar(newOrderItems);
+      resetOrderItemsVar(newOrderItems);
 
       if (newCheckedOrderItems.length > 0) {
         const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
@@ -280,13 +277,13 @@ const RefundTable = () => {
           }
         }
 
-        commonCheckedOrderItemsVar(newCheckedOrderItems);
+        checkedOrderItemsVar(newCheckedOrderItems);
       }
     };
 
   const handleEditButtonClick =
     (id: number, shipmentStatus: ShipmentStatus) => () => {
-      const newOrderItems = cloneDeep(refundOrderItems);
+      const newOrderItems = cloneDeep(orderItems);
 
       const findOrderItmeIndex = newOrderItems.findIndex(
         (orderItem) => orderItem.id === id
@@ -298,7 +295,7 @@ const RefundTable = () => {
         newOrderItems[findOrderItmeIndex].isRefundShipmentInfoEdit = true;
       }
 
-      refundOrderItemsVar(newOrderItems);
+      resetOrderItemsVar(newOrderItems);
     };
 
   const handleSendButtonClick =
@@ -371,7 +368,7 @@ const RefundTable = () => {
                       isVisible: false,
                     });
 
-                    commonCheckedOrderItemsVar([]);
+                    checkedOrderItemsVar([]);
                     checkAllBoxStatusVar(false);
                   },
                 });
@@ -473,7 +470,7 @@ const RefundTable = () => {
 
               if (ok) {
                 loadingSpinnerVisibilityVar(false);
-                const newOrderItems = cloneDeep(refundOrderItems);
+                const newOrderItems = cloneDeep(orderItems);
 
                 const findOrderItmeIndex = newOrderItems.findIndex(
                   ({ id }) => id === orderItemId
@@ -491,7 +488,7 @@ const RefundTable = () => {
                     shipmentNumber;
                 });
 
-                refundOrderItemsVar(newOrderItems);
+                resetOrderItemsVar(newOrderItems);
 
                 systemModalVar({
                   ...systemModalVar(),
@@ -511,7 +508,7 @@ const RefundTable = () => {
                       isVisible: false,
                     });
 
-                    commonCheckedOrderItemsVar([]);
+                    checkedOrderItemsVar([]);
                     checkAllBoxStatusVar(false);
                   },
                 });
@@ -531,79 +528,85 @@ const RefundTable = () => {
 
   useEffect(() => {
     void (async () => {
-      await getOrders({
-        variables: {
-          input: {
-            page,
-            skip,
-            query,
-            type,
-            statusName,
-            statusType: OrderStatusType.CLAIM,
-            statusGroup: OrderStatusGroup.REFUND,
+      try {
+        const {
+          data: {
+            getOrdersBySeller: {
+              ok,
+              error,
+              totalOrderItems,
+              totalPages,
+              totalResults,
+            },
           },
-        },
-        fetchPolicy: "no-cache",
-      });
-    })();
-  }, [page, skip, query, type, statusName, statusType, statusGroup]);
+        } = await getOrderItem({
+          variables: {
+            input: {
+              page,
+              skip,
+              query,
+              type: orderSearchType,
+              statusName: decryptSaleNameId[nameId] as OrderStatusName,
+              statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+              statusGroup: OrderStatusGroup.REFUND,
+            },
+          },
+          fetchPolicy: "no-cache",
+          notifyOnNetworkStatusChange: true,
+        });
 
-  useEffect(() => {
-    if (!data || !data.getOrdersBySeller) return;
+        if (ok) {
+          const isLastPageChanged = totalPages < page;
 
-    const {
-      totalPages,
-      totalResults,
-      totalOrderItems,
-    }: {
-      totalPages: number;
-      totalResults: number;
-      totalOrderItems: Array<OrderItems>;
-    } = data.getOrdersBySeller;
+          if (isLastPageChanged && totalPages !== 0) {
+            commonFilterOptionVar({
+              ...commonFilterOptionVar(),
+              page: totalPages,
+            });
+            return;
+          }
 
-    const isLastPageChanged = totalPages < page;
+          pageNumberListVar(
+            Array(totalPages)
+              .fill(null)
+              .map((_, index) => index + 1)
+          );
 
-    if (isLastPageChanged && totalPages !== 0) {
-      commonFilterOptionVar({
-        ...commonFilterOptionVar(),
-        page: totalPages,
-      });
+          totalPageLengthVar(totalResults);
 
-      return;
-    }
+          const reconstructOrderItems: NormalizedType =
+            constructOrderItem(totalOrderItems);
 
-    pageNumberListVar(
-      Array(totalPages)
-        .fill(null)
-        .map((_, index) => index + 1)
-    );
+          const resetOrderItems: Array<ResetOrderItemType> = getResetOrderItems(
+            reconstructOrderItems
+          );
 
-    totalPageLengthVar(totalResults);
+          resetOrderItemsVar(resetOrderItems);
+          checkedOrderItemsVar([]);
+        }
 
-    const reconstructOrderItems: NormalizedType =
-      constructOrderItem(totalOrderItems);
-
-    const resetOrderItems: Array<ResetOrderItemType> = getResetOrderItems(
-      reconstructOrderItems
-    );
-
-    totalOrderItemsVar(totalOrderItems);
-    refundOrderItemsVar(resetOrderItems);
-
-    commonCheckedOrderItemsVar([]);
-    checkAllBoxStatusVar(false);
-  }, [data]);
-
-  useEffect(() => {
-    paginationVisibilityVar(loading || error);
-  }, [loading]);
-
-  useEffect(() => {
-    if (error) {
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        description: (
+        if (error) {
+          showHasAnyProblemModal(
+            <>
+              내부 서버 오류로 인해 요청하신
+              <br />
+              작업을 완료하지 못했습니다.
+              <br />
+              다시 한 번 시도 후 같은 문제가 발생할 경우
+              <br />
+              찹스틱스로 문의해주세요.
+              <br />
+              <br />
+              (전화 문의 070-4187-3848)
+              <br />
+              <br />
+              Code:
+              {error}
+            </>
+          );
+        }
+      } catch (error) {
+        showHasAnyProblemModal(
           <>
             내부 서버 오류로 인해 요청하신
             <br />
@@ -618,18 +621,16 @@ const RefundTable = () => {
             <br />
             <br />
             Code:
-            {error.message}
+            {error}
           </>
-        ),
-        confirmButtonClickHandler: () => {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: false,
-          });
-        },
-      });
-    }
-  }, [error]);
+        );
+      }
+    })();
+  }, [page, skip, query, orderSearchType, nameId, typeId]);
+
+  useEffect(() => {
+    paginationVisibilityVar(loading || error);
+  }, [loading]);
 
   useEffect(() => {
     void (async () => {
@@ -672,8 +673,7 @@ const RefundTable = () => {
     })();
   }, []);
 
-  const hasRefundOrderItems =
-    !!refundOrderItems && !!refundOrderItems.length && !loading;
+  const hasRefundOrderItems = !!orderItems && !!orderItems.length && !loading;
   const isFetchingOrderItemsFailed = !loading && !error && hasRefundOrderItems;
 
   return (
@@ -710,7 +710,7 @@ const RefundTable = () => {
         </ThContainer>
         <TdContainer>
           {hasRefundOrderItems &&
-            refundOrderItems.map(
+            orderItems.map(
               (
                 {
                   merchantUid,
@@ -863,7 +863,7 @@ const RefundTable = () => {
         </ThContainer>
         <TdContainer>
           {hasRefundOrderItems &&
-            refundOrderItems.map(
+            orderItems.map(
               (
                 {
                   id,
@@ -944,7 +944,8 @@ const RefundTable = () => {
                           size={"small"}
                           width={"55px"}
                           disabled={
-                            statusName === OrderStatusName.REFUND_COMPLETED ||
+                            decryptSaleNameId[nameId] ===
+                              OrderStatusName.REFUND_COMPLETED ||
                             claimStatus === "환불 오류"
                           }
                           onClick={handleEditReasonModalClick(
@@ -1439,7 +1440,8 @@ const RefundTable = () => {
                           size={"small"}
                           width={"55px"}
                           disabled={
-                            statusName === OrderStatusName.REFUND_COMPLETED ||
+                            decryptSaleNameId[nameId] ===
+                              OrderStatusName.REFUND_COMPLETED ||
                             claimStatus === "환불 오류"
                           }
                           onClick={handleEditReasonModalClick(

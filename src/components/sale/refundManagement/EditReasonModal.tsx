@@ -9,20 +9,24 @@ import {
   modalVar,
   systemModalVar,
 } from "@cache/index";
-import { commonSaleFilterOptionVar } from "@cache/sale";
+import { checkedOrderItemsVar } from "@cache/sale";
+import { showHasServerErrorModal } from "@cache/productManagement";
+import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
 import {
   MainReason,
   optionListType,
   refusalCancelOrRefundOptionList,
   OrderStatusName,
   mainReasonTypes,
+  OrderStatusType,
+  OrderStatusGroup,
 } from "@constants/sale";
-import { checkedOrderItemsVar } from "@cache/sale";
-import { showHasServerErrorModal } from "@cache/productManagement";
+
 import {
   EditStatusReasonBySellerInputType,
   EditStatusReasonBySellerType,
 } from "@models/sale";
+
 import { GET_REFUND_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import { EDIT_STATUS_REASON_BY_SELLER } from "@graphql/mutations/editStatusReasonBySeller";
 
@@ -37,6 +41,7 @@ import {
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
+import { useSearchParams } from "react-router-dom";
 
 const EditReasonModal = ({
   statusReasonId,
@@ -49,9 +54,11 @@ const EditReasonModal = ({
   mainReason: string;
   detailedReason: string;
 }) => {
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } = useReactiveVar(
-    commonSaleFilterOptionVar
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
   );
 
   const [reason, setReason] = useState<{
@@ -80,10 +87,10 @@ const EditReasonModal = ({
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.REFUND,
           },
         },
       },

@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { useMutation, useReactiveVar } from "@apollo/client";
+
+import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
+import {
+  MainReason,
+  mainReasonTypes,
+  optionListType,
+  OrderStatusGroup,
+  OrderStatusName,
+  OrderStatusType,
+} from "@constants/sale";
 
 import {
   checkAllBoxStatusVar,
@@ -9,13 +20,16 @@ import {
   modalVar,
   systemModalVar,
 } from "@cache/index";
-import { filterOptionVar } from "@cache/sale/cancel";
+import { checkedOrderItemsVar } from "@cache/sale";
+import { showHasServerErrorModal } from "@cache/productManagement";
+
 import {
-  MainReason,
-  mainReasonTypes,
-  optionListType,
-  OrderStatusName,
-} from "@constants/sale";
+  EditStatusReasonBySellerInputType,
+  EditStatusReasonBySellerType,
+} from "@models/sale";
+
+import { GET_CANCEL_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+import { EDIT_STATUS_REASON_BY_SELLER } from "@graphql/mutations/editStatusReasonBySeller";
 
 import closeIconSource from "@icons/delete.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -28,14 +42,6 @@ import {
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
-import { checkedOrderItemsVar } from "@cache/sale";
-import { showHasServerErrorModal } from "@cache/productManagement";
-import {
-  EditStatusReasonBySellerInputType,
-  EditStatusReasonBySellerType,
-} from "@models/sale";
-import { GET_CANCEL_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
-import { EDIT_STATUS_REASON_BY_SELLER } from "@graphql/mutations/editStatusReasonBySeller";
 
 const EditReasonModal = ({
   statusReasonId,
@@ -48,9 +54,11 @@ const EditReasonModal = ({
   mainReason: string;
   detailedReason: string;
 }) => {
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
+  );
 
   const [reason, setReason] = useState<{
     main: MainReason;
@@ -78,10 +86,10 @@ const EditReasonModal = ({
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.CANCEL,
           },
         },
       },

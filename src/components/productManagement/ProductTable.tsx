@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import styled from "styled-components/macro";
 import { useMutation, useReactiveVar } from "@apollo/client";
 
@@ -16,21 +16,30 @@ import {
   pageNumberListVar,
   paginationVisibilityVar,
   totalPageLengthVar,
+  showHasAnyProblemModal,
 } from "@cache/index";
 import { tableData } from "@constants/product/table";
 import { ProductStatus, productStatus, productType } from "@constants/product";
-import {
-  GET_PRODUCTS_BY_SELLER,
-  ProductsType,
-} from "@graphql/queries/getProductsBySeller";
+import { decryptProductStatusId, ServiceUrls } from "@constants/index";
+
+import { GET_PRODUCTS_BY_SELLER } from "@graphql/queries/getProductsBySeller";
 import {
   ChangeProductsInfoBySellerInputType,
   ChangeProductsInfoBySellerType,
   CHANGE_PRODUCTS_INFO_BY_SELLER,
 } from "@graphql/mutations/changeProductsInfoBySeller";
-import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
-import { TableType } from "@models/index";
 import useLazyProducts from "@hooks/product/useLazyGetProducts";
+
+import { TableType } from "@models/index";
+import {
+  NormalizedType,
+  CaculatedProductsType,
+} from "@models/product/management";
+
+import contructProducts from "@utils/product/management/constructProducts";
+import caculateProducts from "@utils/product/management/caculateProducts";
+
+import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 import {
   ThContainer,
   Th,
@@ -46,16 +55,12 @@ import {
 import Checkbox from "@components/common/input/Checkbox";
 import NoDataContainer from "@components/common/table/NoDataContainer";
 import Loading from "@components/common/table/Loading";
-import contructProducts from "@utils/product/management/constructProducts";
-import {
-  NormalizedType,
-  CaculatedProductsType,
-} from "@models/product/management";
-import caculateProducts from "@utils/product/management/caculateProducts";
-import { ServiceUrls } from "@constants/index";
 
 const ProductTable = () => {
-  const { loading, error, data, getProducts } = useLazyProducts();
+  const [searchParams] = useSearchParams();
+  const statusId: string = searchParams.get("statusId");
+
+  const { loading, error, getProducts } = useLazyProducts();
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { status } = useReactiveVar(filterOptionVar);
 
@@ -234,102 +239,105 @@ const ProductTable = () => {
     };
 
   useEffect(() => {
-    void (async () => {
-      await getProducts({
-        variables: { input: { page, skip, status, query } },
-        fetchPolicy: "no-cache",
-      });
-    })();
-  }, [page, skip, status, query]);
+    try {
+      void (async () => {
+        const {
+          data: {
+            getProductsBySeller: {
+              ok,
+              error,
+              totalPages,
+              totalResults,
+              products,
+            },
+          },
+        } = await getProducts({
+          variables: {
+            input: {
+              page,
+              skip,
+              status: decryptProductStatusId[statusId] as ProductStatus,
+              query,
+            },
+          },
+          notifyOnNetworkStatusChange: true,
+          fetchPolicy: "no-cache",
+        });
 
-  useEffect(() => {
-    if (!data || !data.getProductsBySeller) return;
+        if (ok) {
+          const isLastPageChanged = totalPages < page;
 
-    const {
-      totalPages,
-      totalResults,
-      products,
-    }: {
-      totalPages: number;
-      totalResults: number;
-      products: Array<ProductsType>;
-    } = data.getProductsBySeller;
+          if (isLastPageChanged && totalPages !== 0) {
+            commonFilterOptionVar({
+              ...commonFilterOptionVar(),
+              page: totalPages,
+            });
 
-    const isLastPageChanged = totalPages < page;
+            return;
+          }
 
-    if (isLastPageChanged && totalPages !== 0) {
-      commonFilterOptionVar({
-        ...commonFilterOptionVar(),
-        page: totalPages,
-      });
+          pageNumberListVar(
+            Array(totalPages)
+              .fill(null)
+              .map((_, index) => index + 1)
+          );
 
-      return;
+          totalPageLengthVar(totalResults);
+
+          const recontructProducts: NormalizedType = contructProducts(products);
+          const caculatedProducts: Array<CaculatedProductsType> =
+            caculateProducts(recontructProducts);
+          setProducts(caculatedProducts);
+
+          checkedProductsVar([]);
+          checkAllBoxStatusVar(false);
+        }
+        if (error) {
+          showHasAnyProblemModal(
+            <>
+              내부 서버 오류로 인해 요청하신
+              <br />
+              작업을 완료하지 못했습니다.
+              <br />
+              다시 한 번 시도 후 같은 문제가 발생할 경우
+              <br />
+              찹스틱스로 문의해주세요.
+              <br />
+              <br />
+              (전화 문의 070-4187-3848)
+              <br />
+              <br />
+              Code:
+              {error}
+            </>
+          );
+        }
+      })();
+    } catch (error) {
+      showHasAnyProblemModal(
+        <>
+          내부 서버 오류로 인해 요청하신
+          <br />
+          작업을 완료하지 못했습니다.
+          <br />
+          다시 한 번 시도 후 같은 문제가 발생할 경우
+          <br />
+          찹스틱스로 문의해주세요.
+          <br />
+          <br />
+          (전화 문의 070-4187-3848)
+          <br />
+          <br />
+          Code:
+          {error}
+        </>
+      );
     }
-
-    pageNumberListVar(
-      Array(totalPages)
-        .fill(null)
-        .map((_, index) => index + 1)
-    );
-
-    totalPageLengthVar(totalResults);
-
-    const recontructProducts: NormalizedType = contructProducts(products);
-    const caculatedProducts: Array<CaculatedProductsType> =
-      caculateProducts(recontructProducts);
-    setProducts(caculatedProducts);
-
-    checkedProductsVar([]);
-    checkAllBoxStatusVar(false);
-  }, [data]);
+  }, [page, skip, status, query]);
 
   useEffect(() => {
     paginationVisibilityVar(loading || error);
   }, [loading, error]);
-
-  useEffect(() => {
-    if (!query) {
-      return;
-    }
-
-    commonFilterOptionVar({
-      ...commonFilterOptionVar(),
-      page: 1,
-    });
-  }, [query]);
-
-  useEffect(() => {
-    if (error) {
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        description: (
-          <>
-            내부 서버 오류로 인해 요청하신
-            <br />
-            작업을 완료하지 못했습니다.
-            <br />
-            다시 한 번 시도 후 같은 문제가 발생할 경우
-            <br />
-            찹스틱스로 문의해주세요.
-            <br />
-            <br />
-            (전화 문의 070-4187-3848)
-            <br />
-            <br />
-            code:
-            {error.message}
-          </>
-        ),
-        confirmButtonClickHandler: () => {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: false,
-          });
-        },
-      });
-    }
-  }, [error]);
 
   const hasProducts = !!products && !!products.length;
   const isFetchingProductFailed = !!loading || !!error || hasProducts;
