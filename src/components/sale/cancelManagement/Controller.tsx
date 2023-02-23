@@ -27,6 +27,10 @@ import {
   searchQueryType,
 } from "@constants/sale";
 import { OrderCancel } from "@constants/sale/cancelManagement";
+import {
+  fixTableType,
+  scrollTableType,
+} from "@constants/sale/cancelManagement/table";
 
 import { ResetOrderItemType } from "@models/sale";
 import {
@@ -46,6 +50,7 @@ import Button from "@components/common/Button";
 import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
 import HandleCancelRefusalModal from "@components/sale/cancelManagement/HandleCancelRefusalModal";
+import ExportToExcelButton from "@components/sale/ExportToExcelButton";
 
 const Controller = () => {
   const [searchParams] = useSearchParams();
@@ -297,7 +302,13 @@ const Controller = () => {
           ))}
         </Select>
 
-        <Button size={"small"}>내보내기</Button>
+        <ExportToExcelButton
+          exportData={checkedOrderItems}
+          tableData={[...fixTableType, ...scrollTableType]}
+          status={OrderStatusGroup.REFUND}
+        >
+          내보내기
+        </ExportToExcelButton>
       </FilterContainer>
     </ControllerContainer>
   );

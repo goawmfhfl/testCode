@@ -644,15 +644,13 @@ const Controller = () => {
             </Option>
           ))}
         </StatusDropDown>
-        <ExportToExcelButtonWrapper>
-          <ExportToExcelButton
-            exportData={checkedOrderItems}
-            tableData={[...fixTableType, ...scrollTableType]}
-            status={OrderStatusGroup.ORDER}
-          >
-            내보내기
-          </ExportToExcelButton>
-        </ExportToExcelButtonWrapper>
+        <ExportToExcelButton
+          exportData={checkedOrderItems}
+          tableData={[...fixTableType, ...scrollTableType]}
+          status={OrderStatusGroup.ORDER}
+        >
+          내보내기
+        </ExportToExcelButton>
       </FilterContainer>
     </ControllerContainer>
   );

@@ -4,7 +4,7 @@ import * as xlsx from "xlsx";
 import { ResetOrderItemType } from "@models/sale";
 
 import Button from "@components/common/Button";
-import { OrderStatusGroup } from "@constants/sale";
+import { OrderStatusGroup, shipmentCompanyCode } from "@constants/sale";
 
 interface ExportToExcelButtonType {
   children: React.ReactNode;
@@ -80,7 +80,7 @@ const ExportToExcelButton = ({
               userName,
               orderStatus,
               claimStatus,
-              shipmentCompany,
+              shipmentCompanyCode[shipmentCompany],
               shipmentNumber,
               paidAt,
               recipientName,
@@ -99,6 +99,262 @@ const ExportToExcelButton = ({
               shipmentPrice,
               shipmentDistantPrice,
               totalPaymentAmount,
+            ],
+          ],
+          { origin: -1 }
+        );
+
+        ws["!cols"] = tableWidth;
+      }
+    );
+  }
+
+  if (status === OrderStatusGroup.CANCEL) {
+    exportData.map(
+      ({
+        merchantUid,
+        merchantItemUid,
+        productName,
+        userName,
+        orderStatus,
+        claimStatus,
+        paidAt,
+        requestAt,
+        mainReason,
+        detailedReason,
+        completedAt,
+        option,
+        quantity,
+        price,
+        optionPrice,
+        discountPrice,
+        totalPrice,
+        shipmentPrice,
+        shipmentDistantPrice,
+        totalPaymentAmount,
+        totalRefundAmout,
+        userEmail,
+        userPhoneNumber,
+        recipientName,
+        recipientPhoneNumber,
+        refusalAt,
+        refusalReason,
+        refusalDetailedReason,
+      }) => {
+        xlsx.utils.sheet_add_aoa(
+          ws,
+          [
+            [
+              merchantUid,
+              merchantItemUid,
+              productName,
+              userName,
+              orderStatus,
+              claimStatus,
+              paidAt,
+              requestAt,
+              mainReason,
+              detailedReason,
+              completedAt,
+              option,
+              quantity,
+              price,
+              optionPrice,
+              discountPrice,
+              totalPrice,
+              shipmentPrice,
+              shipmentDistantPrice,
+              totalPaymentAmount,
+              totalRefundAmout,
+              userEmail,
+              userPhoneNumber,
+              recipientName,
+              recipientPhoneNumber,
+              refusalAt,
+              refusalReason,
+              refusalDetailedReason,
+            ],
+          ],
+          { origin: -1 }
+        );
+
+        ws["!cols"] = tableWidth;
+      }
+    );
+  }
+
+  if (status === OrderStatusGroup.REFUND) {
+    exportData.map(
+      ({
+        merchantUid,
+        merchantItemUid,
+        productName,
+        userName,
+        orderStatus,
+        claimStatus,
+        paidAt,
+        requestAt,
+        mainReason,
+        detailedReason,
+        attachedImages,
+        completedAt,
+        shipmentCompany,
+        shipmentNumber,
+        pickupShipmentCompany,
+        pickupShipmentNumber,
+        option,
+        quantity,
+        price,
+        optionPrice,
+        discountPrice,
+        totalPrice,
+        shipmentPrice,
+        shipmentDistantPrice,
+        totalPaymentAmount,
+        totalRefundAmout,
+        userEmail,
+        userPhoneNumber,
+        recipientName,
+        recipientPhoneNumber,
+        recipientAddress,
+        postCode,
+        refusalAt,
+        refusalReason,
+        refusalDetailedReason,
+      }) => {
+        xlsx.utils.sheet_add_aoa(
+          ws,
+          [
+            [
+              merchantUid,
+              merchantItemUid,
+              productName,
+              userName,
+              orderStatus,
+              claimStatus,
+              paidAt,
+              requestAt,
+              mainReason,
+              detailedReason,
+              attachedImages,
+              completedAt,
+              shipmentCompanyCode[shipmentCompany],
+              shipmentNumber,
+              shipmentCompanyCode[pickupShipmentCompany],
+              pickupShipmentNumber,
+              option,
+              quantity,
+              price,
+              optionPrice,
+              discountPrice,
+              totalPrice,
+              shipmentPrice,
+              shipmentDistantPrice,
+              totalPaymentAmount,
+              totalRefundAmout,
+              userEmail,
+              userPhoneNumber,
+              recipientName,
+              recipientPhoneNumber,
+              recipientAddress,
+              postCode,
+              refusalAt,
+              refusalReason,
+              refusalDetailedReason,
+            ],
+          ],
+          { origin: -1 }
+        );
+
+        ws["!cols"] = tableWidth;
+      }
+    );
+  }
+
+  if (status === OrderStatusGroup.EXCHANGE) {
+    exportData.map(
+      ({
+        merchantUid,
+        merchantItemUid,
+        productName,
+        userName,
+        orderStatus,
+        claimStatus,
+        paidAt,
+        requestAt,
+        mainReason,
+        detailedReason,
+        attachedImages,
+        completedAt,
+        shipmentCompany,
+        shipmentNumber,
+        pickupShipmentCompany,
+        pickupShipmentNumber,
+        pickupAgainShipmentCompany,
+        pickupAgainShipmentNumber,
+        option,
+        quantity,
+        price,
+        optionPrice,
+        discountPrice,
+        totalPrice,
+        shipmentPrice,
+        shipmentDistantPrice,
+        totalPaymentAmount,
+        userEmail,
+        userPhoneNumber,
+        recipientName,
+        recipientPhoneNumber,
+        recipientAddress,
+        postCode,
+        // 재배송지
+        // 재배송 우편번호
+        refusalAt,
+        refusalReason,
+        refusalDetailedReason,
+      }) => {
+        xlsx.utils.sheet_add_aoa(
+          ws,
+          [
+            [
+              merchantUid,
+              merchantItemUid,
+              productName,
+              userName,
+              orderStatus,
+              claimStatus,
+              paidAt,
+              requestAt,
+              mainReason,
+              detailedReason,
+              attachedImages,
+              completedAt,
+              shipmentCompanyCode[shipmentCompany],
+              shipmentNumber,
+              shipmentCompanyCode[pickupShipmentCompany],
+              pickupShipmentNumber,
+              shipmentCompanyCode[pickupAgainShipmentCompany],
+              pickupAgainShipmentNumber,
+              option,
+              quantity,
+              price,
+              optionPrice,
+              discountPrice,
+              totalPrice,
+              shipmentPrice,
+              shipmentDistantPrice,
+              totalPaymentAmount,
+              userEmail,
+              userPhoneNumber,
+              recipientName,
+              recipientPhoneNumber,
+              recipientAddress,
+              postCode,
+              "-", // 재배송지
+              "-", // 재배송 우편번호
+              refusalAt,
+              refusalReason,
+              refusalDetailedReason,
             ],
           ],
           { origin: -1 }

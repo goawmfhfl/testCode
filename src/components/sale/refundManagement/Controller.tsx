@@ -15,6 +15,7 @@ import {
 } from "@cache/index";
 import { showHasServerErrorModal } from "@cache/productManagement";
 import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
+
 import {
   OrderSearchType,
   searchQueryType,
@@ -27,6 +28,10 @@ import {
 } from "@constants/sale";
 import { skipQuantityType } from "@constants/index";
 import { changeRefundOrderStatusByForceType } from "@constants/sale/refundManagement/index";
+import {
+  fixTableType,
+  scrollTableType,
+} from "@constants/sale/refundManagement/table";
 
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
 import { CHANGE_ORDER_STATUS_BY_FORCE } from "@graphql/mutations/changeOrderStatusByForce";
@@ -58,6 +63,7 @@ import { Input as SearchInput } from "@components/common/input/SearchInput";
 import HandleRefusalRefundOrExchangeRequestModal from "@components/sale/HandleRefusalRefundOrExchangeRequestModal";
 import HandleCompleteRefundModal from "@components/sale/refundManagement/HandleCompleteRefundModal";
 import { checkedOrderItemsVar } from "@cache/sale";
+import ExportToExcelButton from "components/sale/ExportToExcelButton";
 
 const Controller = () => {
   const [searchParams] = useSearchParams();
@@ -718,7 +724,13 @@ const Controller = () => {
           ))}
         </Select>
 
-        <Button size={"small"}>내보내기</Button>
+        <ExportToExcelButton
+          exportData={checkedOrderItems}
+          tableData={[...fixTableType, ...scrollTableType]}
+          status={OrderStatusGroup.ORDER}
+        >
+          내보내기
+        </ExportToExcelButton>
       </FilterContainer>
     </ControllerContainer>
   );

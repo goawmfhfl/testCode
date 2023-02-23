@@ -59,6 +59,11 @@ import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
 import HandleRefusalRefundOrExchangeRequestModal from "@components/sale/HandleRefusalRefundOrExchangeRequestModal";
 import HandleCompleteRefundModal from "@components/sale/refundManagement/HandleCompleteRefundModal";
+import {
+  fixTableType,
+  scrollTableType,
+} from "@constants/sale/exchangeManagement/table";
+import ExportToExcelButton from "@components/sale/ExportToExcelButton";
 
 const Controller = () => {
   const [searchParams] = useSearchParams();
@@ -761,7 +766,13 @@ const Controller = () => {
           ))}
         </Select>
 
-        <Button size={"small"}>내보내기</Button>
+        <ExportToExcelButton
+          exportData={checkedOrderItems}
+          tableData={[...fixTableType, ...scrollTableType]}
+          status={OrderStatusGroup.REFUND}
+        >
+          내보내기
+        </ExportToExcelButton>
       </FilterContainer>
     </ControllerContainer>
   );
