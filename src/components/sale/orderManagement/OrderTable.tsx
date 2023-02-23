@@ -568,7 +568,7 @@ const OrderTable = () => {
         );
       }
     })();
-  }, [page, skip, query, typeId, nameId]);
+  }, [page, skip, query, typeId, nameId, orderSearchType]);
 
   useEffect(() => {
     paginationVisibilityVar(loading || error);

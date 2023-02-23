@@ -24,6 +24,10 @@ const SideNavigationBar = () => {
   const saleSubItemVisibility = useReactiveVar(saleSubItemVisibilityVar);
   const sideNavigationBarStatus = useReactiveVar(sideNavigationBarStatusVar);
 
+  const handleDrowdownClick = () => {
+    saleSubItemVisibilityVar(!saleSubItemVisibility);
+  };
+
   useEffect(() => {
     loadingSpinnerVisibilityVar(loading);
 
@@ -47,20 +51,21 @@ const SideNavigationBar = () => {
           </NavItem>
         </Link>
 
-        <Link to={Pathnames.Order}>
-          <NavItem
-            disabled={true}
-            isActive={decryptSaleStatusId[statusId] === OrderStatusGroup.ORDER}
-          >
-            판매관리
-            {/* <DropdownIcon
-              src={saleSubItemVisibility ? mediumTopSrc : mediumBottomSrc}
-              isActive={statusId === Pathnames.Sale}
-            /> */}
-          </NavItem>
-        </Link>
+        {/* <Link to={Pathnames.Order}> */}
+        <NavItem
+          disabled={location.pathname !== Pathnames.Sale}
+          isActive={location.pathname === Pathnames.Sale}
+        >
+          판매관리
+          {/* <DropdownIcon
+            src={saleSubItemVisibility ? mediumTopSrc : mediumBottomSrc}
+            isActive={location.pathname === Pathnames.Sale}
+            onClick={handleDrowdownClick}
+          /> */}
+        </NavItem>
+        {/* </Link> */}
 
-        {location.pathname === Pathnames.Sale && (
+        {location.pathname === Pathnames.Sale && saleSubItemVisibility && (
           <SubNavContainer
             isActive={sideNavigationBarStatus === Pathnames.Sale}
           >
