@@ -18,6 +18,7 @@ import { getOrdersLength } from "@utils/sale/cancel";
 
 import FilterBarContainer from "@components/sale/FilterBarContainer";
 import Button from "@components/common/Button";
+import ExportAllExcelButton from "@components/sale/cancelManagement/ExportAllExcelButton";
 
 const FilterBar = () => {
   const [searchParams] = useSearchParams();
@@ -59,7 +60,7 @@ const FilterBar = () => {
 
   return (
     <FilterBarContainer
-      button={<Button size={"small"}>전체 내역 내보내기</Button>}
+      button={<ExportAllExcelButton>전체 내역 내보내기</ExportAllExcelButton>}
       searchResultLength={totalPageLength}
     >
       <Link to={Pathnames.Cancel}>

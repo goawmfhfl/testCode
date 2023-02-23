@@ -15,8 +15,9 @@ import useLazyOrderStatus from "@hooks/order/useLazyOrderStatus";
 
 import { getOrdersLength } from "@utils/sale/order/getOrdersLength";
 
-import FilterBarContainer from "@components/sale/FilterBarContainer";
 import Button from "@components/common/Button";
+import FilterBarContainer from "@components/sale/FilterBarContainer";
+import ExportAllExcelButton from "@components/sale/orderManagement/ExportAllExcelButton";
 
 const FilterBar = () => {
   const [searchParams] = useSearchParams();
@@ -59,7 +60,7 @@ const FilterBar = () => {
 
   return (
     <FilterBarContainer
-      button={<Button size={"small"}>전체 내역 내보내기</Button>}
+      button={<ExportAllExcelButton>전체 내역 내보내기</ExportAllExcelButton>}
       searchResultLength={totalPageLength}
     >
       <Link to={Pathnames.Order}>

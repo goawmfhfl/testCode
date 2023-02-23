@@ -15,7 +15,7 @@ import useLazyRefundOrders from "@hooks/order/useLazyRefundOrders";
 import { getOrdersLength } from "@utils/sale";
 
 import FilterBarContainer from "@components/sale/FilterBarContainer";
-import Button from "@components/common/Button";
+import ExportToExcelButton from "@components/sale/refundManagement/ExportAllExcelButton";
 
 const FilterBar = () => {
   const [searchParams] = useSearchParams();
@@ -63,7 +63,7 @@ const FilterBar = () => {
 
   return (
     <FilterBarContainer
-      button={<Button size={"small"}>전체 내역 내보내기</Button>}
+      button={<ExportToExcelButton>전체 내역 내보내기</ExportToExcelButton>}
       searchResultLength={totalPageLength}
     >
       <Link to={Pathnames.Refund}>
