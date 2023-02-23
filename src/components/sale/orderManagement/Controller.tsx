@@ -17,6 +17,7 @@ import { checkedOrderItemsVar } from "@cache/sale";
 import { showHasServerErrorModal } from "@cache/productManagement";
 
 import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
+
 import {
   searchQueryType,
   OrderSearchType,
@@ -26,6 +27,10 @@ import {
   optionListType,
   SendType,
 } from "@constants/sale";
+import {
+  fixTableType,
+  scrollTableType,
+} from "@constants/sale/orderManagement/table";
 
 import { CONFIRM_ORDERITMES_BY_SELLER } from "@graphql/mutations/confirmOrderItemsBySeller";
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
@@ -55,6 +60,7 @@ import ControllerContainer from "@components/sale/ControllerContainer";
 import HandleCancelOrderModal from "@components/sale/orderManagement/HandleCancelOrderModal";
 import HandleRefundModal from "@components/sale/orderManagement/HandleRefundModal";
 import HandleExchangeModal from "@components/sale/orderManagement/HandleExchangeModal";
+import ExportToExcelButton from "@components/sale/ExportToExcelButton";
 
 const Controller = () => {
   const [searchParams] = useSearchParams();
@@ -65,6 +71,7 @@ const Controller = () => {
 
   const checkedOrderItems =
     useReactiveVar<Array<ResetOrderItemType>>(checkedOrderItemsVar);
+
   const reconstructCheckedOrderItems =
     getReconstructCheckedOrderItems(checkedOrderItems);
 
@@ -637,7 +644,15 @@ const Controller = () => {
             </Option>
           ))}
         </StatusDropDown>
-        <Button size={"small"}>내보내기</Button>
+        <ExportToExcelButtonWrapper>
+          <ExportToExcelButton
+            exportData={checkedOrderItems}
+            tableData={[...fixTableType, ...scrollTableType]}
+            status={OrderStatusGroup.ORDER}
+          >
+            내보내기
+          </ExportToExcelButton>
+        </ExportToExcelButtonWrapper>
       </FilterContainer>
     </ControllerContainer>
   );
@@ -663,5 +678,7 @@ const ControlButton = styled(Button)`
 const FilterContainer = styled.div`
   display: flex;
 `;
+
+const ExportToExcelButtonWrapper = styled.div``;
 
 export default Controller;
