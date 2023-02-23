@@ -65,7 +65,8 @@ const SideNavigationBar = () => {
         </NavItem>
         {/* </Link> */}
 
-        {location.pathname === Pathnames.Sale && saleSubItemVisibility && (
+        {/* need Status: saleSubItemVisibility */}
+        {location.pathname === Pathnames.Sale && (
           <SubNavContainer
             isActive={sideNavigationBarStatus === Pathnames.Sale}
           >
