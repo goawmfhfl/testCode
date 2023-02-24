@@ -17,7 +17,6 @@ import useLazyOrderStatus from "@hooks/order/useLazyOrderStatus";
 import { getOrdersLength } from "@utils/sale/cancel";
 
 import FilterBarContainer from "@components/sale/FilterBarContainer";
-import Button from "@components/common/Button";
 import ExportAllExcelButton from "@components/sale/cancelManagement/ExportAllExcelButton";
 
 const FilterBar = () => {
