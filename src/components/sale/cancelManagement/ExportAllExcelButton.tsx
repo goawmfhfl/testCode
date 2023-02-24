@@ -12,7 +12,7 @@ import { NormalizedListType, ResetOrderItemType } from "@models/sale";
 
 import constructOrderItem from "@utils/sale/constructOrderItem";
 import getResetOrderItems from "@utils/sale/cancel/getResetOrderItems";
-import { OrderStatusGroup, shipmentCompanyCode } from "@constants/sale";
+import { OrderStatusGroup } from "@constants/sale";
 import { showHasServerErrorModal } from "@cache/productManagement";
 
 interface ExportToExcelButtonType {

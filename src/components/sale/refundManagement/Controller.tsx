@@ -727,7 +727,7 @@ const Controller = () => {
         <ExportToExcelButton
           exportData={checkedOrderItems}
           tableData={[...fixTableType, ...scrollTableType]}
-          status={OrderStatusGroup.ORDER}
+          status={OrderStatusGroup.REFUND}
         >
           내보내기
         </ExportToExcelButton>
