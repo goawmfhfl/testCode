@@ -583,6 +583,7 @@ const RefundTable = () => {
 
           resetOrderItemsVar(resetOrderItems);
           checkedOrderItemsVar([]);
+          checkAllBoxStatusVar(false);
         }
 
         if (error) {

@@ -192,6 +192,7 @@ const CancelTable = () => {
 
           resetOrderItemsVar(resetOrderItems);
           checkedOrderItemsVar([]);
+          checkAllBoxStatusVar(false);
         }
 
         if (error) {

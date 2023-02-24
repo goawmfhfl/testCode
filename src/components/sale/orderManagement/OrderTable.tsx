@@ -525,6 +525,7 @@ const OrderTable = () => {
 
           resetOrderItemsVar(resetOrderItems);
           checkedOrderItemsVar([]);
+          checkAllBoxStatusVar(false);
         }
 
         if (error) {
