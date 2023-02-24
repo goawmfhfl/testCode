@@ -2,12 +2,40 @@ import {
   Cause,
   MainReason,
   mainReasonType,
+  OrderStatusGroup,
   OrderStatusName,
   ShipmentStatus,
   ShipmentType,
 } from "@constants/sale";
 import { ResetOrderItemType } from "@models/sale";
 import { DateType, getDateFormat } from "@utils/date";
+
+export const getOrderGroupCounter = (orderStatus: Array<OrderStatusGroup>) => {
+  return orderStatus.reduce(
+    (result, status) => {
+      if (status === OrderStatusGroup.ORDER) {
+        result.order++;
+      }
+      if (status === OrderStatusGroup.CANCEL) {
+        result.cancel++;
+      }
+      if (status === OrderStatusGroup.REFUND) {
+        result.refund++;
+      }
+      if (status === OrderStatusGroup.EXCHANGE) {
+        result.exchange++;
+      }
+
+      return result;
+    },
+    {
+      order: 0,
+      cancel: 0,
+      refund: 0,
+      exchange: 0,
+    }
+  );
+};
 
 export const getIsCheckedStatus = (
   checkedOrderItems: Array<ResetOrderItemType>

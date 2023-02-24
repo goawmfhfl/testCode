@@ -10,12 +10,10 @@ import {
 } from "@constants/index";
 import { OrderSearchType } from "@constants/sale";
 
-// Global Layout
 export const loadingSpinnerVisibilityVar = makeVar<boolean>(false);
 export const saleSubItemVisibilityVar = makeVar<boolean>(true);
 export const sideNavigationBarStatusVar = makeVar<string>("");
 
-// TABLE: 페이지네이션
 export const paginationVisibilityVar = makeVar<boolean | ApolloError>(true);
 export const commonFilterOptionVar = makeVar<CommonFilterOptionType>({
   page: 1,
@@ -27,7 +25,6 @@ export const pageNumberListVar = makeVar<Array<number>>([]);
 export const paginationSkipVar = makeVar<number>(0);
 export const totalPageLengthVar = makeVar<number>(0);
 
-// TABLE: 기타
 export const temporaryQueryVar = makeVar<string>("");
 export const checkAllBoxStatusVar = makeVar<boolean>(false);
 

@@ -337,6 +337,7 @@ export const GET_ORDER_STATUS_BY_SELLER = gql`
       ok
       error
       totalOrderItems {
+        orderStatusGroup
         orderStatus {
           name
         }

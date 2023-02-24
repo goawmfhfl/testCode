@@ -2,18 +2,20 @@ import { useEffect } from "react";
 import styled from "styled-components/macro";
 import { Link, useSearchParams } from "react-router-dom";
 import { useReactiveVar } from "@apollo/client";
+import { orderStatusGroupVar } from "@cache/sale";
 import { decryptSaleStatusId, Pathnames } from "@constants/index";
+import { showHasServerErrorModal } from "@cache/productManagement";
+import { OrderStatusGroup } from "@constants/sale";
 import useShopInfo from "@hooks/useShopInfo";
 import {
   loadingSpinnerVisibilityVar,
   saleSubItemVisibilityVar,
   sideNavigationBarStatusVar,
 } from "@cache/index";
-import { showHasServerErrorModal } from "@cache/productManagement";
-import { OrderStatusGroup } from "@constants/sale";
 
 import mediumTopSrc from "@icons/medium-top.svg";
 import mediumBottomSrc from "@icons/medium-bottom.svg";
+import { getOrderGroupCounter } from "@utils/sale";
 
 const SideNavigationBar = () => {
   const { data, loading, error } = useShopInfo();
@@ -23,6 +25,9 @@ const SideNavigationBar = () => {
 
   const saleSubItemVisibility = useReactiveVar(saleSubItemVisibilityVar);
   const sideNavigationBarStatus = useReactiveVar(sideNavigationBarStatusVar);
+  const orderStatusGroup = useReactiveVar(orderStatusGroupVar);
+  const { order, cancel, refund, exchange } =
+    getOrderGroupCounter(orderStatusGroup);
 
   const handleDrowdownClick = () => {
     saleSubItemVisibilityVar(!saleSubItemVisibility);
@@ -77,6 +82,11 @@ const SideNavigationBar = () => {
                 }
               >
                 주문 관리
+                {order ? (
+                  <OrderCounter count={order}>
+                    {order <= 99 ? order : `${order}+`}
+                  </OrderCounter>
+                ) : null}
               </SubNavItem>
             </Link>
 
@@ -87,6 +97,11 @@ const SideNavigationBar = () => {
                 }
               >
                 취소 관리
+                {cancel ? (
+                  <OrderCounter count={cancel}>
+                    {cancel <= 99 ? cancel : `${cancel}+`}
+                  </OrderCounter>
+                ) : null}
               </SubNavItem>
             </Link>
 
@@ -97,6 +112,11 @@ const SideNavigationBar = () => {
                 }
               >
                 반품 관리
+                {refund ? (
+                  <OrderCounter count={refund}>
+                    {refund <= 99 ? refund : `${refund}+`}
+                  </OrderCounter>
+                ) : null}
               </SubNavItem>
             </Link>
 
@@ -107,6 +127,11 @@ const SideNavigationBar = () => {
                 }
               >
                 교환 관리
+                {exchange ? (
+                  <OrderCounter count={exchange}>
+                    {exchange <= 99 ? exchange : `${exchange}+`}
+                  </OrderCounter>
+                ) : null}
               </SubNavItem>
             </Link>
           </SubNavContainer>
@@ -204,11 +229,32 @@ const SubNavContainer = styled.div<{ isActive: boolean }>`
 `;
 
 const SubNavItem = styled.li<{ isActive: boolean }>`
+  display: flex;
+  align-items: center;
+
   padding-top: 12px;
   padding-bottom: 8px;
   padding-left: 54px;
 
   color: ${({ theme: { palette }, isActive }) => isActive && palette.red500};
+`;
+
+const OrderCounter = styled.div<{ count: number }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: ${({ count }) => (count <= 99 ? "14px" : "20px")};
+  height: 14px;
+  border-radius: 50%;
+  background-color: ${({ theme: { palette } }) => palette.red900};
+  margin-left: 4px;
+
+  color: ${({ theme: { palette } }) => palette.white};
+  font-family: "Spoqa Han Sans Neo";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 8px;
 `;
 
 export default SideNavigationBar;

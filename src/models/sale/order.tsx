@@ -41,6 +41,7 @@ export interface GetOrderStatusBySellerType {
       orderStatus: {
         name: OrderStatusName;
       };
+      orderStatusGroup: OrderStatusGroup;
     }>;
   };
 }
