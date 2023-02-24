@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components/macro";
 import { useMutation, useReactiveVar } from "@apollo/client";
 
@@ -24,12 +24,12 @@ import {
   SendType,
   DenyRefundOrExchangeRequestType,
   OrderStatusName,
+  Cause,
 } from "@constants/sale";
 import { skipQuantityType } from "@constants/index";
 import { changeRefundOrderStatusByForceType } from "@constants/sale/refundManagement/index";
 
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
-import { COMPLETE_REFUND_BY_SELLER } from "@graphql/mutations/completeRefundBySeller";
 import { CHANGE_ORDER_STATUS_BY_FORCE } from "@graphql/mutations/changeOrderStatusByForce";
 import { GET_REFUND_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 
@@ -43,17 +43,10 @@ import {
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
-import {
-  CompleteRefundBySellerType,
-  CompleteRefundBySellerInputType,
-} from "@models/sale/refund";
 
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
 import { getIsCheckedStatus } from "@utils/sale";
-import {
-  getHandleCompleteRefundErrorCase,
-  getRefundInformation,
-} from "@utils/sale/refund";
+import { getHandleCompleteRefundErrorCase } from "@utils/sale/refund";
 
 import questionMarkSrc from "@icons/questionmark.svg";
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
@@ -126,37 +119,11 @@ const Controller = () => {
     ],
   });
 
-  const [completeRefund] = useMutation<
-    CompleteRefundBySellerType,
-    {
-      input: CompleteRefundBySellerInputType;
-    }
-  >(COMPLETE_REFUND_BY_SELLER, {
-    fetchPolicy: "no-cache",
-    notifyOnNetworkStatusChange: true,
-    refetchQueries: [
-      {
-        query: GET_REFUND_ORDERS_BY_SELLER,
-        variables: {
-          input: {
-            page,
-            skip,
-            query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
-          },
-        },
-      },
-      "GetOrdersBySeller",
-    ],
-  });
-
   const [showNotice, setShowNotice] = useState<boolean>(false);
   const [temporaryQuery, setTemporaryQuery] = useState<string>("");
 
   const totalOrderItems: Array<OrderItems> = useReactiveVar(totalOrderItemsVar);
+
   const checkedOrderItems: Array<ResetOrderItemType> = useReactiveVar(
     commonCheckedOrderItemsVar
   );
@@ -166,10 +133,9 @@ const Controller = () => {
   const {
     isRefundRequestChecked,
     refundRequestCount,
-    isRefundPickUpInProgressChecked,
-    refundPickUpInProgressCount,
-    isRefundPickUpCompletedChecked,
-    refundPickUpCompletedCount,
+    isPickupInProgressChecked,
+    pickupInProgressCount,
+    isPickupCompletedChecked,
     isRefundCompletedChecked,
   } = getIsCheckedStatus(reconstructCheckedOrderItems);
 
@@ -188,8 +154,8 @@ const Controller = () => {
     }
 
     if (
-      isRefundPickUpInProgressChecked ||
-      isRefundPickUpCompletedChecked ||
+      isPickupInProgressChecked ||
+      isPickupCompletedChecked ||
       isRefundCompletedChecked
     ) {
       showHasAnyProblemModal(
@@ -330,8 +296,8 @@ const Controller = () => {
     }
 
     if (
-      isRefundPickUpInProgressChecked ||
-      isRefundPickUpCompletedChecked ||
+      isPickupInProgressChecked ||
+      isPickupCompletedChecked ||
       isRefundCompletedChecked
     ) {
       showHasAnyProblemModal(
@@ -358,31 +324,6 @@ const Controller = () => {
   };
 
   const handleCompleteRefundButtonClick = () => {
-    const {
-      cause,
-      totalPrice,
-      shipmentPrice,
-      shipmentDistantPrice,
-      isConditionalFree,
-      mainReason,
-      detailedReason,
-    } = getRefundInformation(reconstructCheckedOrderItems, totalOrderItems);
-
-    modalVar({
-      isVisible: true,
-      component: (
-        <HandleCompleteRefundModal
-          cause={cause}
-          totalPrice={totalPrice}
-          shipmentPrice={shipmentPrice}
-          shipmentDistantPrice={shipmentDistantPrice}
-          mainReason={mainReason}
-          detailedReason={detailedReason}
-          isConditionalFree={isConditionalFree}
-        />
-      ),
-    });
-
     if (!checkedOrderItems.length) {
       showHasAnyProblemModal(
         <>
@@ -396,7 +337,7 @@ const Controller = () => {
 
     if (
       isRefundRequestChecked ||
-      isRefundPickUpInProgressChecked ||
+      isPickupInProgressChecked ||
       isRefundCompletedChecked
     ) {
       showHasAnyProblemModal(
@@ -450,6 +391,25 @@ const Controller = () => {
 
       return;
     }
+
+    const checkedOrderItemIds = reconstructCheckedOrderItems.map(
+      ({ id }) => id
+    );
+    const detailedReason = reconstructCheckedOrderItems.map(
+      ({ detailedReason }) => detailedReason
+    );
+    const cause = reconstructCheckedOrderItems.map(({ cause }) => cause);
+
+    modalVar({
+      isVisible: true,
+      component: (
+        <HandleCompleteRefundModal
+          orderItemIds={checkedOrderItemIds}
+          cause={cause[0]}
+          detailedReason={detailedReason[0]}
+        />
+      ),
+    });
   };
 
   const handleOrderStatusByForceClick = () => {
@@ -483,11 +443,24 @@ const Controller = () => {
   ) => {
     const claimStatus = e.target.value as OrderStatusName;
 
+    if (isRefundCompletedChecked) {
+      showHasAnyProblemModal(
+        <>
+          해당 버튼은 선택하신
+          <br />
+          주문건을 처리할 수 없습니다.
+          <br />
+          주문 상태를 다시 확인해주세요.
+        </>
+      );
+      return;
+    }
+
     if (
       (claimStatus === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS &&
-        isRefundPickUpInProgressChecked) ||
+        isPickupInProgressChecked) ||
       (claimStatus === OrderStatusName.REFUND_COMPLETED &&
-        isRefundPickUpCompletedChecked)
+        isPickupCompletedChecked)
     ) {
       showHasAnyProblemModal(
         <>
@@ -505,7 +478,7 @@ const Controller = () => {
 
     if (
       claimStatus === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS &&
-      isRefundPickUpCompletedChecked
+      isPickupCompletedChecked
     ) {
       showHasAnyProblemModal(
         <>
@@ -527,8 +500,7 @@ const Controller = () => {
       description: (
         <>
           {isRefundRequestChecked && `반품요청 ${refundRequestCount}건`}{" "}
-          {isRefundPickUpInProgressChecked &&
-            `수거중 ${refundPickUpInProgressCount}건`}
+          {isPickupInProgressChecked && `수거중 ${pickupInProgressCount}건`}
           을
           <br />
           {claimStatus === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS &&
@@ -634,6 +606,17 @@ const Controller = () => {
     paginationSkipVar(0);
   };
 
+  useEffect(() => {
+    const debounce = setTimeout(() => {
+      return commonFilterOptionVar({
+        ...commonFilterOptionVar(),
+        query: temporaryQuery,
+      });
+    }, 500);
+
+    return () => clearTimeout(debounce);
+  }, [temporaryQuery]);
+
   return (
     <ControllerContainer>
       <ActiveButtonContainer>
@@ -680,6 +663,7 @@ const Controller = () => {
             statusName === OrderStatusName.REFUND_COMPLETED
           }
           onChange={changeOrderStatusByForceHandler}
+          onClick={handleOrderStatusByForceClick}
         >
           {changeRefundOrderStatusByForceType.map(({ id, label, value }) => (
             <Option value={value} key={id}>
@@ -712,7 +696,6 @@ const Controller = () => {
           width={"119px"}
           value={type}
           onChange={changeSearchTypeHandler}
-          onClick={handleOrderStatusByForceClick}
         >
           {searchQueryType.map(({ id, label, value }) => (
             <Option value={value} key={id}>

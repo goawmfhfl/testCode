@@ -1,7 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { useMutation, useReactiveVar } from "@apollo/client";
 
-import { Cause } from "@constants/sale";
+import { Cause, causeType, ShipmentType } from "@constants/sale";
+import {
+  commonFilterOptionVar,
+  loadingSpinnerVisibilityVar,
+  modalVar,
+  systemModalVar,
+} from "@cache/index";
+import { commonSaleFilterOptionVar } from "@cache/sale";
+
+import {
+  EstimateRefundAmountInputType,
+  EstimateRefundAmountType,
+} from "@models/sale";
+
+import { COMPLETE_REFUND_BY_SELLER } from "@graphql/mutations/completeRefundBySeller";
+import { GET_REFUND_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+import { ESTIMATE_REFUND_AMOUNT } from "@graphql/mutations/estimateRefundAmout";
+
+import {
+  CompleteRefundBySellerInputType,
+  CompleteRefundBySellerType,
+} from "@models/sale/refund";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import exclamationGreySrc from "@icons/exclamation-grey.svg";
@@ -14,22 +36,292 @@ import Input from "@components/common/Input";
 import Button from "@components/common/Button";
 
 const HandleCompleteRefundModal = ({
+  orderItemIds,
   cause,
-  totalPrice,
-  shipmentPrice,
-  shipmentDistantPrice,
-  mainReason,
   detailedReason,
-  isConditionalFree,
 }: {
+  orderItemIds: Array<number>;
   cause: Cause;
-  totalPrice: number;
-  shipmentPrice: number;
-  shipmentDistantPrice: number;
-  mainReason: string;
   detailedReason: string;
-  isConditionalFree: boolean;
 }) => {
+  const sign = cause === Cause.CLIENT ? "-" : "+";
+  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
+  const { type, statusName, statusType, statusGroup } = useReactiveVar(
+    commonSaleFilterOptionVar
+  );
+
+  const [refundInformation, setRefundInformation] = useState<{
+    totalProductAmount: number;
+    initialShipmentAmount: number;
+    initialShipmentDistantAmount: number;
+    shipmentRefundAmount: number;
+  }>({
+    totalProductAmount: 0,
+    initialShipmentAmount: 0,
+    initialShipmentDistantAmount: 0,
+    shipmentRefundAmount: 0,
+  });
+
+  const {
+    totalProductAmount,
+    initialShipmentAmount,
+    initialShipmentDistantAmount,
+    shipmentRefundAmount,
+  } = refundInformation;
+
+  const [handleShipmentStringType, setHandleShipmentStringType] = useState<{
+    shipment: string;
+    shipmentDistant: string;
+    refund: string;
+  }>({
+    shipment: "",
+    shipmentDistant: "",
+    refund: "",
+  });
+
+  const [handleShipmentNumberType, setHandleShipmentNumberType] = useState<{
+    shipmentDistant: number;
+    refund: number;
+  }>({
+    shipmentDistant: 0,
+    refund: 0,
+  });
+
+  useState<number>(0);
+  const { refund, shipment, shipmentDistant } = handleShipmentStringType;
+  const { refund: totalRefund, shipmentDistant: totalShipmentDistant } =
+    handleShipmentNumberType;
+
+  const [totalRefundAmount, setTotalRefundAmount] = useState<number>(0);
+  const totalAmount =
+    cause === Cause.CLIENT
+      ? totalProductAmount -
+        initialShipmentAmount -
+        totalRefund -
+        totalShipmentDistant
+      : totalProductAmount +
+        initialShipmentAmount +
+        initialShipmentDistantAmount;
+
+  const [completeRefund] = useMutation<
+    CompleteRefundBySellerType,
+    {
+      input: CompleteRefundBySellerInputType;
+    }
+  >(COMPLETE_REFUND_BY_SELLER, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+    refetchQueries: [
+      {
+        query: GET_REFUND_ORDERS_BY_SELLER,
+        variables: {
+          input: {
+            page,
+            skip,
+            query,
+            type,
+            statusName,
+            statusType,
+            statusGroup,
+          },
+        },
+      },
+      "GetOrdersBySeller",
+    ],
+  });
+
+  const [estimateRefundAmount] = useMutation<
+    EstimateRefundAmountType,
+    {
+      input: EstimateRefundAmountInputType;
+    }
+  >(ESTIMATE_REFUND_AMOUNT, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
+  });
+
+  const handleCloseButtonClick = () => {
+    modalVar({
+      ...modalVar(),
+      isVisible: false,
+    });
+  };
+
+  const changeRefundShipmentAmountHandler =
+    (type: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value: string = e.target.value;
+
+      const deleteComma: string = value.replaceAll(",", "");
+      const deleteSignAndComma = Number(deleteComma.replaceAll(sign, ""));
+
+      if (isNaN(deleteSignAndComma)) {
+        return;
+      }
+
+      setHandleShipmentNumberType((prev) => ({
+        ...prev,
+        [type]: deleteSignAndComma,
+      }));
+
+      const addSignAndCommaRefundAmount = `${sign} ${deleteSignAndComma.toLocaleString()}`;
+      setHandleShipmentStringType((prev) => ({
+        ...prev,
+        [type]: addSignAndCommaRefundAmount,
+      }));
+    };
+
+  const handleSubmitButtonClick = () => {
+    void (async () => {
+      try {
+        loadingSpinnerVisibilityVar(true);
+
+        const components = orderItemIds.map((id) => ({
+          orderItemId: id,
+          cause,
+          totalAmount,
+          shipmentReturnAmount: totalRefund + totalShipmentDistant,
+        }));
+
+        const {
+          data: {
+            completeRefundBySeller: { ok, error },
+          },
+        } = await completeRefund({
+          variables: {
+            input: { components },
+          },
+          fetchPolicy: "no-cache",
+          notifyOnNetworkStatusChange: true,
+          errorPolicy: "all",
+        });
+
+        if (ok) {
+          loadingSpinnerVisibilityVar(false);
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: (
+              <>
+                반품 처리가 완료되었습니다.
+                <br />
+                (자동 환불되나 구매고객 결제수단에 따라
+                <br />
+                환불 소요일이 다를 수 있습니다.)
+              </>
+            ),
+            confirmButtonVisibility: true,
+            cancelButtonVisibility: false,
+            confirmButtonClickHandler: () => {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+            },
+          });
+        }
+
+        if (error) {
+          loadingSpinnerVisibilityVar(false);
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: true,
+            description: (
+              <>
+                PG사 또는 네트워크 오류로 인해
+                <br />
+                반품 완료처리가 되지 않았습니다.
+                <br />
+                반품 완료처리 버튼을 다시 눌러주세요.
+              </>
+            ),
+            confirmButtonVisibility: true,
+            cancelButtonVisibility: false,
+            confirmButtonClickHandler: () => {
+              systemModalVar({
+                ...systemModalVar(),
+                isVisible: false,
+              });
+            },
+          });
+        }
+      } catch (error) {
+        loadingSpinnerVisibilityVar(false);
+        console.log(error);
+      }
+    })();
+  };
+
+  useEffect(() => {
+    loadingSpinnerVisibilityVar(true);
+    try {
+      void (async () => {
+        const {
+          data: {
+            estimateRefundAmount: {
+              ok,
+              error,
+              totalProductAmount,
+              initialShipmentAmount,
+              initialShipmentDistantAmount,
+              shipmentRefundAmount,
+            },
+          },
+        } = await estimateRefundAmount({
+          variables: {
+            input: {
+              orderItemIds,
+              cause,
+            },
+          },
+          fetchPolicy: "no-cache",
+          notifyOnNetworkStatusChange: true,
+          errorPolicy: "all",
+        });
+
+        if (ok) {
+          loadingSpinnerVisibilityVar(false);
+          setRefundInformation({
+            totalProductAmount: totalProductAmount ?? 0,
+            initialShipmentAmount: initialShipmentAmount ?? 0,
+            initialShipmentDistantAmount: initialShipmentDistantAmount ?? 0,
+            shipmentRefundAmount: shipmentRefundAmount ?? 0,
+          });
+        }
+
+        if (error) {
+          loadingSpinnerVisibilityVar(false);
+          console.log(error);
+        }
+      })();
+    } catch (error) {
+      loadingSpinnerVisibilityVar(false);
+      console.log(error);
+    }
+  }, [orderItemIds, cause]);
+
+  useEffect(() => {
+    const shipment = initialShipmentAmount;
+    const shipmentDistant = initialShipmentDistantAmount;
+    const refund = shipmentRefundAmount;
+
+    const addSignAndCommaShipment = `${sign} ${shipment.toLocaleString()}`;
+    const addSignAndCommaShipmentDistant = `${sign} ${shipmentDistant.toLocaleString()}`;
+    const addSignAndCommaRefund = `${sign} ${refund.toLocaleString()}`;
+
+    setHandleShipmentStringType({
+      shipment: addSignAndCommaShipment,
+      shipmentDistant: addSignAndCommaShipmentDistant,
+      refund: addSignAndCommaRefund,
+    });
+
+    setHandleShipmentNumberType({
+      refund: shipmentRefundAmount,
+      shipmentDistant: initialShipmentDistantAmount,
+    });
+
+    setTotalRefundAmount(totalRefundAmount);
+  }, [refundInformation]);
+
   return (
     <Container>
       <Title>반품 완료처리하기</Title>
@@ -51,53 +343,95 @@ const HandleCompleteRefundModal = ({
       <RefundAmountContainer>
         <Label>환불 금액</Label>
         <CalculateRefundAmountContainer>
-          <WhoseCause>{cause}</WhoseCause>
+          <WhoseCause>{causeType[cause]} 귀책</WhoseCause>
 
-          <RefundContainer>
-            <RefundLabel>결제 금액(상품가+최초배송비)</RefundLabel>
-            <RefundPrice>{totalPrice}</RefundPrice>
-          </RefundContainer>
+          <RefundInformationContainer>
+            <RefundInformationLabel>상품금액</RefundInformationLabel>
+            <RefundInformationPrice>
+              {totalProductAmount.toLocaleString("ko-Kr")}
+            </RefundInformationPrice>
+          </RefundInformationContainer>
 
-          <RefundContainer>
-            <RefundLabel>-최초 배송비</RefundLabel>
-            <RefundPrice>{shipmentPrice}</RefundPrice>
-          </RefundContainer>
+          {initialShipmentAmount ? (
+            <RefundInformationContainer>
+              <RefundInformationLabel>최초 배송비</RefundInformationLabel>
+              <RefundInformationPrice>{shipment}</RefundInformationPrice>
+            </RefundInformationContainer>
+          ) : null}
 
-          <RefundShipmentContainer>
-            <RefundLabel>-반품 배송비(편도)</RefundLabel>
-            <RefundShipmentInput />
+          {initialShipmentDistantAmount && cause === Cause.SELLER ? (
+            <RefundInformationContainer>
+              <RefundInformationLabel>
+                최초 추가 배송비(제주도서산간)
+              </RefundInformationLabel>
+              <RefundInformationPrice>
+                {`${sign} ${initialShipmentDistantAmount.toLocaleString(
+                  "Ko-kr"
+                )}`}
+              </RefundInformationPrice>
+            </RefundInformationContainer>
+          ) : null}
 
-            <ExclamationIconContainer>
-              <ExclamationIcon src={exclamationGreySrc} />
-              <StyledNoticeContainer width="363px" className={"notice"}>
-                <NoticeIcon src={exclamationGreySrc} />
-                <NoticeText>
-                  • &nbsp;반품 배송비가 설정되어 있던 금액과 다를 경우 수정해
-                  <br />
-                  &nbsp;&nbsp;&nbsp;주세요.
-                  <br />• &nbsp;소비자 귀책 사유의 경우에 소비자가 반품 배송비를
-                  미리 <br />
-                  &nbsp;&nbsp;&nbsp;송금 혹은 택배에 동봉 했다면 반품 배송비를
-                  ‘0원'으로 입
-                  <br />
-                  &nbsp;&nbsp;&nbsp;력해주세요.
-                </NoticeText>
-              </StyledNoticeContainer>
-            </ExclamationIconContainer>
-          </RefundShipmentContainer>
+          {cause === Cause.CLIENT ? (
+            <RefundShipmentContainer>
+              <RefundInformationLabel>반품 배송비(편도)</RefundInformationLabel>
+              <RefundShipmentInput
+                type={"text"}
+                value={refund}
+                onChange={changeRefundShipmentAmountHandler("refund")}
+              />
+            </RefundShipmentContainer>
+          ) : null}
+
+          {cause === Cause.CLIENT ? (
+            <RefundShipmentContainer>
+              <RefundInformationLabel>
+                반품 추가 배송비(제주도서산간)
+              </RefundInformationLabel>
+              <RefundShipmentInput
+                type={"text"}
+                value={shipmentDistant}
+                onChange={changeRefundShipmentAmountHandler("shipmentDistant")}
+              />
+              <ExclamationIconContainer>
+                <ExclamationIcon src={exclamationGreySrc} />
+                <StyledNoticeContainer width="363px" className={"notice"}>
+                  <NoticeIcon src={exclamationGreySrc} />
+                  <NoticeText>
+                    • &nbsp;반품 배송비가 설정되어 있던 금액과 다를 경우 수정해
+                    <br />
+                    &nbsp;&nbsp;&nbsp;주세요.
+                    <br />• &nbsp;소비자 귀책 사유의 경우에 소비자가 반품
+                    배송비를 미리 <br />
+                    &nbsp;&nbsp;&nbsp;송금 혹은 택배에 동봉 했다면 반품 배송비를
+                    ‘0원'으로 입
+                    <br />
+                    &nbsp;&nbsp;&nbsp;력해주세요.
+                  </NoticeText>
+                </StyledNoticeContainer>
+              </ExclamationIconContainer>
+            </RefundShipmentContainer>
+          ) : null}
 
           <TotalPayAmountContainer>
             <TotalPaymentLabel>최종 환불 금액</TotalPaymentLabel>
-            <TotalPaymentAmount>45,000</TotalPaymentAmount>
+            <TotalPaymentAmount>
+              {totalAmount.toLocaleString()}
+            </TotalPaymentAmount>
           </TotalPayAmountContainer>
         </CalculateRefundAmountContainer>
       </RefundAmountContainer>
 
       <ButtonContainer>
-        <StyledButton size={"small"} width={"55px"} className={"positive"}>
+        <StyledButton
+          size={"small"}
+          width={"55px"}
+          className={"positive"}
+          onClick={handleSubmitButtonClick}
+        >
           확인
         </StyledButton>
-        <Button size={"small"} width={"55px"}>
+        <Button size={"small"} width={"55px"} onClick={handleCloseButtonClick}>
           취소
         </Button>
       </ButtonContainer>
@@ -186,14 +520,19 @@ const WhoseCause = styled.span`
   }) => emphasized}
 `;
 
-const RefundContainer = styled.div`
+const RefundInformationContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 8px;
 `;
 
-const RefundLabel = styled.span`
+const RefundInformationLabel = styled.span`
   width: 160px;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
 
   ${({
     theme: {
@@ -208,7 +547,7 @@ const RefundLabel = styled.span`
   }) => basic};
 `;
 
-const RefundPrice = styled.span`
+const RefundInformationPrice = styled.span`
   ${({
     theme: {
       typo: {

@@ -14,6 +14,7 @@ export interface UploadedFileInfos {
   filename?: string;
   url: string;
   type: UploadFileType;
+  size: string;
 }
 
 export enum ColorType {

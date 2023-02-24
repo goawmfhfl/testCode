@@ -16,6 +16,7 @@ import {
 
 import { showHasServerErrorModal } from "@cache/productManagement";
 import { MainReason, refusalCancelOrRefundOptionList } from "@constants/sale";
+import { DenyRefundOrExchangeRequestType } from "@constants/sale";
 import { ResetOrderItemType } from "@models/sale/index";
 
 import {
@@ -23,7 +24,10 @@ import {
   DenyRefundOrExchangeRequestBySellerInputType,
 } from "@models/sale/refund";
 
-import { GET_REFUND_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+import {
+  GET_EXCHANGE_ORDERS_BY_SELLER,
+  GET_REFUND_ORDERS_BY_SELLER,
+} from "@graphql/queries/getOrdersBySeller";
 import { DENY_REFUND_OR_EXCHANGE_REQUEST_BY_SELLER } from "@graphql/mutations/denyRefundOrExchangeRequestBySeller";
 
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
@@ -39,7 +43,6 @@ import {
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
-import { DenyRefundOrExchangeRequestType } from "@constants/sale";
 
 const HandleRefusalRefundOrExchangeRequestModal = ({
   status,
@@ -50,6 +53,8 @@ const HandleRefusalRefundOrExchangeRequestModal = ({
   const { type, statusName, statusType, statusGroup } = useReactiveVar(
     commonSaleFilterOptionVar
   );
+  const requestType =
+    status === DenyRefundOrExchangeRequestType.REFUND ? "반품" : "교환";
 
   const checkedOrderItems = useReactiveVar<Array<ResetOrderItemType>>(
     commonCheckedOrderItemsVar
@@ -67,6 +72,11 @@ const HandleRefusalRefundOrExchangeRequestModal = ({
 
   const { main, detail } = reason;
 
+  const refetchQuery =
+    status === DenyRefundOrExchangeRequestType.EXCHANGE
+      ? GET_REFUND_ORDERS_BY_SELLER
+      : GET_EXCHANGE_ORDERS_BY_SELLER;
+
   const [denyRefundReqeust] = useMutation<
     DenyRefundOrExchangeRequestBySellerType,
     {
@@ -77,7 +87,7 @@ const HandleRefusalRefundOrExchangeRequestModal = ({
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
-        query: GET_REFUND_ORDERS_BY_SELLER,
+        query: refetchQuery,
         variables: {
           input: {
             page,
@@ -118,86 +128,84 @@ const HandleRefusalRefundOrExchangeRequestModal = ({
   };
 
   const handleSubmitButtonClick = () => {
-    const { hasShippingOrderItem, hasShippingCompleted } =
-      reconstructCheckedOrderItems.reduce(
-        (result, { orderStatus }) => {
-          if (orderStatus === "배송중") result.hasShippingOrderItem = true;
-          if (orderStatus === "배송 완료") result.hasShippingCompleted = true;
-          return result;
-        },
-        {
-          hasShippingOrderItem: false,
-          hasShippingCompleted: false,
-        }
-      );
+    const {
+      hasShippingOrderItem,
+      hasShippingCompleted,
+      hasRefundPickupCompleted,
+    } = reconstructCheckedOrderItems.reduce(
+      (result, { orderStatus, claimStatus }) => {
+        if (orderStatus === "배송중") result.hasShippingOrderItem = true;
+        if (orderStatus === "배송 완료") result.hasShippingCompleted = true;
+        if (claimStatus === "수거완료") result.hasRefundPickupCompleted = true;
 
-    systemModalVar({
-      ...systemModalVar(),
-      isVisible: true,
-      confirmButtonVisibility: true,
-      cancelButtonVisibility: true,
-      description: (
-        <>
-          `$
-          {status === DenyRefundOrExchangeRequestType.REFUND &&
-            "반품 요청을 거절하시겠습니까?"}
-          {status === DenyRefundOrExchangeRequestType.EXCHANGE &&
-            "교환 요청을 거절하시겠습니까?"}
-          `
-        </>
-      ),
+        return result;
+      },
+      {
+        hasShippingOrderItem: false,
+        hasShippingCompleted: false,
+        hasRefundPickupCompleted: false,
+      }
+    );
 
-      confirmButtonClickHandler: () => {
-        const description =
-          DenyRefundOrExchangeRequestType.REFUND === status
-            ? "반품 거절"
-            : "교환 거절";
+    const isPickupCompletedExchangeRequest =
+      hasRefundPickupCompleted &&
+      DenyRefundOrExchangeRequestType.EXCHANGE === status;
 
-        try {
-          void (async () => {
-            loadingSpinnerVisibilityVar(true);
+    if (!isPickupCompletedExchangeRequest) {
+      systemModalVar({
+        ...systemModalVar(),
+        isVisible: true,
+        confirmButtonVisibility: true,
+        cancelButtonVisibility: true,
+        description: <>{requestType} 요청을 거절하시겠습니까?</>,
 
-            const components = reconstructCheckedOrderItems.map(({ id }) => ({
-              orderItemId: id,
-              mainReason: main,
-              detailedReason: detail,
-            }));
+        confirmButtonClickHandler: () => {
+          const description =
+            DenyRefundOrExchangeRequestType.REFUND === status
+              ? "반품 거절"
+              : "교환 거절";
 
-            const {
-              data: {
-                denyRefunrOrExchangeRequestBySeller: { ok, error },
-              },
-            } = await denyRefundReqeust({
-              variables: {
-                input: {
-                  components,
-                  type: status,
+          try {
+            void (async () => {
+              loadingSpinnerVisibilityVar(true);
+
+              const components = reconstructCheckedOrderItems.map(({ id }) => ({
+                orderItemId: id,
+                mainReason: main,
+                detailedReason: detail,
+              }));
+
+              const {
+                data: {
+                  denyRefunrOrExchangeRequestBySeller: { ok, error },
                 },
-              },
-            });
+              } = await denyRefundReqeust({
+                variables: {
+                  input: {
+                    components,
+                    type: status,
+                  },
+                },
+              });
 
-            if (ok) {
-              loadingSpinnerVisibilityVar(false);
-              systemModalVar({
-                ...systemModalVar(),
-                isVisible: true,
-                description: (
-                  <>
-                    {status === DenyRefundOrExchangeRequestType.REFUND &&
-                      hasShippingOrderItem &&
-                      !hasShippingCompleted && (
+              if (ok) {
+                loadingSpinnerVisibilityVar(false);
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: true,
+                  description: (
+                    <>
+                      {hasShippingOrderItem && !hasShippingCompleted && (
                         <>
-                          반품요청이 거절되었습니다.
+                          {requestType} 요청이 거절되었습니다.
                           <br />
                           (주문관리 - 배송중에서 확인 가능)
                         </>
                       )}
 
-                    {status === DenyRefundOrExchangeRequestType.REFUND &&
-                      !hasShippingOrderItem &&
-                      hasShippingCompleted && (
+                      {!hasShippingOrderItem && hasShippingCompleted && (
                         <>
-                          반품요청이 거절되었습니다.
+                          {requestType} 요청이 거절되었습니다.
                           <br />
                           (주문관리 - 배송완료에서
                           <br />
@@ -205,53 +213,52 @@ const HandleRefusalRefundOrExchangeRequestModal = ({
                         </>
                       )}
 
-                    {status === DenyRefundOrExchangeRequestType.REFUND &&
-                      hasShippingOrderItem &&
-                      hasShippingCompleted && (
+                      {hasShippingOrderItem && hasShippingCompleted && (
                         <>
-                          반품요청이 거절되었습니다.
+                          {requestType} 요청이 거절되었습니다.
                           <br />
                           (주문관리 - 배송중과 배송완료에서
                           <br />
                           확인 가능)
                         </>
                       )}
-                  </>
-                ),
-                confirmButtonVisibility: true,
-                cancelButtonVisibility: false,
-                confirmButtonClickHandler: () => {
-                  modalVar({
-                    ...modalVar(),
-                    isVisible: false,
-                  });
-                  systemModalVar({
-                    ...systemModalVar(),
-                    isVisible: false,
-                  });
-                  commonCheckedOrderItemsVar([]);
-                  checkAllBoxStatusVar(false);
-                },
-              });
-            }
+                    </>
+                  ),
+                  confirmButtonVisibility: true,
+                  cancelButtonVisibility: false,
+                  confirmButtonClickHandler: () => {
+                    modalVar({
+                      ...modalVar(),
+                      isVisible: false,
+                    });
+                    systemModalVar({
+                      ...systemModalVar(),
+                      isVisible: false,
+                    });
+                    commonCheckedOrderItemsVar([]);
+                    checkAllBoxStatusVar(false);
+                  },
+                });
+              }
 
-            if (error) {
-              loadingSpinnerVisibilityVar(false);
-              showHasServerErrorModal(error, description);
-            }
-          })();
-        } catch (error) {
-          loadingSpinnerVisibilityVar(false);
-          showHasServerErrorModal(error as string, description);
-        }
-      },
-      cancelButtonClickHandler: () => {
-        systemModalVar({
-          ...systemModalVar(),
-          isVisible: false,
-        });
-      },
-    });
+              if (error) {
+                loadingSpinnerVisibilityVar(false);
+                showHasServerErrorModal(error, description);
+              }
+            })();
+          } catch (error) {
+            loadingSpinnerVisibilityVar(false);
+            showHasServerErrorModal(error as string, description);
+          }
+        },
+        cancelButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
+      });
+    }
   };
 
   useEffect(() => {
@@ -266,9 +273,10 @@ const HandleRefusalRefundOrExchangeRequestModal = ({
   return (
     <Container>
       <CloseButton onClick={handleCloseButtonClick} src={closeIconSource} />
-      <Title>취소 거절하기</Title>
+      <Title>{requestType} 거절하기</Title>
       <NoticeContainer icon={exclamationmarkSrc} width={"392px"}>
-        취소 거절 처리 전 반드시 소비자와 합의 후 처리해주시길 바랍니다.
+        {requestType} 거절 처리 전 반드시 소비자와 합의 후 처리해주시길
+        바랍니다.
       </NoticeContainer>
       <ReasonContainer>
         <Label>대표사유</Label>

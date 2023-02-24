@@ -1,16 +1,17 @@
 import { NormalizedListType } from "@models/sale/order";
-import { DateType, getDateFormat } from "@utils/date";
 import { orderStatusNameType } from "@constants/sale";
+import { DateType, getDateFormat } from "@utils/date";
 
 import {
   getShipmentPrice,
   getShipmentDistantPrice,
+  getStatusReason,
   getShipmentInfos,
   getOption,
   getPaymentsInfo,
 } from "@utils/sale/index";
 
-const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
+const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
   const hasOrderItems =
     !!reconstructOrderItems && !!reconstructOrderItems.orders;
   if (!hasOrderItems) return;
@@ -37,6 +38,7 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       orderShipmentInfos,
       orderStatus,
       claimStatus,
+      statusReasons,
       colorIndex,
       rowIndex,
       isLastRow,
@@ -44,12 +46,35 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
     } = orderByid[id];
 
     const {
+      attachedImages,
+      requestAt,
+      mainReason,
+      detailedReason,
+      reasonStatus,
+      statusReasonId,
+      completedAt,
+      refusalAt,
+      refusalReason,
+      refusalDetailedReason,
+      refusalReasonStatus,
+      refusalStatusReasonId,
+      cause,
+    } = getStatusReason(statusReasons);
+
+    const {
       shipmentOrderId,
       shipmentCompany: shippingShipmentCompany,
       shipmentNumber: shippingShipmentNumber,
+      pickupOrderId,
+      pickupShipmentCompany,
+      pickupShipmentNumber,
+      pickupAgainOrderId,
+      pickupAgainShipmentCompany,
+      pickupAgainShipmentNumber,
     } = getShipmentInfos(orderShipmentInfos);
 
     const { optionName, optionPrice, optionQuantity } = getOption(options);
+
     const calculateShipmentPrice: number = getShipmentPrice(
       isBundleShipment,
       shipmentPrice,
@@ -86,15 +111,12 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       thumbnail: product?.thumbnail || "-",
       productName: product?.name || "-",
       userName: user?.name || "-",
-      orderStatus: orderStatus
+      orderStatus: orderStatus?.name
         ? (orderStatusNameType[orderStatus.name] as string)
         : "-",
-      claimStatus: claimStatus
-        ? (orderStatusNameType[claimStatus.name] as string)
+      claimStatus: claimStatus?.name
+        ? (orderStatusNameType[claimStatus?.name] as string)
         : "-",
-      shipmentOrderId,
-      shipmentCompany: shippingShipmentCompany,
-      shipmentNumber: shippingShipmentNumber,
       paidAt: orderByShop?.order?.paidAt
         ? `${
             getDateFormat(orderByShop?.order?.paidAt, DateType.PAYMENT)
@@ -103,16 +125,31 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
             getDateFormat(orderByShop?.order?.paidAt, DateType.PAYMENT).HH_MM_SS
           }`
         : "-",
-      recipientName: orderByShop?.order?.recipientName || "-",
-      recipientPhoneNumber: orderByShop?.order?.recipientPhoneNumber || "-",
-      recipientAddress: orderByShop?.order?.recipientAddress || "-",
-      postCode: orderByShop?.order?.postCode || "-",
-      shipmentMemo: orderByShop?.order?.shipmentMemo || "-",
-      userEmail: user?.email || "-",
-      userPhoneNumber: user?.phoneNumber || "-",
+
+      requestAt: requestAt || "-",
+      mainReason: mainReason || "-",
+      detailedReason: detailedReason || "-",
+      reasonStatus,
+      statusReasonId,
+      attachedImages:
+        !!attachedImages && !!attachedImages.length ? attachedImages : null,
+
+      completedAt: completedAt || "-",
+      shipmentOrderId,
+      shipmentCompany: shippingShipmentCompany,
+      shipmentNumber: shippingShipmentNumber,
+
+      pickupOrderId,
+      pickupShipmentCompany,
+      pickupShipmentNumber,
+
+      pickupAgainOrderId,
+      pickupAgainShipmentCompany,
+      pickupAgainShipmentNumber,
+
       option: optionName || "-",
       quantity: resetQuantity,
-      price: resetOriginalPrice
+      originalPrice: resetOriginalPrice
         ? `${resetOriginalPrice.toLocaleString("ko-KR")}`
         : "-",
       optionPrice: resetOptionPrice
@@ -132,10 +169,38 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
         ? `${totalPaymentAmount.toLocaleString("ko-KR")}`
         : "-",
 
-      isChecked: false,
+      recipientName: orderByShop?.order?.recipientName || "-",
+      recipientPhoneNumber: orderByShop?.order?.recipientPhoneNumber || "-",
+
+      // 교환 수거지 및 우편번호
+      recipientAddress: orderByShop?.order?.recipientAddress || "-",
+      postCode: orderByShop?.order?.postCode || "-",
+      // 재배송 수거지 및 우편번호
+
+      userEmail: user?.email || "-",
+      userPhoneNumber: user?.phoneNumber || "-",
+      refusalAt: refusalAt || "-",
+      refusalReason,
+      refusalDetailedReason: refusalDetailedReason || "-",
+      refusalReasonStatus,
+      refusalStatusReasonId,
+
       isShipmentInfoEdit: false,
       temporaryShipmentCompany: shippingShipmentCompany || "",
       temporaryShipmentNumber: shippingShipmentNumber || 0,
+
+      isPickupShipmentInfoEdit: false,
+      temporaryPickupShipmentCompany: pickupShipmentCompany || "",
+      temporaryPickupShipmentNumber: pickupShipmentNumber || 0,
+
+      isPickupAgainShipmentInfoEdit: false,
+      temporaryPickupAgainShipmentCompany: pickupAgainShipmentCompany || "",
+      temporaryPickupAgainShipmentNumber: pickupAgainShipmentNumber || 0,
+
+      isBundleShipment,
+      cause,
+
+      isChecked: false,
       colorIndex,
       rowIndex,
       isLastRow,
@@ -145,4 +210,4 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
   return result;
 };
 
-export default resetOrderItems;
+export default getResetOrderItems;

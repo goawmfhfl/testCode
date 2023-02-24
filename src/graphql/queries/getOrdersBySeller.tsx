@@ -100,6 +100,7 @@ export const GET_CANCEL_ORDERS_BY_SELLER = gql`
           bundleShipmentType
           bundleOrderItemTotalPrice
           shipmentConditionalPrice
+
           order {
             recipientName
             recipientPhoneNumber
@@ -150,6 +151,97 @@ export const GET_CANCEL_ORDERS_BY_SELLER = gql`
 `;
 
 export const GET_REFUND_ORDERS_BY_SELLER = gql`
+  query GetOrdersBySeller($input: GetOrdersBySellerInput!) {
+    getOrdersBySeller(input: $input) {
+      ok
+      error
+      totalPages
+      totalResults
+      totalOrderItems {
+        id
+        merchantUid
+        merchantItemUid
+        isBundleShipment
+
+        product {
+          code
+          thumbnail
+          name
+        }
+
+        user {
+          name
+          email
+          phoneNumber
+        }
+
+        orderByShop {
+          bundleShipmentPrice
+          bundleShipmentDistantPrice
+          bundleShipmentType
+          bundleOrderItemTotalPrice
+          shipmentConditionalPrice
+
+          order {
+            recipientName
+            recipientPhoneNumber
+            recipientAddress
+            postCode
+            paidAt
+          }
+        }
+
+        statusReasons {
+          id
+          createdAt
+          amount
+          mainReason
+          detailedReason
+          cause
+          status
+          uploadedFileUrls {
+            url
+          }
+        }
+
+        options {
+          id
+          components {
+            name
+            value
+          }
+          price
+          quantity
+          isRequired
+        }
+
+        quantity
+        discountAppliedPrice
+        originalPrice
+        shipmentPrice
+        shipmentDistantPrice
+        shipmentType
+
+        orderShipmentInfos {
+          id
+          shipmentNumber
+          shipmentCompany
+          status
+        }
+
+        orderStatus {
+          name
+        }
+
+        claimStatus {
+          name
+        }
+      }
+    }
+  }
+`;
+
+export const GET_EXCHANGE_ORDERS_BY_SELLER = gql`
   query GetOrdersBySeller($input: GetOrdersBySellerInput!) {
     getOrdersBySeller(input: $input) {
       ok

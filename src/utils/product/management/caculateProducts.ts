@@ -17,6 +17,8 @@ const caculateProducts = (recontructProducts: NormalizedType) => {
       originalPrice,
       discountAmount,
       discountMethod,
+      startDiscountDate,
+      endDiscountDate,
       status,
       thumbnail,
       quantity,
@@ -40,19 +42,23 @@ const caculateProducts = (recontructProducts: NormalizedType) => {
       ? `${originalPrice.toLocaleString("ko-KR")} ₩`
       : "-";
 
+    const isDiscountNow =
+      new Date(startDiscountDate).getTime() <= new Date().getTime() &&
+      new Date().getTime() <= new Date(endDiscountDate).getTime();
+
     const discountedRate =
-      discountMethod && discountAmount
+      discountMethod && discountAmount && isDiscountNow
         ? `${discountAmount.toLocaleString("ko-KR")} ${
             discountMethod === "PERCENT" ? "%" : "₩"
           }`
         : "-";
 
     const discountAppliedPrice =
-      discountAmount && discountMethod
+      discountAmount && discountMethod && isDiscountNow
         ? Number(
             getDiscountedPrice(originalPrice, discountAmount, discountMethod)
           ).toLocaleString("ko-KR") + " ₩"
-        : "";
+        : 0;
 
     const resetQuantity = getQuantity(quantity, options);
 

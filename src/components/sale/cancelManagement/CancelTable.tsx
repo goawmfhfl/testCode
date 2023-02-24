@@ -33,6 +33,7 @@ import { OrderItems } from "@models/sale";
 
 import useLazyCancelOrders from "@hooks/order/useLazyCancelOrders";
 import constructOrderItem from "@utils/sale/constructOrderItem";
+import getResetOrderItems from "@utils/sale/cancel/getResetOrderItems";
 
 import {
   FixedTable,
@@ -48,7 +49,6 @@ import Checkbox from "@components/common/input/Checkbox";
 import Loading from "@components/common/table/Loading";
 import NoDataContainer from "@components/common/table/NoDataContainer";
 import Button from "@components/common/Button";
-import getResetOrderItems from "@utils/sale/cancel/getResetOrderItems";
 import EditReasonModal from "@components/sale/cancelManagement/EditReasonModal";
 
 const CancelTable = () => {

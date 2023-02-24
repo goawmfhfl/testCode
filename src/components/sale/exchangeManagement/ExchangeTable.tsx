@@ -1,38 +1,9 @@
-import { useEffect, useState } from "react";
-import styled, { css } from "styled-components";
-import axios, { AxiosError } from "axios";
+import React, { useEffect, useState } from "react";
 import { useMutation, useReactiveVar } from "@apollo/client";
+import axios, { AxiosError } from "axios";
 import { cloneDeep } from "lodash";
 
-import {
-  fixTableType,
-  scrollTableType,
-} from "@constants/sale/refundManagement/table";
-import { tableWidth } from "@constants/sale/refundManagement/table";
-import {
-  commonFilterOptionVar,
-  pageNumberListVar,
-  totalPageLengthVar,
-  checkAllBoxStatusVar,
-  paginationVisibilityVar,
-  systemModalVar,
-  modalVar,
-  loadingSpinnerVisibilityVar,
-} from "@cache/index";
-import { refundOrderItemsVar } from "@cache/sale/refund";
-
-import { TableType } from "@models/index";
-import { NormalizedType, OrderItems, ResetOrderItemType } from "@models/sale";
-
-import useLazyRefundOrders from "@hooks/order/useLazyRefundOrders";
-
-import {
-  commonCheckedOrderItemsVar,
-  commonSaleFilterOptionVar,
-  totalOrderItemsVar,
-} from "@cache/sale";
-import constructOrderItem from "@utils/sale/constructOrderItem";
-import getResetOrderItems from "@utils/sale/refund/getResetOrderItems";
+import styled, { css } from "styled-components";
 import {
   OrderStatusGroup,
   OrderStatusName,
@@ -41,47 +12,147 @@ import {
   shipmentCompanyCode,
   ShipmentStatus,
 } from "@constants/sale";
+import {
+  checkAllBoxStatusVar,
+  commonFilterOptionVar,
+  loadingSpinnerVisibilityVar,
+  modalVar,
+  pageNumberListVar,
+  showHasAnyProblemModal,
+  systemModalVar,
+  totalPageLengthVar,
+} from "@cache/index";
+import {
+  commonCheckedOrderItemsVar,
+  commonSaleFilterOptionVar,
+} from "@cache/sale";
 import { showHasServerErrorModal } from "@cache/productManagement";
+
+import { exchangeOrderItemsVar } from "@cache/sale/exchange";
+import {
+  fixTableType,
+  scrollTableType,
+  tableWidth,
+} from "@constants/sale/exchangeManagement/table";
+
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
-import { GET_REFUND_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+import { GET_EXCHANGE_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import { EDIT_SHIPMENT_NUMBER } from "@graphql/mutations/editShipmentNumber";
+
 import {
   EditShipmentNumberInputType,
   EditShipmentNumberType,
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
+import { NormalizedType, ResetOrderItemType } from "@models/sale";
+import { TableType } from "@models/index";
+import useLazyExchangeOrders from "@hooks/order/useLazyExchangeOrders";
+import constructOrderItem from "@utils/sale/constructOrderItem";
+import getResetOrderItems from "@utils/sale/exchange/getResetOrderItems";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 
 import {
   FixedTable,
+  ScrollTable,
   TableContainer,
   TdContainer,
+  Td,
   Th,
   ThContainer,
   Tr,
-  Td,
-  ScrollTable,
 } from "@components/common/table/Table";
 import Checkbox from "@components/common/input/Checkbox";
 import Loading from "@components/common/table/Loading";
-import NoDataContainer from "@components/common/table/NoDataContainer";
 import {
   SelectInput,
   OptionInput as Option,
 } from "@components/common/input/Dropdown";
+import NoDataContainer from "@components/common/table/NoDataContainer";
 import Button from "@components/common/Button";
+import EditReasonModal from "@components/sale/exchangeManagement/EditReasonModal";
 import { Input } from "@components/common/input/TextInput";
-import EditReasonModal from "@components/sale/refundManagement/EditReasonModal";
 
-const RefundTable = () => {
-  const { getOrders, error, loading, data } = useLazyRefundOrders();
+const ExchangeTable = () => {
+  const { getOrders, loading, error } = useLazyExchangeOrders();
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { type, statusName, statusType, statusGroup } = useReactiveVar(
     commonSaleFilterOptionVar
   );
+
+  const exchangeOrderItems: Array<ResetOrderItemType> = useReactiveVar(
+    exchangeOrderItemsVar
+  );
+
+  const checkedOrderItems: Array<ResetOrderItemType> = useReactiveVar(
+    commonCheckedOrderItemsVar
+  );
+  const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
+
+  const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newOrderItems = cloneDeep(exchangeOrderItems);
+    checkAllBoxStatusVar(e.target.checked);
+
+    if (e.target.checked) {
+      const checkAllOrderItem = newOrderItems.map((orderItem) => ({
+        ...orderItem,
+        isChecked: true,
+      }));
+      exchangeOrderItemsVar(checkAllOrderItem);
+      commonCheckedOrderItemsVar(checkAllOrderItem);
+    }
+
+    if (!e.target.checked) {
+      const checkAllOrderItem = newOrderItems.map((orderItem) => ({
+        ...orderItem,
+        isChecked: false,
+      }));
+
+      exchangeOrderItemsVar(checkAllOrderItem);
+      commonCheckedOrderItemsVar([]);
+    }
+  };
+
+  const changeSingleCheckBoxHandler =
+    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newOrderItems = cloneDeep(exchangeOrderItems);
+      const targetOrderItemId = newOrderItems[index].id;
+
+      if (e.target.checked) {
+        const targetOrderItems = newOrderItems.filter(
+          ({ id }) => id === targetOrderItemId
+        );
+        const checkTargetOrderItems = targetOrderItems.map((orderItem) => ({
+          ...orderItem,
+          isChecked: true,
+        }));
+
+        commonCheckedOrderItemsVar([
+          ...checkedOrderItems,
+          ...checkTargetOrderItems,
+        ]);
+        newOrderItems[index].isChecked = true;
+      }
+
+      if (!e.target.checked) {
+        const filteredOrderItems = checkedOrderItems.filter(
+          (orderItem) => orderItem.id !== targetOrderItemId
+        );
+        commonCheckedOrderItemsVar(filteredOrderItems);
+        newOrderItems[index].isChecked = false;
+      }
+      exchangeOrderItemsVar(newOrderItems);
+    };
+
+  const [shipmentCompanys, setShipmentCompanys] = useState<
+    Array<{
+      Code: string;
+      International: boolean;
+      Name: string;
+    }>
+  >([]);
 
   const [sendOrderItems] = useMutation<
     SendOrderItemsType,
@@ -93,7 +164,7 @@ const RefundTable = () => {
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
-        query: GET_REFUND_ORDERS_BY_SELLER,
+        query: GET_EXCHANGE_ORDERS_BY_SELLER,
         variables: {
           input: {
             page,
@@ -120,7 +191,7 @@ const RefundTable = () => {
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
-        query: GET_REFUND_ORDERS_BY_SELLER,
+        query: GET_EXCHANGE_ORDERS_BY_SELLER,
         variables: {
           input: {
             page,
@@ -136,264 +207,6 @@ const RefundTable = () => {
       "GetOrdersBySeller",
     ],
   });
-
-  const refundOrderItems = useReactiveVar(refundOrderItemsVar);
-  const checkedOrderItems = useReactiveVar(commonCheckedOrderItemsVar);
-  const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
-
-  const [shipmentCompanys, setShipmentCompanys] = useState<
-    Array<{
-      Code: string;
-      International: boolean;
-      Name: string;
-    }>
-  >([]);
-
-  const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newOrderItems = cloneDeep(refundOrderItems);
-    checkAllBoxStatusVar(e.target.checked);
-
-    if (e.target.checked) {
-      const checkAllOrderItem = newOrderItems.map((orderItem) => ({
-        ...orderItem,
-        isChecked: true,
-      }));
-      refundOrderItemsVar(checkAllOrderItem);
-      commonCheckedOrderItemsVar(checkAllOrderItem);
-    }
-
-    if (!e.target.checked) {
-      const checkAllOrderItem = newOrderItems.map((orderItem) => ({
-        ...orderItem,
-        isChecked: false,
-      }));
-
-      refundOrderItemsVar(checkAllOrderItem);
-      commonCheckedOrderItemsVar([]);
-    }
-  };
-
-  const changeSingleCheckBoxHandler =
-    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newOrderItems = cloneDeep(refundOrderItems);
-      const targetOrderItemId = newOrderItems[index].id;
-
-      if (e.target.checked) {
-        const targetOrderItems = newOrderItems.filter(
-          ({ id }) => id === targetOrderItemId
-        );
-        const checkTargetOrderItems = targetOrderItems.map((orderItem) => ({
-          ...orderItem,
-          isChecked: true,
-        }));
-
-        commonCheckedOrderItemsVar([
-          ...checkedOrderItems,
-          ...checkTargetOrderItems,
-        ]);
-        newOrderItems[index].isChecked = true;
-      }
-
-      if (!e.target.checked) {
-        const filteredOrderItems = checkedOrderItems.filter(
-          (orderItem) => orderItem.id !== targetOrderItemId
-        );
-        commonCheckedOrderItemsVar(filteredOrderItems);
-        newOrderItems[index].isChecked = false;
-      }
-      refundOrderItemsVar(newOrderItems);
-    };
-
-  const changeShipmentNumberHandler =
-    (index: number, shipmentStatus: ShipmentStatus) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newOrderItems = cloneDeep(refundOrderItems);
-      const newCheckedOrderItems = cloneDeep(checkedOrderItems);
-
-      if (shipmentStatus === ShipmentStatus.SHIPPING) {
-        newOrderItems[index].temporaryShipmentNumber = Number(e.target.value);
-      }
-      if (shipmentStatus === ShipmentStatus.REFUND_PICK_UP) {
-        newOrderItems[index].temporaryRefundShipmentNumber = Number(
-          e.target.value
-        );
-      }
-
-      refundOrderItemsVar(newOrderItems);
-
-      if (newCheckedOrderItems.length > 0) {
-        const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
-          (list) => list.id === newOrderItems[index].id
-        );
-
-        if (findCheckedOrderItemsIndex !== -1) {
-          newCheckedOrderItems[
-            findCheckedOrderItemsIndex
-          ].temporaryShipmentNumber = Number(e.target.value);
-
-          if (shipmentStatus === ShipmentStatus.SHIPPING) {
-            newCheckedOrderItems[
-              findCheckedOrderItemsIndex
-            ].temporaryShipmentNumber = Number(e.target.value);
-          }
-          if (shipmentStatus === ShipmentStatus.REFUND_PICK_UP) {
-            newCheckedOrderItems[
-              findCheckedOrderItemsIndex
-            ].temporaryRefundShipmentNumber = Number(e.target.value);
-          }
-        }
-
-        commonCheckedOrderItemsVar(newCheckedOrderItems);
-      }
-    };
-
-  const changeShipmentCompanyHandler =
-    (index: number, shipmentStatus: ShipmentStatus) =>
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const newOrderItems = cloneDeep(refundOrderItems);
-      const newCheckedOrderItems = cloneDeep(checkedOrderItems);
-
-      if (shipmentStatus === ShipmentStatus.SHIPPING) {
-        newOrderItems[index].temporaryShipmentCompany = e.target.value;
-      }
-      if (shipmentStatus === ShipmentStatus.REFUND_PICK_UP) {
-        newOrderItems[index].temporaryRefundShipmentCompany = e.target.value;
-      }
-
-      refundOrderItemsVar(newOrderItems);
-
-      if (newCheckedOrderItems.length > 0) {
-        const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
-          (list) => list.id === newOrderItems[index].id
-        );
-
-        if (findCheckedOrderItemsIndex !== -1) {
-          if (shipmentStatus === ShipmentStatus.SHIPPING) {
-            newCheckedOrderItems[
-              findCheckedOrderItemsIndex
-            ].temporaryShipmentCompany = e.target.value;
-          }
-          if (shipmentStatus === ShipmentStatus.REFUND_PICK_UP) {
-            newCheckedOrderItems[
-              findCheckedOrderItemsIndex
-            ].temporaryRefundShipmentCompany = e.target.value;
-          }
-        }
-
-        commonCheckedOrderItemsVar(newCheckedOrderItems);
-      }
-    };
-
-  const handleEditButtonClick =
-    (id: number, shipmentStatus: ShipmentStatus) => () => {
-      const newOrderItems = cloneDeep(refundOrderItems);
-
-      const findOrderItmeIndex = newOrderItems.findIndex(
-        (orderItem) => orderItem.id === id
-      );
-      if (shipmentStatus === ShipmentStatus.SHIPPING) {
-        newOrderItems[findOrderItmeIndex].isShipmentInfoEdit = true;
-      }
-      if (shipmentStatus === ShipmentStatus.REFUND_PICK_UP) {
-        newOrderItems[findOrderItmeIndex].isRefundShipmentInfoEdit = true;
-      }
-
-      refundOrderItemsVar(newOrderItems);
-    };
-
-  const handleSendButtonClick =
-    (id: number, shipmentCompany: string, shipmentNumber: number) => () => {
-      if (!shipmentCompany || !shipmentNumber) {
-        systemModalVar({
-          ...systemModalVar(),
-          isVisible: true,
-          icon: exclamationmarkSrc,
-          description: <>송장정보를 기입해주세요</>,
-          cancelButtonVisibility: false,
-          confirmButtonVisibility: true,
-          confirmButtonClickHandler: () => {
-            systemModalVar({
-              ...systemModalVar(),
-              isVisible: false,
-              icon: "",
-            });
-          },
-        });
-
-        return;
-      }
-
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        description: (
-          <>
-            해당 반품건을 <br />
-            수거 처리 하시겠습니까?
-          </>
-        ),
-        cancelButtonVisibility: true,
-        confirmButtonVisibility: true,
-        confirmButtonClickHandler: () => {
-          try {
-            void (async () => {
-              loadingSpinnerVisibilityVar(true);
-              const {
-                data: {
-                  sendOrderItems: { ok, error },
-                },
-              } = await sendOrderItems({
-                variables: {
-                  input: {
-                    components: [
-                      {
-                        orderItemId: id,
-                        shipmentCompany,
-                        shipmentNumber,
-                      },
-                    ],
-                    type: SendType.REFUND_PICK_UP,
-                  },
-                },
-              });
-
-              if (ok) {
-                loadingSpinnerVisibilityVar(false);
-                systemModalVar({
-                  ...systemModalVar(),
-                  isVisible: true,
-                  description: <>수거 처리되었습니다.</>,
-                  confirmButtonVisibility: true,
-                  cancelButtonVisibility: false,
-                  confirmButtonClickHandler: () => {
-                    systemModalVar({
-                      ...systemModalVar(),
-                      isVisible: false,
-                    });
-
-                    commonCheckedOrderItemsVar([]);
-                    checkAllBoxStatusVar(false);
-                  },
-                });
-              }
-              if (error) {
-                loadingSpinnerVisibilityVar(false);
-                showHasServerErrorModal(error, "수거 처리");
-              }
-            })();
-          } catch (error) {
-            loadingSpinnerVisibilityVar(false);
-            showHasServerErrorModal(error as string, "수거 처리");
-          }
-        },
-        cancelButtonClickHandler: () => {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: false,
-          });
-        },
-      });
-    };
 
   const handleEditReasonModalClick =
     (
@@ -414,6 +227,108 @@ const RefundTable = () => {
           />
         ),
       });
+    };
+
+  const changeShipmentCompanyHandler =
+    (index: number, shipmentStatus: ShipmentStatus) =>
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const newOrderItems = cloneDeep(exchangeOrderItems);
+      const newCheckedOrderItems = cloneDeep(checkedOrderItems);
+
+      if (shipmentStatus === ShipmentStatus.SHIPPING) {
+        newOrderItems[index].temporaryShipmentCompany = e.target.value;
+      }
+      if (shipmentStatus === ShipmentStatus.EXCHANGE_PICK_UP) {
+        newOrderItems[index].temporaryPickupShipmentCompany = e.target.value;
+      }
+
+      if (shipmentStatus === ShipmentStatus.EXCHANGE_PICK_UP_AGAIN) {
+        newOrderItems[index].temporaryPickupAgainShipmentCompany =
+          e.target.value;
+      }
+
+      exchangeOrderItemsVar(newOrderItems);
+
+      if (newCheckedOrderItems.length > 0) {
+        const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
+          (list) => list.id === newOrderItems[index].id
+        );
+
+        if (findCheckedOrderItemsIndex !== -1) {
+          if (shipmentStatus === ShipmentStatus.SHIPPING) {
+            newCheckedOrderItems[
+              findCheckedOrderItemsIndex
+            ].temporaryShipmentCompany = e.target.value;
+          }
+          if (shipmentStatus === ShipmentStatus.EXCHANGE_PICK_UP) {
+            newCheckedOrderItems[
+              findCheckedOrderItemsIndex
+            ].temporaryPickupShipmentCompany = e.target.value;
+          }
+          if (shipmentStatus === ShipmentStatus.EXCHANGE_PICK_UP_AGAIN) {
+            newCheckedOrderItems[
+              findCheckedOrderItemsIndex
+            ].temporaryPickupAgainShipmentCompany = e.target.value;
+          }
+        }
+
+        commonCheckedOrderItemsVar(newCheckedOrderItems);
+      }
+    };
+
+  const changeShipmentNumberHandler =
+    (index: number, shipmentStatus: ShipmentStatus) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newOrderItems = cloneDeep(exchangeOrderItems);
+      const newCheckedOrderItems = cloneDeep(checkedOrderItems);
+
+      if (shipmentStatus === ShipmentStatus.SHIPPING) {
+        newOrderItems[index].temporaryShipmentNumber = Number(e.target.value);
+      }
+      if (shipmentStatus === ShipmentStatus.EXCHANGE_PICK_UP) {
+        newOrderItems[index].temporaryPickupShipmentNumber = Number(
+          e.target.value
+        );
+      }
+      if (shipmentStatus === ShipmentStatus.EXCHANGE_PICK_UP_AGAIN) {
+        newOrderItems[index].temporaryPickupAgainShipmentNumber = Number(
+          e.target.value
+        );
+      }
+
+      exchangeOrderItemsVar(newOrderItems);
+
+      if (newCheckedOrderItems.length > 0) {
+        const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
+          (list) => list.id === newOrderItems[index].id
+        );
+
+        if (findCheckedOrderItemsIndex !== -1) {
+          newCheckedOrderItems[
+            findCheckedOrderItemsIndex
+          ].temporaryShipmentNumber = Number(e.target.value);
+
+          if (shipmentStatus === ShipmentStatus.SHIPPING) {
+            newCheckedOrderItems[
+              findCheckedOrderItemsIndex
+            ].temporaryShipmentNumber = Number(e.target.value);
+          }
+
+          if (shipmentStatus === ShipmentStatus.EXCHANGE_PICK_UP) {
+            newCheckedOrderItems[
+              findCheckedOrderItemsIndex
+            ].temporaryPickupShipmentNumber = Number(e.target.value);
+          }
+
+          if (shipmentStatus === ShipmentStatus.EXCHANGE_PICK_UP_AGAIN) {
+            newCheckedOrderItems[
+              findCheckedOrderItemsIndex
+            ].temporaryPickupAgainShipmentNumber = Number(e.target.value);
+          }
+        }
+
+        commonCheckedOrderItemsVar(newCheckedOrderItems);
+      }
     };
 
   const handleSaveButtonClick =
@@ -473,7 +388,7 @@ const RefundTable = () => {
 
               if (ok) {
                 loadingSpinnerVisibilityVar(false);
-                const newOrderItems = cloneDeep(refundOrderItems);
+                const newOrderItems = cloneDeep(exchangeOrderItems);
 
                 const findOrderItmeIndex = newOrderItems.findIndex(
                   ({ id }) => id === orderItemId
@@ -491,7 +406,7 @@ const RefundTable = () => {
                     shipmentNumber;
                 });
 
-                refundOrderItemsVar(newOrderItems);
+                exchangeOrderItemsVar(newOrderItems);
 
                 systemModalVar({
                   ...systemModalVar(),
@@ -529,81 +444,218 @@ const RefundTable = () => {
       });
     };
 
-  useEffect(() => {
-    void (async () => {
-      await getOrders({
-        variables: {
-          input: {
-            page,
-            skip,
-            query,
-            type,
-            statusName,
-            statusType: OrderStatusType.CLAIM,
-            statusGroup: OrderStatusGroup.REFUND,
+  const handleEditButtonClick =
+    (id: number, shipmentStatus: ShipmentStatus) => () => {
+      const newOrderItems = cloneDeep(exchangeOrderItems);
+
+      const findOrderItmeIndex = newOrderItems.findIndex(
+        (orderItem) => orderItem.id === id
+      );
+
+      if (shipmentStatus === ShipmentStatus.SHIPPING) {
+        newOrderItems[findOrderItmeIndex].isShipmentInfoEdit = true;
+      }
+
+      if (shipmentStatus === ShipmentStatus.EXCHANGE_PICK_UP) {
+        newOrderItems[findOrderItmeIndex].isPickupShipmentInfoEdit = true;
+      }
+
+      if (shipmentStatus === ShipmentStatus.EXCHANGE_PICK_UP_AGAIN) {
+        newOrderItems[findOrderItmeIndex].isPickupAgainShipmentInfoEdit = true;
+      }
+
+      exchangeOrderItemsVar(newOrderItems);
+    };
+
+  const handleSendButtonClick =
+    (
+      id: number,
+      shipmentCompany: string,
+      shipmentNumber: number,
+      sendType: ShipmentStatus
+    ) =>
+    () => {
+      if (!shipmentCompany || !shipmentNumber) {
+        systemModalVar({
+          ...systemModalVar(),
+          isVisible: true,
+          icon: exclamationmarkSrc,
+          description: <>송장정보를 기입해주세요</>,
+          cancelButtonVisibility: false,
+          confirmButtonVisibility: true,
+          confirmButtonClickHandler: () => {
+            systemModalVar({
+              ...systemModalVar(),
+              isVisible: false,
+              icon: "",
+            });
           },
-        },
-        fetchPolicy: "no-cache",
-      });
-    })();
-  }, [page, skip, query, type, statusName, statusType, statusGroup]);
+        });
 
-  useEffect(() => {
-    if (!data || !data.getOrdersBySeller) return;
+        return;
+      }
 
-    const {
-      totalPages,
-      totalResults,
-      totalOrderItems,
-    }: {
-      totalPages: number;
-      totalResults: number;
-      totalOrderItems: Array<OrderItems>;
-    } = data.getOrdersBySeller;
-
-    const isLastPageChanged = totalPages < page;
-
-    if (isLastPageChanged && totalPages !== 0) {
-      commonFilterOptionVar({
-        ...commonFilterOptionVar(),
-        page: totalPages,
-      });
-
-      return;
-    }
-
-    pageNumberListVar(
-      Array(totalPages)
-        .fill(null)
-        .map((_, index) => index + 1)
-    );
-
-    totalPageLengthVar(totalResults);
-
-    const reconstructOrderItems: NormalizedType =
-      constructOrderItem(totalOrderItems);
-
-    const resetOrderItems: Array<ResetOrderItemType> = getResetOrderItems(
-      reconstructOrderItems
-    );
-
-    totalOrderItemsVar(totalOrderItems);
-    refundOrderItemsVar(resetOrderItems);
-
-    commonCheckedOrderItemsVar([]);
-    checkAllBoxStatusVar(false);
-  }, [data]);
-
-  useEffect(() => {
-    paginationVisibilityVar(loading || error);
-  }, [loading]);
-
-  useEffect(() => {
-    if (error) {
       systemModalVar({
         ...systemModalVar(),
         isVisible: true,
         description: (
+          <>
+            해당 반품건을 <br />
+            수거 처리 하시겠습니까?
+          </>
+        ),
+        cancelButtonVisibility: true,
+        confirmButtonVisibility: true,
+        confirmButtonClickHandler: () => {
+          try {
+            void (async () => {
+              loadingSpinnerVisibilityVar(true);
+              const {
+                data: {
+                  sendOrderItems: { ok, error },
+                },
+              } = await sendOrderItems({
+                variables: {
+                  input: {
+                    components: [
+                      {
+                        orderItemId: id,
+                        shipmentCompany,
+                        shipmentNumber,
+                      },
+                    ],
+                    type:
+                      ShipmentStatus.EXCHANGE_PICK_UP === sendType
+                        ? SendType.EXCHANGE_PICK_UP
+                        : SendType.EXCHANGE_RESEND,
+                  },
+                },
+              });
+
+              if (ok) {
+                loadingSpinnerVisibilityVar(false);
+                systemModalVar({
+                  ...systemModalVar(),
+                  isVisible: true,
+                  description: <>수거 처리되었습니다.</>,
+                  confirmButtonVisibility: true,
+                  cancelButtonVisibility: false,
+                  confirmButtonClickHandler: () => {
+                    systemModalVar({
+                      ...systemModalVar(),
+                      isVisible: false,
+                    });
+
+                    commonCheckedOrderItemsVar([]);
+                    checkAllBoxStatusVar(false);
+                  },
+                });
+              }
+              if (error) {
+                loadingSpinnerVisibilityVar(false);
+                showHasServerErrorModal(error, "수거 처리");
+              }
+            })();
+          } catch (error) {
+            loadingSpinnerVisibilityVar(false);
+            showHasServerErrorModal(error as string, "수거 처리");
+          }
+        },
+        cancelButtonClickHandler: () => {
+          systemModalVar({
+            ...systemModalVar(),
+            isVisible: false,
+          });
+        },
+      });
+    };
+
+  useEffect(() => {
+    void (async () => {
+      loadingSpinnerVisibilityVar(true);
+      try {
+        const {
+          data: {
+            getOrdersBySeller: {
+              ok,
+              error,
+              totalPages,
+              totalResults,
+              totalOrderItems,
+            },
+          },
+        } = await getOrders({
+          variables: {
+            input: {
+              page,
+              skip,
+              query,
+              type,
+              statusName,
+              statusType: OrderStatusType.CLAIM,
+              statusGroup: OrderStatusGroup.EXCHANGE,
+            },
+          },
+          fetchPolicy: "no-cache",
+        });
+
+        if (ok) {
+          loadingSpinnerVisibilityVar(false);
+          const isLastPageChanged = totalPages < page;
+
+          if (isLastPageChanged && totalPages !== 0) {
+            commonFilterOptionVar({
+              ...commonFilterOptionVar(),
+              page: totalPages,
+            });
+
+            return;
+          }
+
+          pageNumberListVar(
+            Array(totalPages)
+              .fill(null)
+              .map((_, index) => index + 1)
+          );
+
+          totalPageLengthVar(totalResults);
+
+          const reconstructOrderItems: NormalizedType =
+            constructOrderItem(totalOrderItems);
+
+          const resetOrderItems: Array<ResetOrderItemType> = getResetOrderItems(
+            reconstructOrderItems
+          );
+
+          exchangeOrderItemsVar(resetOrderItems);
+          commonCheckedOrderItemsVar([]);
+          checkAllBoxStatusVar(false);
+        }
+
+        if (error) {
+          loadingSpinnerVisibilityVar(false);
+          showHasAnyProblemModal(
+            <>
+              내부 서버 오류로 인해 요청하신
+              <br />
+              작업을 완료하지 못했습니다.
+              <br />
+              다시 한 번 시도 후 같은 문제가 발생할 경우
+              <br />
+              찹스틱스로 문의해주세요.
+              <br />
+              <br />
+              (전화 문의 070-4187-3848)
+              <br />
+              <br />
+              Code:
+              {error}
+            </>
+          );
+        }
+      } catch (error) {
+        loadingSpinnerVisibilityVar(false);
+        showHasAnyProblemModal(
           <>
             내부 서버 오류로 인해 요청하신
             <br />
@@ -618,18 +670,12 @@ const RefundTable = () => {
             <br />
             <br />
             Code:
-            {error.message}
+            {error}
           </>
-        ),
-        confirmButtonClickHandler: () => {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: false,
-          });
-        },
-      });
-    }
-  }, [error]);
+        );
+      }
+    })();
+  }, [page, skip, query, type, statusName, statusType, statusGroup]);
 
   useEffect(() => {
     void (async () => {
@@ -672,9 +718,10 @@ const RefundTable = () => {
     })();
   }, []);
 
-  const hasRefundOrderItems =
-    !!refundOrderItems && !!refundOrderItems.length && !loading;
-  const isFetchingOrderItemsFailed = !loading && !error && hasRefundOrderItems;
+  const hasExchangeOrderItems =
+    !!exchangeOrderItems && !!exchangeOrderItems.length && !loading;
+  const isFetchingOrderItemsFailed =
+    !loading && !error && hasExchangeOrderItems;
 
   return (
     <TableContainer
@@ -683,34 +730,34 @@ const RefundTable = () => {
     >
       <FixedTable>
         <ThContainer>
-          <Th width={fixTableType[0].width} type={TableType.SCROLL}>
+          <Th type={TableType.SCROLL} width={fixTableType[0].width}>
             <Checkbox
               onChange={changeAllCheckBoxHandler}
               checked={checkAllBoxStatus}
             />
           </Th>
-          <Th width={fixTableType[1].width} type={TableType.SCROLL}>
+          <Th type={TableType.SCROLL} width={fixTableType[1].width}>
             {fixTableType[1].label}
           </Th>
-          <Th width={fixTableType[2].width} type={TableType.SCROLL}>
+          <Th type={TableType.SCROLL} width={fixTableType[2].width}>
             {fixTableType[2].label}
           </Th>
-          <Th width={fixTableType[3].width} type={TableType.SCROLL}>
+          <Th type={TableType.SCROLL} width={fixTableType[3].width}>
             {fixTableType[3].label}
           </Th>
-          <Th width={fixTableType[4].width} type={TableType.SCROLL}>
+          <Th type={TableType.SCROLL} width={fixTableType[4].width}>
             {fixTableType[4].label}
           </Th>
-          <Th width={fixTableType[5].width} type={TableType.SCROLL}>
+          <Th type={TableType.SCROLL} width={fixTableType[5].width}>
             {fixTableType[5].label}
           </Th>
-          <Th width={fixTableType[6].width} type={TableType.SCROLL}>
+          <Th type={TableType.SCROLL} width={fixTableType[6].width}>
             {fixTableType[6].label}
           </Th>
         </ThContainer>
         <TdContainer>
-          {hasRefundOrderItems &&
-            refundOrderItems.map(
+          {hasExchangeOrderItems &&
+            exchangeOrderItems.map(
               (
                 {
                   merchantUid,
@@ -771,6 +818,7 @@ const RefundTable = () => {
             )}
         </TdContainer>
       </FixedTable>
+
       <ScrollTable width={tableWidth.right}>
         <ThContainer>
           <Th type={TableType.SCROLL} width={scrollTableType[0].width}>
@@ -860,10 +908,20 @@ const RefundTable = () => {
           <Th type={TableType.SCROLL} width={scrollTableType[28].width}>
             {scrollTableType[28].label}
           </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[29].width}>
+            {scrollTableType[29].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[30].width}>
+            {scrollTableType[30].label}
+          </Th>
+          <Th type={TableType.SCROLL} width={scrollTableType[31].width}>
+            {scrollTableType[31].label}
+          </Th>
         </ThContainer>
+
         <TdContainer>
-          {hasRefundOrderItems &&
-            refundOrderItems.map(
+          {hasExchangeOrderItems &&
+            exchangeOrderItems.map(
               (
                 {
                   id,
@@ -876,18 +934,31 @@ const RefundTable = () => {
                   claimStatus,
                   attachedImages,
                   completedAt,
+
                   shipmentOrderId,
                   shipmentCompany,
                   shipmentNumber,
+
                   isShipmentInfoEdit,
                   temporaryShipmentCompany,
                   temporaryShipmentNumber,
-                  refundOrderId,
-                  refundShipmentCompany,
-                  refundShipmentNumber,
-                  isRefundShipmentInfoEdit,
-                  temporaryRefundShipmentCompany,
-                  temporaryRefundShipmentNumber,
+
+                  pickupOrderId,
+                  pickupShipmentCompany,
+                  pickupShipmentNumber,
+
+                  isPickupShipmentInfoEdit,
+                  temporaryPickupShipmentCompany,
+                  temporaryPickupShipmentNumber,
+
+                  pickupAgainOrderId,
+                  pickupAgainShipmentCompany,
+                  pickupAgainShipmentNumber,
+
+                  isPickupAgainShipmentInfoEdit,
+                  temporaryPickupAgainShipmentCompany,
+                  temporaryPickupAgainShipmentNumber,
+
                   option,
                   quantity,
                   originalPrice,
@@ -897,18 +968,20 @@ const RefundTable = () => {
                   shipmentPrice,
                   shipmentDistantPrice,
                   totalPaymentAmount,
-                  amount,
+
                   userEmail,
                   userPhoneNumber,
                   recipientName,
                   recipientPhoneNumber,
                   recipientAddress,
                   postCode,
+
                   refusalAt,
                   refusalReason,
                   refusalDetailedReason,
                   refusalReasonStatus,
                   refusalStatusReasonId,
+
                   colorIndex,
                   rowIndex,
                   isLastRow,
@@ -943,10 +1016,6 @@ const RefundTable = () => {
                           type={"button"}
                           size={"small"}
                           width={"55px"}
-                          disabled={
-                            statusName === OrderStatusName.REFUND_COMPLETED ||
-                            claimStatus === "환불 오류"
-                          }
                           onClick={handleEditReasonModalClick(
                             statusReasonId,
                             reasonStatus,
@@ -1014,7 +1083,6 @@ const RefundTable = () => {
                                 value={temporaryShipmentCompany}
                                 sizing={"medium"}
                                 width={"104px"}
-                                disabled={claimStatus === "환불 완료"}
                               >
                                 <Option hidden value="default">
                                   택배사
@@ -1175,7 +1243,6 @@ const RefundTable = () => {
                       )}
                     </ShipmnetNumberTd>
                   </ShipmentColumn>
-
                   <ShipmentColumn
                     type={TableType.SCROLL}
                     width={scrollTableType[8].width + scrollTableType[9].width}
@@ -1194,18 +1261,17 @@ const RefundTable = () => {
                     <ShipmentCompanyTd width={scrollTableType[8].width}>
                       {isFirstRow ? (
                         <>
-                          {refundShipmentCompany ? (
-                            isRefundShipmentInfoEdit ? (
+                          {pickupShipmentCompany ? (
+                            isPickupShipmentInfoEdit ? (
                               <Dropdown
                                 onChange={changeShipmentCompanyHandler(
                                   index,
-                                  ShipmentStatus.REFUND_PICK_UP
+                                  ShipmentStatus.EXCHANGE_PICK_UP
                                 )}
                                 arrowSrc={triangleArrowSvg}
-                                value={temporaryRefundShipmentCompany}
+                                value={temporaryPickupShipmentCompany}
                                 sizing={"medium"}
                                 width={"104px"}
-                                disabled={claimStatus === "환불 완료"}
                               >
                                 <Option hidden value="default">
                                   택배사
@@ -1222,20 +1288,20 @@ const RefundTable = () => {
                                   type="text"
                                   id="t_code"
                                   name="t_code"
-                                  value={refundShipmentCompany}
+                                  value={pickupShipmentCompany}
                                   readOnly={true}
                                 />
-                                {shipmentCompanyCode[refundShipmentCompany]}
+                                {shipmentCompanyCode[pickupShipmentCompany]}
                               </>
                             )
                           ) : (
                             <Dropdown
                               onChange={changeShipmentCompanyHandler(
                                 index,
-                                ShipmentStatus.REFUND_PICK_UP
+                                ShipmentStatus.EXCHANGE_PICK_UP
                               )}
                               arrowSrc={triangleArrowSvg}
-                              value={temporaryRefundShipmentCompany}
+                              value={temporaryPickupShipmentCompany}
                               sizing={"medium"}
                               width={"104px"}
                               disabled={claimStatus === "환불 완료"}
@@ -1251,8 +1317,8 @@ const RefundTable = () => {
                             </Dropdown>
                           )}
                         </>
-                      ) : refundShipmentCompany ? (
-                        shipmentCompanyCode[refundShipmentCompany]
+                      ) : pickupShipmentCompany ? (
+                        shipmentCompanyCode[pickupShipmentCompany]
                       ) : (
                         "-"
                       )}
@@ -1260,21 +1326,20 @@ const RefundTable = () => {
                     <ShipmnetNumberTd width={scrollTableType[9].width}>
                       {isFirstRow ? (
                         <>
-                          {refundShipmentNumber ? (
-                            isRefundShipmentInfoEdit ? (
+                          {pickupShipmentNumber ? (
+                            isPickupShipmentInfoEdit ? (
                               <ShipmnetNumberContainer>
                                 <EditShipmentNumberInput
                                   type="text"
                                   onChange={changeShipmentNumberHandler(
                                     index,
-                                    ShipmentStatus.REFUND_PICK_UP
+                                    ShipmentStatus.EXCHANGE_PICK_UP
                                   )}
-                                  disabled={claimStatus === "환불 완료"}
                                   width={"145px"}
                                   value={
-                                    temporaryRefundShipmentNumber === 0
+                                    temporaryPickupShipmentNumber === 0
                                       ? ""
-                                      : temporaryRefundShipmentNumber
+                                      : temporaryPickupShipmentNumber
                                   }
                                 />
                                 <Button
@@ -1283,10 +1348,10 @@ const RefundTable = () => {
                                   width="55px"
                                   onClick={handleSaveButtonClick(
                                     id,
-                                    refundOrderId,
-                                    temporaryRefundShipmentCompany,
-                                    temporaryRefundShipmentNumber,
-                                    ShipmentStatus.REFUND_PICK_UP
+                                    pickupOrderId,
+                                    temporaryPickupShipmentCompany,
+                                    temporaryPickupShipmentNumber,
+                                    ShipmentStatus.EXCHANGE_PICK_UP
                                   )}
                                 >
                                   저장
@@ -1295,13 +1360,13 @@ const RefundTable = () => {
                             ) : (
                               <ShipmnetNumberContainer>
                                 <ShipmnetNumber>
-                                  {refundShipmentNumber}
+                                  {pickupShipmentNumber}
                                 </ShipmnetNumber>
                                 <ShipmentTemplateInput
                                   type="text"
                                   id="t_invoice"
                                   name="t_invoice"
-                                  value={refundShipmentNumber}
+                                  value={pickupShipmentNumber}
                                   readOnly={true}
                                 />
                                 <ButtonContainer>
@@ -1310,7 +1375,7 @@ const RefundTable = () => {
                                     width="55px"
                                     onClick={handleEditButtonClick(
                                       id,
-                                      ShipmentStatus.REFUND_PICK_UP
+                                      ShipmentStatus.EXCHANGE_PICK_UP
                                     )}
                                     backgroundColor={"#fff"}
                                     borderColor={"#BBC0C6"}
@@ -1336,14 +1401,13 @@ const RefundTable = () => {
                               <ShipmnetNumberInput
                                 onChange={changeShipmentNumberHandler(
                                   index,
-                                  ShipmentStatus.REFUND_PICK_UP
+                                  ShipmentStatus.EXCHANGE_PICK_UP
                                 )}
-                                disabled={claimStatus === "환불 완료"}
                                 width={"145px"}
                                 value={
-                                  temporaryRefundShipmentNumber === 0
+                                  temporaryPickupShipmentNumber === 0
                                     ? ""
-                                    : temporaryRefundShipmentNumber
+                                    : temporaryPickupShipmentNumber
                                 }
                               />
                               <SubmitButton
@@ -1355,8 +1419,9 @@ const RefundTable = () => {
                                 type="button"
                                 onClick={handleSendButtonClick(
                                   id,
-                                  temporaryRefundShipmentCompany,
-                                  temporaryRefundShipmentNumber
+                                  temporaryPickupShipmentCompany,
+                                  temporaryPickupShipmentNumber,
+                                  ShipmentStatus.EXCHANGE_PICK_UP
                                 )}
                               >
                                 수거
@@ -1364,68 +1429,268 @@ const RefundTable = () => {
                             </ShipmnetNumberContainer>
                           )}
                         </>
-                      ) : refundShipmentNumber ? (
-                        refundShipmentNumber
+                      ) : pickupShipmentNumber ? (
+                        pickupShipmentNumber
                       ) : (
                         "-"
                       )}
                     </ShipmnetNumberTd>
                   </ShipmentColumn>
-                  <Td type={TableType.SCROLL} width={scrollTableType[10].width}>
+                  <ShipmentColumn
+                    type={TableType.SCROLL}
+                    width={
+                      scrollTableType[10].width + scrollTableType[11].width
+                    }
+                    as={"form"}
+                    action="http://info.sweettracker.co.kr/tracking/5"
+                    method="post"
+                    target="_black"
+                  >
+                    <ShipmentTemplateInput
+                      type="text"
+                      id="t_key"
+                      name="t_key"
+                      value={process.env.REACT_APP_SWEETTRAKER_API_KEY}
+                      readOnly={true}
+                    />
+                    <ShipmentCompanyTd width={scrollTableType[10].width}>
+                      {isFirstRow ? (
+                        <>
+                          {pickupAgainShipmentCompany ? (
+                            isPickupAgainShipmentInfoEdit ? (
+                              <Dropdown
+                                onChange={changeShipmentCompanyHandler(
+                                  index,
+                                  ShipmentStatus.EXCHANGE_PICK_UP_AGAIN
+                                )}
+                                arrowSrc={triangleArrowSvg}
+                                value={temporaryPickupAgainShipmentCompany}
+                                sizing={"medium"}
+                                width={"104px"}
+                              >
+                                <Option hidden value="default">
+                                  택배사
+                                </Option>
+                                {shipmentCompanys.map(({ Code, Name }) => (
+                                  <Option key={Code} value={Code}>
+                                    {Name}
+                                  </Option>
+                                ))}
+                              </Dropdown>
+                            ) : (
+                              <>
+                                <ShipmentTemplateInput
+                                  type="text"
+                                  id="t_code"
+                                  name="t_code"
+                                  value={pickupAgainShipmentCompany}
+                                  readOnly={true}
+                                />
+                                {
+                                  shipmentCompanyCode[
+                                    pickupAgainShipmentCompany
+                                  ]
+                                }
+                              </>
+                            )
+                          ) : (
+                            <Dropdown
+                              onChange={changeShipmentCompanyHandler(
+                                index,
+                                ShipmentStatus.EXCHANGE_PICK_UP_AGAIN
+                              )}
+                              arrowSrc={triangleArrowSvg}
+                              value={temporaryPickupAgainShipmentCompany}
+                              sizing={"medium"}
+                              width={"104px"}
+                              disabled={claimStatus === "환불 완료"}
+                            >
+                              <Option hidden value="default">
+                                택배사
+                              </Option>
+                              {shipmentCompanys.map(({ Code, Name }) => (
+                                <Option key={Code} value={Code}>
+                                  {Name}
+                                </Option>
+                              ))}
+                            </Dropdown>
+                          )}
+                        </>
+                      ) : pickupAgainShipmentCompany ? (
+                        shipmentCompanyCode[pickupAgainShipmentCompany]
+                      ) : (
+                        "-"
+                      )}
+                    </ShipmentCompanyTd>
+                    <ShipmnetNumberTd width={scrollTableType[11].width}>
+                      {isFirstRow ? (
+                        <>
+                          {pickupAgainShipmentNumber ? (
+                            isPickupAgainShipmentInfoEdit ? (
+                              <ShipmnetNumberContainer>
+                                <EditShipmentNumberInput
+                                  type="text"
+                                  onChange={changeShipmentNumberHandler(
+                                    index,
+                                    ShipmentStatus.EXCHANGE_PICK_UP_AGAIN
+                                  )}
+                                  width={"145px"}
+                                  value={
+                                    temporaryPickupAgainShipmentNumber === 0
+                                      ? ""
+                                      : temporaryPickupAgainShipmentNumber
+                                  }
+                                />
+                                <Button
+                                  type="button"
+                                  size="small"
+                                  width="55px"
+                                  onClick={handleSaveButtonClick(
+                                    id,
+                                    pickupAgainOrderId,
+                                    temporaryPickupAgainShipmentCompany,
+                                    temporaryPickupAgainShipmentNumber,
+                                    ShipmentStatus.EXCHANGE_PICK_UP_AGAIN
+                                  )}
+                                >
+                                  저장
+                                </Button>
+                              </ShipmnetNumberContainer>
+                            ) : (
+                              <ShipmnetNumberContainer>
+                                <ShipmnetNumber>
+                                  {pickupAgainShipmentNumber}
+                                </ShipmnetNumber>
+                                <ShipmentTemplateInput
+                                  type="text"
+                                  id="t_invoice"
+                                  name="t_invoice"
+                                  value={pickupAgainShipmentNumber}
+                                  readOnly={true}
+                                />
+                                <ButtonContainer>
+                                  <Button
+                                    size="small"
+                                    width="55px"
+                                    onClick={handleEditButtonClick(
+                                      id,
+                                      ShipmentStatus.EXCHANGE_PICK_UP_AGAIN
+                                    )}
+                                    backgroundColor={"#fff"}
+                                    borderColor={"#BBC0C6"}
+                                    type="button"
+                                    disabled={claimStatus === "환불 완료"}
+                                  >
+                                    수정
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    width="55px"
+                                    backgroundColor={"#414A5B"}
+                                    color={"#fff"}
+                                    type="submit"
+                                  >
+                                    조회
+                                  </Button>
+                                </ButtonContainer>
+                              </ShipmnetNumberContainer>
+                            )
+                          ) : (
+                            <ShipmnetNumberContainer>
+                              <ShipmnetNumberInput
+                                onChange={changeShipmentNumberHandler(
+                                  index,
+                                  ShipmentStatus.EXCHANGE_PICK_UP_AGAIN
+                                )}
+                                width={"145px"}
+                                value={
+                                  temporaryPickupAgainShipmentNumber === 0
+                                    ? ""
+                                    : temporaryPickupAgainShipmentNumber
+                                }
+                              />
+                              <SubmitButton
+                                size="small"
+                                width={"55px"}
+                                backgroundColor={"#414A5B"}
+                                color={"#fff"}
+                                type="button"
+                                onClick={handleSendButtonClick(
+                                  id,
+                                  temporaryPickupAgainShipmentCompany,
+                                  temporaryPickupAgainShipmentNumber,
+                                  ShipmentStatus.EXCHANGE_PICK_UP_AGAIN
+                                )}
+                              >
+                                재발송
+                              </SubmitButton>
+                            </ShipmnetNumberContainer>
+                          )}
+                        </>
+                      ) : pickupAgainShipmentNumber ? (
+                        pickupAgainShipmentNumber
+                      ) : (
+                        "-"
+                      )}
+                    </ShipmnetNumberTd>
+                  </ShipmentColumn>
+                  <Td type={TableType.SCROLL} width={scrollTableType[12].width}>
                     {option}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[11].width}>
-                    {quantity}
-                  </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[12].width}>
-                    {originalPrice}
-                  </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[13].width}>
-                    {optionPrice}
+                    <Quantity quantity={quantity}>{quantity}</Quantity>
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[14].width}>
-                    {discountPrice}
+                    {originalPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[15].width}>
-                    {totalPrice}
+                    {optionPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[16].width}>
-                    {shipmentPrice}
+                    {discountPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[17].width}>
-                    {shipmentDistantPrice}
+                    {totalPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[18].width}>
-                    {totalPaymentAmount}
+                    {shipmentPrice}
                   </Td>
-
                   <Td type={TableType.SCROLL} width={scrollTableType[19].width}>
-                    {amount}
+                    {shipmentDistantPrice}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[20].width}>
-                    {userEmail}
+                    {totalPaymentAmount}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[21].width}>
-                    {userPhoneNumber}
+                    {userEmail}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[22].width}>
-                    {recipientName}
+                    {userPhoneNumber}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[23].width}>
-                    {recipientPhoneNumber}
+                    {recipientName}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[24].width}>
-                    {recipientAddress}
+                    {recipientPhoneNumber}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[25].width}>
-                    {postCode}
+                    {recipientAddress}
                   </Td>
                   <Td type={TableType.SCROLL} width={scrollTableType[26].width}>
+                    {postCode}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[27].width}>
+                    {/* 재배송지 */}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[28].width}>
+                    {/* 재배송지 우편번호*/}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={scrollTableType[29].width}>
                     {refusalAt}
                   </Td>
                   <MainReasonTd
                     type={TableType.SCROLL}
-                    width={scrollTableType[27].width}
+                    width={scrollTableType[30].width}
                   >
                     {(!isFirstRow || !refusalReason) && (
                       <Reason isCenterAligned={true}>-</Reason>
@@ -1454,8 +1719,7 @@ const RefundTable = () => {
                       </>
                     )}
                   </MainReasonTd>
-
-                  <Td type={TableType.SCROLL} width={scrollTableType[28].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[31].width}>
                     {(!isFirstRow || !refusalDetailedReason) && (
                       <Reason isCenterAligned={true}>-</Reason>
                     )}
@@ -1472,7 +1736,7 @@ const RefundTable = () => {
         </TdContainer>
       </ScrollTable>
 
-      {!hasRefundOrderItems && (
+      {!hasExchangeOrderItems && (
         <NoDataContainer type={TableType.SCROLL}>
           {query && (
             <>
@@ -1497,15 +1761,6 @@ const RefundTable = () => {
   );
 };
 
-const AttachedImageTd = styled(Td)`
-  gap: 6px;
-`;
-
-const AttachedImage = styled.img`
-  height: 24px;
-  width: 24px;
-`;
-
 const ProductNameTd = styled(Td)`
   justify-content: flex-start;
   padding: 0px;
@@ -1518,7 +1773,6 @@ const ProductThumbNailWrapper = styled.div`
 
   min-width: 40px;
   height: 100%;
-
   border-right: 1px solid ${({ theme: { palette } }) => palette.grey500};
 `;
 
@@ -1530,7 +1784,7 @@ const ProductThumbNail = styled.img`
 const ProductName = styled.span`
   display: block;
 
-  padding: 0 6px;
+  padding: 0 8px;
 
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1555,14 +1809,14 @@ const Reason = styled.span<{ isCenterAligned: boolean }>`
       : css``}
 `;
 
-const Dropdown = styled(SelectInput)`
-  padding-right: 16px;
-
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+const AttachedImageTd = styled(Td)`
+  gap: 6px;
 `;
 
+const AttachedImage = styled.img`
+  height: 24px;
+  width: 24px;
+`;
 const ShipmentColumn = styled(Td)`
   padding: 0px;
 `;
@@ -1626,4 +1880,17 @@ const SubmitButton = styled(Button)`
   border-left: none;
 `;
 
-export default RefundTable;
+const Dropdown = styled(SelectInput)`
+  padding-right: 16px;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`;
+
+const Quantity = styled.span<{ quantity: number }>`
+  color: ${({ theme: { palette }, quantity }) =>
+    quantity > 1 ? palette.red900 : palette.black};
+`;
+
+export default ExchangeTable;

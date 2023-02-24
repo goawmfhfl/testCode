@@ -125,6 +125,22 @@ export interface ResetOrderItemType {
   temporaryRefundShipmentCompany?: string;
   temporaryRefundShipmentNumber?: number;
 
+  pickupOrderId?: number;
+  pickupShipmentCompany?: string;
+  pickupShipmentNumber?: number;
+
+  isPickupShipmentInfoEdit?: boolean;
+  temporaryPickupShipmentCompany?: string;
+  temporaryPickupShipmentNumber?: number;
+
+  pickupAgainOrderId?: number;
+  pickupAgainShipmentCompany?: string;
+  pickupAgainShipmentNumber?: number;
+
+  isPickupAgainShipmentInfoEdit?: boolean;
+  temporaryPickupAgainShipmentCompany?: string;
+  temporaryPickupAgainShipmentNumber?: number;
+
   recipientName: string;
   recipientPhoneNumber: string;
   recipientAddress?: string;
@@ -219,4 +235,23 @@ export interface ChangeOrderStatusByForceType {
 export interface ChangeOrderStatusByForceInputType {
   components: Array<{ orderItemId: number }>;
   orderStatusName: OrderStatusName;
+}
+
+export interface EstimateRefundAmountType {
+  estimateRefundAmount: {
+    ok: boolean;
+    error?: string;
+    totalProductAmount: number;
+    initialShipmentAmount: number;
+    initialShipmentDistantAmount: number;
+    shipmentRefundAmount: number;
+    bundleShipmentType: ShipmentType;
+    isConditionalAmountBreak: boolean;
+    isAllOrderItemRefunded: boolean;
+    isFreeBreak: boolean;
+  };
+}
+export interface EstimateRefundAmountInputType {
+  orderItemIds: Array<number>;
+  cause: Cause;
 }

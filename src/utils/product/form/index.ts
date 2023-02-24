@@ -102,7 +102,11 @@ export async function combineProductFormImages(): Promise<
     return img;
   });
 
-  return registeredCombinedImages.map(({ type, url }) => ({ type, url }));
+  return registeredCombinedImages.map(({ type, url, file }) => ({
+    type,
+    url,
+    size: file ? String(file.size) : null,
+  }));
 }
 
 export function getCategoryName(formContext: UseFormReturn): CategoryNames {

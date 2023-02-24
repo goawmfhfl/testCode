@@ -1,367 +1,291 @@
-import { getAverageWidth } from "@utils/calculator";
-
 export const tableWidth = {
   index: 1182,
-  left: 612,
-  right: 4032,
+  left: 708,
+  right: 4256,
 
-  // 체크박스
   checkbox: 36,
-
-  // 주문번호
-  merchantitemUid: 128,
-
-  // 상품 주문번호
-  productCode: 128,
-
-  // 주문 상품
-  orderProduct: 160,
-
-  // 구매자명
+  merchantUid: 128,
+  merchantItemUid: 128,
+  productName: 160,
   userName: 80,
-
-  // 주문상태
   orderStatus: 80,
-
-  // 클레임 상태
   claimStatus: 96,
 
-  // 결제일
-  paymentDay: 128,
-
-  // 교환요청일
-  requestExchangeDay: 128,
-
-  // 대표사유
+  paidAt: 128,
+  requestExchangeAt: 128,
   mainReason: 180,
-
-  // 상세사유
   detaildReason: 200,
-
-  // 첨부사진
-  AttachedImg: 160,
-
-  // 교환 완료일
-  completedExchangeDay: 128,
-
-  // 원배송 택배사
+  AttachedImage: 160,
+  exchangeCompletedAt: 128,
   shipmentCompany: 136,
-
-  // 원배송 송장번호
   shipmentNumber: 216,
+  pickupShipmentCompany: 136,
+  pickupShipmentNumber: 216,
+  pickupAgainShipmentCompany: 136,
+  pickupAgainShipmentNumber: 216,
 
-  // 수거배송 택배사
-  exchangeShipmentCompany: 136,
-
-  // 수거배송 송장번호
-  exchangeShipmentNumber: 216,
-
-  // 재배송 택배사
-  shippingAgainShipmentCompany: 136,
-
-  // 재배송 송장번호
-  shippingAgainShipmentNumber: 216,
-
-  // 옵션
   option: 136,
-
-  // 상품개수
-  quantity: 64,
-
-  // 상품가
-  price: 64,
-
-  // 옵션가
-  optionPrice: 64,
-
-  // 상품별 총 금액
+  quantity: 80,
+  originalPrice: 80,
+  optionPrice: 80,
+  discountPrice: 136,
   totalPrice: 136,
-
-  // 배송비
   shipmentPrice: 64,
-
-  // 제주/도서 추가배송비
   shipmentDistantPrice: 136,
+  totalPaymentAmount: 136,
 
-  // 총 환불 금액
-  totalExchangePrice: 136,
-
-  // 구매자 아이디
   userEmail: 144,
-
-  // 구매자 전화번호
   userPhoneNumber: 112,
-
-  // 수취인
   recipientName: 64,
-
-  // 수취인 전화번호
   recipientPhoneNumber: 112,
 
-  // 교환 수거지
-  exchangeAddress: 112,
+  pickupAddress: 112,
+  pickupPostCode: 64,
 
-  // 우편번호
-  postCode: 64,
+  pickupAgainAddress: 112,
+  pickupAgainPostCode: 64,
 
-  // 재배송지
-  shippingAgainExchangeAddress: 112,
-
-  // 우편번호
-  shippingAgainPostCode: 64,
-
-  // 교환거절일
-  rejectExchangeDay: 128,
-
-  // 거절대표사유
-  rejectMainReason: 180,
-
-  // 거절상세사유
-  rejectDetaildReason: 200,
+  exchangeRefusalAt: 128,
+  refusalMainReason: 180,
+  refusalDetaildReason: 200,
 };
 
 export const fixTableType = [
   {
     id: 0,
     label: "checkBox",
-    width: getAverageWidth(tableWidth.checkbox, tableWidth.left),
+    width: tableWidth.checkbox,
     value: "checkBox",
   },
   {
     id: 1,
     label: "주문번호",
-    width: getAverageWidth(tableWidth.merchantitemUid, tableWidth.left),
-    value: "merchantitemUid",
+    width: tableWidth.merchantUid,
+    value: "merchantUid",
   },
   {
     id: 2,
     label: "상품 주문번호",
-    width: getAverageWidth(tableWidth.productCode, tableWidth.left),
-    value: "productCode",
+    width: tableWidth.merchantItemUid,
+    value: "merchantItemUid",
   },
   {
     id: 3,
     label: "주문 상품",
-    width: getAverageWidth(tableWidth.orderProduct, tableWidth.left),
-    value: "orderProduct",
+    width: tableWidth.productName,
+    value: "productName",
   },
   {
     id: 4,
     label: "구매자 명",
-    width: getAverageWidth(tableWidth.userName, tableWidth.left),
+    width: tableWidth.userName,
     value: "userName",
   },
   {
     id: 5,
     label: "주문 상태",
-    width: getAverageWidth(tableWidth.orderStatus, tableWidth.left),
+    width: tableWidth.orderStatus,
     value: "orderStatus",
+  },
+  {
+    id: 6,
+    label: "클레임 상태",
+    width: tableWidth.claimStatus,
+    value: "claimStatus",
   },
 ];
 
 export const scrollTableType = [
   {
     id: 0,
-    label: "클레임 상태",
-    width: getAverageWidth(tableWidth.claimStatus, tableWidth.right),
-    value: "claimStatus",
+    label: "결제일",
+    width: tableWidth.paidAt,
+    value: "paidAt",
   },
   {
     id: 1,
-    label: "결제일",
-    width: getAverageWidth(tableWidth.paymentDay, tableWidth.right),
-    value: "paymentDay",
+    label: "교환요청일",
+    width: tableWidth.requestExchangeAt,
+    value: "requestExchangeAt",
   },
   {
     id: 2,
-    label: "교환요청일",
-    width: getAverageWidth(tableWidth.requestExchangeDay, tableWidth.right),
-    value: "requestExchangeDay",
-  },
-  {
-    id: 3,
     label: "대표사유",
-    width: getAverageWidth(tableWidth.mainReason, tableWidth.right),
+    width: tableWidth.mainReason,
     value: "mainReason",
   },
   {
-    id: 4,
+    id: 3,
     label: "상세사유",
-    width: getAverageWidth(tableWidth.detaildReason, tableWidth.right),
+    width: tableWidth.detaildReason,
     value: "detaildReason",
   },
   {
-    id: 5,
+    id: 4,
     label: "첨부사진",
-    width: getAverageWidth(tableWidth.AttachedImg, tableWidth.right),
-    value: "AttachedImg",
+    width: tableWidth.AttachedImage,
+    value: "AttachedImage",
+  },
+  {
+    id: 5,
+    label: "교환 완료일",
+    width: tableWidth.exchangeCompletedAt,
+    value: "exchangeCompletedAt",
   },
   {
     id: 6,
-    label: "교환 완료일",
-    width: getAverageWidth(tableWidth.completedExchangeDay, tableWidth.right),
-    value: "completedExchangeDay",
-  },
-  {
-    id: 7,
     label: "원배송 택배사",
-    width: getAverageWidth(tableWidth.shipmentCompany, tableWidth.right),
+    width: tableWidth.shipmentCompany,
     value: "shipmentCompany",
   },
   {
-    id: 8,
+    id: 7,
     label: "원배송 송장번호",
-    width: getAverageWidth(tableWidth.shipmentNumber, tableWidth.right),
+    width: tableWidth.shipmentNumber,
     value: "shipmentNumber",
   },
   {
-    id: 9,
+    id: 8,
     label: "수거배송 택배사",
-    width: getAverageWidth(
-      tableWidth.exchangeShipmentCompany,
-      tableWidth.right
-    ),
-    value: "exchangeShipmentCompany",
+    width: tableWidth.pickupShipmentCompany,
+    value: "pickupShipmentCompany",
+  },
+  {
+    id: 9,
+    label: "수거배송 송장번호",
+    width: tableWidth.pickupShipmentNumber,
+    value: "pickupShipmentNumber",
   },
   {
     id: 10,
-    label: "수거배송 송장번호",
-    width: getAverageWidth(tableWidth.exchangeShipmentNumber, tableWidth.right),
-    value: "exchangeShipmentNumber",
+    label: "재배송 택배사",
+    width: tableWidth.pickupAgainShipmentCompany,
+    value: "pickupAgainShipmentCompany",
   },
   {
     id: 11,
-    label: "재배송 택배사",
-    width: getAverageWidth(
-      tableWidth.shippingAgainShipmentCompany,
-      tableWidth.right
-    ),
-    value: "exchangeShipmentCompany",
+    label: "재배송 송장번호",
+    width: tableWidth.pickupAgainShipmentNumber,
+    value: "pickupAgainShipmentNumber",
   },
   {
     id: 12,
-    label: "재배송 송장번호",
-    width: getAverageWidth(
-      tableWidth.shippingAgainShipmentNumber,
-      tableWidth.right
-    ),
-    value: "exchangeShipmentNumber",
-  },
-  {
-    id: 13,
     label: "옵션",
-    width: getAverageWidth(tableWidth.option, tableWidth.right),
+    width: tableWidth.option,
     value: "option",
   },
   {
-    id: 14,
+    id: 13,
     label: "상품개수",
-    width: getAverageWidth(tableWidth.quantity, tableWidth.right),
+    width: tableWidth.quantity,
     value: "quantity",
   },
   {
+    id: 14,
+    label: "상품가격",
+    width: tableWidth.originalPrice,
+    value: "originalPrice",
+  },
+  {
     id: 15,
-    label: "상품가",
-    width: getAverageWidth(tableWidth.price, tableWidth.right),
-    value: "price",
+    label: "옵션가격",
+    width: tableWidth.optionPrice,
+    value: "optionPrice",
   },
   {
     id: 16,
-    label: "옵션가",
-    width: getAverageWidth(tableWidth.optionPrice, tableWidth.right),
-    value: "optionPrice",
+    label: "상품별 할인액",
+    width: tableWidth.discountPrice,
+    value: "discountPrice",
   },
   {
     id: 17,
     label: "상품별 총 금액",
-    width: getAverageWidth(tableWidth.totalPrice, tableWidth.right),
+    width: tableWidth.totalPrice,
     value: "totalPrice",
   },
   {
     id: 18,
     label: "배송비",
-    width: getAverageWidth(tableWidth.shipmentPrice, tableWidth.right),
+    width: tableWidth.shipmentPrice,
     value: "shipmentPrice",
   },
   {
     id: 19,
     label: "제주/도서 추가배송비",
-    width: getAverageWidth(tableWidth.shipmentDistantPrice, tableWidth.right),
+    width: tableWidth.shipmentDistantPrice,
     value: "shipmentDistantPrice",
   },
   {
     id: 20,
-    label: "총 환불 금액",
-    width: getAverageWidth(tableWidth.totalExchangePrice, tableWidth.right),
-    value: "totalExchangePrice",
+    label: "총 결제 금액",
+    width: tableWidth.totalPaymentAmount,
+    value: "totalPaymentAmount",
   },
   {
     id: 21,
     label: "구매자 아이디",
-    width: getAverageWidth(tableWidth.userName, tableWidth.right),
-    value: "userName",
+    width: tableWidth.userEmail,
+    value: "userEmail",
   },
   {
     id: 22,
     label: "구매자 전화번호",
-    width: getAverageWidth(tableWidth.userPhoneNumber, tableWidth.right),
+    width: tableWidth.userPhoneNumber,
     value: "userPhoneNumber",
   },
   {
     id: 23,
     label: "수취인",
-    width: getAverageWidth(tableWidth.recipientName, tableWidth.right),
+    width: tableWidth.recipientName,
     value: "recipientName",
   },
   {
     id: 24,
     label: "수취인 전화번호",
-    width: getAverageWidth(tableWidth.recipientPhoneNumber, tableWidth.right),
+    width: tableWidth.recipientPhoneNumber,
     value: "recipientPhoneNumber",
   },
   {
     id: 25,
     label: "교환 수거지",
-    width: getAverageWidth(tableWidth.exchangeAddress, tableWidth.right),
-    value: "exchangeAddress",
+    width: tableWidth.pickupAddress,
+    value: "pickupAddress",
   },
   {
     id: 26,
     label: "우편번호",
-    width: getAverageWidth(tableWidth.postCode, tableWidth.right),
-    value: "postCode",
+    width: tableWidth.pickupPostCode,
+    value: "pickupPostCode",
   },
   {
     id: 27,
     label: "재배송지",
-    width: getAverageWidth(
-      tableWidth.shippingAgainExchangeAddress,
-      tableWidth.right
-    ),
-    value: "shippingAgainExchangeAddress",
+    width: tableWidth.pickupAgainAddress,
+    value: "pickupAgainAddress",
   },
   {
     id: 28,
     label: "우편번호",
-    width: getAverageWidth(tableWidth.shippingAgainPostCode, tableWidth.right),
-    value: "shippingAgainPostCode",
+    width: tableWidth.pickupAgainPostCode,
+    value: "pickupAgainPostCode",
   },
   {
     id: 29,
     label: "교환거절일",
-    width: getAverageWidth(tableWidth.rejectExchangeDay, tableWidth.right),
-    value: "rejectExchangeDay",
+    width: tableWidth.exchangeRefusalAt,
+    value: "exchangeRefusalAt",
   },
   {
     id: 30,
     label: "거절대표사유",
-    width: getAverageWidth(tableWidth.rejectMainReason, tableWidth.right),
-    value: "rejectMainReason",
+    width: tableWidth.refusalMainReason,
+    value: "refusalMainReason",
   },
   {
     id: 31,
     label: "거절상세사유",
-    width: getAverageWidth(tableWidth.rejectDetaildReason, tableWidth.right),
-    value: "rejectDetaildReason",
+    width: tableWidth.refusalDetaildReason,
+    value: "refusalDetaildReason",
   },
 ];

@@ -19,16 +19,26 @@ export const getIsCheckedStatus = (
         result.refundRequestCount++;
       }
       if (claimStatus === "수거중") {
-        result.isRefundPickUpInProgressChecked = true;
-        result.refundPickUpInProgressCount++;
+        result.isPickupInProgressChecked = true;
+        result.pickupInProgressCount++;
       }
-      if (claimStatus === "수거 완료") {
-        result.isRefundPickUpCompletedChecked = true;
-        result.refundPickUpCompletedCount++;
+      if (claimStatus === "수거완료") {
+        result.isPickupCompletedChecked = true;
+        result.pickupCompletedCount++;
       }
-      if (claimStatus === "반품 완료") {
-        result.isRefundCompletedChecked = true;
-        result.refundCompletedCount++;
+      if (claimStatus === "교환 요청") {
+        result.isExchangeRequestChecked = true;
+        result.exchangeRequestCount++;
+      }
+
+      if (claimStatus === "재발송") {
+        result.isShippingAgainChecked = true;
+        result.shippingAgainCount++;
+      }
+
+      if (claimStatus === "교환 완료") {
+        result.isExchangeCompletedChecked = true;
+        result.exchangeCompletedCount++;
       }
 
       return result;
@@ -36,12 +46,24 @@ export const getIsCheckedStatus = (
     {
       isRefundRequestChecked: false,
       refundRequestCount: 0,
-      isRefundPickUpInProgressChecked: false,
-      refundPickUpInProgressCount: 0,
-      isRefundPickUpCompletedChecked: false,
-      refundPickUpCompletedCount: 0,
+
+      isPickupInProgressChecked: false,
+      pickupInProgressCount: 0,
+
+      isPickupCompletedChecked: false,
+      pickupCompletedCount: 0,
+
       isRefundCompletedChecked: false,
       refundCompletedCount: 0,
+
+      isExchangeRequestChecked: false,
+      exchangeRequestCount: 0,
+
+      isShippingAgainChecked: false,
+      shippingAgainCount: 0,
+
+      isExchangeCompletedChecked: false,
+      exchangeCompletedCount: 0,
     }
   );
 };
@@ -53,12 +75,12 @@ export const getOrdersLength = (
   }>
 ) => {
   return orders.reduce(
-    (result, { orderStatus, claimStatus }) => {
-      if (orderStatus.name === OrderStatusName.CANCEL_REQUEST) {
+    (result, { claimStatus }) => {
+      if (claimStatus.name === OrderStatusName.CANCEL_REQUEST) {
         result.cancelRequest++;
       }
 
-      if (orderStatus.name === OrderStatusName.CANCEL_COMPLETED) {
+      if (claimStatus.name === OrderStatusName.CANCEL_COMPLETED) {
         result.cancelCompleted++;
       }
 
@@ -78,6 +100,26 @@ export const getOrdersLength = (
         result.refundCompleted++;
       }
 
+      if (claimStatus.name === OrderStatusName.EXCHANGE_REQUEST) {
+        result.exchangeReqeust++;
+      }
+
+      if (claimStatus.name === OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS) {
+        result.exchangePickupInProgress++;
+      }
+
+      if (claimStatus.name === OrderStatusName.EXCHANGE_PICK_UP_COMPLETED) {
+        result.exchangePickupCompleted++;
+      }
+
+      if (claimStatus.name === OrderStatusName.SHIPPING_AGAIN) {
+        result.shippingAgain++;
+      }
+
+      if (claimStatus.name === OrderStatusName.EXCHANGE_COMPLETED) {
+        result.exchangeCompleted++;
+      }
+
       return result;
     },
     {
@@ -87,6 +129,11 @@ export const getOrdersLength = (
       refundPickUpInProgress: 0,
       refundPickUpCompleted: 0,
       refundCompleted: 0,
+      exchangeReqeust: 0,
+      exchangePickupInProgress: 0,
+      exchangePickupCompleted: 0,
+      shippingAgain: 0,
+      exchangeCompleted: 0,
     }
   );
 };
@@ -155,7 +202,7 @@ export const getStatusReason = (
     refusalDetailedReason: string;
     refusalReasonStatus: OrderStatusName;
     refusalStatusReasonId: number;
-
+    refusalCause: Cause;
     attachedImages: Array<{ url: string }>;
   } = {
     requestAt: "",
@@ -171,6 +218,7 @@ export const getStatusReason = (
     refusalDetailedReason: "",
     refusalReasonStatus: null,
     statusReasonId: null,
+    refusalCause: null,
     attachedImages: [],
   };
 
@@ -232,6 +280,7 @@ export const getStatusReason = (
         result.refusalReason = mainReasonType[mainReason];
         result.refusalDetailedReason = detailedReason;
         result.refusalReasonStatus = status;
+        result.refusalCause = cause;
         result.refusalAt = `${
           getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
         } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
@@ -378,12 +427,12 @@ export const getShipmentInfos = (
     refundOrderId?: number;
     refundShipmentCompany?: string;
     refundShipmentNumber?: number;
-    exchangeOrderId?: number;
-    exchangeShipmentCompany?: string;
-    exchangeShipmentNumber?: number;
-    exchangeAgainOrderId?: number;
-    exchangeAgainShipmentCompany?: string;
-    exchangeAgainShipmentNumber?: number;
+    pickupOrderId?: number;
+    pickupShipmentCompany?: string;
+    pickupShipmentNumber?: number;
+    pickupAgainOrderId?: number;
+    pickupAgainShipmentCompany?: string;
+    pickupAgainShipmentNumber?: number;
   } = {
     shipmentOrderId: null,
     shipmentCompany: null,
@@ -391,12 +440,12 @@ export const getShipmentInfos = (
     refundOrderId: null,
     refundShipmentCompany: null,
     refundShipmentNumber: null,
-    exchangeOrderId: null,
-    exchangeShipmentCompany: null,
-    exchangeShipmentNumber: null,
-    exchangeAgainOrderId: null,
-    exchangeAgainShipmentCompany: null,
-    exchangeAgainShipmentNumber: null,
+    pickupOrderId: null,
+    pickupShipmentCompany: null,
+    pickupShipmentNumber: null,
+    pickupAgainOrderId: null,
+    pickupAgainShipmentCompany: null,
+    pickupAgainShipmentNumber: null,
   };
   const hasOrderShipmentInfos =
     !!orderShipmentInfos && !!orderShipmentInfos.length;
@@ -419,15 +468,15 @@ export const getShipmentInfos = (
         }
 
         if (status === ShipmentStatus.EXCHANGE_PICK_UP) {
-          result.exchangeOrderId = id;
-          result.exchangeShipmentCompany = shipmentCompany;
-          result.exchangeShipmentNumber = shipmentNumber;
+          result.pickupOrderId = id;
+          result.pickupShipmentCompany = shipmentCompany;
+          result.pickupShipmentNumber = shipmentNumber;
         }
 
         if (status === ShipmentStatus.EXCHANGE_PICK_UP_AGAIN) {
-          result.exchangeAgainOrderId = id;
-          result.exchangeAgainShipmentCompany = shipmentCompany;
-          result.exchangeAgainShipmentNumber = shipmentNumber;
+          result.pickupAgainOrderId = id;
+          result.pickupAgainShipmentCompany = shipmentCompany;
+          result.pickupAgainShipmentNumber = shipmentNumber;
         }
 
         return result;

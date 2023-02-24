@@ -97,6 +97,7 @@ export const GET_PRODUCTS_BY_ID = gql`
           id
           url
           type
+          size
         }
       }
     }

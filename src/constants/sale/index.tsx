@@ -55,6 +55,11 @@ export enum OrderStatusType {
   ORDER = "ORDER",
   CLAIM = "CLAIM",
 }
+
+export const causeType = {
+  CLIENT: "소비자",
+  SELLER: "판매자",
+};
 export enum Cause {
   DEFAULT = "DEFAULT",
   CLIENT = "CLIENT",
@@ -311,6 +316,7 @@ export enum MainReason {
   PRODUCT_ALREADY_READY = "PRODUCT_ALREADY_READY",
   SENSE_TRACE_OF_USE = "SENSE_TRACE_OF_USE",
   DAMAGED_BY_CUSTOMER = "DAMAGED_BY_CUSTOMER",
+  OUT_OF_STOCK_FOR_EXCHANGE = "OUT_OF_STOCK_FOR_EXCHANGE",
   OTHER_REASONS = "OTHER_REASONS",
 }
 
@@ -330,6 +336,7 @@ export const mainReasonType = {
   PRODUCT_ALREADY_READY: "상품 준비 완료",
   SENSE_TRACE_OF_USE: "사용 흔적이 보임",
   DAMAGED_BY_CUSTOMER: "고객에 의해 파손됨",
+  OUT_OF_STOCK_FOR_EXCHANGE: "교환할 상품 부족",
   OTHER_REASONS: "기타 사유",
 };
 
@@ -349,6 +356,7 @@ export const mainReasonTypes = {
   "상품 준비 완료": MainReason.PRODUCT_ALREADY_READY,
   "사용 흔적이 보임": MainReason.SENSE_TRACE_OF_USE,
   "고객에 의해 파손됨": MainReason.DAMAGED_BY_CUSTOMER,
+  "교환할 상품 부족": MainReason.OUT_OF_STOCK_FOR_EXCHANGE,
   "기타 사유": MainReason.OTHER_REASONS,
 };
 
@@ -492,10 +500,9 @@ export const refusalExchangeOptionList: Array<{
     value: MainReason.DAMAGED_BY_CUSTOMER,
   },
   {
-    // 교환할 상품 재고 부족 Type필요
     id: 6,
-    label: mainReasonType.DAMAGED_BY_CUSTOMER,
-    value: MainReason.DAMAGED_BY_CUSTOMER,
+    label: mainReasonType.OUT_OF_STOCK_FOR_EXCHANGE,
+    value: MainReason.OUT_OF_STOCK_FOR_EXCHANGE,
   },
   {
     id: 7,

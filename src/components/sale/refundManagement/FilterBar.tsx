@@ -22,10 +22,11 @@ import Button from "@components/common/Button";
 
 const FilterBar = () => {
   const { data, getOrders } = useLazyRefundOrders();
-
   const { statusName } = useReactiveVar(commonSaleFilterOptionVar);
-  const orders = data?.getOrdersBySeller.totalOrderItems || [];
   const totalPageLength = useReactiveVar(totalPageLengthVar);
+
+  const orders = data?.getOrdersBySeller.totalOrderItems || [];
+
   const {
     refundRequest,
     refundPickUpInProgress,
@@ -45,44 +46,13 @@ const FilterBar = () => {
         commonSaleFilterOptionVar({
           ...commonSaleFilterOptionVar(),
           statusName: null,
-          statusType: OrderStatusType.CLAIM,
-          statusGroup: OrderStatusGroup.REFUND,
         });
       }
 
-      if (filterOptionName === OrderStatusName.REFUND_REQUEST) {
+      if (filterOptionName) {
         commonSaleFilterOptionVar({
           ...commonSaleFilterOptionVar(),
           statusName: filterOptionName,
-          statusType: OrderStatusType.CLAIM,
-          statusGroup: OrderStatusGroup.REFUND,
-        });
-      }
-
-      if (filterOptionName === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS) {
-        commonSaleFilterOptionVar({
-          ...commonSaleFilterOptionVar(),
-          statusName: filterOptionName,
-          statusType: OrderStatusType.CLAIM,
-          statusGroup: OrderStatusGroup.REFUND,
-        });
-      }
-
-      if (filterOptionName === OrderStatusName.REFUND_PICK_UP_COMPLETED) {
-        commonSaleFilterOptionVar({
-          ...commonSaleFilterOptionVar(),
-          statusName: filterOptionName,
-          statusType: OrderStatusType.CLAIM,
-          statusGroup: OrderStatusGroup.REFUND,
-        });
-      }
-
-      if (filterOptionName === OrderStatusName.REFUND_COMPLETED) {
-        commonSaleFilterOptionVar({
-          ...commonSaleFilterOptionVar(),
-          statusName: filterOptionName,
-          statusType: OrderStatusType.CLAIM,
-          statusGroup: OrderStatusGroup.REFUND,
         });
       }
     };

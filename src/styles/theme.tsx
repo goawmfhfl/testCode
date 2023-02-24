@@ -102,7 +102,7 @@ const typo = {
         font-size: 14px;
         font-weight: 500;
         line-height: 18px;
-        letter-spacing: 0.10000000149011612px;
+        letter-spacing: 0.1;
         text-align: left;
     `,
       emphasized: `
@@ -110,7 +110,7 @@ const typo = {
         font-size: 14px;
         font-weight: 700;
         line-height: 16px;
-        letter-spacing: 0.10000000149011612px;
+        letter-spacing: 0.1;
         text-align: left;
     `,
     },
@@ -120,7 +120,7 @@ const typo = {
         font-size: 13px;
         font-weight: 400;
         line-height: 18px;
-        letter-spacing: 0.10000000149011612px;
+        letter-spacing: 0.1;
         text-align: left;
       `,
       emphasized: `
@@ -128,7 +128,7 @@ const typo = {
         font-size: 13px;
         font-weight: 500;
         line-height: 18px;
-        letter-spacing: 0.10000000149011612px;
+        letter-spacing: 0.1;
         text-align: left;
       `,
     },
@@ -139,7 +139,7 @@ const typo = {
           font-size: 12px;
           font-weight: 500;
           line-height: 14px;
-          letter-spacing: 0.10000000149011612px;
+          letter-spacing: 0.1;
           text-align: left;
       `,
         emphasized: `
@@ -147,7 +147,7 @@ const typo = {
           font-size: 12px;
           font-weight: 700;
           line-height: 14px;
-          letter-spacing: 0.10000000149011612px;
+          letter-spacing: 0.1;
           text-align: left;
       `,
       },
@@ -157,7 +157,7 @@ const typo = {
           font-size: 12px;
           font-weight: 300;
           line-height: 18px;
-          letter-spacing: 0.10000000149011612px;
+          letter-spacing: 0.1;
           text-align: left;
       `,
         emphasized: `
@@ -165,7 +165,7 @@ const typo = {
           font-size: 12px;
           font-weight: 500;
           line-height: 16px;
-          letter-spacing: 0.10000000149011612px;
+          letter-spacing: 0.1;
           text-align: left;
       `,
       },
@@ -177,7 +177,7 @@ const typo = {
           font-size: 10px;
           font-weight: 300;
           line-height: 14px;
-          letter-spacing: 0.10000000149011612px;
+          letter-spacing: 0.1;
           text-align: left;
       `,
         emphasized: `
@@ -185,7 +185,7 @@ const typo = {
           font-size: 10px;
           font-weight: 500;
           line-height: 14px;
-          letter-spacing: 0.10000000149011612px;
+          letter-spacing: 0.1;
           text-align: left;
       `,
       },
