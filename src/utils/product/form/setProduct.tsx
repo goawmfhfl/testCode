@@ -250,11 +250,11 @@ const setProduct = (
 
     if (descriptionImages.length) {
       descriptionImagesVar(
-        descriptionImages.map(({ type, url }) => ({
+        descriptionImages.map(({ type, url, size }) => ({
           id: uuidv4(),
           type,
           url,
-          size: 1024 * 1024 * 5, // TODO: 서버에서 값을 가져와야 함
+          size: Number(size),
         }))
       );
     }
