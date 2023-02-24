@@ -68,7 +68,9 @@ async function addImageOnServer(
   }
 }
 
-async function removeImageFromServer(urls: Array<UploadedFileInfos>): Promise<{
+async function removeImageFromServer(
+  urls: Array<Omit<UploadedFileInfos, "size">>
+): Promise<{
   result: string;
   error: RemoveImageErrorType;
 }> {
@@ -180,7 +182,7 @@ function isElementOverflown(element: HTMLDivElement | null): void | boolean {
 }
 
 function bytesToMegaBytes(bytes: number) {
-  return Number((bytes / (1024 * 1024)).toFixed(2));
+  return Number((bytes / (1000 * 1000)).toFixed(2));
 }
 
 function preventNaNValues(e: React.KeyboardEvent<HTMLInputElement>): void {
