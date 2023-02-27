@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import styled, { css } from "styled-components";
 import axios, { AxiosError } from "axios";
-import { useMutation, useReactiveVar } from "@apollo/client";
+import { useMutation, useQuery, useReactiveVar } from "@apollo/client";
 import { cloneDeep } from "lodash";
 
 import {
@@ -22,15 +22,6 @@ import {
   loadingSpinnerVisibilityVar,
   showHasAnyProblemModal,
 } from "@cache/index";
-
-import { TableType } from "@models/index";
-import { NormalizedType, ResetOrderItemType } from "@models/sale";
-
-import useLazyRefundOrders from "@hooks/order/useLazyRefundOrders";
-
-import { checkedOrderItemsVar, resetOrderItemsVar } from "@cache/sale";
-import constructOrderItem from "@utils/sale/constructOrderItem";
-import getResetOrderItems from "@utils/sale/refund/getResetOrderItems";
 import {
   OrderStatusGroup,
   OrderStatusName,
@@ -40,15 +31,27 @@ import {
   ShipmentStatus,
 } from "@constants/sale";
 import { showHasServerErrorModal } from "@cache/productManagement";
+import { checkedOrderItemsVar, resetOrderItemsVar } from "@cache/sale";
+
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
 import { GET_REFUND_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import { EDIT_SHIPMENT_NUMBER } from "@graphql/mutations/editShipmentNumber";
+
+import { TableType } from "@models/index";
+import { NormalizedType, ResetOrderItemType } from "@models/sale";
 import {
   EditShipmentNumberInputType,
   EditShipmentNumberType,
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
+import {
+  GetRefundOrdersBySellerInputType,
+  GetRefundOrdersBySellerType,
+} from "@models/sale/refund";
+
+import constructOrderItem from "@utils/sale/constructOrderItem";
+import getResetOrderItems from "@utils/sale/refund/getResetOrderItems";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
@@ -78,10 +81,41 @@ const RefundTable = () => {
   const [searchParams] = useSearchParams();
   const { typeId, nameId } = Object.fromEntries([...searchParams]);
 
-  const { getOrderItem, error, loading } = useLazyRefundOrders();
   const { page, skip, query, orderSearchType } = useReactiveVar(
     commonFilterOptionVar
   );
+
+  const orderItems = useReactiveVar(resetOrderItemsVar);
+  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
+  const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
+
+  const { loading, error, data } = useQuery<
+    GetRefundOrdersBySellerType,
+    { input: GetRefundOrdersBySellerInputType }
+  >(GET_REFUND_ORDERS_BY_SELLER, {
+    variables: {
+      input: {
+        page,
+        skip,
+        query,
+        type: orderSearchType,
+        statusName: decryptSaleNameId[nameId] as OrderStatusName,
+        statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+        statusGroup: OrderStatusGroup.REFUND,
+      },
+    },
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: "network-only",
+    errorPolicy: "all",
+  });
+
+  const [shipmentCompanys, setShipmentCompanys] = useState<
+    Array<{
+      Code: string;
+      International: boolean;
+      Name: string;
+    }>
+  >([]);
 
   const [sendOrderItems] = useMutation<
     SendOrderItemsType,
@@ -89,7 +123,7 @@ const RefundTable = () => {
       input: SendOrderItemsInputType;
     }
   >(SEND_ORDER_ITEMS, {
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
@@ -116,7 +150,7 @@ const RefundTable = () => {
       input: EditShipmentNumberInputType;
     }
   >(EDIT_SHIPMENT_NUMBER, {
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
@@ -136,18 +170,6 @@ const RefundTable = () => {
       "GetOrdersBySeller",
     ],
   });
-
-  const orderItems = useReactiveVar(resetOrderItemsVar);
-  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
-  const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
-
-  const [shipmentCompanys, setShipmentCompanys] = useState<
-    Array<{
-      Code: string;
-      International: boolean;
-      Name: string;
-    }>
-  >([]);
 
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newOrderItems = cloneDeep(orderItems);
@@ -527,107 +549,40 @@ const RefundTable = () => {
     };
 
   useEffect(() => {
-    void (async () => {
-      try {
-        const {
-          data: {
-            getOrdersBySeller: {
-              ok,
-              error,
-              totalOrderItems,
-              totalPages,
-              totalResults,
-            },
-          },
-        } = await getOrderItem({
-          variables: {
-            input: {
-              page,
-              skip,
-              query,
-              type: orderSearchType,
-              statusName: decryptSaleNameId[nameId] as OrderStatusName,
-              statusType: decryptSaleTypeId[typeId] as OrderStatusType,
-              statusGroup: OrderStatusGroup.REFUND,
-            },
-          },
-          fetchPolicy: "no-cache",
-          notifyOnNetworkStatusChange: true,
-        });
+    const hasData = !!data && !!data.getOrdersBySeller;
+    if (!hasData) return;
 
-        if (ok) {
-          const isLastPageChanged = totalPages < page;
+    const {
+      getOrdersBySeller: { totalPages, totalResults, totalOrderItems },
+    } = data;
 
-          if (isLastPageChanged && totalPages !== 0) {
-            commonFilterOptionVar({
-              ...commonFilterOptionVar(),
-              page: totalPages,
-            });
-            return;
-          }
+    const isLastPageChanged = totalPages < page;
 
-          pageNumberListVar(
-            Array(totalPages)
-              .fill(null)
-              .map((_, index) => index + 1)
-          );
+    if (isLastPageChanged && totalPages !== 0) {
+      commonFilterOptionVar({
+        ...commonFilterOptionVar(),
+        page: totalPages,
+      });
+      return;
+    }
 
-          totalPageLengthVar(totalResults);
+    pageNumberListVar(
+      Array(totalPages)
+        .fill(null)
+        .map((_, index) => index + 1)
+    );
 
-          const reconstructOrderItems: NormalizedType =
-            constructOrderItem(totalOrderItems);
+    totalPageLengthVar(totalResults);
 
-          const resetOrderItems: Array<ResetOrderItemType> = getResetOrderItems(
-            reconstructOrderItems
-          );
+    const nomalizedOrderItem: NormalizedType =
+      constructOrderItem(totalOrderItems);
+    const resetOrderItems: Array<ResetOrderItemType> =
+      getResetOrderItems(nomalizedOrderItem);
 
-          resetOrderItemsVar(resetOrderItems);
-          checkedOrderItemsVar([]);
-          checkAllBoxStatusVar(false);
-        }
-
-        if (error) {
-          showHasAnyProblemModal(
-            <>
-              내부 서버 오류로 인해 요청하신
-              <br />
-              작업을 완료하지 못했습니다.
-              <br />
-              다시 한 번 시도 후 같은 문제가 발생할 경우
-              <br />
-              찹스틱스로 문의해주세요.
-              <br />
-              <br />
-              (전화 문의 070-4187-3848)
-              <br />
-              <br />
-              Code:
-              {error}
-            </>
-          );
-        }
-      } catch (error) {
-        showHasAnyProblemModal(
-          <>
-            내부 서버 오류로 인해 요청하신
-            <br />
-            작업을 완료하지 못했습니다.
-            <br />
-            다시 한 번 시도 후 같은 문제가 발생할 경우
-            <br />
-            찹스틱스로 문의해주세요.
-            <br />
-            <br />
-            (전화 문의 070-4187-3848)
-            <br />
-            <br />
-            Code:
-            {error}
-          </>
-        );
-      }
-    })();
-  }, [page, skip, query, orderSearchType, nameId, typeId]);
+    resetOrderItemsVar(resetOrderItems);
+    checkedOrderItemsVar([]);
+    checkAllBoxStatusVar(false);
+  }, [data]);
 
   useEffect(() => {
     paginationVisibilityVar(loading || error);
@@ -676,6 +631,23 @@ const RefundTable = () => {
 
   const hasRefundOrderItems = !!orderItems && !!orderItems.length && !loading;
   const isFetchingOrderItemsFailed = !loading && !error && hasRefundOrderItems;
+
+  if (error) {
+    showHasAnyProblemModal(
+      <>
+        내부 서버 오류로 인해 요청하신
+        <br />
+        작업을 완료하지 못했습니다.
+        <br />
+        다시 한 번 시도 후 같은 문제가 발생할 경우
+        <br />
+        찹스틱스로 문의해주세요.
+        <br />
+        <br />
+        (전화 문의 070-4187-3848)
+      </>
+    );
+  }
 
   return (
     <TableContainer

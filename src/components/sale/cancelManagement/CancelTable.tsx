@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import styled, { css } from "styled-components/macro";
-import { useReactiveVar } from "@apollo/client";
+import { useQuery, useReactiveVar } from "@apollo/client";
 import { cloneDeep } from "lodash";
 import { TableType } from "@models/index";
 
@@ -15,6 +15,10 @@ import {
   totalPageLengthVar,
 } from "@cache/index";
 import { checkedOrderItemsVar, resetOrderItemsVar } from "@cache/sale";
+import {
+  GetCancelOrdersBySellerInputType,
+  GetCancelOrdersBySellerType,
+} from "@models/sale/cancel";
 
 import {
   tableWidth,
@@ -30,7 +34,7 @@ import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
 import { NormalizedListType } from "@models/sale";
 import { ResetOrderItemType } from "@models/sale";
 
-import useLazyCancelOrders from "@hooks/order/useLazyCancelOrders";
+import { GET_CANCEL_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import constructOrderItem from "@utils/sale/constructOrderItem";
 import getResetOrderItems from "@utils/sale/cancel/getResetOrderItems";
 
@@ -53,8 +57,6 @@ import EditReasonModal from "@components/sale/cancelManagement/EditReasonModal";
 const CancelTable = () => {
   const [searchParams] = useSearchParams();
   const { typeId, nameId } = Object.fromEntries([...searchParams]);
-
-  const { getOrderItem, error, loading } = useLazyCancelOrders();
   const { page, skip, query, orderSearchType } = useReactiveVar(
     commonFilterOptionVar
   );
@@ -62,6 +64,26 @@ const CancelTable = () => {
   const orderItems = useReactiveVar(resetOrderItemsVar);
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
+
+  const { loading, error, data } = useQuery<
+    GetCancelOrdersBySellerType,
+    { input: GetCancelOrdersBySellerInputType }
+  >(GET_CANCEL_ORDERS_BY_SELLER, {
+    variables: {
+      input: {
+        page,
+        skip,
+        query,
+        type: orderSearchType,
+        statusName: decryptSaleNameId[nameId] as OrderStatusName,
+        statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+        statusGroup: OrderStatusGroup.CANCEL,
+      },
+    },
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: "network-only",
+    errorPolicy: "all",
+  });
 
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newOrderItems = cloneDeep(orderItems);
@@ -137,106 +159,40 @@ const CancelTable = () => {
     };
 
   useEffect(() => {
-    void (async () => {
-      try {
-        const {
-          data: {
-            getOrdersBySeller: {
-              ok,
-              error,
-              totalOrderItems,
-              totalPages,
-              totalResults,
-            },
-          },
-        } = await getOrderItem({
-          variables: {
-            input: {
-              page,
-              skip,
-              query,
-              type: orderSearchType,
-              statusName: decryptSaleNameId[nameId] as OrderStatusName,
-              statusType: decryptSaleTypeId[typeId] as OrderStatusType,
-              statusGroup: OrderStatusGroup.CANCEL,
-            },
-          },
-          fetchPolicy: "no-cache",
-          notifyOnNetworkStatusChange: true,
-        });
+    const hasData = !!data && !!data.getOrdersBySeller;
+    if (!hasData) return;
 
-        if (ok) {
-          const isLastPageChanged = totalPages < page;
+    const {
+      getOrdersBySeller: { totalPages, totalResults, totalOrderItems },
+    } = data;
 
-          if (isLastPageChanged && totalPages !== 0) {
-            commonFilterOptionVar({
-              ...commonFilterOptionVar(),
-              page: totalPages,
-            });
-            return;
-          }
+    const isLastPageChanged = totalPages < page;
 
-          pageNumberListVar(
-            Array(totalPages)
-              .fill(null)
-              .map((_, index) => index + 1)
-          );
+    if (isLastPageChanged && totalPages !== 0) {
+      commonFilterOptionVar({
+        ...commonFilterOptionVar(),
+        page: totalPages,
+      });
+      return;
+    }
 
-          totalPageLengthVar(totalResults);
+    pageNumberListVar(
+      Array(totalPages)
+        .fill(null)
+        .map((_, index) => index + 1)
+    );
 
-          const nomalizedOrderItem: NormalizedListType =
-            constructOrderItem(totalOrderItems);
+    totalPageLengthVar(totalResults);
 
-          const resetOrderItems: Array<ResetOrderItemType> =
-            getResetOrderItems(nomalizedOrderItem);
+    const nomalizedOrderItem: NormalizedListType =
+      constructOrderItem(totalOrderItems);
+    const resetOrderItems: Array<ResetOrderItemType> =
+      getResetOrderItems(nomalizedOrderItem);
 
-          resetOrderItemsVar(resetOrderItems);
-          checkedOrderItemsVar([]);
-          checkAllBoxStatusVar(false);
-        }
-
-        if (error) {
-          showHasAnyProblemModal(
-            <>
-              내부 서버 오류로 인해 요청하신
-              <br />
-              작업을 완료하지 못했습니다.
-              <br />
-              다시 한 번 시도 후 같은 문제가 발생할 경우
-              <br />
-              찹스틱스로 문의해주세요.
-              <br />
-              <br />
-              (전화 문의 070-4187-3848)
-              <br />
-              <br />
-              Code:
-              {error}
-            </>
-          );
-        }
-      } catch (error) {
-        showHasAnyProblemModal(
-          <>
-            내부 서버 오류로 인해 요청하신
-            <br />
-            작업을 완료하지 못했습니다.
-            <br />
-            다시 한 번 시도 후 같은 문제가 발생할 경우
-            <br />
-            찹스틱스로 문의해주세요.
-            <br />
-            <br />
-            (전화 문의 070-4187-3848)
-            <br />
-            <br />
-            Code:
-            {error}
-          </>
-        );
-      }
-    })();
-  }, [page, skip, query, orderSearchType, nameId, typeId]);
+    resetOrderItemsVar(resetOrderItems);
+    checkedOrderItemsVar([]);
+    checkAllBoxStatusVar(false);
+  }, [data]);
 
   useEffect(() => {
     paginationVisibilityVar(loading || error);
@@ -244,6 +200,23 @@ const CancelTable = () => {
 
   const hasCancelOrderItems = !!orderItems && !!orderItems.length;
   const isFetchingOrderItemsFailed = !loading && !error && hasCancelOrderItems;
+
+  if (error) {
+    showHasAnyProblemModal(
+      <>
+        내부 서버 오류로 인해 요청하신
+        <br />
+        작업을 완료하지 못했습니다.
+        <br />
+        다시 한 번 시도 후 같은 문제가 발생할 경우
+        <br />
+        찹스틱스로 문의해주세요.
+        <br />
+        <br />
+        (전화 문의 070-4187-3848)
+      </>
+    );
+  }
 
   return (
     <TableContainer

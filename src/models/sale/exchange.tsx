@@ -17,7 +17,7 @@ export interface GetExchangeOrdersBySellerType {
 }
 
 export interface GetExchangeOrdersBySellerInputType {
-  page?: number;
+  page: number;
   skip?: number;
   query?: string;
   type?: OrderSearchType;

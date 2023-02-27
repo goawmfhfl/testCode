@@ -12,15 +12,13 @@ import { RequestRefundOrExchange } from "@constants/sale/orderManagement";
 import { OrderItems } from "@models/sale/index";
 
 export interface GetOrdersBySellerInputType {
-  input: {
-    page?: number;
-    skip?: number;
-    query?: string;
-    type?: OrderSearchType;
-    statusName?: OrderStatusName;
-    statusType?: OrderStatusType;
-    statusGroup: OrderStatusGroup;
-  };
+  page?: number;
+  skip?: number;
+  query?: string;
+  type?: OrderSearchType;
+  statusName?: OrderStatusName;
+  statusType?: OrderStatusType;
+  statusGroup: OrderStatusGroup;
 }
 
 export interface GetOrdersBySellerType {

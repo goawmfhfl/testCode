@@ -1,11 +1,9 @@
 import {
-  Cause,
   MainReason,
   OrderSearchType,
   OrderStatusGroup,
   OrderStatusName,
   OrderStatusType,
-  ShipmentType,
 } from "@constants/sale";
 import { OrderCancel } from "@constants/sale/cancelManagement";
 
@@ -43,7 +41,7 @@ export interface GetCancelOrdersBySellerType {
 }
 
 export interface GetCancelOrdersBySellerInputType {
-  page?: number;
+  page: number;
   skip?: number;
   query?: string;
   type?: OrderSearchType;

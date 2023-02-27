@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useMutation, useReactiveVar } from "@apollo/client";
+import { useMutation, useQuery, useReactiveVar } from "@apollo/client";
 import axios, { AxiosError } from "axios";
 import { cloneDeep } from "lodash";
 import styled, { css } from "styled-components";
 
-import {
-  decryptSaleNameId,
-  decryptSaleTypeId,
-  Pathnames,
-} from "@constants/index";
+import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
 import {
   OrderStatusGroup,
   OrderStatusName,
@@ -40,17 +36,18 @@ import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
 import { GET_EXCHANGE_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import { EDIT_SHIPMENT_NUMBER } from "@graphql/mutations/editShipmentNumber";
 
+import { TableType } from "@models/index";
+import { NormalizedType, ResetOrderItemType } from "@models/sale";
 import {
   EditShipmentNumberInputType,
   EditShipmentNumberType,
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
-import { NormalizedType, ResetOrderItemType } from "@models/sale";
-
-import { TableType } from "@models/index";
-
-import useLazyExchangeOrders from "@hooks/order/useLazyExchangeOrders";
+import {
+  GetExchangeOrdersBySellerInputType,
+  GetExchangeOrdersBySellerType,
+} from "@models/sale/exchange";
 
 import constructOrderItem from "@utils/sale/constructOrderItem";
 import getResetOrderItems from "@utils/sale/exchange/getResetOrderItems";
@@ -82,11 +79,33 @@ import { Input } from "@components/common/input/TextInput";
 const ExchangeTable = () => {
   const [searchParams] = useSearchParams();
   const { typeId, nameId } = Object.fromEntries([...searchParams]);
-
-  const { getOrderItems, loading, error } = useLazyExchangeOrders();
   const { page, skip, query, orderSearchType } = useReactiveVar(
     commonFilterOptionVar
   );
+
+  const orderItems = useReactiveVar(resetOrderItemsVar);
+  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
+  const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
+
+  const { loading, error, data } = useQuery<
+    GetExchangeOrdersBySellerType,
+    { input: GetExchangeOrdersBySellerInputType }
+  >(GET_EXCHANGE_ORDERS_BY_SELLER, {
+    variables: {
+      input: {
+        page,
+        skip,
+        query,
+        type: orderSearchType,
+        statusName: decryptSaleNameId[nameId] as OrderStatusName,
+        statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+        statusGroup: OrderStatusGroup.EXCHANGE,
+      },
+    },
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: "network-only",
+    errorPolicy: "all",
+  });
 
   const [sendOrderItems] = useMutation<
     SendOrderItemsType,
@@ -94,7 +113,7 @@ const ExchangeTable = () => {
       input: SendOrderItemsInputType;
     }
   >(SEND_ORDER_ITEMS, {
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
@@ -105,7 +124,6 @@ const ExchangeTable = () => {
             skip,
             query,
             type: orderSearchType,
-
             statusName: decryptSaleNameId[nameId] as OrderStatusName,
             statusType: decryptSaleTypeId[typeId] as OrderStatusType,
             statusGroup: OrderStatusGroup.EXCHANGE,
@@ -122,7 +140,7 @@ const ExchangeTable = () => {
       input: EditShipmentNumberInputType;
     }
   >(EDIT_SHIPMENT_NUMBER, {
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
@@ -142,10 +160,6 @@ const ExchangeTable = () => {
       "GetOrdersBySeller",
     ],
   });
-
-  const orderItems = useReactiveVar(resetOrderItemsVar);
-  const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
-  const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
 
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newOrderItems = cloneDeep(orderItems);
@@ -570,108 +584,40 @@ const ExchangeTable = () => {
     };
 
   useEffect(() => {
-    void (async () => {
-      try {
-        const {
-          data: {
-            getOrdersBySeller: {
-              ok,
-              error,
-              totalPages,
-              totalResults,
-              totalOrderItems,
-            },
-          },
-        } = await getOrderItems({
-          variables: {
-            input: {
-              page,
-              skip,
-              query,
-              type: orderSearchType,
-              statusName: decryptSaleNameId[nameId] as OrderStatusName,
-              statusType: decryptSaleTypeId[typeId] as OrderStatusType,
-              statusGroup: OrderStatusGroup.EXCHANGE,
-            },
-          },
-          fetchPolicy: "no-cache",
-          notifyOnNetworkStatusChange: true,
-        });
+    const hasData = !!data && !!data.getOrdersBySeller;
+    if (!hasData) return;
 
-        if (ok) {
-          const isLastPageChanged = totalPages < page;
+    const {
+      getOrdersBySeller: { totalPages, totalResults, totalOrderItems },
+    } = data;
 
-          if (isLastPageChanged && totalPages !== 0) {
-            commonFilterOptionVar({
-              ...commonFilterOptionVar(),
-              page: totalPages,
-            });
+    const isLastPageChanged = totalPages < page;
 
-            return;
-          }
+    if (isLastPageChanged && totalPages !== 0) {
+      commonFilterOptionVar({
+        ...commonFilterOptionVar(),
+        page: totalPages,
+      });
+      return;
+    }
 
-          pageNumberListVar(
-            Array(totalPages)
-              .fill(null)
-              .map((_, index) => index + 1)
-          );
+    pageNumberListVar(
+      Array(totalPages)
+        .fill(null)
+        .map((_, index) => index + 1)
+    );
 
-          totalPageLengthVar(totalResults);
+    totalPageLengthVar(totalResults);
 
-          const reconstructOrderItems: NormalizedType =
-            constructOrderItem(totalOrderItems);
+    const nomalizedOrderItem: NormalizedType =
+      constructOrderItem(totalOrderItems);
+    const resetOrderItems: Array<ResetOrderItemType> =
+      getResetOrderItems(nomalizedOrderItem);
 
-          const resetOrderItems: Array<ResetOrderItemType> = getResetOrderItems(
-            reconstructOrderItems
-          );
-
-          resetOrderItemsVar(resetOrderItems);
-          checkedOrderItemsVar([]);
-          checkAllBoxStatusVar(false);
-        }
-
-        if (error) {
-          showHasAnyProblemModal(
-            <>
-              내부 서버 오류로 인해 요청하신
-              <br />
-              작업을 완료하지 못했습니다.
-              <br />
-              다시 한 번 시도 후 같은 문제가 발생할 경우
-              <br />
-              찹스틱스로 문의해주세요.
-              <br />
-              <br />
-              (전화 문의 070-4187-3848)
-              <br />
-              <br />
-              Code:
-              {error}
-            </>
-          );
-        }
-      } catch (error) {
-        showHasAnyProblemModal(
-          <>
-            내부 서버 오류로 인해 요청하신
-            <br />
-            작업을 완료하지 못했습니다.
-            <br />
-            다시 한 번 시도 후 같은 문제가 발생할 경우
-            <br />
-            찹스틱스로 문의해주세요.
-            <br />
-            <br />
-            (전화 문의 070-4187-3848)
-            <br />
-            <br />
-            Code:
-            {error}
-          </>
-        );
-      }
-    })();
-  }, [page, skip, query, orderSearchType, nameId, typeId]);
+    resetOrderItemsVar(resetOrderItems);
+    checkedOrderItemsVar([]);
+    checkAllBoxStatusVar(false);
+  }, [data]);
 
   useEffect(() => {
     void (async () => {
@@ -717,6 +663,23 @@ const ExchangeTable = () => {
   const hasExchangeOrderItems = !!orderItems && !!orderItems.length && !loading;
   const isFetchingOrderItemsFailed =
     !loading && !error && hasExchangeOrderItems;
+
+  if (error) {
+    showHasAnyProblemModal(
+      <>
+        내부 서버 오류로 인해 요청하신
+        <br />
+        작업을 완료하지 못했습니다.
+        <br />
+        다시 한 번 시도 후 같은 문제가 발생할 경우
+        <br />
+        찹스틱스로 문의해주세요.
+        <br />
+        <br />
+        (전화 문의 070-4187-3848)
+      </>
+    );
+  }
 
   return (
     <TableContainer

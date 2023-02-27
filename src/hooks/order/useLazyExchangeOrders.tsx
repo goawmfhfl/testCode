@@ -1,4 +1,10 @@
 import { useLazyQuery } from "@apollo/client";
+import {
+  OrderSearchType,
+  OrderStatusGroup,
+  OrderStatusName,
+  OrderStatusType,
+} from "@constants/sale";
 
 import { GET_EXCHANGE_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import {
@@ -12,7 +18,7 @@ const useLazyExchangeOrders = () => {
     { input: GetExchangeOrdersBySellerInputType }
   >(GET_EXCHANGE_ORDERS_BY_SELLER, {
     notifyOnNetworkStatusChange: true,
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
     errorPolicy: "all",
   });
 

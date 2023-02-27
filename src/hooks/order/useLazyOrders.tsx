@@ -9,7 +9,7 @@ import {
 const useLazyOrders = () => {
   const [getOrderItem, { loading, error, data }] = useLazyQuery<
     GetOrdersBySellerType,
-    GetOrdersBySellerInputType
+    { input: GetOrdersBySellerInputType }
   >(GET_ORDERS_BY_SELLER, {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: "no-cache",

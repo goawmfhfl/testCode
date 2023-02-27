@@ -86,7 +86,7 @@ const OrderTable = () => {
 
   const { loading, error, data } = useQuery<
     GetOrdersBySellerType,
-    GetOrdersBySellerInputType
+    { input: GetOrdersBySellerInputType }
   >(GET_ORDERS_BY_SELLER, {
     variables: {
       input: {
@@ -538,10 +538,6 @@ const OrderTable = () => {
         <br />
         <br />
         (전화 문의 070-4187-3848)
-        <br />
-        <br />
-        Code:
-        {error}
       </>
     );
   }
