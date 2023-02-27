@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import styled from "styled-components/macro";
-import { useMutation, useReactiveVar } from "@apollo/client";
+import { useMutation, useQuery, useReactiveVar } from "@apollo/client";
 
 import {
   checkedProductsVar,
@@ -22,14 +22,16 @@ import { tableData } from "@constants/product/table";
 import { ProductStatus, productStatus, productType } from "@constants/product";
 import { decryptProductStatusId, ServiceUrls } from "@constants/index";
 
-import { GET_PRODUCTS_BY_SELLER } from "@graphql/queries/getProductsBySeller";
+import {
+  GetProductsBySellerInputType,
+  GetProductsBySellerType,
+  GET_PRODUCTS_BY_SELLER,
+} from "@graphql/queries/getProductsBySeller";
 import {
   ChangeProductsInfoBySellerInputType,
   ChangeProductsInfoBySellerType,
   CHANGE_PRODUCTS_INFO_BY_SELLER,
 } from "@graphql/mutations/changeProductsInfoBySeller";
-import useLazyProducts from "@hooks/product/useLazyGetProducts";
-
 import { TableType } from "@models/index";
 import {
   NormalizedType,
@@ -60,7 +62,6 @@ const ProductTable = () => {
   const [searchParams] = useSearchParams();
   const statusId: string = searchParams.get("statusId");
 
-  const { loading, error, getProducts } = useLazyProducts();
   const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
   const { status } = useReactiveVar(filterOptionVar);
 
@@ -70,12 +71,28 @@ const ProductTable = () => {
 
   const [products, setProducts] = useState<Array<CaculatedProductsType>>([]);
 
+  const { data, loading, error } = useQuery<
+    GetProductsBySellerType,
+    GetProductsBySellerInputType
+  >(GET_PRODUCTS_BY_SELLER, {
+    variables: {
+      input: {
+        page,
+        skip,
+        status: decryptProductStatusId[statusId] as ProductStatus,
+        query,
+      },
+    },
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: "network-only",
+  });
+
   const [changeProductStatus] = useMutation<
     ChangeProductsInfoBySellerType,
     ChangeProductsInfoBySellerInputType
   >(CHANGE_PRODUCTS_INFO_BY_SELLER, {
     notifyOnNetworkStatusChange: true,
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
     refetchQueries: [
       {
         query: GET_PRODUCTS_BY_SELLER,
@@ -239,101 +256,40 @@ const ProductTable = () => {
     };
 
   useEffect(() => {
-    try {
-      void (async () => {
-        const {
-          data: {
-            getProductsBySeller: {
-              ok,
-              error,
-              totalPages,
-              totalResults,
-              products,
-            },
-          },
-        } = await getProducts({
-          variables: {
-            input: {
-              page,
-              skip,
-              status: decryptProductStatusId[statusId] as ProductStatus,
-              query,
-            },
-          },
-          notifyOnNetworkStatusChange: true,
-          fetchPolicy: "no-cache",
-        });
+    const hasData = !!data && !!data.getProductsBySeller;
+    if (!hasData) return;
 
-        if (ok) {
-          const isLastPageChanged = totalPages < page;
+    const {
+      getProductsBySeller: { totalPages, totalResults, products },
+    } = data;
 
-          if (isLastPageChanged && totalPages !== 0) {
-            commonFilterOptionVar({
-              ...commonFilterOptionVar(),
-              page: totalPages,
-            });
+    const isLastPageChanged = totalPages < page;
 
-            return;
-          }
+    if (isLastPageChanged && totalPages !== 0) {
+      commonFilterOptionVar({
+        ...commonFilterOptionVar(),
+        page: totalPages,
+      });
 
-          pageNumberListVar(
-            Array(totalPages)
-              .fill(null)
-              .map((_, index) => index + 1)
-          );
-
-          totalPageLengthVar(totalResults);
-
-          const recontructProducts: NormalizedType = contructProducts(products);
-          const caculatedProducts: Array<CaculatedProductsType> =
-            caculateProducts(recontructProducts);
-          setProducts(caculatedProducts);
-
-          checkedProductsVar([]);
-          checkAllBoxStatusVar(false);
-        }
-        if (error) {
-          showHasAnyProblemModal(
-            <>
-              내부 서버 오류로 인해 요청하신
-              <br />
-              작업을 완료하지 못했습니다.
-              <br />
-              다시 한 번 시도 후 같은 문제가 발생할 경우
-              <br />
-              찹스틱스로 문의해주세요.
-              <br />
-              <br />
-              (전화 문의 070-4187-3848)
-              <br />
-              <br />
-              Code:
-              {error}
-            </>
-          );
-        }
-      })();
-    } catch (error) {
-      showHasAnyProblemModal(
-        <>
-          내부 서버 오류로 인해 요청하신
-          <br />
-          작업을 완료하지 못했습니다.
-          <br />
-          다시 한 번 시도 후 같은 문제가 발생할 경우
-          <br />
-          찹스틱스로 문의해주세요.
-          <br />
-          <br />
-          (전화 문의 070-4187-3848)
-          <br />
-          <br />
-          Code:
-          {error}
-        </>
-      );
+      return;
     }
-  }, [page, skip, status, query]);
+
+    pageNumberListVar(
+      Array(totalPages)
+        .fill(null)
+        .map((_, index) => index + 1)
+    );
+
+    totalPageLengthVar(totalResults);
+
+    const recontructProducts: NormalizedType = contructProducts(products);
+    const caculatedProducts: Array<CaculatedProductsType> =
+      caculateProducts(recontructProducts);
+    setProducts(caculatedProducts);
+
+    checkedProductsVar([]);
+    checkAllBoxStatusVar(false);
+  }, [data]);
 
   useEffect(() => {
     paginationVisibilityVar(loading || error);
@@ -341,6 +297,27 @@ const ProductTable = () => {
 
   const hasProducts = !!products && !!products.length;
   const isFetchingProductFailed = !!loading || !!error || hasProducts;
+
+  if (error) {
+    showHasAnyProblemModal(
+      <>
+        내부 서버 오류로 인해 요청하신
+        <br />
+        작업을 완료하지 못했습니다.
+        <br />
+        다시 한 번 시도 후 같은 문제가 발생할 경우
+        <br />
+        찹스틱스로 문의해주세요.
+        <br />
+        <br />
+        (전화 문의 070-4187-3848)
+        <br />
+        <br />
+        Code:
+        {error}
+      </>
+    );
+  }
 
   return (
     <TableContainer type={TableType.FIX} hasData={isFetchingProductFailed}>
