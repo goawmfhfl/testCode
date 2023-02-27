@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import styled from "styled-components/macro";
 import axios, { AxiosError } from "axios";
-import { useMutation, useReactiveVar } from "@apollo/client";
+import { useMutation, useQuery, useReactiveVar } from "@apollo/client";
 import { cloneDeep } from "lodash";
 
 import { decryptSaleTypeId, decryptSaleNameId } from "@constants/index";
@@ -39,6 +39,8 @@ import { TableType } from "@models/index";
 import {
   EditShipmentNumberInputType,
   EditShipmentNumberType,
+  GetOrdersBySellerInputType,
+  GetOrdersBySellerType,
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
@@ -51,8 +53,6 @@ import constructOrderItem from "@utils/sale/constructOrderItem";
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
 import { EDIT_SHIPMENT_NUMBER } from "@graphql/mutations/editShipmentNumber";
-
-import useLazyOrders from "@hooks/order/useLazyOrders";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
@@ -80,10 +80,29 @@ import { Input } from "@components/common/input/TextInput";
 const OrderTable = () => {
   const [searchParams] = useSearchParams();
   const { typeId, nameId } = Object.fromEntries([...searchParams]);
-  const { getOrderItem, error, loading } = useLazyOrders();
   const { page, skip, query, orderSearchType } = useReactiveVar(
     commonFilterOptionVar
   );
+
+  const { loading, error, data } = useQuery<
+    GetOrdersBySellerType,
+    GetOrdersBySellerInputType
+  >(GET_ORDERS_BY_SELLER, {
+    variables: {
+      input: {
+        page,
+        skip,
+        query,
+        type: orderSearchType,
+        statusName: decryptSaleNameId[nameId] as OrderStatusName,
+        statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+        statusGroup: OrderStatusGroup.ORDER,
+      },
+    },
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: "network-only",
+    errorPolicy: "all",
+  });
 
   const [sendOrderItems] = useMutation<
     SendOrderItemsType,
@@ -91,7 +110,7 @@ const OrderTable = () => {
       input: SendOrderItemsInputType;
     }
   >(SEND_ORDER_ITEMS, {
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
@@ -118,7 +137,7 @@ const OrderTable = () => {
       input: EditShipmentNumberInputType;
     }
   >(EDIT_SHIPMENT_NUMBER, {
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
@@ -470,106 +489,62 @@ const OrderTable = () => {
   };
 
   useEffect(() => {
-    void (async () => {
-      try {
-        const {
-          data: {
-            getOrdersBySeller: {
-              ok,
-              error,
-              totalOrderItems,
-              totalPages,
-              totalResults,
-            },
-          },
-        } = await getOrderItem({
-          variables: {
-            input: {
-              page,
-              skip,
-              query,
-              type: orderSearchType,
-              statusName: decryptSaleNameId[nameId] as OrderStatusName,
-              statusType: decryptSaleTypeId[typeId] as OrderStatusType,
-              statusGroup: OrderStatusGroup.ORDER,
-            },
-          },
-          fetchPolicy: "no-cache",
-          notifyOnNetworkStatusChange: true,
-        });
+    const hasData = !!data && !!data.getOrdersBySeller;
+    if (!hasData) return;
 
-        if (ok) {
-          const isLastPageChanged = totalPages < page;
+    const {
+      getOrdersBySeller: { totalPages, totalResults, totalOrderItems },
+    } = data;
 
-          if (isLastPageChanged && totalPages !== 0) {
-            commonFilterOptionVar({
-              ...commonFilterOptionVar(),
-              page: totalPages,
-            });
-            return;
-          }
+    const isLastPageChanged = totalPages < page;
 
-          pageNumberListVar(
-            Array(totalPages)
-              .fill(null)
-              .map((_, index) => index + 1)
-          );
+    if (isLastPageChanged && totalPages !== 0) {
+      commonFilterOptionVar({
+        ...commonFilterOptionVar(),
+        page: totalPages,
+      });
+      return;
+    }
 
-          totalPageLengthVar(totalResults);
+    pageNumberListVar(
+      Array(totalPages)
+        .fill(null)
+        .map((_, index) => index + 1)
+    );
 
-          const nomalizedOrderItem: NormalizedListType =
-            constructOrderItem(totalOrderItems);
+    totalPageLengthVar(totalResults);
 
-          const resetOrderItems: Array<ResetOrderItemType> =
-            getResetOrderItems(nomalizedOrderItem);
+    const nomalizedOrderItem: NormalizedListType =
+      constructOrderItem(totalOrderItems);
 
-          resetOrderItemsVar(resetOrderItems);
-          checkedOrderItemsVar([]);
-          checkAllBoxStatusVar(false);
-        }
+    const resetOrderItems: Array<ResetOrderItemType> =
+      getResetOrderItems(nomalizedOrderItem);
 
-        if (error) {
-          showHasAnyProblemModal(
-            <>
-              내부 서버 오류로 인해 요청하신
-              <br />
-              작업을 완료하지 못했습니다.
-              <br />
-              다시 한 번 시도 후 같은 문제가 발생할 경우
-              <br />
-              찹스틱스로 문의해주세요.
-              <br />
-              <br />
-              (전화 문의 070-4187-3848)
-              <br />
-              <br />
-              Code:
-              {error}
-            </>
-          );
-        }
-      } catch (error) {
-        showHasAnyProblemModal(
-          <>
-            내부 서버 오류로 인해 요청하신
-            <br />
-            작업을 완료하지 못했습니다.
-            <br />
-            다시 한 번 시도 후 같은 문제가 발생할 경우
-            <br />
-            찹스틱스로 문의해주세요.
-            <br />
-            <br />
-            (전화 문의 070-4187-3848)
-            <br />
-            <br />
-            Code:
-            {error}
-          </>
-        );
-      }
-    })();
-  }, [page, skip, query, typeId, nameId, orderSearchType]);
+    resetOrderItemsVar(resetOrderItems);
+    checkedOrderItemsVar([]);
+    checkAllBoxStatusVar(false);
+  }, [data]);
+
+  if (error) {
+    showHasAnyProblemModal(
+      <>
+        내부 서버 오류로 인해 요청하신
+        <br />
+        작업을 완료하지 못했습니다.
+        <br />
+        다시 한 번 시도 후 같은 문제가 발생할 경우
+        <br />
+        찹스틱스로 문의해주세요.
+        <br />
+        <br />
+        (전화 문의 070-4187-3848)
+        <br />
+        <br />
+        Code:
+        {error}
+      </>
+    );
+  }
 
   useEffect(() => {
     paginationVisibilityVar(loading || error);
