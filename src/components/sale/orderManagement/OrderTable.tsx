@@ -614,6 +614,9 @@ const OrderTable = () => {
           <Th type={TableType.SCROLL} width={fixTableType[5].width}>
             {fixTableType[5].label}
           </Th>
+          <Th type={TableType.SCROLL} width={fixTableType[5].width}>
+            {fixTableType[6].label}
+          </Th>
         </ThContainer>
         <TdContainer>
           {!loading &&
@@ -627,6 +630,7 @@ const OrderTable = () => {
                   productName,
                   userName,
                   orderStatus,
+                  claimStatus,
                   isChecked,
                   colorIndex,
                   isLastRow,
@@ -669,6 +673,9 @@ const OrderTable = () => {
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[5].width}>
                     {orderStatus}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[6].width}>
+                    {claimStatus}
                   </Td>
                 </Tr>
               )
@@ -734,9 +741,6 @@ const OrderTable = () => {
           <Th type={TableType.SCROLL} width={scrollTableType[18].width}>
             {scrollTableType[18].label}
           </Th>
-          <Th type={TableType.SCROLL} width={scrollTableType[19].width}>
-            {scrollTableType[19].label}
-          </Th>
         </ThContainer>
 
         <TdContainer>
@@ -747,7 +751,6 @@ const OrderTable = () => {
                   id,
                   rowIndex,
                   colorIndex,
-                  claimStatus,
                   orderStatus,
                   shipmentOrderId,
                   shipmentCompany,
@@ -783,12 +786,9 @@ const OrderTable = () => {
                   isLastRow={isLastRow}
                   height={80}
                 >
-                  <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
-                    {claimStatus}
-                  </Td>
                   <ShipmentColumn
                     type={TableType.SCROLL}
-                    width={scrollTableType[1].width + scrollTableType[2].width}
+                    width={scrollTableType[0].width + scrollTableType[1].width}
                     as={"form"}
                     action="http://info.sweettracker.co.kr/tracking/5"
                     method="post"
@@ -801,7 +801,7 @@ const OrderTable = () => {
                       value={process.env.REACT_APP_SWEETTRAKER_API_KEY}
                       readOnly={true}
                     />
-                    <ShipmentCompanyTd width={scrollTableType[1].width}>
+                    <ShipmentCompanyTd width={scrollTableType[0].width}>
                       {isFirstRow ? (
                         <>
                           {shipmentCompany ? (
@@ -861,7 +861,7 @@ const OrderTable = () => {
                         "-"
                       )}
                     </ShipmentCompanyTd>
-                    <ShipmnetNumberTd width={scrollTableType[2].width}>
+                    <ShipmnetNumberTd width={scrollTableType[1].width}>
                       {isFirstRow ? (
                         <>
                           {shipmentNumber ? (
@@ -968,60 +968,60 @@ const OrderTable = () => {
                     </ShipmnetNumberTd>
                   </ShipmentColumn>
 
-                  <Td type={TableType.SCROLL} width={scrollTableType[3].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[2].width}>
                     {paidAt}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[4].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[3].width}>
                     {recipientName}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[5].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[4].width}>
                     {recipientPhoneNumber}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[6].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[5].width}>
                     <RecipientAddressWrapper>
                       {recipientAddress}
                     </RecipientAddressWrapper>
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[7].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[6].width}>
                     {postCode}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[8].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[7].width}>
                     {shipmentMemo}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[9].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[8].width}>
                     {userEmail}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[10].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[9].width}>
                     {userPhoneNumber}
                   </Td>
                   <OptionTd
                     type={TableType.SCROLL}
-                    width={scrollTableType[11].width}
+                    width={scrollTableType[10].width}
                   >
                     <OptionWrapper>{option}</OptionWrapper>
                   </OptionTd>
-                  <Td type={TableType.SCROLL} width={scrollTableType[12].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[11].width}>
                     <Quantity quantity={quantity}>{quantity}</Quantity>
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[13].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[12].width}>
                     {price}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[14].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[13].width}>
                     {optionPrice}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[15].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[14].width}>
                     {discountPrice}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[16].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[15].width}>
                     {totalPrice}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[17].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[16].width}>
                     {shipmentPrice}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[18].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[17].width}>
                     {shipmentDistantPrice}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[19].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[18].width}>
                     {totalPaymentAmount}
                   </Td>
                 </Tr>
