@@ -176,6 +176,7 @@ export const GET_REFUND_ORDERS_BY_SELLER = gql`
         }
 
         orderByShop {
+          id
           bundleShipmentPrice
           bundleShipmentDistantPrice
           bundleShipmentType

@@ -46,11 +46,13 @@ import { showHasServerErrorModal } from "@cache/productManagement";
 const HandleCompleteRefundModal = ({
   type,
   orderItemIds,
+  orderByShopId,
   cause,
   detailedReason,
 }: {
   type: OrderStatusGroup;
   orderItemIds: Array<number>;
+  orderByShopId: number;
   cause: Cause;
   detailedReason: string;
 }) => {
@@ -67,11 +69,15 @@ const HandleCompleteRefundModal = ({
     initialShipmentAmount: number;
     initialShipmentDistantAmount: number;
     shipmentRefundAmount: number;
+    shipmentRefundDistantAmount: number;
+    finalRefundAmount: number;
   }>({
     totalProductAmount: 0,
     initialShipmentAmount: 0,
     initialShipmentDistantAmount: 0,
     shipmentRefundAmount: 0,
+    shipmentRefundDistantAmount: 0,
+    finalRefundAmount: 0,
   });
 
   const {
@@ -148,7 +154,7 @@ const HandleCompleteRefundModal = ({
       input: EstimateRefundAmountInputType;
     }
   >(ESTIMATE_REFUND_AMOUNT, {
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   });
 
@@ -276,16 +282,19 @@ const HandleCompleteRefundModal = ({
               initialShipmentAmount,
               initialShipmentDistantAmount,
               shipmentRefundAmount,
+              shipmentRefundDistantAmount,
+              finalRefundAmount,
             },
           },
         } = await estimateRefundAmount({
           variables: {
             input: {
               orderItemIds,
+              orderByShopId,
               cause,
             },
           },
-          fetchPolicy: "no-cache",
+          fetchPolicy: "network-only",
           notifyOnNetworkStatusChange: true,
           errorPolicy: "all",
         });
@@ -297,19 +306,21 @@ const HandleCompleteRefundModal = ({
             initialShipmentAmount: initialShipmentAmount ?? 0,
             initialShipmentDistantAmount: initialShipmentDistantAmount ?? 0,
             shipmentRefundAmount: shipmentRefundAmount ?? 0,
+            shipmentRefundDistantAmount: shipmentRefundDistantAmount ?? 0,
+            finalRefundAmount: finalRefundAmount ?? 0,
           });
         }
 
         if (error) {
           loadingSpinnerVisibilityVar(false);
-          console.log(error);
+          showHasServerErrorModal(error, "반품 완료처리");
         }
       })();
     } catch (error) {
       loadingSpinnerVisibilityVar(false);
-      console.log(error);
+      showHasServerErrorModal(error as string, "반품 완료처리");
     }
-  }, [orderItemIds, cause]);
+  }, []);
 
   useEffect(() => {
     const shipment = initialShipmentAmount;

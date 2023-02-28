@@ -185,7 +185,7 @@ const HandleRefusalRefundOrExchangeRequestModal = ({
 
               const {
                 data: {
-                  denyRefunrOrExchangeRequestBySeller: { ok, error },
+                  denyRefundOrExchangeRequestBySeller: { ok, error },
                 },
               } = await denyRefundReqeust({
                 variables: {
@@ -249,12 +249,12 @@ const HandleRefusalRefundOrExchangeRequestModal = ({
 
               if (error) {
                 loadingSpinnerVisibilityVar(false);
-                showHasServerErrorModal(error, description);
+                showHasServerErrorModal(error, description as string);
               }
             })();
           } catch (error) {
             loadingSpinnerVisibilityVar(false);
-            showHasServerErrorModal(error as string, description);
+            showHasServerErrorModal(error as string, description as string);
           }
         },
         cancelButtonClickHandler: () => {

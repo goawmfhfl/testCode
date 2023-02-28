@@ -50,6 +50,7 @@ export interface OrderItems {
   }>;
 
   orderByShop?: {
+    id: number;
     bundleShipmentPrice: number;
     bundleShipmentDistantPrice: number;
     bundleShipmentType: ShipmentType;
@@ -102,6 +103,7 @@ export interface OrderItems {
 
 export interface ResetOrderItemType {
   id: number;
+  orderByShopId?: number;
   merchantUid: string;
   merchantItemUid: string;
 
@@ -236,7 +238,7 @@ export interface ChangeOrderStatusByForceType {
 
 export interface ChangeOrderStatusByForceInputType {
   components: Array<{ orderItemId: number }>;
-  orderStatusName: OrderStatusName;
+  claimStatusName: OrderStatusName;
 }
 
 export interface EstimateRefundAmountType {
@@ -247,13 +249,12 @@ export interface EstimateRefundAmountType {
     initialShipmentAmount: number;
     initialShipmentDistantAmount: number;
     shipmentRefundAmount: number;
-    bundleShipmentType: ShipmentType;
-    isConditionalAmountBreak: boolean;
-    isAllOrderItemRefunded: boolean;
-    isFreeBreak: boolean;
+    shipmentRefundDistantAmount: number;
+    finalRefundAmount: number;
   };
 }
 export interface EstimateRefundAmountInputType {
   orderItemIds: Array<number>;
+  orderByShopId: number;
   cause: Cause;
 }

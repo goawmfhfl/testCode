@@ -431,6 +431,9 @@ const Controller = () => {
             ({ detailedReason }) => detailedReason
           );
           const cause = reconstructCheckedOrderItems.map(({ cause }) => cause);
+          const orderByShopId = reconstructCheckedOrderItems.map(
+            ({ orderByShopId }) => orderByShopId
+          );
 
           modalVar({
             isVisible: true,
@@ -438,6 +441,7 @@ const Controller = () => {
               <HandleCompleteRefundModal
                 type={OrderStatusGroup.EXCHANGE}
                 orderItemIds={checkedOrderItemIds}
+                orderByShopId={orderByShopId[0]}
                 cause={cause[0]}
                 detailedReason={detailedReason[0]}
               />
@@ -571,7 +575,7 @@ const Controller = () => {
               variables: {
                 input: {
                   components,
-                  orderStatusName: claimStatus,
+                  claimStatusName: claimStatus,
                 },
               },
             });

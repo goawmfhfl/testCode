@@ -32,7 +32,7 @@ export interface GetRefundOrdersBySellerInputType {
 }
 
 export interface DenyRefundOrExchangeRequestBySellerType {
-  denyRefunrOrExchangeRequestBySeller: {
+  denyRefundOrExchangeRequestBySeller: {
     ok: boolean;
     error?: string;
   };

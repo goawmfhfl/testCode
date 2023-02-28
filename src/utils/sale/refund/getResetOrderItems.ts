@@ -104,6 +104,7 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
 
     return {
       id: orderId,
+      orderByShopId: orderByShop?.id,
       merchantUid: merchantUid || "-",
       merchantItemUid: merchantItemUid || "-",
       thumbnail: product?.thumbnail || "-",
