@@ -1,56 +1,60 @@
 import { useEffect } from "react";
+import { useQuery } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
+
 import { SaleMenuStatusType } from "@constants/sale";
 import { decryptSaleStatusId } from "@constants/index";
+import { orderStatusGroupVar } from "@cache/sale";
+
+import { GET_ORDER_STATUS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 
 import useAuthGuard from "@hooks/useAuthGuard";
-import useLazyOrderStatus from "@hooks/order/useLazyOrderStatus";
+
+import {
+  GetOrderStatusBySellerType,
+  GetOrderStatusBySellerInputType,
+} from "@models/sale/order";
 
 import Layout from "@components/common/Layout";
 import OrderManagement from "@components/sale/orderManagement";
 import CancelManagement from "@components/sale/cancelManagement";
 import RefundManagement from "@components/sale/refundManagement";
 import ExchangeMananagement from "@components/sale/exchangeManagement";
-import { orderStatusGroupVar } from "@cache/sale";
 
 const Sale = () => {
+  const { data } = useQuery<
+    GetOrderStatusBySellerType,
+    { input: GetOrderStatusBySellerInputType }
+  >(GET_ORDER_STATUS_BY_SELLER, {
+    fetchPolicy: "network-only",
+    errorPolicy: "all",
+    variables: {
+      input: {
+        page: 1,
+      },
+    },
+  });
+
   const [searchParams] = useSearchParams();
   const menuStatus = searchParams.get("statusId");
 
-  const { getOrderStatus } = useLazyOrderStatus();
   useAuthGuard();
 
   useEffect(() => {
-    void (async () => {
-      const {
-        data: {
-          getOrdersBySeller: { ok, error, totalOrderItems },
-        },
-      } = await getOrderStatus({
-        variables: {
-          input: {
-            page: 1,
-          },
-        },
-      });
+    const hasData = !!data && !!data.getOrdersBySeller;
 
-      if (ok) {
-        const hasOrderItems = !!totalOrderItems && !!totalOrderItems.length;
-        if (!hasOrderItems) {
-          return "";
-        }
+    if (!hasData) return;
 
-        const orderStatusGroup = totalOrderItems.map(
-          ({ orderStatusGroup }) => orderStatusGroup
-        );
+    const {
+      getOrdersBySeller: { totalOrderItems },
+    } = data;
 
-        orderStatusGroupVar(orderStatusGroup);
-      }
-      if (error) {
-        console.log("error");
-      }
-    })();
-  }, []);
+    const orderStatusGroup = totalOrderItems.map(
+      ({ orderStatusGroup }) => orderStatusGroup
+    );
+
+    orderStatusGroupVar(orderStatusGroup);
+  }, [data]);
 
   return (
     <Layout>
