@@ -117,11 +117,8 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
         ? (orderStatusNameType[claimStatus?.name] as string)
         : "-",
       paidAt: orderByShop?.order?.paidAt
-        ? `${
-            getDateFormat(orderByShop?.order?.paidAt, DateType.PAYMENT)
-              .YYYY_MM_DD
-          } / ${
-            getDateFormat(orderByShop?.order?.paidAt, DateType.PAYMENT).HH_MM_SS
+        ? `${getDateFormat(orderByShop?.order?.paidAt).YYYY_MM_DD} / ${
+            getDateFormat(orderByShop?.order?.paidAt).HH_MM_SS
           }`
         : "-",
       requestAt: requestAt || "-",

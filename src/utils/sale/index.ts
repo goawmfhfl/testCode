@@ -281,9 +281,9 @@ export const getStatusReason = (
         result.mainReason = mainReasonType[mainReason];
         result.detailedReason = detailedReason;
         result.reasonStatus = status;
-        result.requestAt = `${
-          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
-        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
+        result.requestAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
+          getDateFormat(createdAt).HH_MM_SS
+        }`;
         result.cause = cause;
         result.attachedImages = uploadedFileUrls;
       }
@@ -293,9 +293,9 @@ export const getStatusReason = (
         status === OrderStatusName.REFUND_COMPLETED ||
         status === OrderStatusName.EXCHANGE_COMPLETED
       ) {
-        result.completedAt = `${
-          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
-        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
+        result.completedAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
+          getDateFormat(createdAt).HH_MM_SS
+        }`;
         result.amount = amount;
       }
 
@@ -309,9 +309,9 @@ export const getStatusReason = (
         result.refusalDetailedReason = detailedReason;
         result.refusalReasonStatus = status;
         result.refusalCause = cause;
-        result.refusalAt = `${
-          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
-        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
+        result.refusalAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
+          getDateFormat(createdAt).HH_MM_SS
+        }`;
       }
 
       return result;
