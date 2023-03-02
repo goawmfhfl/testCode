@@ -47,7 +47,7 @@ import { ResetOrderItemType } from "@models/sale";
 import { getHasCheckedOrderStatus } from "@utils/sale/order/getHasCheckedOrderStatus";
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
 
-import exclamationmarkSrc from "@icons/exclamationmark.svg";
+import exclamationMark from "@icons/exclamationmark.svg";
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
 
 import Button from "@components/common/Button";
@@ -246,6 +246,7 @@ const Controller = () => {
           주문건을 선택해주세요
         </>
       );
+
       return;
     }
 
@@ -264,30 +265,31 @@ const Controller = () => {
           주문 상태를 다시 확인해주세요.
         </>
       );
+
       return;
     }
 
-    const { isShipmentCompanyFullFilled, isShipmentNumberFullFilled } =
+    const { isShipmentCompanyFulfilled, isShipmentNumberFulfilled } =
       reconstructCheckedOrderItems.reduce(
         (result, { temporaryShipmentCompany, temporaryShipmentNumber }) => {
           if (!temporaryShipmentCompany)
-            result.isShipmentCompanyFullFilled = false;
+            result.isShipmentCompanyFulfilled = false;
           if (!temporaryShipmentNumber)
-            result.isShipmentCompanyFullFilled = false;
+            result.isShipmentNumberFulfilled = false;
 
           return result;
         },
         {
-          isShipmentCompanyFullFilled: true,
-          isShipmentNumberFullFilled: true,
+          isShipmentCompanyFulfilled: true,
+          isShipmentNumberFulfilled: true,
         }
       );
 
-    if (!isShipmentCompanyFullFilled || !isShipmentNumberFullFilled) {
+    if (!isShipmentCompanyFulfilled || !isShipmentNumberFulfilled) {
       systemModalVar({
         ...systemModalVar(),
         isVisible: true,
-        icon: exclamationmarkSrc,
+        icon: exclamationMark,
         description: <>송장정보를 기입해주세요</>,
         cancelButtonVisibility: false,
         confirmButtonVisibility: true,
@@ -323,7 +325,7 @@ const Controller = () => {
               ({ id, temporaryShipmentCompany, temporaryShipmentNumber }) => ({
                 orderItemId: id,
                 shipmentCompany: temporaryShipmentCompany,
-                shipmentNumber: Number(temporaryShipmentNumber),
+                shipmentNumber: String(temporaryShipmentNumber),
               })
             );
 

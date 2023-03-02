@@ -97,7 +97,7 @@ export interface SendOrderItemsInputType {
   components: Array<{
     orderItemId: number;
     shipmentCompany: string;
-    shipmentNumber: number;
+    shipmentNumber: string;
   }>;
   type: SendType;
 }
