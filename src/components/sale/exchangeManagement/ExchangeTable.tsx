@@ -459,7 +459,7 @@ const ExchangeTable = () => {
 
   const handleEditButtonClick =
     (id: number, shipmentStatus: ShipmentStatus) => () => {
-      const newOrderItems = cloneDeep(orderItems);
+      const newOrderItems: Array<ResetOrderItemType> = cloneDeep(orderItems);
 
       const findOrderItmeIndex = newOrderItems.findIndex(
         (orderItem) => orderItem.id === id
@@ -534,7 +534,7 @@ const ExchangeTable = () => {
                       {
                         orderItemId: id,
                         shipmentCompany,
-                        shipmentNumber,
+                        shipmentNumber: String(shipmentNumber),
                       },
                     ],
                     type:

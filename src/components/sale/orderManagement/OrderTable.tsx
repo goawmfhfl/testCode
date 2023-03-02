@@ -319,7 +319,7 @@ const OrderTable = () => {
                       {
                         orderItemId: id,
                         shipmentCompany,
-                        shipmentNumber,
+                        shipmentNumber: String(shipmentNumber),
                       },
                     ],
                     type: SendType.SEND,

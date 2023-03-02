@@ -368,7 +368,7 @@ const RefundTable = () => {
                       {
                         orderItemId: id,
                         shipmentCompany,
-                        shipmentNumber,
+                        shipmentNumber: String(shipmentNumber),
                       },
                     ],
                     type: SendType.REFUND_PICK_UP,
