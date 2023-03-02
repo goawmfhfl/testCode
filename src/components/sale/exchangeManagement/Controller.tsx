@@ -276,7 +276,7 @@ const Controller = () => {
                     }) => ({
                       orderItemId: id,
                       shipmentCompany: temporaryPickupShipmentCompany,
-                      shipmentNumber: Number(
+                      shipmentNumber: String(
                         temporaryPickupAgainShipmentNumber
                       ),
                     })
@@ -289,7 +289,7 @@ const Controller = () => {
                     }) => ({
                       orderItemId: id,
                       shipmentCompany: temporaryPickupAgainShipmentCompany,
-                      shipmentNumber: Number(
+                      shipmentNumber: String(
                         temporaryPickupAgainShipmentNumber
                       ),
                     })

@@ -235,7 +235,7 @@ const Controller = () => {
               }) => ({
                 orderItemId: id,
                 shipmentCompany: temporaryRefundShipmentCompany,
-                shipmentNumber: Number(temporaryRefundShipmentNumber),
+                shipmentNumber: String(temporaryRefundShipmentNumber),
               })
             );
 
