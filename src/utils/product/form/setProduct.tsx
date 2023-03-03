@@ -92,7 +92,7 @@ const setProduct = (
     HAS_DISCOUNT_SPAN: !!isSetDiscountSpan,
     DISCOUNT_STARTS_AT: startDiscountDate ? new Date(startDiscountDate) : null,
     DISCOUNT_ENDS_AT: endDiscountDate ? new Date(endDiscountDate) : null,
-    PRODUCT_STOCK: quantity,
+    PRODUCT_STOCK: Number(quantity),
     IS_BUNDLE_SHIPMENT: isBundleShipment ? "가능" : "불가능",
     SHIPMENT_TEMPLATE_ID: shipment && shipment.id ? Number(shipment.id) : null,
     SHIPMENT_PRICE_TYPE: shipmentType ?? ShipmentChargeType.Charged,

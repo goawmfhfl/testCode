@@ -242,7 +242,7 @@ const SaveBar = () => {
           nullableFields,
           [
             !isDiscounted && "discountAmount",
-            hasRequiredOption && "quantity",
+            "quantity",
             isShipmentPriceFree && "shipmentPrice",
           ]
         );

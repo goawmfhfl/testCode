@@ -121,7 +121,7 @@ export default async function constructProductInput(
       isDiscounted && hasDiscountSpan && endDiscountDate
         ? new Date(endDiscountDate)
         : null,
-    quantity: quantity ? Number(quantity) : null,
+    quantity: quantity != null ? Number(quantity) : null,
 
     isSelectiveOptionInUse: hasSelectiveOption,
     optionCombinations: productOptions,

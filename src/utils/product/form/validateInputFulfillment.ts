@@ -26,7 +26,7 @@ const validateInputFulfillment = (
   const inputValues = Object.values(inputFields);
 
   const isFulfilled = inputValues.reduce(
-    (acc: boolean, inputValue: unknown, index: number) => {
+    (hasAllInputFulfilled: boolean, inputValue: unknown, index: number) => {
       const inputName = inputNames[index];
 
       const isOptionalInput = optionalInputNames.find(
@@ -34,7 +34,7 @@ const validateInputFulfillment = (
       );
 
       if (isOptionalInput) {
-        return acc;
+        return hasAllInputFulfilled;
       }
 
       if (typeof inputValue === "string" && inputName === "description") {
@@ -86,7 +86,7 @@ const validateInputFulfillment = (
           return false;
         }
 
-        return acc;
+        return hasAllInputFulfilled;
       }
 
       if (inputValue instanceof Array && inputName === "colors") {
@@ -98,7 +98,7 @@ const validateInputFulfillment = (
           return false;
         }
 
-        return acc;
+        return hasAllInputFulfilled;
       }
 
       if (inputValue instanceof Array && inputName === "optionCombinations") {
@@ -159,10 +159,10 @@ const validateInputFulfillment = (
 
         const isRequiredOptionValid =
           Boolean(requiredOptions.numberOfOptions) &&
-          Boolean(requiredOptions.stockSum);
+          requiredOptions.stockSum >= 0;
         const isSelectiveOptionValid =
           Boolean(selectiveOptions.numberOfOptions) &&
-          Boolean(selectiveOptions.stockSum);
+          selectiveOptions.stockSum >= 0;
 
         if (hasRequiredOptions && !isRequiredOptionValid) {
           unfulfilledInputList.push(
@@ -171,6 +171,7 @@ const validateInputFulfillment = (
               UnfulfilledStatus.Unfilled
             )
           );
+
           result = false;
         }
 
@@ -181,10 +182,11 @@ const validateInputFulfillment = (
               UnfulfilledStatus.Unfilled
             )
           );
+
           result = false;
         }
 
-        return acc && result;
+        return hasAllInputFulfilled && result;
       }
 
       if (
@@ -228,7 +230,7 @@ const validateInputFulfillment = (
           return false;
         }
 
-        return acc;
+        return hasAllInputFulfilled;
       }
 
       if (inputValue instanceof Array && inputName === "tagInfos") {
@@ -240,7 +242,7 @@ const validateInputFulfillment = (
           return false;
         }
 
-        return acc;
+        return hasAllInputFulfilled;
       }
 
       // string
@@ -253,7 +255,7 @@ const validateInputFulfillment = (
           );
         }
 
-        return acc && isValid;
+        return hasAllInputFulfilled && isValid;
       }
 
       // number
@@ -275,17 +277,17 @@ const validateInputFulfillment = (
           return false;
         }
 
-        return acc;
+        return hasAllInputFulfilled;
       }
 
       // boolean
       if (typeof inputValue === "boolean") {
-        return acc;
+        return hasAllInputFulfilled;
       }
 
       // Date
       if (inputValue instanceof Date) {
-        return acc;
+        return hasAllInputFulfilled;
       }
 
       unfulfilledInputList.push(
