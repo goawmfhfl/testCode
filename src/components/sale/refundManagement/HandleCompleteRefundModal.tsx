@@ -59,7 +59,6 @@ const HandleCompleteRefundModal = ({
   const [searchParams] = useSearchParams();
   const { typeId, nameId } = Object.fromEntries([...searchParams]);
 
-  const sign = cause === Cause.CLIENT ? "-" : "+";
   const { page, skip, query, orderSearchType } = useReactiveVar(
     commonFilterOptionVar
   );
@@ -82,44 +81,35 @@ const HandleCompleteRefundModal = ({
 
   const {
     totalProductAmount,
-    initialShipmentAmount,
+    initialShipmentAmount: initialShipmentFromServer,
     initialShipmentDistantAmount,
     shipmentRefundAmount,
   } = refundInformation;
 
   const [handleShipmentStringType, setHandleShipmentStringType] = useState<{
-    shipment: string;
-    shipmentDistant: string;
+    initialShipmentAmount: string;
+    shipmentDistantAmount: string;
     refund: string;
   }>({
-    shipment: "",
-    shipmentDistant: "",
+    initialShipmentAmount: "",
+    shipmentDistantAmount: "",
     refund: "",
   });
 
-  const [handleShipmentNumberType, setHandleShipmentNumberType] = useState<{
-    shipmentDistant: number;
-    refund: number;
-  }>({
-    shipmentDistant: 0,
-    refund: 0,
-  });
-
   useState<number>(0);
-  const { refund, shipment, shipmentDistant } = handleShipmentStringType;
-  const { refund: totalRefund, shipmentDistant: totalShipmentDistant } =
-    handleShipmentNumberType;
+  const { refund, initialShipmentAmount, shipmentDistantAmount } =
+    handleShipmentStringType;
 
   const [totalRefundAmount, setTotalRefundAmount] = useState<number>(0);
   const totalAmount =
     cause === Cause.CLIENT
       ? totalProductAmount -
-        initialShipmentAmount -
-        totalRefund -
-        totalShipmentDistant
+        Number(initialShipmentAmount) -
+        Number(refund) -
+        Number(shipmentDistantAmount)
       : totalProductAmount +
-        initialShipmentAmount +
-        initialShipmentDistantAmount;
+        Number(initialShipmentAmount) +
+        initialShipmentDistantAmount; // TODO: 계산 다시 확인
 
   const [completeRefund] = useMutation<
     CompleteRefundBySellerType,
@@ -165,26 +155,18 @@ const HandleCompleteRefundModal = ({
     });
   };
 
-  const changeRefundShipmentAmountHandler =
+  const handleRefundShipmentAmountChange =
     (type: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const value: string = e.target.value;
-
       const deleteComma: string = value.replaceAll(",", "");
-      const deleteSignAndComma = Number(deleteComma.replaceAll(sign, ""));
 
-      if (isNaN(deleteSignAndComma)) {
+      if (isNaN(Number(deleteComma))) {
         return;
       }
 
-      setHandleShipmentNumberType((prev) => ({
-        ...prev,
-        [type]: deleteSignAndComma,
-      }));
-
-      const addSignAndCommaRefundAmount = `${sign} ${deleteSignAndComma.toLocaleString()}`;
       setHandleShipmentStringType((prev) => ({
         ...prev,
-        [type]: addSignAndCommaRefundAmount,
+        [type]: deleteComma.toLocaleString(),
       }));
     };
 
@@ -193,20 +175,23 @@ const HandleCompleteRefundModal = ({
       try {
         loadingSpinnerVisibilityVar(true);
 
-        const components = orderItemIds.map((id) => ({
-          orderItemId: id,
-          cause,
-          totalAmount,
-          shipmentReturnAmount: totalRefund + totalShipmentDistant,
-        }));
-
         const {
           data: {
             completeRefundBySeller: { ok, error },
           },
         } = await completeRefund({
           variables: {
-            input: { components },
+            input: {
+              orderItemIds,
+              orderByShopId,
+              cause,
+              isDistant: true, // TODO: 판매자쪽에서 꼭 보내주어야하는 것인지 확인 필요
+              totalProductAmount,
+              initialShipmentAmount: Number(initialShipmentAmount),
+              initialShipmentDistantAmount,
+              shipmentRefundAmount,
+              shipmentRefundDistantAmount: Number(shipmentDistantAmount),
+            },
           },
           fetchPolicy: "no-cache",
           notifyOnNetworkStatusChange: true,
@@ -323,23 +308,10 @@ const HandleCompleteRefundModal = ({
   }, []);
 
   useEffect(() => {
-    const shipment = initialShipmentAmount;
-    const shipmentDistant = initialShipmentDistantAmount;
-    const refund = shipmentRefundAmount;
-
-    const addSignAndCommaShipment = `${sign} ${shipment.toLocaleString()}`;
-    const addSignAndCommaShipmentDistant = `${sign} ${shipmentDistant.toLocaleString()}`;
-    const addSignAndCommaRefund = `${sign} ${refund.toLocaleString()}`;
-
     setHandleShipmentStringType({
-      shipment: addSignAndCommaShipment,
-      shipmentDistant: addSignAndCommaShipmentDistant,
-      refund: addSignAndCommaRefund,
-    });
-
-    setHandleShipmentNumberType({
-      refund: shipmentRefundAmount,
-      shipmentDistant: initialShipmentDistantAmount,
+      initialShipmentAmount: initialShipmentFromServer.toLocaleString(),
+      shipmentDistantAmount: initialShipmentDistantAmount.toLocaleString(),
+      refund: shipmentRefundAmount.toLocaleString(),
     });
 
     setTotalRefundAmount(totalRefundAmount);
@@ -378,7 +350,9 @@ const HandleCompleteRefundModal = ({
           {initialShipmentAmount ? (
             <RefundInformationContainer>
               <RefundInformationLabel>최초 배송비</RefundInformationLabel>
-              <RefundInformationPrice>{shipment}</RefundInformationPrice>
+              <RefundInformationPrice>
+                {initialShipmentAmount}
+              </RefundInformationPrice>
             </RefundInformationContainer>
           ) : null}
 
@@ -388,9 +362,7 @@ const HandleCompleteRefundModal = ({
                 최초 추가 배송비(제주도서산간)
               </RefundInformationLabel>
               <RefundInformationPrice>
-                {`${sign} ${initialShipmentDistantAmount.toLocaleString(
-                  "Ko-kr"
-                )}`}
+                {`${initialShipmentDistantAmount.toLocaleString("Ko-kr")}`}
               </RefundInformationPrice>
             </RefundInformationContainer>
           ) : null}
@@ -401,7 +373,7 @@ const HandleCompleteRefundModal = ({
               <RefundShipmentInput
                 type={"text"}
                 value={refund}
-                onChange={changeRefundShipmentAmountHandler("refund")}
+                onChange={handleRefundShipmentAmountChange("refund")}
               />
             </RefundShipmentContainer>
           ) : null}
@@ -413,8 +385,10 @@ const HandleCompleteRefundModal = ({
               </RefundInformationLabel>
               <RefundShipmentInput
                 type={"text"}
-                value={shipmentDistant}
-                onChange={changeRefundShipmentAmountHandler("shipmentDistant")}
+                value={shipmentDistantAmount}
+                onChange={handleRefundShipmentAmountChange(
+                  "shipmentDistantAmount"
+                )}
               />
               <ExclamationIconContainer>
                 <ExclamationIcon src={exclamationGreySrc} />
