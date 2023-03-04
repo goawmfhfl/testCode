@@ -1,6 +1,6 @@
 import { NormalizedListType } from "@models/sale";
 import { orderStatusNameType } from "@constants/sale";
-import { DateType, getDateFormat } from "@utils/date";
+import { getDateFormat } from "@utils/date";
 
 import {
   getShipmentPrice,
@@ -13,18 +13,19 @@ import {
 
 const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
   const hasOrderItems =
-    !!reconstructOrderItems && !!reconstructOrderItems.orders;
+    !!reconstructOrderItems && !!reconstructOrderItems.orderItems;
   if (!hasOrderItems) return;
 
-  const orderAllIds = reconstructOrderItems?.orders.allIds;
-  const orderByid = reconstructOrderItems?.orders.byId;
+  const orderAllIds = reconstructOrderItems?.orderItems.allIds;
+  const orderByid = reconstructOrderItems?.orderItems.byId;
 
   const result = orderAllIds.map((id) => {
     const {
       id: orderId,
       merchantUid,
       merchantItemUid,
-      product,
+      thumbnail,
+      name,
       user,
       orderByShop,
       options,
@@ -107,8 +108,8 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       orderByShopId: orderByShop?.id,
       merchantUid: merchantUid || "-",
       merchantItemUid: merchantItemUid || "-",
-      thumbnail: product?.thumbnail || "-",
-      productName: product?.name || "-",
+      thumbnail: thumbnail || "-",
+      productName: name || "-",
       userName: user?.name || "-",
       orderStatus: orderStatus?.name
         ? (orderStatusNameType[orderStatus.name] as string)

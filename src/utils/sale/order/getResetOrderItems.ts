@@ -11,18 +11,19 @@ import {
 
 const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
   const hasOrderItems =
-    !!reconstructOrderItems && !!reconstructOrderItems.orders;
+    !!reconstructOrderItems && !!reconstructOrderItems.orderItems;
   if (!hasOrderItems) return;
 
-  const orderAllIds = reconstructOrderItems?.orders.allIds;
-  const orderByid = reconstructOrderItems?.orders.byId;
+  const allIds = reconstructOrderItems?.orderItems.allIds;
+  const orderItemById = reconstructOrderItems?.orderItems.byId;
 
-  const result = orderAllIds.map((id) => {
+  const result = allIds.map((id) => {
     const {
       id: orderId,
       merchantUid,
       merchantItemUid,
-      product,
+      thumbnail,
+      name,
       user,
       orderByShop,
       options,
@@ -40,7 +41,7 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       rowIndex,
       isLastRow,
       isFirstRow,
-    } = orderByid[id];
+    } = orderItemById[id];
 
     const {
       shipmentOrderId,
@@ -82,8 +83,8 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       id: orderId,
       merchantUid: merchantUid || "-",
       merchantItemUid: merchantItemUid || "-",
-      thumbnail: product?.thumbnail || "-",
-      productName: product?.name || "-",
+      thumbnail: thumbnail || "-",
+      productName: name || "-",
       userName: user?.name || "-",
       orderStatus: orderStatus
         ? (orderStatusNameType[orderStatus.name] as string)
@@ -138,6 +139,7 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       isFirstRow,
     };
   });
+
   return result;
 };
 

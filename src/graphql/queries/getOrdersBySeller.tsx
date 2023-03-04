@@ -12,10 +12,10 @@ export const GET_ORDERS_BY_SELLER = gql`
         merchantUid
         merchantItemUid
         isBundleShipment
+        thumbnail
+        name
         product {
           code
-          thumbnail
-          name
         }
         user {
           name
@@ -82,11 +82,8 @@ export const GET_CANCEL_ORDERS_BY_SELLER = gql`
         merchantUid
         merchantItemUid
         isBundleShipment
-
-        product {
-          thumbnail
-          name
-        }
+        thumbnail
+        name
 
         user {
           name
@@ -162,11 +159,10 @@ export const GET_REFUND_ORDERS_BY_SELLER = gql`
         merchantUid
         merchantItemUid
         isBundleShipment
-
+        thumbnail
+        name
         product {
           code
-          thumbnail
-          name
         }
 
         user {
@@ -254,11 +250,11 @@ export const GET_EXCHANGE_ORDERS_BY_SELLER = gql`
         merchantUid
         merchantItemUid
         isBundleShipment
+        thumbnail
+        name
 
         product {
           code
-          thumbnail
-          name
         }
 
         user {

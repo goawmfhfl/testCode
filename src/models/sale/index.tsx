@@ -8,7 +8,7 @@ import {
 } from "@constants/sale";
 
 export interface NormalizedListType {
-  orders: {
+  orderItems: {
     allIds: Array<string>;
     byId: { [key: string]: OrderItems };
   };
@@ -24,11 +24,8 @@ export interface OrderItems {
   merchantUid: string;
   merchantItemUid: string;
   isBundleShipment: boolean;
-
-  product: {
-    thumbnail: string;
-    name: string;
-  };
+  thumbnail: string;
+  name: string;
 
   user: {
     name: string;
@@ -210,7 +207,7 @@ export interface SearchQueryType {
 }
 
 export interface NormalizedType {
-  orders: {
+  orderItems: {
     allIds: Array<string>;
     byId: { [key: string]: OrderItems };
   };
