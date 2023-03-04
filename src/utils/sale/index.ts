@@ -185,8 +185,9 @@ export const getPaymentsInfo = (
 
   const resetQuantity = quantity ? quantity : optionQuantity;
   const resetOriginalPrice = originalPrice * resetQuantity;
-  const resetDiscountPrice =
-    (discountAppliedPrice - originalPrice) * resetQuantity;
+  const resetDiscountPrice = discountAppliedPrice
+    ? (discountAppliedPrice - originalPrice) * resetQuantity
+    : 0;
   const resetOptionPrice = optionPirce * optionQuantity;
   const totalPrice = resetOriginalPrice + resetOptionPrice + resetDiscountPrice;
   const totalPaymentAmount = totalPrice + shipmentPrice + shipmentDistantPrice;

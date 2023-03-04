@@ -496,6 +496,7 @@ const OrderTable = () => {
       getOrdersBySeller: { totalPages, totalResults, totalOrderItems },
     } = data;
 
+
     const isLastPageChanged = totalPages < page;
 
     if (isLastPageChanged && totalPages !== 0) {
