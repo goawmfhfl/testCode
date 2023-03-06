@@ -43,6 +43,15 @@ import Input from "@components/common/Input";
 import Button from "@components/common/Button";
 import { showHasServerErrorModal } from "@cache/productManagement";
 
+export interface RefundInformation {
+  totalProductAmount: number;
+  initialShipmentAmount: number;
+  initialShipmentDistantAmount: number | null;
+  shipmentRefundAmount: number;
+  shipmentRefundDistantAmount: number | null;
+  finalRefundAmount: number;
+}
+
 const HandleCompleteRefundModal = ({
   type,
   orderItemIds,
@@ -63,22 +72,16 @@ const HandleCompleteRefundModal = ({
     commonFilterOptionVar
   );
 
-  const [refundInformation, setRefundInformation] = useState<{
-    totalProductAmount: number;
-    initialShipmentAmount: number;
-    initialShipmentDistantAmount: number;
-    shipmentRefundAmount: number;
-    shipmentRefundDistantAmount: number;
-    finalRefundAmount: number;
-  }>({
-    totalProductAmount: 0,
-    initialShipmentAmount: 0,
-    initialShipmentDistantAmount: 0,
-    shipmentRefundAmount: 0,
-    shipmentRefundDistantAmount: 0,
-    finalRefundAmount: 0,
-  });
-
+  const [refundInformation, setRefundInformation] = useState<RefundInformation>(
+    {
+      totalProductAmount: 0,
+      initialShipmentAmount: 0,
+      initialShipmentDistantAmount: 0,
+      shipmentRefundAmount: 0,
+      shipmentRefundDistantAmount: 0,
+      finalRefundAmount: 0,
+    }
+  );
   const {
     totalProductAmount,
     initialShipmentAmount,
@@ -302,17 +305,18 @@ const HandleCompleteRefundModal = ({
   }, []);
 
   useEffect(() => {
-    setHandleShipmentNumberType((prev) => ({
-      ...prev,
+    setHandleShipmentNumberType({
+      initialShipment: initialShipmentAmount,
       shipmentRefund: shipmentRefundAmount,
-      shipmentRefundDistantAmount: shipmentRefundDistantAmount,
-    }));
+      shipmentRefundDistant: shipmentRefundDistantAmount,
+    });
   }, [refundInformation]);
 
   useEffect(() => {
     setFinalRefund(
       totalProductAmount +
         initialShipment +
+        initialShipmentDistantAmount +
         shipmentRefund +
         shipmentRefundDistant
     );
@@ -325,7 +329,7 @@ const HandleCompleteRefundModal = ({
         아래의 환불 사유 및 금액대로 환불될 예정입니다. 환불 사유 수정을 원하실
         경우
         <br />
-        현재 창을 나가셔서 주문건 선택 후 ‘환불 사유 수정'버튼을 눌러
+        현재 창을 나가셔서 주문건 선택 후 ‘환불 사유 수정'버튼을 눌러2
         진행해주시길 바랍니다.
       </NoticeContainer>
 
@@ -352,7 +356,7 @@ const HandleCompleteRefundModal = ({
             <RefundInformationContainer>
               <RefundInformationLabel>최초 배송비</RefundInformationLabel>
               <RefundInformationPrice>
-                {`+ ${initialShipmentDistantAmount.toLocaleString()}`}
+                {`+ ${initialShipmentAmount.toLocaleString()}`}
               </RefundInformationPrice>
             </RefundInformationContainer>
           )}
@@ -385,16 +389,16 @@ const HandleCompleteRefundModal = ({
             </RefundShipmentContainer>
           )}
 
-          {initialShipmentDistantAmount ? (
+          {Boolean(initialShipmentDistantAmount) && (
             <RefundInformationContainer>
               <RefundInformationLabel>
                 최초 추가 배송비(제주도서산간)
               </RefundInformationLabel>
               <RefundInformationPrice>
-                {`+ ${initialShipmentDistantAmount.toLocaleString()}`}
+                {`${initialShipmentDistantAmount.toLocaleString()}`}
               </RefundInformationPrice>
             </RefundInformationContainer>
-          ) : null}
+          )}
 
           {cause === Cause.CLIENT ? (
             <RefundShipmentContainer>
@@ -409,7 +413,7 @@ const HandleCompleteRefundModal = ({
             </RefundShipmentContainer>
           ) : null}
 
-          {cause === Cause.CLIENT ? (
+          {cause === Cause.CLIENT && Boolean(shipmentRefundDistantAmount) && (
             <RefundShipmentContainer>
               <RefundInformationLabel>
                 반품 추가 배송비(제주도서산간){" "}
@@ -440,7 +444,7 @@ const HandleCompleteRefundModal = ({
                 </StyledNoticeContainer>
               </ExclamationIconContainer>
             </RefundShipmentContainer>
-          ) : null}
+          )}
 
           <TotalPayAmountContainer>
             <TotalPaymentLabel>최종 환불 금액</TotalPaymentLabel>

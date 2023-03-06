@@ -56,8 +56,6 @@ const caculateProducts = (recontructProducts: NormalizedType) => {
           ).toLocaleString() + " ₩"
         : null;
 
-    console.log("name", name);
-
     const resetQuantity = getQuantity(
       quantity,
       options.filter((option) => option.isRequired)
