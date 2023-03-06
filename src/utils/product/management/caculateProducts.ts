@@ -42,29 +42,26 @@ const caculateProducts = (recontructProducts: NormalizedType) => {
       ? `${originalPrice.toLocaleString("ko-KR")} ₩`
       : "-";
 
-    const isDiscountNow =
-      new Date(startDiscountDate).getTime() <= new Date().getTime() &&
-      new Date().getTime() <= new Date(endDiscountDate).getTime();
-
-    const discountedRate =
-      discountMethod && discountAmount && isDiscountNow
-        ? `${discountAmount.toLocaleString("ko-KR")} ${
-            discountMethod === "PERCENT" ? "%" : "₩"
-          }`
-        : "-";
+    const discountedRate = getDiscountedRate(
+      startDiscountDate,
+      endDiscountDate,
+      discountMethod,
+      discountAmount
+    );
 
     const discountAppliedPrice =
-      discountAmount && discountMethod && isDiscountNow
+      discountedRate !== "-"
         ? Number(
             getDiscountedPrice(originalPrice, discountAmount, discountMethod)
-          ).toLocaleString("ko-KR") + " ₩"
-        : 0;
+          ).toLocaleString() + " ₩"
+        : null;
 
-    const resetQuantity = getQuantity(quantity, options);
+    console.log("name", name);
 
-    const finalSellngPrice = discountAppliedPrice
-      ? discountAppliedPrice
-      : originalPriceToWonSign;
+    const resetQuantity = getQuantity(
+      quantity,
+      options.filter((option) => option.isRequired)
+    );
 
     const isChecked = false;
 
@@ -77,7 +74,7 @@ const caculateProducts = (recontructProducts: NormalizedType) => {
       thirdCategory,
       originalPriceToWonSign,
       discountedRate,
-      finalSellngPrice,
+      finalSellngPrice: discountAppliedPrice ?? originalPriceToWonSign,
       quantity: resetQuantity,
       status,
       isChecked,
@@ -95,14 +92,50 @@ const getQuantity = (
   const hasOptions = !!options && !!options.length;
 
   if (!hasQuantity && !hasOptions) return 0;
-  if (hasQuantity && !hasOptions) return quantity;
-  if ((!hasQuantity && hasOptions) || (hasQuantity && hasOptions)) {
-    return options.reduce((result, { quantity, isRequired }) => {
-      if (isRequired) {
-        result += quantity;
-      }
-      return result;
+
+  if (hasOptions) {
+    return options.reduce((result, { quantity }) => {
+      return (result += quantity);
     }, 0);
+  }
+
+  if (hasQuantity) {
+    return quantity;
+  }
+};
+
+const getDiscountedRate = (
+  startDiscountDate: string,
+  endDiscountDate: string,
+  discountMethod: string,
+  discountAmount: number
+) => {
+  const hasDiscount = !!discountMethod && !!discountAmount;
+  if (!hasDiscount) return "-";
+
+  const isSetDiscountSpan =
+    Boolean(startDiscountDate) || Boolean(endDiscountDate);
+
+  const isDiscountNow =
+    new Date(startDiscountDate).getTime() <= new Date().getTime() &&
+    new Date().getTime() <= new Date(endDiscountDate).getTime();
+
+  if (isSetDiscountSpan) {
+    if (isDiscountNow) {
+      return `${discountAmount.toLocaleString("ko-KR")} ${
+        discountMethod === "PERCENT" ? "%" : "₩"
+      }`;
+    }
+
+    if (!isDiscountNow) {
+      return "-";
+    }
+  }
+
+  if (!isSetDiscountSpan) {
+    return `${discountAmount.toLocaleString("ko-KR")} ${
+      discountMethod === "PERCENT" ? "%" : "₩"
+    }`;
   }
 };
 
