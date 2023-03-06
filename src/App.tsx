@@ -51,7 +51,7 @@ function App() {
             path={`${Pathnames.Product}/:productId`}
             element={<ProductModification />}
           />
-          <Route path={Pathnames.Order} element={<Sale />} />
+          <Route path={Pathnames.Sale} element={<Sale />} />
           <Route path={Pathnames.Inquiry} element={<Inquiry />} />
           <Route path={Pathnames.Settlement} element={<Settlement />} />
           <Route path={Pathnames.Notice} element={<Notice />} />

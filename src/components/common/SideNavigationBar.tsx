@@ -1,30 +1,36 @@
 import { useEffect } from "react";
 import styled from "styled-components/macro";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useReactiveVar } from "@apollo/client";
-import { Pathnames } from "@constants/index";
+import { orderStatusGroupVar } from "@cache/sale";
+import { decryptSaleStatusId, Pathnames } from "@constants/index";
+import { showHasServerErrorModal } from "@cache/productManagement";
+import { OrderStatusGroup } from "@constants/sale";
 import useShopInfo from "@hooks/useShopInfo";
 import {
   loadingSpinnerVisibilityVar,
   saleSubItemVisibilityVar,
   sideNavigationBarStatusVar,
 } from "@cache/index";
-import { showHasServerErrorModal } from "@cache/productManagement";
-import { saleMenuStatusVar } from "@cache/sale";
-import { MenuStatusType, SaleMenuStatusType } from "@constants/sale";
 
 import mediumTopSrc from "@icons/medium-top.svg";
 import mediumBottomSrc from "@icons/medium-bottom.svg";
+import { getOrderGroupCounter } from "@utils/sale";
 
 const SideNavigationBar = () => {
   const { data, loading, error } = useShopInfo();
 
-  const saleMenuStatus = useReactiveVar(saleMenuStatusVar);
+  const [searchParams] = useSearchParams();
+  const { statusId } = Object.fromEntries([...searchParams]);
+
   const saleSubItemVisibility = useReactiveVar(saleSubItemVisibilityVar);
   const sideNavigationBarStatus = useReactiveVar(sideNavigationBarStatusVar);
+  const orderStatusGroup = useReactiveVar(orderStatusGroupVar);
+  const { order, cancel, refund, exchange } =
+    getOrderGroupCounter(orderStatusGroup);
 
-  const handleSubNavItemClick = (status: SaleMenuStatusType) => () => {
-    saleMenuStatusVar(status);
+  const handleDrowdownClick = () => {
+    saleSubItemVisibilityVar(!saleSubItemVisibility);
   };
 
   useEffect(() => {
@@ -41,50 +47,93 @@ const SideNavigationBar = () => {
     <Container>
       <Header>Shop Manager</Header>
       <NavList>
+        <Link to={Pathnames.Product}>
+          <NavItem
+            disabled={!isRegisteredShop}
+            isActive={location.pathname === Pathnames.Product}
+          >
+            상품관리
+          </NavItem>
+        </Link>
+
+        {/* <Link to={Pathnames.Order}> */}
         <NavItem
-          disabled={!isRegisteredShop}
-          isActive={sideNavigationBarStatus === Pathnames.Product}
+          disabled={location.pathname !== Pathnames.Sale}
+          isActive={location.pathname === Pathnames.Sale}
         >
-          <Link to={Pathnames.Product}>상품관리</Link>
-        </NavItem>
-        <NavItem
-          disabled={true}
-          isActive={sideNavigationBarStatus === Pathnames.Order}
-        >
-          <Link to={Pathnames.Order}>판매관리</Link>
+          판매관리
           {/* <DropdownIcon
             src={saleSubItemVisibility ? mediumTopSrc : mediumBottomSrc}
-            isActive={sideNavigationBarStatus === Pathnames.Order}
+            isActive={location.pathname === Pathnames.Sale}
+            onClick={handleDrowdownClick}
           /> */}
         </NavItem>
-        {saleSubItemVisibility && (
+        {/* </Link> */}
+
+        {/* need Status: saleSubItemVisibility */}
+        {location.pathname === Pathnames.Sale && (
           <SubNavContainer
-            isActive={sideNavigationBarStatus === Pathnames.Order}
+            isActive={sideNavigationBarStatus === Pathnames.Sale}
           >
-            <SubNavItem
-              isActive={saleMenuStatus === SaleMenuStatusType.ORDER}
-              onClick={handleSubNavItemClick(SaleMenuStatusType.ORDER)}
-            >
-              주문 관리
-            </SubNavItem>
-            <SubNavItem
-              isActive={saleMenuStatus === SaleMenuStatusType.CANCEL}
-              onClick={handleSubNavItemClick(SaleMenuStatusType.CANCEL)}
-            >
-              취소 관리
-            </SubNavItem>
-            <SubNavItem
-              isActive={saleMenuStatus === SaleMenuStatusType.REFUND}
-              onClick={handleSubNavItemClick(SaleMenuStatusType.REFUND)}
-            >
-              반품 관리
-            </SubNavItem>
-            <SubNavItem
-              isActive={saleMenuStatus === SaleMenuStatusType.EXCHANGE}
-              onClick={handleSubNavItemClick(SaleMenuStatusType.EXCHANGE)}
-            >
-              교환 관리
-            </SubNavItem>
+            <Link to={Pathnames.Order}>
+              <SubNavItem
+                isActive={
+                  decryptSaleStatusId[statusId] === OrderStatusGroup.ORDER
+                }
+              >
+                주문 관리
+                {order ? (
+                  <OrderCounter count={order}>
+                    {order <= 99 ? order : `${order}+`}
+                  </OrderCounter>
+                ) : null}
+              </SubNavItem>
+            </Link>
+
+            <Link to={Pathnames.Cancel}>
+              <SubNavItem
+                isActive={
+                  decryptSaleStatusId[statusId] === OrderStatusGroup.CANCEL
+                }
+              >
+                취소 관리
+                {cancel ? (
+                  <OrderCounter count={cancel}>
+                    {cancel <= 99 ? cancel : `${cancel}+`}
+                  </OrderCounter>
+                ) : null}
+              </SubNavItem>
+            </Link>
+
+            <Link to={Pathnames.Refund}>
+              <SubNavItem
+                isActive={
+                  decryptSaleStatusId[statusId] === OrderStatusGroup.REFUND
+                }
+              >
+                반품 관리
+                {refund ? (
+                  <OrderCounter count={refund}>
+                    {refund <= 99 ? refund : `${refund}+`}
+                  </OrderCounter>
+                ) : null}
+              </SubNavItem>
+            </Link>
+
+            <Link to={Pathnames.Exchange}>
+              <SubNavItem
+                isActive={
+                  decryptSaleStatusId[statusId] === OrderStatusGroup.EXCHANGE
+                }
+              >
+                교환 관리
+                {exchange ? (
+                  <OrderCounter count={exchange}>
+                    {exchange <= 99 ? exchange : `${exchange}+`}
+                  </OrderCounter>
+                ) : null}
+              </SubNavItem>
+            </Link>
           </SubNavContainer>
         )}
 
@@ -180,11 +229,32 @@ const SubNavContainer = styled.div<{ isActive: boolean }>`
 `;
 
 const SubNavItem = styled.li<{ isActive: boolean }>`
+  display: flex;
+  align-items: center;
+
   padding-top: 12px;
   padding-bottom: 8px;
   padding-left: 54px;
 
   color: ${({ theme: { palette }, isActive }) => isActive && palette.red500};
+`;
+
+const OrderCounter = styled.div<{ count: number }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: ${({ count }) => (count <= 99 ? "14px" : "20px")};
+  height: 14px;
+  border-radius: 50%;
+  background-color: ${({ theme: { palette } }) => palette.red900};
+  margin-left: 4px;
+
+  color: ${({ theme: { palette } }) => palette.white};
+  font-family: "Spoqa Han Sans Neo";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 8px;
 `;
 
 export default SideNavigationBar;

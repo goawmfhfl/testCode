@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { useMutation, useReactiveVar } from "@apollo/client";
 
@@ -9,17 +10,22 @@ import {
   modalVar,
   systemModalVar,
 } from "@cache/index";
-import { filterOptionVar } from "@cache/sale/cancel";
-import { MainReason, refusalCancelOrRefundOptionList } from "@constants/sale";
-import { ResetOrderItemType } from "@models/sale/index";
-
+import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
+import {
+  MainReason,
+  OrderStatusGroup,
+  OrderStatusName,
+  OrderStatusType,
+  refusalCancelOrRefundOptionList,
+} from "@constants/sale";
 import {
   ConfirmOrDenyCancelBySellerInputType,
   ConfirmOrDenyCancelBySellerType,
 } from "@models/sale/cancel";
 import { OrderCancel } from "@constants/sale/cancelManagement";
-import { checkedOrderItemsVar } from "@cache/sale/cancel";
 import { showHasServerErrorModal } from "@cache/productManagement";
+import { checkedOrderItemsVar } from "@cache/sale";
+import { ResetOrderItemType } from "@models/sale/index";
 
 import { CONFIRM_OR_DENY_CANCEL_BY_SELLER } from "@graphql/mutations/confirmOrDenyCancelBySeller";
 import { GET_CANCEL_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
@@ -39,9 +45,11 @@ import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
 
 const HandleCancelRefusalModal = () => {
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
+  );
 
   const checkedOrderItems =
     useReactiveVar<Array<ResetOrderItemType>>(checkedOrderItemsVar);
@@ -74,10 +82,10 @@ const HandleCancelRefusalModal = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.CANCEL,
           },
         },
       },

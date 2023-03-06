@@ -12,7 +12,7 @@ const useLazyOrderStatus = () => {
     { input: GetOrderStatusBySellerInputType }
   >(GET_ORDER_STATUS_BY_SELLER, {
     notifyOnNetworkStatusChange: true,
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
     errorPolicy: "all",
   });
 

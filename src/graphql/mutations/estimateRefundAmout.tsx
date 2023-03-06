@@ -9,10 +9,8 @@ export const ESTIMATE_REFUND_AMOUNT = gql`
       initialShipmentAmount
       initialShipmentDistantAmount
       shipmentRefundAmount
-      bundleShipmentType
-      isConditionalAmountBreak
-      isAllOrderItemRefunded
-      isFreeBreak
+      shipmentRefundDistantAmount
+      finalRefundAmount
     }
   }
 `;

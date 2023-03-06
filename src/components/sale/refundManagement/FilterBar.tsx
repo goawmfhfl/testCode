@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import styled from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
@@ -7,22 +8,20 @@ import {
   paginationSkipVar,
   totalPageLengthVar,
 } from "@cache/index";
+import { decryptSaleNameId, Pathnames } from "@constants/index";
+import { OrderStatusGroup, OrderStatusName } from "@constants/sale";
 
-import { commonSaleFilterOptionVar } from "@cache/sale";
-import {
-  OrderStatusGroup,
-  OrderStatusName,
-  OrderStatusType,
-} from "@constants/sale";
 import useLazyRefundOrders from "@hooks/order/useLazyRefundOrders";
 import { getOrdersLength } from "@utils/sale";
 
 import FilterBarContainer from "@components/sale/FilterBarContainer";
-import Button from "@components/common/Button";
+import ExportToExcelButton from "@components/sale/refundManagement/ExportAllExcelButton";
 
 const FilterBar = () => {
-  const { data, getOrders } = useLazyRefundOrders();
-  const { statusName } = useReactiveVar(commonSaleFilterOptionVar);
+  const [searchParams] = useSearchParams();
+  const { nameId } = Object.fromEntries([...searchParams]);
+
+  const { data, getOrderItem } = useLazyRefundOrders();
   const totalPageLength = useReactiveVar(totalPageLengthVar);
 
   const orders = data?.getOrdersBySeller.totalOrderItems || [];
@@ -34,32 +33,9 @@ const FilterBar = () => {
     refundCompleted,
   } = getOrdersLength(orders);
 
-  const handleFilterOptionNameClick =
-    (filterOptionName: OrderStatusName) => () => {
-      commonFilterOptionVar({
-        ...commonFilterOptionVar(),
-        page: 1,
-      });
-      paginationSkipVar(0);
-
-      if (!filterOptionName) {
-        commonSaleFilterOptionVar({
-          ...commonSaleFilterOptionVar(),
-          statusName: null,
-        });
-      }
-
-      if (filterOptionName) {
-        commonSaleFilterOptionVar({
-          ...commonSaleFilterOptionVar(),
-          statusName: filterOptionName,
-        });
-      }
-    };
-
   useEffect(() => {
     void (async () => {
-      await getOrders({
+      await getOrderItem({
         variables: {
           input: {
             page: 1,
@@ -67,58 +43,76 @@ const FilterBar = () => {
             query: null,
             type: null,
             statusName: null,
-            statusType: OrderStatusType.CLAIM,
+            statusType: null,
             statusGroup: OrderStatusGroup.REFUND,
           },
         },
         fetchPolicy: "no-cache",
+        notifyOnNetworkStatusChange: true,
       });
     })();
   }, []);
 
+  useEffect(() => {
+    commonFilterOptionVar({
+      ...commonFilterOptionVar(),
+      page: 1,
+    });
+    paginationSkipVar(0);
+  }, [searchParams]);
+
   return (
     <FilterBarContainer
-      button={<Button size={"small"}>전체 내역 내보내기</Button>}
+      button={<ExportToExcelButton>전체 내역 내보내기</ExportToExcelButton>}
       searchResultLength={totalPageLength}
     >
-      <Filter
-        isActvie={statusName === null}
-        onClick={handleFilterOptionNameClick(null)}
-      >
-        전체{" "}
-        {refundRequest +
-          refundPickUpInProgress +
-          refundPickUpCompleted +
-          refundCompleted}
-      </Filter>
-      <Filter
-        isActvie={statusName === OrderStatusName.REFUND_REQUEST}
-        onClick={handleFilterOptionNameClick(OrderStatusName.REFUND_REQUEST)}
-      >
-        반품요청 {refundRequest}
-      </Filter>
-      <Filter
-        isActvie={statusName === OrderStatusName.REFUND_PICK_UP_IN_PROGRESS}
-        onClick={handleFilterOptionNameClick(
-          OrderStatusName.REFUND_PICK_UP_IN_PROGRESS
-        )}
-      >
-        수거중 {refundPickUpInProgress}
-      </Filter>
-      <Filter
-        isActvie={statusName === OrderStatusName.REFUND_PICK_UP_COMPLETED}
-        onClick={handleFilterOptionNameClick(
-          OrderStatusName.REFUND_PICK_UP_COMPLETED
-        )}
-      >
-        수거완료 {refundPickUpCompleted}
-      </Filter>
-      <Filter
-        isActvie={statusName === OrderStatusName.REFUND_COMPLETED}
-        onClick={handleFilterOptionNameClick(OrderStatusName.REFUND_COMPLETED)}
-      >
-        반품완료 {refundCompleted}
-      </Filter>
+      <Link to={Pathnames.Refund}>
+        <Filter isActvie={!nameId}>
+          전체{" "}
+          {refundRequest +
+            refundPickUpInProgress +
+            refundPickUpCompleted +
+            refundCompleted}
+        </Filter>
+      </Link>
+      <Link to={Pathnames.RefundRequest}>
+        <Filter
+          isActvie={
+            decryptSaleNameId[nameId] === OrderStatusName.REFUND_REQUEST
+          }
+        >
+          반품요청 {refundRequest}
+        </Filter>
+      </Link>
+      <Link to={Pathnames.RefundPickupInProgress}>
+        <Filter
+          isActvie={
+            decryptSaleNameId[nameId] ===
+            OrderStatusName.REFUND_PICK_UP_IN_PROGRESS
+          }
+        >
+          수거중 {refundPickUpInProgress}
+        </Filter>
+      </Link>
+      <Link to={Pathnames.RefundPickupCompleted}>
+        <Filter
+          isActvie={
+            decryptSaleNameId[nameId] ===
+            OrderStatusName.REFUND_PICK_UP_COMPLETED
+          }
+        >
+          수거완료 {refundPickUpCompleted}
+        </Filter>
+      </Link>
+      <Link to={Pathnames.RefundCompleted}>
+        <Filter
+          isActvie={
+            decryptSaleNameId[nameId] === OrderStatusName.REFUND_COMPLETED
+          }
+        >
+          반품완료 {refundCompleted}
+        </Filter>
+      </Link>
     </FilterBarContainer>
   );
 };

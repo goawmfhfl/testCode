@@ -1,15 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components/macro";
+import { useSearchParams } from "react-router-dom";
 import { useMutation, useReactiveVar } from "@apollo/client";
-
-import { skipQuantityType } from "@constants/index";
-import {
-  OrderSearchType,
-  OrderStatusName,
-  searchQueryType,
-} from "@constants/sale";
-import { OrderCancel } from "@constants/sale/cancelManagement";
-import { ResetOrderItemType } from "@models/sale";
 
 import {
   checkAllBoxStatusVar,
@@ -20,13 +12,31 @@ import {
   showHasAnyProblemModal,
   systemModalVar,
 } from "@cache/index";
-import { filterOptionVar } from "@cache/sale/cancel";
+import { showHasServerErrorModal } from "@cache/productManagement";
+import { checkedOrderItemsVar } from "@cache/sale";
+import {
+  decryptSaleNameId,
+  decryptSaleTypeId,
+  skipQuantityType,
+} from "@constants/index";
+import {
+  OrderSearchType,
+  OrderStatusGroup,
+  OrderStatusName,
+  OrderStatusType,
+  searchQueryType,
+} from "@constants/sale";
+import { OrderCancel } from "@constants/sale/cancelManagement";
+import {
+  fixTableType,
+  scrollTableType,
+} from "@constants/sale/cancelManagement/table";
+
+import { ResetOrderItemType } from "@models/sale";
 import {
   ConfirmOrDenyCancelBySellerInputType,
   ConfirmOrDenyCancelBySellerType,
 } from "@models/sale/cancel";
-import { showHasServerErrorModal } from "@cache/productManagement";
-import { checkedOrderItemsVar } from "@cache/sale/cancel";
 
 import { CONFIRM_OR_DENY_CANCEL_BY_SELLER } from "@graphql/mutations/confirmOrDenyCancelBySeller";
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
@@ -40,15 +50,17 @@ import Button from "@components/common/Button";
 import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
 import HandleCancelRefusalModal from "@components/sale/cancelManagement/HandleCancelRefusalModal";
+import ExportToExcelButton from "@components/sale/ExportToExcelButton";
 
 const Controller = () => {
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
+  );
 
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const [temporaryQuery, setTemporaryQuery] = useState<string>("");
-
   const reconstructCheckedOrderItems: Array<ResetOrderItemType> =
     getReconstructCheckedOrderItems(checkedOrderItems);
 
@@ -72,10 +84,10 @@ const Controller = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.CANCEL,
           },
         },
       },
@@ -204,9 +216,9 @@ const Controller = () => {
   const changeSearchTypeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const type = e.target.value as OrderSearchType;
 
-    filterOptionVar({
-      ...filterOptionVar(),
-      type,
+    commonFilterOptionVar({
+      ...commonFilterOptionVar(),
+      orderSearchType: type,
     });
   };
 
@@ -241,14 +253,18 @@ const Controller = () => {
         <ControlButton
           size="small"
           onClick={handleConfirmOrDenyButtonClick(OrderCancel.APPROVE)}
-          disabled={statusName === OrderStatusName.CANCEL_COMPLETED}
+          disabled={
+            decryptSaleNameId[nameId] === OrderStatusName.CANCEL_COMPLETED
+          }
         >
           취소 승인
         </ControlButton>
         <ControlButton
           size="small"
           onClick={handleConfirmOrDenyButtonClick(OrderCancel.DENY)}
-          disabled={statusName === OrderStatusName.CANCEL_COMPLETED}
+          disabled={
+            decryptSaleNameId[nameId] === OrderStatusName.CANCEL_COMPLETED
+          }
         >
           취소 거절
         </ControlButton>
@@ -258,7 +274,7 @@ const Controller = () => {
           arrowSrc={triangleArrowSvg}
           sizing={"medium"}
           width={"119px"}
-          value={type}
+          value={orderSearchType}
           onChange={changeSearchTypeHandler}
         >
           {searchQueryType.map(({ id, label, value }) => (
@@ -286,7 +302,13 @@ const Controller = () => {
           ))}
         </Select>
 
-        <Button size={"small"}>내보내기</Button>
+        <ExportToExcelButton
+          exportData={checkedOrderItems}
+          tableData={[...fixTableType, ...scrollTableType]}
+          status={OrderStatusGroup.CANCEL}
+        >
+          내보내기
+        </ExportToExcelButton>
       </FilterContainer>
     </ControllerContainer>
   );

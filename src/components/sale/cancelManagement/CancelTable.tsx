@@ -1,14 +1,9 @@
 import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled, { css } from "styled-components/macro";
-import { useReactiveVar } from "@apollo/client";
+import { useQuery, useReactiveVar } from "@apollo/client";
 import { cloneDeep } from "lodash";
 import { TableType } from "@models/index";
-
-import {
-  cancleOrderItemsVar,
-  checkedOrderItemsVar,
-  filterOptionVar,
-} from "@cache/sale/cancel";
 
 import {
   checkAllBoxStatusVar,
@@ -19,19 +14,27 @@ import {
   showHasAnyProblemModal,
   totalPageLengthVar,
 } from "@cache/index";
+import { checkedOrderItemsVar, resetOrderItemsVar } from "@cache/sale";
+import {
+  GetCancelOrdersBySellerInputType,
+  GetCancelOrdersBySellerType,
+} from "@models/sale/cancel";
 
 import {
   tableWidth,
   fixTableType,
   scrollTableType,
 } from "@constants/sale/cancelManagement/table";
-import { OrderStatusName } from "@constants/sale";
-
-import { NormalizedType } from "@models/sale/index";
+import {
+  OrderStatusGroup,
+  OrderStatusName,
+  OrderStatusType,
+} from "@constants/sale";
+import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
+import { NormalizedListType } from "@models/sale";
 import { ResetOrderItemType } from "@models/sale";
-import { OrderItems } from "@models/sale";
 
-import useLazyCancelOrders from "@hooks/order/useLazyCancelOrders";
+import { GET_CANCEL_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
 import constructOrderItem from "@utils/sale/constructOrderItem";
 import getResetOrderItems from "@utils/sale/cancel/getResetOrderItems";
 
@@ -52,17 +55,38 @@ import Button from "@components/common/Button";
 import EditReasonModal from "@components/sale/cancelManagement/EditReasonModal";
 
 const CancelTable = () => {
-  const { getOrders, error, loading, data } = useLazyCancelOrders();
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
+  );
 
-  const cancleOrderItems = useReactiveVar(cancleOrderItemsVar);
+  const orderItems = useReactiveVar(resetOrderItemsVar);
   const checkedOrderItems = useReactiveVar(checkedOrderItemsVar);
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
 
+  const { loading, error, data } = useQuery<
+    GetCancelOrdersBySellerType,
+    { input: GetCancelOrdersBySellerInputType }
+  >(GET_CANCEL_ORDERS_BY_SELLER, {
+    variables: {
+      input: {
+        page,
+        skip,
+        query,
+        type: orderSearchType,
+        statusName: decryptSaleNameId[nameId] as OrderStatusName,
+        statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+        statusGroup: OrderStatusGroup.CANCEL,
+      },
+    },
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: "network-only",
+    errorPolicy: "all",
+  });
+
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newOrderItems = cloneDeep(cancleOrderItems);
+    const newOrderItems = cloneDeep(orderItems);
     checkAllBoxStatusVar(e.target.checked);
 
     if (e.target.checked) {
@@ -70,7 +94,7 @@ const CancelTable = () => {
         ...orderItem,
         isChecked: true,
       }));
-      cancleOrderItemsVar(checkAllOrderItem);
+      resetOrderItemsVar(checkAllOrderItem);
       checkedOrderItemsVar(checkAllOrderItem);
     }
 
@@ -80,14 +104,14 @@ const CancelTable = () => {
         isChecked: false,
       }));
 
-      cancleOrderItemsVar(checkAllOrderItem);
+      resetOrderItemsVar(checkAllOrderItem);
       checkedOrderItemsVar([]);
     }
   };
 
   const changeSingleCheckBoxHandler =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newOrderItems = cloneDeep(cancleOrderItems);
+      const newOrderItems = cloneDeep(orderItems);
       const targetOrderItemId = newOrderItems[index].id;
 
       if (e.target.checked) {
@@ -110,7 +134,7 @@ const CancelTable = () => {
         checkedOrderItemsVar(filteredOrderItems);
         newOrderItems[index].isChecked = false;
       }
-      cancleOrderItemsVar(newOrderItems);
+      resetOrderItemsVar(newOrderItems);
     };
 
   const handleEditReasonModalClick =
@@ -135,36 +159,12 @@ const CancelTable = () => {
     };
 
   useEffect(() => {
-    void (async () => {
-      await getOrders({
-        variables: {
-          input: {
-            page,
-            skip,
-            query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
-          },
-        },
-        fetchPolicy: "no-cache",
-      });
-    })();
-  }, [page, skip, query, type, statusName, statusType, statusGroup]);
-
-  useEffect(() => {
-    if (!data || !data.getOrdersBySeller) return;
+    const hasData = !!data && !!data.getOrdersBySeller;
+    if (!hasData) return;
 
     const {
-      totalPages,
-      totalResults,
-      totalOrderItems,
-    }: {
-      totalPages: number;
-      totalResults: number;
-      totalOrderItems: Array<OrderItems>;
-    } = data.getOrdersBySeller;
+      getOrdersBySeller: { totalPages, totalResults, totalOrderItems },
+    } = data;
 
     const isLastPageChanged = totalPages < page;
 
@@ -173,7 +173,6 @@ const CancelTable = () => {
         ...commonFilterOptionVar(),
         page: totalPages,
       });
-
       return;
     }
 
@@ -185,13 +184,12 @@ const CancelTable = () => {
 
     totalPageLengthVar(totalResults);
 
-    const reconstructCancelOrderItem: NormalizedType =
+    const nomalizedOrderItem: NormalizedListType =
       constructOrderItem(totalOrderItems);
+    const resetOrderItems: Array<ResetOrderItemType> =
+      getResetOrderItems(nomalizedOrderItem);
 
-    const resetOrderItems: Array<ResetOrderItemType> = getResetOrderItems(
-      reconstructCancelOrderItem
-    );
-    cancleOrderItemsVar(resetOrderItems);
+    resetOrderItemsVar(resetOrderItems);
     checkedOrderItemsVar([]);
     checkAllBoxStatusVar(false);
   }, [data]);
@@ -200,31 +198,25 @@ const CancelTable = () => {
     paginationVisibilityVar(loading || error);
   }, [loading]);
 
-  useEffect(() => {
-    if (error) {
-      showHasAnyProblemModal(
-        <>
-          내부 서버 오류로 인해 요청하신
-          <br />
-          작업을 완료하지 못했습니다.
-          <br />
-          다시 한 번 시도 후 같은 문제가 발생할 경우
-          <br />
-          찹스틱스로 문의해주세요.
-          <br />
-          <br />
-          (전화 문의 070-4187-3848)
-          <br />
-          <br />
-          Code:
-          {error.message}
-        </>
-      );
-    }
-  }, [error]);
-
-  const hasCancelOrderItems = !!cancleOrderItems && !!cancleOrderItems.length;
+  const hasCancelOrderItems = !!orderItems && !!orderItems.length;
   const isFetchingOrderItemsFailed = !loading && !error && hasCancelOrderItems;
+
+  if (error) {
+    showHasAnyProblemModal(
+      <>
+        내부 서버 오류로 인해 요청하신
+        <br />
+        작업을 완료하지 못했습니다.
+        <br />
+        다시 한 번 시도 후 같은 문제가 발생할 경우
+        <br />
+        찹스틱스로 문의해주세요.
+        <br />
+        <br />
+        (전화 문의 070-4187-3848)
+      </>
+    );
+  }
 
   return (
     <TableContainer
@@ -260,7 +252,7 @@ const CancelTable = () => {
         </ThContainer>
         <TdContainer>
           {!loading &&
-            cancleOrderItems?.map(
+            orderItems?.map(
               (
                 {
                   merchantUid,
@@ -394,7 +386,7 @@ const CancelTable = () => {
 
         <TdContainer>
           {!loading &&
-            cancleOrderItems?.map(
+            orderItems?.map(
               ({
                 paidAt,
                 requestAt,
@@ -461,7 +453,8 @@ const CancelTable = () => {
                             detailedReason
                           )}
                           disabled={
-                            statusName === OrderStatusName.CANCEL_COMPLETED
+                            decryptSaleNameId[nameId] ===
+                            OrderStatusName.CANCEL_COMPLETED
                           }
                         >
                           수정
@@ -549,7 +542,8 @@ const CancelTable = () => {
                             refusalDetailedReason
                           )}
                           disabled={
-                            statusName === OrderStatusName.CANCEL_COMPLETED
+                            decryptSaleNameId[nameId] ===
+                            OrderStatusName.CANCEL_COMPLETED
                           }
                         >
                           수정

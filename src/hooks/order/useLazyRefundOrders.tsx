@@ -7,7 +7,7 @@ import {
 } from "@models/sale/refund";
 
 const useLazyRefundOrders = () => {
-  const [getOrders, { loading, error, data }] = useLazyQuery<
+  const [getOrderItem, { loading, error, data }] = useLazyQuery<
     GetRefundOrdersBySellerType,
     { input: GetRefundOrdersBySellerInputType }
   >(GET_REFUND_ORDERS_BY_SELLER, {
@@ -16,6 +16,6 @@ const useLazyRefundOrders = () => {
     errorPolicy: "all",
   });
 
-  return { getOrders, loading, error, data };
+  return { getOrderItem, loading, error, data };
 };
 export default useLazyRefundOrders;

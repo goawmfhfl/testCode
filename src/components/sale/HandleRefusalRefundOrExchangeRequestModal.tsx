@@ -1,22 +1,26 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { useMutation, useReactiveVar } from "@apollo/client";
 
 import {
-  checkAllBoxStatusVar,
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
   modalVar,
   systemModalVar,
 } from "@cache/index";
-import {
-  commonSaleFilterOptionVar,
-  commonCheckedOrderItemsVar,
-} from "@cache/sale";
-
+import { checkedOrderItemsVar } from "@cache/sale";
 import { showHasServerErrorModal } from "@cache/productManagement";
-import { MainReason, refusalCancelOrRefundOptionList } from "@constants/sale";
+import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
+import {
+  MainReason,
+  OrderStatusGroup,
+  OrderStatusName,
+  OrderStatusType,
+  refusalCancelOrRefundOptionList,
+} from "@constants/sale";
 import { DenyRefundOrExchangeRequestType } from "@constants/sale";
+
 import { ResetOrderItemType } from "@models/sale/index";
 
 import {
@@ -49,16 +53,17 @@ const HandleRefusalRefundOrExchangeRequestModal = ({
 }: {
   status: DenyRefundOrExchangeRequestType;
 }) => {
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } = useReactiveVar(
-    commonSaleFilterOptionVar
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
   );
+
   const requestType =
     status === DenyRefundOrExchangeRequestType.REFUND ? "반품" : "교환";
 
-  const checkedOrderItems = useReactiveVar<Array<ResetOrderItemType>>(
-    commonCheckedOrderItemsVar
-  );
+  const checkedOrderItems =
+    useReactiveVar<Array<ResetOrderItemType>>(checkedOrderItemsVar);
   const reconstructCheckedOrderItems: Array<ResetOrderItemType> =
     getReconstructCheckedOrderItems(checkedOrderItems);
 
@@ -93,10 +98,13 @@ const HandleRefusalRefundOrExchangeRequestModal = ({
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup:
+              status === DenyRefundOrExchangeRequestType.REFUND
+                ? OrderStatusGroup.REFUND
+                : OrderStatusGroup.EXCHANGE,
           },
         },
       },
@@ -177,7 +185,7 @@ const HandleRefusalRefundOrExchangeRequestModal = ({
 
               const {
                 data: {
-                  denyRefunrOrExchangeRequestBySeller: { ok, error },
+                  denyRefundOrExchangeRequestBySeller: { ok, error },
                 },
               } = await denyRefundReqeust({
                 variables: {
@@ -235,20 +243,18 @@ const HandleRefusalRefundOrExchangeRequestModal = ({
                       ...systemModalVar(),
                       isVisible: false,
                     });
-                    commonCheckedOrderItemsVar([]);
-                    checkAllBoxStatusVar(false);
                   },
                 });
               }
 
               if (error) {
                 loadingSpinnerVisibilityVar(false);
-                showHasServerErrorModal(error, description);
+                showHasServerErrorModal(error, description as string);
               }
             })();
           } catch (error) {
             loadingSpinnerVisibilityVar(false);
-            showHasServerErrorModal(error as string, description);
+            showHasServerErrorModal(error as string, description as string);
           }
         },
         cancelButtonClickHandler: () => {

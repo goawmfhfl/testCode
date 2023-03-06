@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import styled from "styled-components/macro";
 import { useReactiveVar } from "@apollo/client";
 
@@ -7,26 +8,25 @@ import {
   paginationSkipVar,
   totalPageLengthVar,
 } from "@cache/index";
-import { commonSaleFilterOptionVar } from "@cache/sale";
 
-import {
-  OrderStatusGroup,
-  OrderStatusName,
-  OrderStatusType,
-} from "@constants/sale";
+import { OrderStatusGroup, OrderStatusName } from "@constants/sale";
+import { Pathnames, decryptSaleNameId } from "@constants/index";
+
 import useLazyExchangeOrders from "@hooks/order/useLazyExchangeOrders";
+import { getOrdersLength } from "@utils/sale";
 
 import FilterBarContainer from "@components/sale/FilterBarContainer";
 import Button from "@components/common/Button";
-import { getOrdersLength } from "@utils/sale";
+import ExportAllExcelButton from "@components/sale/exchangeManagement/ExportAllExcelButton";
 
 const FilterBar = () => {
-  const { getOrders, data } = useLazyExchangeOrders();
-  const { statusName } = useReactiveVar(commonSaleFilterOptionVar);
+  const [searchParams] = useSearchParams();
+  const { nameId } = Object.fromEntries([...searchParams]);
+
+  const { getOrderItems, data } = useLazyExchangeOrders();
   const totalPageLength = useReactiveVar(totalPageLengthVar);
 
   const orders = data?.getOrdersBySeller.totalOrderItems || [];
-
   const {
     exchangeReqeust,
     exchangePickupInProgress,
@@ -35,32 +35,9 @@ const FilterBar = () => {
     exchangeCompleted,
   } = getOrdersLength(orders);
 
-  const handleFilterOptionNameClick =
-    (filterOptionName: OrderStatusName) => () => {
-      commonFilterOptionVar({
-        ...commonFilterOptionVar(),
-        page: 1,
-      });
-      paginationSkipVar(0);
-
-      if (!filterOptionName) {
-        commonSaleFilterOptionVar({
-          ...commonSaleFilterOptionVar(),
-          statusName: null,
-        });
-      }
-
-      if (filterOptionName) {
-        commonSaleFilterOptionVar({
-          ...commonSaleFilterOptionVar(),
-          statusName: filterOptionName,
-        });
-      }
-    };
-
   useEffect(() => {
     void (async () => {
-      await getOrders({
+      await getOrderItems({
         variables: {
           input: {
             page: 1,
@@ -68,67 +45,91 @@ const FilterBar = () => {
             query: null,
             type: null,
             statusName: null,
-            statusType: OrderStatusType.CLAIM,
+            statusType: null,
             statusGroup: OrderStatusGroup.EXCHANGE,
           },
         },
         fetchPolicy: "no-cache",
+        notifyOnNetworkStatusChange: true,
       });
     })();
   }, []);
 
+  useEffect(() => {
+    commonFilterOptionVar({
+      ...commonFilterOptionVar(),
+      page: 1,
+    });
+    paginationSkipVar(0);
+  }, [searchParams]);
+
   return (
     <FilterBarContainer
-      button={<Button size={"small"}>전체 내역 내보내기</Button>}
+      button={<ExportAllExcelButton>전체 내역 내보내기</ExportAllExcelButton>}
       searchResultLength={totalPageLength}
     >
-      <Filter
-        isActvie={statusName === null}
-        onClick={handleFilterOptionNameClick(null)}
-      >
-        전체{" "}
-        {exchangeReqeust +
-          exchangePickupInProgress +
-          exchangePickupCompleted +
-          shippingAgain +
-          exchangeCompleted}
-      </Filter>
-      <Filter
-        isActvie={statusName === OrderStatusName.EXCHANGE_REQUEST}
-        onClick={handleFilterOptionNameClick(OrderStatusName.EXCHANGE_REQUEST)}
-      >
-        교환요청 {exchangeReqeust}
-      </Filter>
-      <Filter
-        isActvie={statusName === OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS}
-        onClick={handleFilterOptionNameClick(
-          OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS
-        )}
-      >
-        수거중 {exchangePickupInProgress}
-      </Filter>
-      <Filter
-        isActvie={statusName === OrderStatusName.EXCHANGE_PICK_UP_COMPLETED}
-        onClick={handleFilterOptionNameClick(
-          OrderStatusName.EXCHANGE_PICK_UP_COMPLETED
-        )}
-      >
-        수거완료 {exchangePickupCompleted}
-      </Filter>
-      <Filter
-        isActvie={statusName === OrderStatusName.SHIPPING_AGAIN}
-        onClick={handleFilterOptionNameClick(OrderStatusName.SHIPPING_AGAIN)}
-      >
-        재발송 {shippingAgain}
-      </Filter>
-      <Filter
-        isActvie={statusName === OrderStatusName.EXCHANGE_COMPLETED}
-        onClick={handleFilterOptionNameClick(
-          OrderStatusName.EXCHANGE_COMPLETED
-        )}
-      >
-        교환완료 {exchangeCompleted}
-      </Filter>
+      <Link to={Pathnames.Exchange}>
+        <Filter isActvie={!nameId}>
+          전체{" "}
+          {exchangeReqeust +
+            exchangePickupInProgress +
+            exchangePickupCompleted +
+            shippingAgain +
+            exchangeCompleted}
+        </Filter>
+      </Link>
+
+      <Link to={Pathnames.ExchangeRequest}>
+        <Filter
+          isActvie={
+            decryptSaleNameId[nameId] === OrderStatusName.EXCHANGE_REQUEST
+          }
+        >
+          교환요청 {exchangeReqeust}
+        </Filter>
+      </Link>
+
+      <Link to={Pathnames.ExchangePickupInProgress}>
+        <Filter
+          isActvie={
+            decryptSaleNameId[nameId] ===
+            OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS
+          }
+        >
+          수거중 {exchangePickupInProgress}
+        </Filter>
+      </Link>
+
+      <Link to={Pathnames.ExchangePickupCompleted}>
+        <Filter
+          isActvie={
+            decryptSaleNameId[nameId] ===
+            OrderStatusName.EXCHANGE_PICK_UP_COMPLETED
+          }
+        >
+          수거완료 {exchangePickupCompleted}
+        </Filter>
+      </Link>
+
+      <Link to={Pathnames.ExchangeShippingAgain}>
+        <Filter
+          isActvie={
+            decryptSaleNameId[nameId] === OrderStatusName.SHIPPING_AGAIN
+          }
+        >
+          재발송 {shippingAgain}
+        </Filter>
+      </Link>
+
+      <Link to={Pathnames.ExchangeCompleted}>
+        <Filter
+          isActvie={
+            decryptSaleNameId[nameId] === OrderStatusName.EXCHANGE_COMPLETED
+          }
+        >
+          교환완료 {exchangeCompleted}
+        </Filter>
+      </Link>
     </FilterBarContainer>
   );
 };

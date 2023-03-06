@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled from "styled-components/macro";
 import { useReactiveVar, useMutation } from "@apollo/client";
 
@@ -11,9 +12,16 @@ import {
 } from "@cache/index";
 import { checkedOrderItemsVar } from "@cache/sale";
 import { showHasServerErrorModal } from "@cache/productManagement";
-import { filterOptionVar } from "@cache/sale/order";
 
-import { Cause, exchangeOptionListType, MainReason } from "@constants/sale";
+import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
+import {
+  Cause,
+  exchangeOptionListType,
+  MainReason,
+  OrderStatusGroup,
+  OrderStatusName,
+  OrderStatusType,
+} from "@constants/sale";
 import { RequestRefundOrExchange } from "@constants/sale/orderManagement";
 import {
   RequestRefundOrExchangeBySellerInputType,
@@ -22,7 +30,9 @@ import {
 import { ResetOrderItemType } from "@models/sale/index";
 
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+import { REQEUST_REFUND_OR_EXCHANGE_BY_SELLER } from "@graphql/mutations/requestRefundOrExchangeBySeller";
 
+import getCancelOrderItemComponents from "@utils/sale/order/getCancelOrderItemComponents";
 import getWhoseResponsibility from "@utils/sale/order/getWhoseResponsibility";
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
 
@@ -37,13 +47,14 @@ import {
 import Button from "@components/common/Button";
 import NoticeContainer from "@components/common/NoticeContainer";
 import Textarea from "@components/common/input/Textarea";
-import getCancelOrderItemComponents from "@utils/sale/order/getCancelOrderItemComponents";
-import { REQEUST_REFUND_OR_EXCHANGE_BY_SELLER } from "@graphql/mutations/requestRefundOrExchangeBySeller";
 
 const HandleRefundModal = () => {
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
+  );
 
   const checkedOrderItems =
     useReactiveVar<Array<ResetOrderItemType>>(checkedOrderItemsVar);
@@ -77,10 +88,10 @@ const HandleRefundModal = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.ORDER,
           },
         },
       },

@@ -1,7 +1,6 @@
-import { NormalizedListType } from "@models/sale/order";
-import { DateType, getDateFormat } from "@utils/date";
 import { orderStatusNameType } from "@constants/sale";
-
+import { NormalizedListType } from "@models/sale";
+import { DateType, getDateFormat } from "@utils/date";
 import {
   getShipmentPrice,
   getShipmentDistantPrice,
@@ -12,18 +11,19 @@ import {
 
 const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
   const hasOrderItems =
-    !!reconstructOrderItems && !!reconstructOrderItems.orders;
+    !!reconstructOrderItems && !!reconstructOrderItems.orderItems;
   if (!hasOrderItems) return;
 
-  const orderAllIds = reconstructOrderItems?.orders.allIds;
-  const orderByid = reconstructOrderItems?.orders.byId;
+  const allIds = reconstructOrderItems?.orderItems.allIds;
+  const orderItemById = reconstructOrderItems?.orderItems.byId;
 
-  const result = orderAllIds.map((id) => {
+  const result = allIds.map((id) => {
     const {
       id: orderId,
       merchantUid,
       merchantItemUid,
-      product,
+      thumbnail,
+      name,
       user,
       orderByShop,
       options,
@@ -41,7 +41,7 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       rowIndex,
       isLastRow,
       isFirstRow,
-    } = orderByid[id];
+    } = orderItemById[id];
 
     const {
       shipmentOrderId,
@@ -83,8 +83,8 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       id: orderId,
       merchantUid: merchantUid || "-",
       merchantItemUid: merchantItemUid || "-",
-      thumbnail: product?.thumbnail || "-",
-      productName: product?.name || "-",
+      thumbnail: thumbnail || "-",
+      productName: name || "-",
       userName: user?.name || "-",
       orderStatus: orderStatus
         ? (orderStatusNameType[orderStatus.name] as string)
@@ -96,11 +96,8 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       shipmentCompany: shippingShipmentCompany,
       shipmentNumber: shippingShipmentNumber,
       paidAt: orderByShop?.order?.paidAt
-        ? `${
-            getDateFormat(orderByShop?.order?.paidAt, DateType.PAYMENT)
-              .YYYY_MM_DD
-          } / ${
-            getDateFormat(orderByShop?.order?.paidAt, DateType.PAYMENT).HH_MM_SS
+        ? `${getDateFormat(orderByShop?.order?.paidAt).YYYY_MM_DD} / ${
+            getDateFormat(orderByShop?.order?.paidAt).HH_MM_SS
           }`
         : "-",
       recipientName: orderByShop?.order?.recipientName || "-",
@@ -142,6 +139,7 @@ const resetOrderItems = (reconstructOrderItems: NormalizedListType) => {
       isFirstRow,
     };
   });
+
   return result;
 };
 

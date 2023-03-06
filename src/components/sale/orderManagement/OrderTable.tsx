@@ -1,57 +1,58 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled from "styled-components/macro";
 import axios, { AxiosError } from "axios";
-import { useMutation, useReactiveVar } from "@apollo/client";
+import { useMutation, useQuery, useReactiveVar } from "@apollo/client";
 import { cloneDeep } from "lodash";
-import { TableType } from "@models/index";
 
+import { decryptSaleTypeId, decryptSaleNameId } from "@constants/index";
 import {
   fixTableType,
   scrollTableType,
   tableWidth,
 } from "@constants/sale/orderManagement/table";
-import { ShipmentStatus, shipmentCompanyCode, SendType } from "@constants/sale";
 
 import {
-  filterOptionVar,
-  orderItemsVar,
-  resetOrderItemVar,
-} from "@cache/sale/order";
+  ShipmentStatus,
+  shipmentCompanyCode,
+  SendType,
+  OrderStatusGroup,
+  OrderStatusType,
+  OrderStatusName,
+} from "@constants/sale";
+
 import {
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
-  showHasAnyProblemModal,
   systemModalVar,
   totalPageLengthVar,
-} from "@cache/index";
-import { checkedOrderItemsVar } from "@cache/sale";
-import { showHasServerErrorModal } from "@cache/productManagement/index";
-
-import {
-  EditShipmentNumberInputType,
-  EditShipmentNumberType,
-  NormalizedListType,
-  SendOrderItemsInputType,
-  SendOrderItemsType,
-} from "@models/sale/order";
-import { ResetOrderItemType } from "@models/sale";
-
-import getResetOrderItems from "@utils/sale/order/getResetOrderItems";
-import { preventNaNValues } from "@utils/index";
-import constructOrderItem from "@utils/sale/constructOrderItem";
-
-import {
   checkAllBoxStatusVar,
   pageNumberListVar,
   paginationVisibilityVar,
+  showHasAnyProblemModal,
 } from "@cache/index";
 
+import { checkedOrderItemsVar, resetOrderItemsVar } from "@cache/sale";
+import { showHasServerErrorModal } from "@cache/productManagement/index";
+
+import { TableType } from "@models/index";
+import {
+  EditShipmentNumberInputType,
+  EditShipmentNumberType,
+  GetOrdersBySellerInputType,
+  GetOrdersBySellerType,
+  SendOrderItemsInputType,
+  SendOrderItemsType,
+} from "@models/sale/order";
+import { ResetOrderItemType, NormalizedListType } from "@models/sale";
+
+import { preventNaNValues } from "@utils/index";
+import getResetOrderItems from "@utils/sale/order/getResetOrderItems";
+import constructOrderItem from "@utils/sale/constructOrderItem";
+
 import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
-import { OrderItems } from "@models/sale/index";
 import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
 import { EDIT_SHIPMENT_NUMBER } from "@graphql/mutations/editShipmentNumber";
-
-import useLazyOrders from "@hooks/order/useLazyOrders";
 
 import exclamationmarkSrc from "@icons/exclamationmark.svg";
 import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
@@ -77,10 +78,31 @@ import Button from "@components/common/Button";
 import { Input } from "@components/common/input/TextInput";
 
 const OrderTable = () => {
-  const { getOrderItem, error, loading, data } = useLazyOrders();
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
+  );
+
+  const { loading, error, data } = useQuery<
+    GetOrdersBySellerType,
+    { input: GetOrdersBySellerInputType }
+  >(GET_ORDERS_BY_SELLER, {
+    variables: {
+      input: {
+        page,
+        skip,
+        query,
+        type: orderSearchType,
+        statusName: decryptSaleNameId[nameId] as OrderStatusName,
+        statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+        statusGroup: OrderStatusGroup.ORDER,
+      },
+    },
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: "network-only",
+    errorPolicy: "all",
+  });
 
   const [sendOrderItems] = useMutation<
     SendOrderItemsType,
@@ -88,7 +110,7 @@ const OrderTable = () => {
       input: SendOrderItemsInputType;
     }
   >(SEND_ORDER_ITEMS, {
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
@@ -98,10 +120,10 @@ const OrderTable = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.ORDER,
           },
         },
       },
@@ -115,7 +137,7 @@ const OrderTable = () => {
       input: EditShipmentNumberInputType;
     }
   >(EDIT_SHIPMENT_NUMBER, {
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
     refetchQueries: [
       {
@@ -125,10 +147,10 @@ const OrderTable = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.ORDER,
           },
         },
       },
@@ -136,8 +158,8 @@ const OrderTable = () => {
     ],
   });
 
-  const resetOrderItem =
-    useReactiveVar<Array<ResetOrderItemType>>(resetOrderItemVar);
+  const resetOrderItems =
+    useReactiveVar<Array<ResetOrderItemType>>(resetOrderItemsVar);
 
   const [shipmentCompanys, setShipmentCompanys] = useState<
     Array<{
@@ -151,7 +173,7 @@ const OrderTable = () => {
   const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
 
   const changeAllCheckBoxHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newOrderItems = cloneDeep(resetOrderItem);
+    const newOrderItems = cloneDeep(resetOrderItems);
     checkAllBoxStatusVar(e.target.checked);
 
     if (e.target.checked) {
@@ -159,7 +181,7 @@ const OrderTable = () => {
         ...orderItem,
         isChecked: true,
       }));
-      resetOrderItemVar(checkAllOrderItem);
+      resetOrderItemsVar(checkAllOrderItem);
       checkedOrderItemsVar(checkAllOrderItem);
     }
 
@@ -169,14 +191,14 @@ const OrderTable = () => {
         isChecked: false,
       }));
 
-      resetOrderItemVar(checkAllOrderItem);
+      resetOrderItemsVar(checkAllOrderItem);
       checkedOrderItemsVar([]);
     }
   };
 
   const changeSingleCheckBoxHandler =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newOrderItems = cloneDeep(resetOrderItem);
+      const newOrderItems = cloneDeep(resetOrderItems);
       const targetOrderItemId = newOrderItems[index].id;
 
       if (e.target.checked) {
@@ -199,16 +221,16 @@ const OrderTable = () => {
         checkedOrderItemsVar(filteredOrderItems);
         newOrderItems[index].isChecked = false;
       }
-      resetOrderItemVar(newOrderItems);
+      resetOrderItemsVar(newOrderItems);
     };
 
   const changeShipmentNumberHandler =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newOrderItems = cloneDeep(resetOrderItem);
+      const newOrderItems = cloneDeep(resetOrderItems);
       const newCheckedOrderItems = cloneDeep(checkedOrderItems);
 
       newOrderItems[index].temporaryShipmentNumber = Number(e.target.value);
-      resetOrderItemVar(newOrderItems);
+      resetOrderItemsVar(newOrderItems);
 
       if (newCheckedOrderItems.length > 0) {
         const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
@@ -227,11 +249,11 @@ const OrderTable = () => {
 
   const changeShipmentCompanyHandler =
     (index: number) => (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const newOrderItems = cloneDeep(resetOrderItem);
+      const newOrderItems = cloneDeep(resetOrderItems);
       const newCheckedOrderItems = cloneDeep(checkedOrderItems);
 
       newOrderItems[index].temporaryShipmentCompany = e.target.value;
-      resetOrderItemVar(newOrderItems);
+      resetOrderItemsVar(newOrderItems);
 
       if (newCheckedOrderItems.length > 0) {
         const findCheckedOrderItemsIndex = newCheckedOrderItems.findIndex(
@@ -297,7 +319,7 @@ const OrderTable = () => {
                       {
                         orderItemId: id,
                         shipmentCompany,
-                        shipmentNumber,
+                        shipmentNumber: String(shipmentNumber),
                       },
                     ],
                     type: SendType.SEND,
@@ -400,7 +422,7 @@ const OrderTable = () => {
 
               if (ok) {
                 loadingSpinnerVisibilityVar(false);
-                const newOrderItems = cloneDeep(resetOrderItem);
+                const newOrderItems = cloneDeep(resetOrderItems);
 
                 const findOrderItmeIndex = newOrderItems.findIndex(
                   ({ id }) => id === orderItemId
@@ -418,7 +440,7 @@ const OrderTable = () => {
                     shipmentNumber;
                 });
 
-                resetOrderItemVar(newOrderItems);
+                resetOrderItemsVar(newOrderItems);
 
                 systemModalVar({
                   ...systemModalVar(),
@@ -457,46 +479,23 @@ const OrderTable = () => {
     };
 
   const handleEditButtonClick = (id: number) => () => {
-    const newOrderItems = cloneDeep(resetOrderItem);
+    const newOrderItems = cloneDeep(resetOrderItems);
 
     const findOrderItmeIndex = newOrderItems.findIndex(
       (orderItem) => orderItem.id === id
     );
     newOrderItems[findOrderItmeIndex].isShipmentInfoEdit = true;
-    resetOrderItemVar(newOrderItems);
+    resetOrderItemsVar(newOrderItems);
   };
 
   useEffect(() => {
-    void (async () => {
-      await getOrderItem({
-        variables: {
-          input: {
-            page,
-            skip,
-            query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
-          },
-        },
-        fetchPolicy: "no-cache",
-      });
-    })();
-  }, [page, skip, query, type, statusName, statusType, statusGroup]);
-
-  useEffect(() => {
-    if (!data || !data.getOrdersBySeller) return;
+    const hasData = !!data && !!data.getOrdersBySeller;
+    if (!hasData) return;
 
     const {
-      totalPages,
-      totalResults,
-      totalOrderItems,
-    }: {
-      totalPages: number;
-      totalResults: number;
-      totalOrderItems: Array<OrderItems>;
-    } = data.getOrdersBySeller;
+      getOrdersBySeller: { totalPages, totalResults, totalOrderItems },
+    } = data;
+
 
     const isLastPageChanged = totalPages < page;
 
@@ -505,16 +504,15 @@ const OrderTable = () => {
         ...commonFilterOptionVar(),
         page: totalPages,
       });
-
       return;
     }
 
-    orderItemsVar(totalOrderItems);
     pageNumberListVar(
       Array(totalPages)
         .fill(null)
         .map((_, index) => index + 1)
     );
+
     totalPageLengthVar(totalResults);
 
     const nomalizedOrderItem: NormalizedListType =
@@ -523,46 +521,31 @@ const OrderTable = () => {
     const resetOrderItems: Array<ResetOrderItemType> =
       getResetOrderItems(nomalizedOrderItem);
 
-    resetOrderItemVar(resetOrderItems);
+    resetOrderItemsVar(resetOrderItems);
     checkedOrderItemsVar([]);
+    checkAllBoxStatusVar(false);
   }, [data]);
+
+  if (error) {
+    showHasAnyProblemModal(
+      <>
+        내부 서버 오류로 인해 요청하신
+        <br />
+        작업을 완료하지 못했습니다.
+        <br />
+        다시 한 번 시도 후 같은 문제가 발생할 경우
+        <br />
+        찹스틱스로 문의해주세요.
+        <br />
+        <br />
+        (전화 문의 070-4187-3848)
+      </>
+    );
+  }
 
   useEffect(() => {
     paginationVisibilityVar(loading || error);
   }, [loading]);
-
-  useEffect(() => {
-    if (error) {
-      systemModalVar({
-        ...systemModalVar(),
-        isVisible: true,
-        description: (
-          <>
-            내부 서버 오류로 인해 요청하신
-            <br />
-            작업을 완료하지 못했습니다.
-            <br />
-            다시 한 번 시도 후 같은 문제가 발생할 경우
-            <br />
-            찹스틱스로 문의해주세요.
-            <br />
-            <br />
-            (전화 문의 070-4187-3848)
-            <br />
-            <br />
-            Code:
-            {error.message}
-          </>
-        ),
-        confirmButtonClickHandler: () => {
-          systemModalVar({
-            ...systemModalVar(),
-            isVisible: false,
-          });
-        },
-      });
-    }
-  }, [error]);
 
   useEffect(() => {
     void (async () => {
@@ -605,7 +588,7 @@ const OrderTable = () => {
     })();
   }, []);
 
-  const hasOrderItems = !loading && !error && !!resetOrderItem?.length;
+  const hasOrderItems = !loading && !error && !!resetOrderItems?.length;
 
   return (
     <TableContainer type={TableType.SCROLL} hasData={hasOrderItems}>
@@ -632,10 +615,13 @@ const OrderTable = () => {
           <Th type={TableType.SCROLL} width={fixTableType[5].width}>
             {fixTableType[5].label}
           </Th>
+          <Th type={TableType.SCROLL} width={fixTableType[5].width}>
+            {fixTableType[6].label}
+          </Th>
         </ThContainer>
         <TdContainer>
           {!loading &&
-            resetOrderItem?.map(
+            resetOrderItems?.map(
               (
                 {
                   rowIndex,
@@ -645,6 +631,7 @@ const OrderTable = () => {
                   productName,
                   userName,
                   orderStatus,
+                  claimStatus,
                   isChecked,
                   colorIndex,
                   isLastRow,
@@ -687,6 +674,9 @@ const OrderTable = () => {
                   </Td>
                   <Td type={TableType.SCROLL} width={fixTableType[5].width}>
                     {orderStatus}
+                  </Td>
+                  <Td type={TableType.SCROLL} width={fixTableType[6].width}>
+                    {claimStatus}
                   </Td>
                 </Tr>
               )
@@ -752,20 +742,16 @@ const OrderTable = () => {
           <Th type={TableType.SCROLL} width={scrollTableType[18].width}>
             {scrollTableType[18].label}
           </Th>
-          <Th type={TableType.SCROLL} width={scrollTableType[19].width}>
-            {scrollTableType[19].label}
-          </Th>
         </ThContainer>
 
         <TdContainer>
           {!loading &&
-            resetOrderItem?.map(
+            resetOrderItems?.map(
               (
                 {
                   id,
                   rowIndex,
                   colorIndex,
-                  claimStatus,
                   orderStatus,
                   shipmentOrderId,
                   shipmentCompany,
@@ -801,12 +787,9 @@ const OrderTable = () => {
                   isLastRow={isLastRow}
                   height={80}
                 >
-                  <Td type={TableType.SCROLL} width={scrollTableType[0].width}>
-                    {claimStatus}
-                  </Td>
                   <ShipmentColumn
                     type={TableType.SCROLL}
-                    width={scrollTableType[1].width + scrollTableType[2].width}
+                    width={scrollTableType[0].width + scrollTableType[1].width}
                     as={"form"}
                     action="http://info.sweettracker.co.kr/tracking/5"
                     method="post"
@@ -819,7 +802,7 @@ const OrderTable = () => {
                       value={process.env.REACT_APP_SWEETTRAKER_API_KEY}
                       readOnly={true}
                     />
-                    <ShipmentCompanyTd width={scrollTableType[1].width}>
+                    <ShipmentCompanyTd width={scrollTableType[0].width}>
                       {isFirstRow ? (
                         <>
                           {shipmentCompany ? (
@@ -879,7 +862,7 @@ const OrderTable = () => {
                         "-"
                       )}
                     </ShipmentCompanyTd>
-                    <ShipmnetNumberTd width={scrollTableType[2].width}>
+                    <ShipmnetNumberTd width={scrollTableType[1].width}>
                       {isFirstRow ? (
                         <>
                           {shipmentNumber ? (
@@ -986,60 +969,60 @@ const OrderTable = () => {
                     </ShipmnetNumberTd>
                   </ShipmentColumn>
 
-                  <Td type={TableType.SCROLL} width={scrollTableType[3].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[2].width}>
                     {paidAt}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[4].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[3].width}>
                     {recipientName}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[5].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[4].width}>
                     {recipientPhoneNumber}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[6].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[5].width}>
                     <RecipientAddressWrapper>
                       {recipientAddress}
                     </RecipientAddressWrapper>
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[7].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[6].width}>
                     {postCode}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[8].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[7].width}>
                     {shipmentMemo}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[9].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[8].width}>
                     {userEmail}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[10].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[9].width}>
                     {userPhoneNumber}
                   </Td>
                   <OptionTd
                     type={TableType.SCROLL}
-                    width={scrollTableType[11].width}
+                    width={scrollTableType[10].width}
                   >
                     <OptionWrapper>{option}</OptionWrapper>
                   </OptionTd>
-                  <Td type={TableType.SCROLL} width={scrollTableType[12].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[11].width}>
                     <Quantity quantity={quantity}>{quantity}</Quantity>
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[13].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[12].width}>
                     {price}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[14].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[13].width}>
                     {optionPrice}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[15].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[14].width}>
                     {discountPrice}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[16].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[15].width}>
                     {totalPrice}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[17].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[16].width}>
                     {shipmentPrice}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[18].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[17].width}>
                     {shipmentDistantPrice}
                   </Td>
-                  <Td type={TableType.SCROLL} width={scrollTableType[19].width}>
+                  <Td type={TableType.SCROLL} width={scrollTableType[18].width}>
                     {totalPaymentAmount}
                   </Td>
                 </Tr>

@@ -142,8 +142,8 @@ const constructOrderItem = (orderItem: Array<OrderItems>) => {
     });
   });
 
-  newOrderItems.forEach((order, index, array) => {
-    const { product, options, merchantUid } = order;
+  newOrderItems.forEach((orderItem, index, array) => {
+    const { thumbnail, options, merchantUid } = orderItem;
     const tableLayoutCalculator = {
       rowOrders: 0,
       isLastRow: false,
@@ -192,7 +192,7 @@ const constructOrderItem = (orderItem: Array<OrderItems>) => {
 
         if (option.isRequired) {
           reconstructOrderItems.push({
-            ...order,
+            ...orderItem,
             rowIndex: uuidv4(),
             options: [option],
             isLastRow: tableLayoutCalculator.isLastRow,
@@ -200,18 +200,16 @@ const constructOrderItem = (orderItem: Array<OrderItems>) => {
           });
         }
         if (!option.isRequired) {
-          const resetProducts = reconstructNotRequiredProducts(
-            product,
-            option.components
-          );
+          const optionName = reconstructNotRequiredProducts(option.components);
           const resetOption = reconstructNotRequiredOption(option);
 
           reconstructOrderItems.push({
-            ...order,
+            ...orderItem,
             rowIndex: uuidv4(),
             originalPrice: null,
             discountAppliedPrice: null,
-            product: resetProducts,
+            thumbnail,
+            name: optionName,
             options: [resetOption],
             shipmentPrice: null,
             shipmentDistantPrice: null,
@@ -244,7 +242,7 @@ const constructOrderItem = (orderItem: Array<OrderItems>) => {
       }
 
       reconstructOrderItems.push({
-        ...order,
+        ...orderItem,
         rowIndex: uuidv4(),
         isLastRow: tableLayoutCalculator.isLastRow,
         isFirstRow: tableLayoutCalculator.isFirstRow,
@@ -253,7 +251,7 @@ const constructOrderItem = (orderItem: Array<OrderItems>) => {
   });
 
   return {
-    orders: {
+    orderItems: {
       allIds: reconstructOrderItems.map((order) => order.rowIndex),
       byId: reconstructOrderItems.reduce((byId, order) => {
         byId[order.rowIndex] = order;
@@ -264,15 +262,11 @@ const constructOrderItem = (orderItem: Array<OrderItems>) => {
 };
 
 const reconstructNotRequiredProducts = (
-  product: {
-    thumbnail: string;
-    name: string;
-  },
   components: Array<{
     name: string;
     value: string;
   }>
-) => {
+): string => {
   const optionName = components.reduce((result, { name, value }) => {
     if (result) {
       result += `/ ${name} : ${value} `;
@@ -284,10 +278,7 @@ const reconstructNotRequiredProducts = (
     return result;
   }, "");
 
-  return {
-    thumbnail: product.thumbnail,
-    name: optionName,
-  };
+  return optionName;
 };
 
 const reconstructNotRequiredOption = (option: {

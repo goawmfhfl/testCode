@@ -7,22 +7,23 @@ import {
   getOption,
   getPaymentsInfo,
 } from "@utils/sale/index";
-import { DateType, getDateFormat } from "@utils/date";
+import { getDateFormat } from "@utils/date";
 
 const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
   const hasOrderItems =
-    !!reconstructOrderItems && !!reconstructOrderItems.orders;
+    !!reconstructOrderItems && !!reconstructOrderItems.orderItems;
   if (!hasOrderItems) return;
 
-  const orderAllIds = reconstructOrderItems?.orders.allIds;
-  const orderByid = reconstructOrderItems?.orders.byId;
+  const orderAllIds = reconstructOrderItems?.orderItems.allIds;
+  const orderByid = reconstructOrderItems?.orderItems.byId;
 
   const result = orderAllIds.map((id) => {
     const {
       id: orderId,
       merchantUid,
       merchantItemUid,
-      product,
+      thumbnail,
+      name,
       user,
       claimStatus,
       orderStatus,
@@ -91,8 +92,8 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
       id: orderId,
       merchantUid: merchantUid || "-",
       merchantItemUid: merchantItemUid || "-",
-      thumbnail: product.thumbnail || "-",
-      productName: product.name || "-",
+      thumbnail: thumbnail || "-",
+      productName: name || "-",
       userName: user.name || "-",
       orderStatus: orderStatus
         ? (orderStatusNameType[orderStatus.name] as string)
@@ -101,11 +102,8 @@ const getResetOrderItems = (reconstructOrderItems: NormalizedType) => {
         ? (orderStatusNameType[claimStatus.name] as string)
         : "-",
       paidAt: orderByShop?.order?.paidAt
-        ? `${
-            getDateFormat(orderByShop?.order?.paidAt, DateType.PAYMENT)
-              .YYYY_MM_DD
-          } / ${
-            getDateFormat(orderByShop?.order?.paidAt, DateType.PAYMENT).HH_MM_SS
+        ? `${getDateFormat(orderByShop?.order?.paidAt).YYYY_MM_DD} / ${
+            getDateFormat(orderByShop?.order?.paidAt).HH_MM_SS
           }`
         : "-",
       requestAt: requestAt || "-",

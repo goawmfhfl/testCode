@@ -32,7 +32,7 @@ export interface GetRefundOrdersBySellerInputType {
 }
 
 export interface DenyRefundOrExchangeRequestBySellerType {
-  denyRefunrOrExchangeRequestBySeller: {
+  denyRefundOrExchangeRequestBySeller: {
     ok: boolean;
     error?: string;
   };
@@ -55,10 +55,13 @@ export interface CompleteRefundBySellerType {
 }
 
 export interface CompleteRefundBySellerInputType {
-  components: Array<{
-    orderItemId: number;
-    cause: Cause;
-    totalAmount: number;
-    shipmentReturnAmount: number;
-  }>;
+  orderItemIds: Array<number>;
+  orderByShopId: number;
+  cause: Cause;
+  isDistant: boolean;
+  totalProductAmount: number;
+  initialShipmentAmount: number;
+  initialShipmentDistantAmount: number;
+  shipmentRefundAmount: number;
+  shipmentRefundDistantAmount: number;
 }

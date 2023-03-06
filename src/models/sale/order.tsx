@@ -12,15 +12,13 @@ import { RequestRefundOrExchange } from "@constants/sale/orderManagement";
 import { OrderItems } from "@models/sale/index";
 
 export interface GetOrdersBySellerInputType {
-  input: {
-    page?: number;
-    skip?: number;
-    query?: string;
-    type?: OrderSearchType;
-    statusName?: OrderStatusName;
-    statusType?: OrderStatusType;
-    statusGroup: OrderStatusGroup;
-  };
+  page?: number;
+  skip?: number;
+  query?: string;
+  type?: OrderSearchType;
+  statusName?: OrderStatusName;
+  statusType?: OrderStatusType;
+  statusGroup: OrderStatusGroup;
 }
 
 export interface GetOrdersBySellerType {
@@ -41,6 +39,7 @@ export interface GetOrderStatusBySellerType {
       orderStatus: {
         name: OrderStatusName;
       };
+      orderStatusGroup: OrderStatusGroup;
     }>;
   };
 }
@@ -98,7 +97,7 @@ export interface SendOrderItemsInputType {
   components: Array<{
     orderItemId: number;
     shipmentCompany: string;
-    shipmentNumber: number;
+    shipmentNumber: string;
   }>;
   type: SendType;
 }
@@ -129,11 +128,4 @@ export interface RequestRefundOrExchangeBySellerInputType {
     cause: Cause;
   }>;
   status: RequestRefundOrExchange;
-}
-
-export interface NormalizedListType {
-  orders: {
-    allIds: Array<string>;
-    byId: { [key: string]: OrderItems };
-  };
 }

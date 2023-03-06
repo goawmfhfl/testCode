@@ -2,12 +2,40 @@ import {
   Cause,
   MainReason,
   mainReasonType,
+  OrderStatusGroup,
   OrderStatusName,
   ShipmentStatus,
   ShipmentType,
 } from "@constants/sale";
 import { ResetOrderItemType } from "@models/sale";
 import { DateType, getDateFormat } from "@utils/date";
+
+export const getOrderGroupCounter = (orderStatus: Array<OrderStatusGroup>) => {
+  return orderStatus.reduce(
+    (result, status) => {
+      if (status === OrderStatusGroup.ORDER) {
+        result.order++;
+      }
+      if (status === OrderStatusGroup.CANCEL) {
+        result.cancel++;
+      }
+      if (status === OrderStatusGroup.REFUND) {
+        result.refund++;
+      }
+      if (status === OrderStatusGroup.EXCHANGE) {
+        result.exchange++;
+      }
+
+      return result;
+    },
+    {
+      order: 0,
+      cancel: 0,
+      refund: 0,
+      exchange: 0,
+    }
+  );
+};
 
 export const getIsCheckedStatus = (
   checkedOrderItems: Array<ResetOrderItemType>
@@ -157,8 +185,9 @@ export const getPaymentsInfo = (
 
   const resetQuantity = quantity ? quantity : optionQuantity;
   const resetOriginalPrice = originalPrice * resetQuantity;
-  const resetDiscountPrice =
-    (discountAppliedPrice - originalPrice) * resetQuantity;
+  const resetDiscountPrice = discountAppliedPrice
+    ? (discountAppliedPrice - originalPrice) * resetQuantity
+    : 0;
   const resetOptionPrice = optionPirce * optionQuantity;
   const totalPrice = resetOriginalPrice + resetOptionPrice + resetDiscountPrice;
   const totalPaymentAmount = totalPrice + shipmentPrice + shipmentDistantPrice;
@@ -253,9 +282,9 @@ export const getStatusReason = (
         result.mainReason = mainReasonType[mainReason];
         result.detailedReason = detailedReason;
         result.reasonStatus = status;
-        result.requestAt = `${
-          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
-        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
+        result.requestAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
+          getDateFormat(createdAt).HH_MM_SS
+        }`;
         result.cause = cause;
         result.attachedImages = uploadedFileUrls;
       }
@@ -265,9 +294,9 @@ export const getStatusReason = (
         status === OrderStatusName.REFUND_COMPLETED ||
         status === OrderStatusName.EXCHANGE_COMPLETED
       ) {
-        result.completedAt = `${
-          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
-        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
+        result.completedAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
+          getDateFormat(createdAt).HH_MM_SS
+        }`;
         result.amount = amount;
       }
 
@@ -281,9 +310,9 @@ export const getStatusReason = (
         result.refusalDetailedReason = detailedReason;
         result.refusalReasonStatus = status;
         result.refusalCause = cause;
-        result.refusalAt = `${
-          getDateFormat(createdAt, DateType.DEFAULT).YYYY_MM_DD
-        } / ${getDateFormat(createdAt, DateType.DEFAULT).HH_MM_SS}`;
+        result.refusalAt = `${getDateFormat(createdAt).YYYY_MM_DD} / ${
+          getDateFormat(createdAt).HH_MM_SS
+        }`;
       }
 
       return result;

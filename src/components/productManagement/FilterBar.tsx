@@ -1,6 +1,6 @@
 import styled from "styled-components/macro";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useReactiveVar } from "@apollo/client";
 
 import {
@@ -9,7 +9,7 @@ import {
   totalPageLengthVar,
 } from "@cache/index";
 import { filterOptionVar } from "@cache/productManagement";
-import { Pathnames } from "@constants/index";
+import { decryptProductStatusId, Pathnames } from "@constants/index";
 import { ProductStatus } from "@constants/product";
 import useLazyGetProductStatus from "@hooks/product/useLazyGetProductStatus";
 import { getProductLength } from "@utils/product/management";
@@ -20,33 +20,32 @@ import FilterBarContainer from "@components/sale/FilterBarContainer";
 
 const FilterBar = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const statusId = searchParams.get("statusId");
 
   const { data: productStatus, getProductStatus } = useLazyGetProductStatus();
 
-  const { status: selectedStatus } = useReactiveVar(filterOptionVar);
   const totalPageLength = useReactiveVar(totalPageLengthVar);
-
   const products = productStatus?.getProductsBySeller.products || [];
   const productLength = getProductLength(products);
-
-  const [showNotice, setShowNotice] = useState<boolean>(false);
-
   const { all, onSale, stopSale, soldOut, temporary } = productLength;
 
-  const handleFilterOptionNameClick =
-    (filterOptionName: ProductStatus) => () => {
-      commonFilterOptionVar({
-        ...commonFilterOptionVar(),
-        page: 1,
-      });
-      paginationSkipVar(0);
-
-      filterOptionVar({ status: filterOptionName });
-    };
+  const [showNotice, setShowNotice] = useState<boolean>(false);
 
   const handleProductRegistrationButtonClick = () => {
     navigate(Pathnames.ProductRegistration);
   };
+
+  useEffect(() => {
+    filterOptionVar({
+      status: decryptProductStatusId[statusId] as ProductStatus,
+    });
+    commonFilterOptionVar({
+      ...commonFilterOptionVar(),
+      page: 1,
+    });
+    paginationSkipVar(0);
+  }, [searchParams]);
 
   useEffect(() => {
     void (async () => {
@@ -80,49 +79,58 @@ const FilterBar = () => {
       searchResultLength={totalPageLength}
     >
       <FilterList>
-        <Filter
-          onClick={handleFilterOptionNameClick(null)}
-          isActive={selectedStatus === null}
-        >
-          전체 {all}
-        </Filter>
-        <Filter
-          onClick={handleFilterOptionNameClick(ProductStatus.ON_SALE)}
-          isActive={selectedStatus === ProductStatus.ON_SALE}
-        >
-          판매중 {onSale}
-        </Filter>
-        <Filter
-          onClick={handleFilterOptionNameClick(ProductStatus.STOP_SALE)}
-          isActive={selectedStatus === ProductStatus.STOP_SALE}
-        >
-          숨김 {stopSale}
-        </Filter>
-        <Filter
-          onClick={handleFilterOptionNameClick(ProductStatus.SOLD_OUT)}
-          isActive={selectedStatus === ProductStatus.SOLD_OUT}
-        >
-          <QuestionMarkIcon
-            src={questionMarkSrc}
-            onMouseOver={() => setShowNotice(true)}
-            onMouseLeave={() => setShowNotice(false)}
-          />
-          품절 {soldOut}
-          {showNotice && (
-            <SoldOutNoticeContainer>
-              <NoticeIcon src={questionMarkSrc} />
-              <NoticeText>
-                품절된 상품을 숨김처리시 ‘숨김'메뉴에서 확인 가능합니다.
-              </NoticeText>
-            </SoldOutNoticeContainer>
-          )}
-        </Filter>
-        <Filter
-          onClick={handleFilterOptionNameClick(ProductStatus.TEMPORARY)}
-          isActive={selectedStatus === ProductStatus.TEMPORARY}
-        >
-          임시저장 {temporary}
-        </Filter>
+        <Link to={`${Pathnames.Product}`}>
+          <Filter isActive={!statusId}>전체 {all}</Filter>
+        </Link>
+        <Link to={`${Pathnames.ProductOnsale}`}>
+          <Filter
+            isActive={
+              decryptProductStatusId[statusId] === ProductStatus.ON_SALE
+            }
+          >
+            판매중 {onSale}
+          </Filter>
+        </Link>
+        <Link to={`${Pathnames.ProductStopSale}`}>
+          <Filter
+            isActive={
+              decryptProductStatusId[statusId] === ProductStatus.STOP_SALE
+            }
+          >
+            숨김 {stopSale}
+          </Filter>
+        </Link>
+        <Link to={`${Pathnames.ProductSoldOut}`}>
+          <Filter
+            isActive={
+              decryptProductStatusId[statusId] === ProductStatus.SOLD_OUT
+            }
+          >
+            <QuestionMarkIcon
+              src={questionMarkSrc}
+              onMouseOver={() => setShowNotice(true)}
+              onMouseLeave={() => setShowNotice(false)}
+            />
+            품절 {soldOut}
+            {showNotice && (
+              <SoldOutNoticeContainer>
+                <NoticeIcon src={questionMarkSrc} />
+                <NoticeText>
+                  품절된 상품을 숨김처리시 ‘숨김'메뉴에서 확인 가능합니다.
+                </NoticeText>
+              </SoldOutNoticeContainer>
+            )}
+          </Filter>
+        </Link>
+        <Link to={`${Pathnames.ProductTemporary}`}>
+          <Filter
+            isActive={
+              decryptProductStatusId[statusId] === ProductStatus.TEMPORARY
+            }
+          >
+            임시저장 {temporary}
+          </Filter>
+        </Link>
       </FilterList>
     </FilterBarContainer>
   );

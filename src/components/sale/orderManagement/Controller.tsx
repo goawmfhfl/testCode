@@ -1,15 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useMutation, useReactiveVar } from "@apollo/client";
 import styled from "styled-components/macro";
-
-import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
-
-import Button from "@components/common/Button";
-import {
-  SelectInput as Dropdown,
-  OptionInput as Option,
-} from "@components/common/input/Dropdown";
-import { Input as SearchInput } from "@components/common/input/SearchInput";
-import ControllerContainer from "@components/sale/ControllerContainer";
 
 import {
   checkAllBoxStatusVar,
@@ -21,44 +13,65 @@ import {
   SkipQuantityCache,
   systemModalVar,
 } from "@cache/index";
+import { checkedOrderItemsVar } from "@cache/sale";
+import { showHasServerErrorModal } from "@cache/productManagement";
+
+import { decryptSaleNameId, decryptSaleTypeId } from "@constants/index";
+
 import {
   searchQueryType,
   OrderSearchType,
   OrderStatusName,
+  OrderStatusGroup,
+  OrderStatusType,
   optionListType,
   SendType,
 } from "@constants/sale";
-import { useMutation, useReactiveVar } from "@apollo/client";
-import { checkedOrderItemsVar } from "@cache/sale";
-import { filterOptionVar } from "@cache/sale/order";
+import {
+  fixTableType,
+  scrollTableType,
+} from "@constants/sale/orderManagement/table";
+
 import { CONFIRM_ORDERITMES_BY_SELLER } from "@graphql/mutations/confirmOrderItemsBySeller";
+import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
+import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
+
 import {
   ConfirmOrderItemsBySellerInputType,
   ConfirmOrderItemsBySellerType,
   SendOrderItemsInputType,
   SendOrderItemsType,
 } from "@models/sale/order";
-
 import { ResetOrderItemType } from "@models/sale";
 
-import { GET_ORDERS_BY_SELLER } from "@graphql/queries/getOrdersBySeller";
-import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
-
-import exclamationmarkSrc from "@icons/exclamationmark.svg";
-import { showHasServerErrorModal } from "@cache/productManagement";
 import { getHasCheckedOrderStatus } from "@utils/sale/order/getHasCheckedOrderStatus";
 import getReconstructCheckedOrderItems from "@utils/sale/order/getReconstructCheckedOrderItems";
+
+import exclamationMark from "@icons/exclamationmark.svg";
+import triangleArrowSvg from "@icons/arrow-triangle-small.svg";
+
+import Button from "@components/common/Button";
+import {
+  SelectInput as Dropdown,
+  OptionInput as Option,
+} from "@components/common/input/Dropdown";
+import { Input as SearchInput } from "@components/common/input/SearchInput";
+import ControllerContainer from "@components/sale/ControllerContainer";
 import HandleCancelOrderModal from "@components/sale/orderManagement/HandleCancelOrderModal";
 import HandleRefundModal from "@components/sale/orderManagement/HandleRefundModal";
 import HandleExchangeModal from "@components/sale/orderManagement/HandleExchangeModal";
+import ExportToExcelButton from "@components/sale/ExportToExcelButton";
 
 const Controller = () => {
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } =
-    useReactiveVar(filterOptionVar);
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
+  );
 
   const checkedOrderItems =
     useReactiveVar<Array<ResetOrderItemType>>(checkedOrderItemsVar);
+
   const reconstructCheckedOrderItems =
     getReconstructCheckedOrderItems(checkedOrderItems);
 
@@ -88,10 +101,10 @@ const Controller = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.ORDER,
           },
         },
       },
@@ -115,10 +128,10 @@ const Controller = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.ORDER,
           },
         },
       },
@@ -233,6 +246,7 @@ const Controller = () => {
           주문건을 선택해주세요
         </>
       );
+
       return;
     }
 
@@ -251,30 +265,31 @@ const Controller = () => {
           주문 상태를 다시 확인해주세요.
         </>
       );
+
       return;
     }
 
-    const { isShipmentCompanyFullFilled, isShipmentNumberFullFilled } =
+    const { isShipmentCompanyFulfilled, isShipmentNumberFulfilled } =
       reconstructCheckedOrderItems.reduce(
         (result, { temporaryShipmentCompany, temporaryShipmentNumber }) => {
           if (!temporaryShipmentCompany)
-            result.isShipmentCompanyFullFilled = false;
+            result.isShipmentCompanyFulfilled = false;
           if (!temporaryShipmentNumber)
-            result.isShipmentCompanyFullFilled = false;
+            result.isShipmentNumberFulfilled = false;
 
           return result;
         },
         {
-          isShipmentCompanyFullFilled: true,
-          isShipmentNumberFullFilled: true,
+          isShipmentCompanyFulfilled: true,
+          isShipmentNumberFulfilled: true,
         }
       );
 
-    if (!isShipmentCompanyFullFilled || !isShipmentNumberFullFilled) {
+    if (!isShipmentCompanyFulfilled || !isShipmentNumberFulfilled) {
       systemModalVar({
         ...systemModalVar(),
         isVisible: true,
-        icon: exclamationmarkSrc,
+        icon: exclamationMark,
         description: <>송장정보를 기입해주세요</>,
         cancelButtonVisibility: false,
         confirmButtonVisibility: true,
@@ -310,7 +325,7 @@ const Controller = () => {
               ({ id, temporaryShipmentCompany, temporaryShipmentNumber }) => ({
                 orderItemId: id,
                 shipmentCompany: temporaryShipmentCompany,
-                shipmentNumber: Number(temporaryShipmentNumber),
+                shipmentNumber: String(temporaryShipmentNumber),
               })
             );
 
@@ -512,9 +527,9 @@ const Controller = () => {
   const changeSearchTypeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const type = e.target.value as OrderSearchType;
 
-    filterOptionVar({
-      ...filterOptionVar(),
-      type,
+    commonFilterOptionVar({
+      ...commonFilterOptionVar(),
+      orderSearchType: type,
     });
   };
 
@@ -550,9 +565,9 @@ const Controller = () => {
           size="small"
           onClick={handleConfirmOrderButtonClick}
           disabled={
-            statusName === OrderStatusName.PREPARING ||
-            statusName === OrderStatusName.SHIPPING ||
-            statusName === OrderStatusName.SHIPPING_COMPLETED
+            decryptSaleNameId[nameId] === OrderStatusName.PREPARING ||
+            decryptSaleNameId[nameId] === OrderStatusName.SHIPPING ||
+            decryptSaleNameId[nameId] === OrderStatusName.SHIPPING_COMPLETED
           }
         >
           주문확인
@@ -561,9 +576,9 @@ const Controller = () => {
           size="small"
           onClick={handleSendButtonClick}
           disabled={
-            statusName === OrderStatusName.PAYMENT_COMPLETED ||
-            statusName === OrderStatusName.SHIPPING ||
-            statusName === OrderStatusName.SHIPPING_COMPLETED
+            decryptSaleNameId[nameId] === OrderStatusName.PAYMENT_COMPLETED ||
+            decryptSaleNameId[nameId] === OrderStatusName.SHIPPING ||
+            decryptSaleNameId[nameId] === OrderStatusName.SHIPPING_COMPLETED
           }
         >
           발송 처리
@@ -572,8 +587,8 @@ const Controller = () => {
           size="small"
           onClick={handleCancelOrderClick}
           disabled={
-            statusName === OrderStatusName.SHIPPING ||
-            statusName === OrderStatusName.SHIPPING_COMPLETED
+            decryptSaleNameId[nameId] === OrderStatusName.SHIPPING ||
+            decryptSaleNameId[nameId] === OrderStatusName.SHIPPING_COMPLETED
           }
         >
           주문 취소
@@ -582,8 +597,8 @@ const Controller = () => {
           size="small"
           onClick={handleReturnButtonClick}
           disabled={
-            statusName === OrderStatusName.PAYMENT_COMPLETED ||
-            statusName === OrderStatusName.PREPARING
+            decryptSaleNameId[nameId] === OrderStatusName.PAYMENT_COMPLETED ||
+            decryptSaleNameId[nameId] === OrderStatusName.PREPARING
           }
         >
           반품 처리
@@ -592,8 +607,8 @@ const Controller = () => {
           size="small"
           onClick={handleExchangeButtonClick}
           disabled={
-            statusName === OrderStatusName.PAYMENT_COMPLETED ||
-            statusName === OrderStatusName.PREPARING
+            decryptSaleNameId[nameId] === OrderStatusName.PAYMENT_COMPLETED ||
+            decryptSaleNameId[nameId] === OrderStatusName.PREPARING
           }
         >
           교환 처리
@@ -605,7 +620,7 @@ const Controller = () => {
           arrowSrc={triangleArrowSvg}
           sizing={"medium"}
           width={"119px"}
-          value={type}
+          value={orderSearchType}
           onChange={changeSearchTypeHandler}
         >
           {searchQueryType.map(({ id, label, value }) => (
@@ -631,7 +646,13 @@ const Controller = () => {
             </Option>
           ))}
         </StatusDropDown>
-        <Button size={"small"}>내보내기</Button>
+        <ExportToExcelButton
+          exportData={checkedOrderItems}
+          tableData={[...fixTableType, ...scrollTableType]}
+          status={OrderStatusGroup.ORDER}
+        >
+          내보내기
+        </ExportToExcelButton>
       </FilterContainer>
     </ControllerContainer>
   );
@@ -657,5 +678,7 @@ const ControlButton = styled(Button)`
 const FilterContainer = styled.div`
   display: flex;
 `;
+
+const ExportToExcelButtonWrapper = styled.div``;
 
 export default Controller;

@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import styled from "styled-components/macro";
 import { useMutation, useReactiveVar } from "@apollo/client";
 
+import { checkedOrderItemsVar } from "@cache/sale";
 import {
-  commonCheckedOrderItemsVar,
-  commonSaleFilterOptionVar,
-  totalOrderItemsVar,
-} from "@cache/sale";
-import {
-  checkAllBoxStatusVar,
   commonFilterOptionVar,
   loadingSpinnerVisibilityVar,
   modalVar,
@@ -20,12 +16,18 @@ import { showHasServerErrorModal } from "@cache/productManagement";
 import {
   DenyRefundOrExchangeRequestType,
   OrderSearchType,
+  OrderStatusGroup,
   OrderStatusName,
   orderStatusNameType,
+  OrderStatusType,
   searchQueryType,
   SendType,
 } from "@constants/sale";
-import { skipQuantityType } from "@constants/index";
+import {
+  decryptSaleNameId,
+  decryptSaleTypeId,
+  skipQuantityType,
+} from "@constants/index";
 import { changeOrderStatusType } from "@constants/sale/exchangeManagement/index";
 
 import { CHANGE_ORDER_STATUS_BY_FORCE } from "@graphql/mutations/changeOrderStatusByForce";
@@ -35,7 +37,6 @@ import { SEND_ORDER_ITEMS } from "@graphql/mutations/sendOrderItems";
 import {
   ChangeOrderStatusByForceInputType,
   ChangeOrderStatusByForceType,
-  OrderItems,
   ResetOrderItemType,
 } from "@models/sale";
 import {
@@ -58,18 +59,23 @@ import { SelectInput, OptionInput } from "@components/common/input/Dropdown";
 import { Input as SearchInput } from "@components/common/input/SearchInput";
 import HandleRefusalRefundOrExchangeRequestModal from "@components/sale/HandleRefusalRefundOrExchangeRequestModal";
 import HandleCompleteRefundModal from "@components/sale/refundManagement/HandleCompleteRefundModal";
+import {
+  fixTableType,
+  scrollTableType,
+} from "@constants/sale/exchangeManagement/table";
+import ExportToExcelButton from "@components/sale/ExportToExcelButton";
 
 const Controller = () => {
-  const { page, skip, query } = useReactiveVar(commonFilterOptionVar);
-  const { type, statusName, statusType, statusGroup } = useReactiveVar(
-    commonSaleFilterOptionVar
+  const [searchParams] = useSearchParams();
+  const { typeId, nameId } = Object.fromEntries([...searchParams]);
+  const { page, skip, query, orderSearchType } = useReactiveVar(
+    commonFilterOptionVar
   );
-  const [temporaryQuery, setTemporaryQuery] = useState<string>("");
-  const checkAllBoxStatus = useReactiveVar(checkAllBoxStatusVar);
 
-  const checkedOrderItems: Array<ResetOrderItemType> = useReactiveVar(
-    commonCheckedOrderItemsVar
-  );
+  const [temporaryQuery, setTemporaryQuery] = useState<string>("");
+
+  const checkedOrderItems: Array<ResetOrderItemType> =
+    useReactiveVar(checkedOrderItemsVar);
   const reconstructCheckedOrderItems: Array<ResetOrderItemType> =
     getReconstructCheckedOrderItems(checkedOrderItems);
 
@@ -89,10 +95,10 @@ const Controller = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.EXCHANGE,
           },
         },
       },
@@ -116,10 +122,10 @@ const Controller = () => {
             page,
             skip,
             query,
-            type,
-            statusName,
-            statusType,
-            statusGroup,
+            type: orderSearchType,
+            statusName: decryptSaleNameId[nameId] as OrderStatusName,
+            statusType: decryptSaleTypeId[typeId] as OrderStatusType,
+            statusGroup: OrderStatusGroup.EXCHANGE,
           },
         },
       },
@@ -270,7 +276,7 @@ const Controller = () => {
                     }) => ({
                       orderItemId: id,
                       shipmentCompany: temporaryPickupShipmentCompany,
-                      shipmentNumber: Number(
+                      shipmentNumber: String(
                         temporaryPickupAgainShipmentNumber
                       ),
                     })
@@ -283,7 +289,7 @@ const Controller = () => {
                     }) => ({
                       orderItemId: id,
                       shipmentCompany: temporaryPickupAgainShipmentCompany,
-                      shipmentNumber: Number(
+                      shipmentNumber: String(
                         temporaryPickupAgainShipmentNumber
                       ),
                     })
@@ -315,9 +321,6 @@ const Controller = () => {
                     ...systemModalVar(),
                     isVisible: false,
                   });
-
-                  commonCheckedOrderItemsVar([]);
-                  checkAllBoxStatusVar(false);
                 },
               });
             }
@@ -428,12 +431,17 @@ const Controller = () => {
             ({ detailedReason }) => detailedReason
           );
           const cause = reconstructCheckedOrderItems.map(({ cause }) => cause);
+          const orderByShopId = reconstructCheckedOrderItems.map(
+            ({ orderByShopId }) => orderByShopId
+          );
 
           modalVar({
             isVisible: true,
             component: (
               <HandleCompleteRefundModal
+                type={OrderStatusGroup.EXCHANGE}
                 orderItemIds={checkedOrderItemIds}
+                orderByShopId={orderByShopId[0]}
                 cause={cause[0]}
                 detailedReason={detailedReason[0]}
               />
@@ -567,7 +575,7 @@ const Controller = () => {
               variables: {
                 input: {
                   components,
-                  orderStatusName: claimStatus,
+                  claimStatusName: claimStatus,
                 },
               },
             });
@@ -590,9 +598,6 @@ const Controller = () => {
                     ...systemModalVar(),
                     isVisible: false,
                   });
-
-                  commonCheckedOrderItemsVar([]);
-                  checkAllBoxStatusVar(false);
                 },
               });
             }
@@ -627,9 +632,9 @@ const Controller = () => {
   const changeSearchTypeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const type = e.target.value as OrderSearchType;
 
-    commonSaleFilterOptionVar({
-      ...commonSaleFilterOptionVar(),
-      type,
+    commonFilterOptionVar({
+      ...commonFilterOptionVar(),
+      orderSearchType: type,
     });
   };
 
@@ -664,10 +669,12 @@ const Controller = () => {
         <ControlButton
           size="small"
           disabled={
-            statusName === OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS ||
-            statusName === OrderStatusName.EXCHANGE_PICK_UP_COMPLETED ||
-            statusName === OrderStatusName.SHIPPING_AGAIN ||
-            statusName === OrderStatusName.EXCHANGE_COMPLETED
+            decryptSaleNameId[nameId] ===
+              OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS ||
+            decryptSaleNameId[nameId] ===
+              OrderStatusName.EXCHANGE_PICK_UP_COMPLETED ||
+            decryptSaleNameId[nameId] === OrderStatusName.SHIPPING_AGAIN ||
+            decryptSaleNameId[nameId] === OrderStatusName.EXCHANGE_COMPLETED
           }
           onClick={handleSendButtonClick(SendType.EXCHANGE_PICK_UP)}
         >
@@ -677,10 +684,11 @@ const Controller = () => {
           size="small"
           onClick={handleSendButtonClick(SendType.EXCHANGE_RESEND)}
           disabled={
-            statusName === OrderStatusName.EXCHANGE_REQUEST ||
-            statusName === OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS ||
-            statusName === OrderStatusName.SHIPPING_AGAIN ||
-            statusName === OrderStatusName.EXCHANGE_COMPLETED
+            decryptSaleNameId[nameId] === OrderStatusName.EXCHANGE_REQUEST ||
+            decryptSaleNameId[nameId] ===
+              OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS ||
+            decryptSaleNameId[nameId] === OrderStatusName.SHIPPING_AGAIN ||
+            decryptSaleNameId[nameId] === OrderStatusName.EXCHANGE_COMPLETED
           }
         >
           교환 재발송
@@ -690,9 +698,10 @@ const Controller = () => {
           size="small"
           onClick={handleRefusalExchangeButtonClick}
           disabled={
-            statusName === OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS ||
-            statusName === OrderStatusName.SHIPPING_AGAIN ||
-            statusName === OrderStatusName.EXCHANGE_COMPLETED
+            decryptSaleNameId[nameId] ===
+              OrderStatusName.EXCHANGE_PICK_UP_IN_PROGRESS ||
+            decryptSaleNameId[nameId] === OrderStatusName.SHIPPING_AGAIN ||
+            decryptSaleNameId[nameId] === OrderStatusName.EXCHANGE_COMPLETED
           }
         >
           교환 거절
@@ -702,7 +711,7 @@ const Controller = () => {
           arrowSrc={triangleArrowSvg}
           sizing={"medium"}
           width={"119px"}
-          value={type}
+          value={OrderStatusName.DEFAULT}
           onClick={handleOrderStatusByForceClick}
           onChange={changeOrderStatusByForceHandler}
         >
@@ -733,7 +742,7 @@ const Controller = () => {
           arrowSrc={triangleArrowSvg}
           sizing={"medium"}
           width={"119px"}
-          value={type}
+          value={orderSearchType}
           onChange={changeSearchTypeHandler}
         >
           {searchQueryType.map(({ id, label, value }) => (
@@ -761,7 +770,13 @@ const Controller = () => {
           ))}
         </Select>
 
-        <Button size={"small"}>내보내기</Button>
+        <ExportToExcelButton
+          exportData={checkedOrderItems}
+          tableData={[...fixTableType, ...scrollTableType]}
+          status={OrderStatusGroup.EXCHANGE}
+        >
+          내보내기
+        </ExportToExcelButton>
       </FilterContainer>
     </ControllerContainer>
   );
