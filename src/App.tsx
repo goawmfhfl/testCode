@@ -20,6 +20,7 @@ import Settlement from "@pages/Settlement";
 import Notice from "@pages/Notice";
 import Error from "@pages/Error";
 import Password from "@pages/Password";
+import TestOperator from "@pages/TestOperator";
 
 function App() {
   const modal = useReactiveVar(modalVar);
@@ -56,6 +57,7 @@ function App() {
           <Route path={Pathnames.Settlement} element={<Settlement />} />
           <Route path={Pathnames.Notice} element={<Notice />} />
           <Route path={Pathnames.Error} element={<Error />} />
+          <Route path={"/test"} element={<TestOperator />} />
         </Routes>
       </ThemeProvider>
     </BrowserRouter>

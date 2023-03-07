@@ -34,31 +34,30 @@ const constructOrderItem = (orderItem: Array<OrderItems>) => {
   };
 
   newOrderItems.forEach((orderItem, index, array) => {
-    const previousOrderItem =
-      0 < index ? array[index - 1].merchantUid : "firstIndex";
-
+    const previousOrderItem = 0 < index ? array[index - 1].merchantUid : null;
     const currentOrderItem = orderItem.merchantUid;
-
     const nextOrderItem =
-      index === array.length - 1 ? "lastIndex" : array[index + 1].merchantUid;
+      index === array.length - 1 ? null : array[index + 1].merchantUid;
 
     const previousIsBundleShipment =
-      0 < index ? array[index - 1].isBundleShipment : "firstIndex";
-
+      0 < index ? array[index - 1].isBundleShipment : null;
     const currentIsBundleShipment = orderItem.isBundleShipment;
+    const nextIsBundleShipment =
+      index === array.length - 1 ? null : array[index + 1].isBundleShipment;
 
     const isPreviousAndCurrentShipmentTypeNotSame =
-      (previousIsBundleShipment && !currentIsBundleShipment) ||
-      (!previousIsBundleShipment && !currentIsBundleShipment);
-
+      previousIsBundleShipment !== currentIsBundleShipment;
     const isPreviousAndCurrentOrderItemBundle =
       previousOrderItem === currentOrderItem;
     const isCurrentAndNextOrderItemBundle = currentOrderItem === nextOrderItem;
 
-    if (previousOrderItem === "firstIndex") {
+    if (index === 0) {
       newOrderItems[index].colorIndex = 0;
-
-      if (isCurrentAndNextOrderItemBundle) {
+      if (
+        isCurrentAndNextOrderItemBundle &&
+        currentIsBundleShipment &&
+        nextIsBundleShipment
+      ) {
         tableLayoutCalculator.temporaryBundleOrderItems.push(orderItem);
         return;
       }
@@ -66,7 +65,9 @@ const constructOrderItem = (orderItem: Array<OrderItems>) => {
     }
 
     if (isPreviousAndCurrentOrderItemBundle) {
-      tableLayoutCalculator.temporaryBundleOrderItems.push(orderItem);
+      if (currentIsBundleShipment && previousIsBundleShipment) {
+        tableLayoutCalculator.temporaryBundleOrderItems.push(orderItem);
+      }
 
       if (!isCurrentAndNextOrderItemBundle) {
         if (tableLayoutCalculator.temporaryBundleOrderItems.length > 1) {
@@ -95,7 +96,11 @@ const constructOrderItem = (orderItem: Array<OrderItems>) => {
     }
 
     if (!isPreviousAndCurrentOrderItemBundle) {
-      if (isCurrentAndNextOrderItemBundle) {
+      if (
+        isCurrentAndNextOrderItemBundle &&
+        currentIsBundleShipment &&
+        nextIsBundleShipment
+      ) {
         tableLayoutCalculator.temporaryBundleOrderItems.push(orderItem);
       }
 
@@ -113,14 +118,11 @@ const constructOrderItem = (orderItem: Array<OrderItems>) => {
     }
   });
 
-  tableLayoutCalculator.bundleOrderItems.forEach((orderItems) => {
-    const bundleOrders = orderItems.filter(
-      ({ isBundleShipment }) => isBundleShipment === true
-    );
-    const hasBundleOrders = !!bundleOrders && !!bundleOrders.length;
-    if (!hasBundleOrders) return;
+  tableLayoutCalculator.bundleOrderItems.forEach((eachBundleOrderItems) => {
+    // const hasBundleOrders = !!bundleOrders && !!bundleOrders.length;
+    // if (!hasBundleOrders) return;
 
-    bundleOrders.forEach((orderItem, index, array) => {
+    eachBundleOrderItems.forEach((orderItem, index, array) => {
       const findCurrentOrderIndex = newOrderItems.findIndex(
         ({ merchantUid, merchantItemUid }) =>
           merchantUid === orderItem.merchantUid &&
